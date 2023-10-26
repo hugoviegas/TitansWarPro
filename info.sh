@@ -25,8 +25,8 @@ script_slogan() {
      w=59
      m=89
      author="author: Hugo Viegas"
-     collaborator="collaborator: @_hviegas"
-     versionNum=3.0.1
+     #collaborator="collaborator: @_hviegas"
+     versionNum=3.0.2
      for i in $colors; do
           clear
           t=$((t - 27))
@@ -49,7 +49,7 @@ script_slogan() {
 "
 
           # ⟩\\
-          printf "\033[1;38;5;${i}m${author}\n\033[02m${collaborator}\n${versionNum}${COLOR_RESET}\n"
+          printf "\033[1;38;5;${i}m${author}\n\033[02m${versionNum}${COLOR_RESET}\n"
           sleep 0.1s
      done
 }

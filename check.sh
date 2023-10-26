@@ -19,7 +19,7 @@ check_missions() {
   i=0
   for i in {0..15} ; do
   #while [ $i -lt 15 ]; do // /inv/chest/?quest_t=quest&quest_id=13&qz=01690126f2e5d7a75a31e6ee149c6cb2
-  if grep -o -E "/inv/chest/?quest_t=quest&quest_id=13&[^A-Za-z0-9]+" "$TMP"/SRC; then
+  if grep -E "/inv/chest/?quest_t=quest&quest_id=13&" "$TMP"/SRC; then
       (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/inv/chest/?quest_t=quest&quest_id=13&[^A-Za-z0-9]+" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
