@@ -1,9 +1,9 @@
 #!/bin/sh
 #create fold twm if does not exist
 mkdir -p ~/twm
-
+TOKEN="?token=GHSAT0AAAAAACIYIAVBYU46FQ7VGTHPNPIWZJZ4LLA"
 if [ ! -e "~/twm/info.sh" ]; then
-  curl https://raw.githubusercontent.com/sharesourcecode/TitansWarMacro/master/info.sh -s -L >"$HOME"/twm/info.sh
+  curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/info.sh"${TOKEN}" -s -L >"$HOME"/twm/info.sh
   chmod +x ~/twm/info.sh
   sleep 0.5s
 fi
@@ -21,9 +21,9 @@ else
   #./easyinstall.sh beta1, or backup
   version="$@"
 fi
-
-SERVER="https://raw.githubusercontent.com/sharesourcecode/TitansWarMacro/$version/"
-remote_count=$(curl "${SERVER}"easyinstall.sh -s -L | wc -c)
+#TOKEN="?token=GHSAT0AAAAAACIYIAVBYU46FQ7VGTHPNPIWZJZ4LLA"
+SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/$version/"
+remote_count=$(curl "${SERVER}"easyinstall.sh"${TOKEN}" -s -L | wc -c)
 if [ -e "easyinstall.sh" ]; then
   local_count=$(wc -c <"easyinstall.sh")
 else
@@ -140,7 +140,7 @@ sync_func() {
   for script in $SCRIPTS; do
     LEN=$((LEN + 1))
     printf "Checking $LEN/$NUM_SCRIPTS $script\n"
-    remote_count=$(curl "${SERVER}"$script -s -L | wc -c)
+    remote_count=$(curl "$SERVER""$script""$TOKEN" -s -L | wc -c)
 
     if [ -e ~/twm/"$script" ]; then
       local_count=$(wc -c <"$script")
@@ -152,10 +152,10 @@ sync_func() {
       printf "✅ ${BLACK_CYAN}Updated $script${COLOR_RESET}\n"
     elif [ -e ~/twm/"$script" ] && [ "$remote_count" -ne "$local_count" ]; then
       printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
-      curl "${SERVER}"$script -s -L >"$script"
+      curl "${SERVER}"$script"${TOKEN}" -s -L >"$script"
     else
       printf "🔽 ${BLACK_YELLOW}Downloading $script${COLOR_RESET}\n"
-      curl "${SERVER}"$script -s -L -O
+      curl "${SERVER}"$script"${TOKEN}" -s -L -O
     fi
     sleep 0.1s
   done
@@ -167,9 +167,9 @@ sync_func() {
 
 sync_func_other() {
   SCRIPTS="requeriments.sh svproxy.sh loginlogoff.sh crono.sh check.sh run.sh clanid.sh allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh clancoliseum.sh clandungeon.sh clanfight.sh coliseum.sh flagfight.sh king.sh league.sh trade.sh undying.sh"
-  curl "${SERVER}"play.sh -s -L -O
-  curl "${SERVER}"info.sh -s -L >twm.sh
-  curl "${SERVER}"twm.sh -s -L | sed -n '3,33p' >>twm.sh
+  curl "${SERVER}"play.sh"${TOKEN}" -s -L -O
+  curl "${SERVER}"info.sh"${TOKEN}" -s -L >twm.sh
+  curl "${SERVER}"twm.sh"${TOKEN}" -s -L | sed -n '3,33p' >>twm.sh
   NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
   LEN=0
 
@@ -177,11 +177,11 @@ sync_func_other() {
     LEN=$((LEN + 1))
     printf "Checking $LEN/$NUM_SCRIPTS $script\n"
     printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
-    curl "${SERVER}"$script -s -L >>twm.sh
+    curl "${SERVER}"$script"${TOKEN}" -s -L >>twm.sh
     printf "\n#\n" >>twm.sh
     sleep 0.1s
   done
-  curl "${SERVER}"twm.sh -s -L | sed -n '40,120p' >>twm.sh
+  curl "${SERVER}"twm.sh"${TOKEN}" -s -L | sed -n '40,120p' >>twm.sh
 
   #DOS to Unix
   find ~/twm -type f -name '*.sh' -print0 | xargs -0 sed -i 's/\r$//' 2>/dev/null
