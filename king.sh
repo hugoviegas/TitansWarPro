@@ -80,14 +80,14 @@ king_fight () {
     ) </dev/null &>/dev/null &
     time_exit 17
     cl_access
-    #/stone...
-#     if awk -v ush="$(cat HP2)" 'BEGIN { exit !(ush < 25) }' ; then
-#     (
-#      w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat STONE)" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
-#     ) </dev/null &>/dev/null &
-#     time_exit 17
-#     cl_access
-#    fi #...stone
+    stone...
+     if awk -v ush="$(cat HP2)" 'BEGIN { exit !(ush < 25) }' ; then
+     (
+      w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat STONE)" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
+     ) </dev/null &>/dev/null &
+     time_exit 17
+     cl_access
+    fi #...stone
    else #...kingatk
     #/random
     if awk -v latk="$(( $(date +%s) - $(cat last_atk) ))" -v atktime="$LA" 'BEGIN { exit !(latk != atktime) }' && ! grep -q -o 'txt smpl grey' $TMP/SRC && awk -v rhp="$RHP" -v enh="$(cat HP2)" 'BEGIN { exit !(rhp < enh) }' || awk -v latk="$(( $(date +%s) - $(cat last_atk) ))" -v atktime="$LA" 'BEGIN { exit !(latk != atktime) }' && ! grep -q -o 'txt smpl grey' $TMP/SRC && grep -q -o "$(cat USER)" allies.txt ; then
