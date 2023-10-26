@@ -1,17 +1,18 @@
 checkQuest() {
-  quest_id="$@"
+  quest_id="$*"
   clan_id
   if [ -n "${CLD}" ]; then
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan/${CLD}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
   time_exit 20
-  click=$(grep -o "/clan/${CLD}/quest/\(take\|help\|deleteHelp\|end\)/$quest_id/[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p')
-  echo "$click/$quest_id/[?]r=[0-9]+"
-  echo "click"
+  click=$(grep -o "/clan/${CLD}/quest/\(take\|help\|deleteHelp\|end\)" "$TMP"/SRC | sed -n '1p')
+  link=$(grep -o "$click/$quest_id/[?]r=[0-9]+" "$TMP"/SRC)
+  echo "$click"
+  echo "$link"
   sleep 2s
     (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "${URL}$click/$quest_id/[?]r=[0-9]+" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "${URL}$link" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
     ) </dev/null &>/dev/null &
     time_exit 17
     echo " Quest $quest_id Check..."
