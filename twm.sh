@@ -71,9 +71,9 @@ func_unset() {
 }
 if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
   printf "${GREEN_BLACK} Starting with last settings used.${COLOR_RESET}\n"
-  num=6
-  for i in $(seq 6 -1 1); do
-    i=$((i - 1))
+
+  for i in {3..1}; do
+    #i=$((i - 1))
     if read -t 1; then
       >"$HOME"/twm/al_file
       >"$HOME"/twm/ur_file
