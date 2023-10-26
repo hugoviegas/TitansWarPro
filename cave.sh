@@ -106,14 +106,10 @@ cave_routine() {
   printf "Cave...\n"
   if [ -n "$CLD" ]; then
       (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/clan/${CLD}/quest/help/5" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
+       w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/(take|end)/5" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)"|tail -n0
       ) </dev/null &>/dev/null &
       time_exit 17
-      (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/clan/${CLD}/quest/take/5" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
-      ) </dev/null &>/dev/null &
-      time_exit 17
-      #printf "/clan/${CLD}/quest/help/5\n"
+      echo " Quest Cave Clan."
     fi
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/cave/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
@@ -123,7 +119,7 @@ cave_routine() {
     #/'=\\\&apos
     local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
     local BREAK=$(($(date +%s) + 15))
-    while [ -n "$CAVE" ] && [ $(date +%s) -lt "$BREAK" ]; do
+    while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ]; do
       case $CAVE in
       *gather* | *down* | *runaway* | *attack*)
         (
@@ -138,14 +134,10 @@ cave_routine() {
   fi
   if [ -n "$CLD" ]; then
       (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL/clan/$CLD/quest/deleteHelp/5" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" &>/dev/null
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL/clan/$CLD/quest/(deleteHelp|end)/5" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" &>/dev/null
       ) </dev/null &>/dev/null &
       time_exit 17
-      (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL/clan/$CLD/quest/end/5" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" &>/dev/null
-      ) </dev/null &>/dev/null &
-      time_exit 17
-      printf "/clan/$CLD/quest/deleteHelp/5\n"
+      echo " Completing Quest Cave Clan."
     fi
   echo -e "${GREEN_BLACK}Cave (✔)${COLOR_RESET}\n"
 }
