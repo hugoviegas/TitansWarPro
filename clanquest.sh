@@ -6,7 +6,7 @@ checkQuest() {
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan/${CLD}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
   time_exit 20
-  click=$(grep -o "/quest/\(take\|help\|deleteHelp\|end\)/$*/" "$TMP"/SRC)
+  click=$(grep -o "/quest/\(take\|help\|deleteHelp\|end\)/$*/[?]" "$TMP"/SRC | sed -n '1p')
   link=${click#"$*/"}
   echo "$link"
   echo "$click"
