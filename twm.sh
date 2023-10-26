@@ -70,10 +70,10 @@ twm_start() {
 func_unset() {
   unset HP1 HP2 YOU USER CLAN ENTER ENTER ATK ATKRND DODGE HEAL BEXIT OUTGATE LEAVEFIGHT WDRED HLHP
 }
-if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
-  printf "${GREEN_BLACK} Starting with last settings used.${COLOR_RESET}\n"
-  num=6
-  for i in `seq 6 -1 1` ; do
+if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ] ; then
+ printf "${GREEN_BLACK} Starting with last settings used.${COLOR_RESET}\n"
+ num=6
+ for i in $(seq 6 -1 1) ; do
   i=$((i - 1))
   if read -t 1 ; then
    >$HOME/twm/al_file
@@ -84,8 +84,8 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
    unset AL
    break &>/dev/null
   fi
-    printf " Hit${GOLD_BLACK} [Enter]${COLOR_RESET} to${GOLD_BLACK} reconfigure${GREEN_BLACK} ${i}s${COLOR_RESET}\n"
-  done
+  printf " Hit${GOLD_BLACK} [Enter]${COLOR_RESET} to${GOLD_BLACK} reconfigure${GREEN_BLACK} ${i}s${COLOR_RESET}\n"
+ done
 fi
 requer_func
 func_proxy
@@ -101,3 +101,4 @@ while true; do
   sleep 1s
   twm_start
 done
+
