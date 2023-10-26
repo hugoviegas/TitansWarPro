@@ -6,6 +6,7 @@ BLACK_YELLOW='\033[00;33m\033[01;07m'
 GOLD_BLACK='\033[33m'
 CYAN_BLACK='\033[36m'
 COLOR_RESET='\033[00m'
+TOKEN="?token=GHSAT0AAAAAACIYIAVBYU46FQ7VGTHPNPIWZJZ4LLA"
 
 printf "Versions\n 1- Master\n 2- Beta\n 3- Old\n"
 printf "${CYAN_BLACK}Select the version:${COLOR_RESET} \n"
@@ -39,7 +40,7 @@ cd ~/twm || exit
 SCRIPTS="easyinstall.sh info.sh"
 rm -rf "$HOME/$SCRIPTS" "$SCRIPTS" 2>/dev/null
 
-SERVER="https://raw.githubusercontent.com/sharesourcecode/TitansWarMacro/${version}/"
+SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/${version}/"${TOKEN}""
 
 NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
 LEN=0
@@ -47,7 +48,7 @@ for script in $SCRIPTS; do
   LEN=$((LEN + 1))
   printf "Checking $LEN/$NUM_SCRIPTS $script\n"
 
-  remote_count=$(curl "${SERVER}"$script -s -L | wc -c)
+  remote_count=$(curl "${SERVER}"$script"${TOKEN}" -s -L | wc -c)
 
   if [ -e ~/twm/"$script" ]; then
     local_count=$(wc -c <"$script")
@@ -59,10 +60,10 @@ for script in $SCRIPTS; do
     printf "✅ ${BLACK_CYAN}Updated $script${COLOR_RESET}\n"
   elif [ -e ~/twm/"$script" ] && [ "$remote_count" -ne "$local_count" ]; then
     printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
-    curl "${SERVER}"$script -s -L >"$script"
+    curl "${SERVER}"$script"${TOKEN}" -s -L >"$script"
   else
     printf "🔽 ${BLACK_YELLOW}Downloading $script${COLOR_RESET}\n"
-    curl "${SERVER}"$script -s -L -O
+    curl "${SERVER}"$script"${TOKEN}" -s -L -O
   fi
 
   chmod +x "$script"
