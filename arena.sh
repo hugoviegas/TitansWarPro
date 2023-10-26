@@ -40,21 +40,21 @@ arena_collFight() {
 arena_takeHelp() {
   clan_id
   if [ -n "$CLD" ]; then
-    #  (
-    #   w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/take/3" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)"|tail -n0
-    #  ) </dev/null &>/dev/null &
-    #  time_exit 17
-    #  echo "/clan/$CLD/quest/take/3"
+      (
+       w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/take/3" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)"|tail -n0
+      ) </dev/null &>/dev/null &
+      time_exit 17
+      echo "/clan/$CLD/quest/take/3"
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/help/3" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
     ) </dev/null &>/dev/null &
     time_exit 17
     echo "/clan/$CLD/quest/help/3"
-    #  (
-    #   w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/take/4" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)"|tail -n0
-    #  ) </dev/null &>/dev/null &
-    #  time_exit 17
-    #  echo "/clan/$CLD/quest/take/4"
+      (
+       w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/take/4" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)"|tail -n0
+      ) </dev/null &>/dev/null &
+      time_exit 17
+      echo "/clan/$CLD/quest/take/4"
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/help/4" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
     ) </dev/null &>/dev/null &
@@ -108,7 +108,7 @@ arena_duel() {
   ) </dev/null &>/dev/null &
   time_exit 17
   local BREAK=$(($(date +%s) + 60))
-  until grep -q -o 'lab/wizard' "$TMP"/SRC || [ $(date +%s) -gt "$BREAK" ]; do
+  until grep -q -o 'lab/wizard' "$TMP"/SRC || [ "$(date +%s)" -gt "$BREAK" ]; do
     #icon=$(grep -q -o -A 1 "/images/icon/race/0.png" $TMP/SRC|sed -n '1p')
     local ACCESS=$(grep -o -E '(/arena/attack/1/[?]r[=][0-9]+)' "$TMP"/SRC | sed -n '1p') #/arena/attack/1/1234567*/
     (
@@ -118,6 +118,12 @@ arena_duel() {
     echo " ⚔ ${ACCESS}"
     sleep 1s
   done
+  local ACCESS=$(grep -o -E '(/inv/bag/sellAll/1/[?]r[=][0-9]+)' "$TMP"/SRC | sed -n '1p')
+    (
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${ACCESS}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+    ) </dev/null &>/dev/null &
+    time_exit 17
+    echo " Sell all itens ✅"
   arena_deleteEnd
   echo -e "${GREEN_BLACK}arena (✔)${COLOR_RESET}\n"
 }
