@@ -81,34 +81,14 @@ arena_deleteEnd() {
   fi
 }
 
-completeQuest() {
-  quest_id="$@"
-  clan_id
-  if [ -n "$CLD" ]; then
-  local BREAK=$(($(date +%s) + 5))
-  while grep -q -o -E '/clan/$CLD/quest/(deleteHelp|end)/' "$TMP"/SRC || [ "$(date +%s)" -lt "$BREAK" ]; do
-  local click
-  click=$(grep -q -o -E '/clan/$CLD/quest/(deleteHelp|end)/' "$TMP"/SRC)
-    (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "${URL}'$click'$quest_id" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
-    ) </dev/null &>/dev/null &
-    time_exit 17
-    echo " Quest $quest_id Check"
-  done
-  else
-    (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL/clanrating/wantedToClan" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
-    ) </dev/null &>/dev/null &
-    time_exit 17
-  fi
-}
-
 arena_duel() {
   # arena_collFight
   # arena_fault
   # clear
   printf "arena ...\n"
-  arena_takeHelp
+  #arena_takeHelp
+  checkQuest 3
+  checkQuest 4
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/arena/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
@@ -138,8 +118,8 @@ arena_duel() {
     time_exit 17
     echo " Sell all itens ✅"
   #arena_deleteEnd
-  completeQuest 3
-  completeQuest 4
+  checkQuest 3
+  checkQuest 4
   echo -e "${GREEN_BLACK}arena (✔)${COLOR_RESET}\n"
 }
 arena_fullmana() {

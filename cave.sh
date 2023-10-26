@@ -104,14 +104,7 @@ cave_start() {
 
 cave_routine() {
   printf "Cave...\n"
-  if [ -n "$CLD" ]; then
-    local click=$(grep -q -o -E '/clan/$CLD/quest/(take|end)/5/[?]r=[0-9]+' "$TMP"/SRC)
-      (
-       w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump "${URL}$click" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)"|tail -n0
-      ) </dev/null &>/dev/null &
-      time_exit 17
-      echo " Quest Cave Clan."
-    fi
+  checkQuest 5
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/cave/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
@@ -143,5 +136,6 @@ cave_routine() {
       time_exit 17
       echo " Completing Quest Cave Clan."
     fi
+    checkQuest 5
   echo -e "${GREEN_BLACK}Cave (✔)${COLOR_RESET}\n"
 }

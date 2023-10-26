@@ -1,11 +1,11 @@
-completeQuest() {
+checkQuest() {
   quest_id="$@"
   clan_id
   if [ -n "$CLD" ]; then
-  local BREAK=$(($(date +%s) + 5))
-  while grep -q -o -E '/clan/$CLD/quest/(deleteHelp|end)/' "$TMP"/SRC || [ "$(date +%s)" -lt "$BREAK" ]; do
+  #local BREAK=$(($(date +%s) + 1)) || [ "$(date +%s)" -lt "$BREAK" ]
+  while grep -q -o -E '/clan/$CLD/quest/(take|help|deleteHelp|end)/' "$TMP"/SRC ; do
   local click
-  click=$(grep -q -o -E '/clan/$CLD/quest/(deleteHelp|end)/' "$TMP"/SRC)
+  click=$(grep -q -o -E '/clan/$CLD/quest/(take|help|deleteHelp|end)/' "$TMP"/SRC)
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "${URL}'$click'$quest_id" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
     ) </dev/null &>/dev/null &
