@@ -6,11 +6,10 @@ checkQuest() {
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan/${CLD}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
   time_exit 20
-  click=$(grep -o "/quest/\(take\|help\|deleteHelp\|end\)/$*/" "$TMP"/SRC | sed -n '1p')
-  link=$(grep -o "$click/$quest_id/[?]r=[0-9]+" "$TMP"/SRC)
+  click=$(grep -o "/quest/\(take\|help\|deleteHelp\|end\)/$*/[?]r[=][0-9]+" "$TMP"/SRC | sed -n '1p')
+  link=${click#"$*/"}
   echo "$click"
   echo "$*"
-  echo "$link"
   sleep 2s
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
