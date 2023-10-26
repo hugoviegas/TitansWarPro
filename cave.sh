@@ -109,8 +109,6 @@ cave_routine() {
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/cave/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
   time_exit 20
-  echo "PAREEEEEEEE_____________ "
-  sleep 2s
   
   if grep -q -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
     #/'=\\\&apos
@@ -131,14 +129,8 @@ cave_routine() {
         ;;
       esac
     done
-  fi
-  if [ -n "$CLD" ]; then
-      (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL/clan/$CLD/quest/(deleteHelp|end)/5/[?]r=[0-9]+" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" &>/dev/null
-      ) </dev/null &>/dev/null &
-      time_exit 17
-      echo " Completing Quest Cave Clan."
-    fi
     checkQuest 5
+  fi
+  
   echo -e "${GREEN_BLACK}Cave (✔)${COLOR_RESET}\n"
 }
