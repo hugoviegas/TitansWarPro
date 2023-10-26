@@ -34,43 +34,43 @@ version=$(echo "$VERSION" | sed 's/[ \t]//g' | tr "[[:upper:]]" "[[:lower:]]")
 printf "\n${CYAN_BLACK}🔧 Preparing${COLOR_RESET} ${GOLD_BLACK}$VERSION${COLOR_RESET} ${CYAN_BLACK}repository source...${COLOR_RESET}\n"
 
 mkdir -p ~/twm
-cd ~/twm
+cd ~/twm || exit
 
 SCRIPTS="easyinstall.sh info.sh"
-rm -rf "$HOME/$SCRIPTS" $SCRIPTS 2>/dev/null
+rm -rf "$HOME/$SCRIPTS" "$SCRIPTS" 2>/dev/null
 
 SERVER="https://raw.githubusercontent.com/sharesourcecode/TitansWarMacro/${version}/"
 
-NUM_SCRIPTS=$(echo $SCRIPTS | wc -w)
+NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
 LEN=0
 for script in $SCRIPTS; do
   LEN=$((LEN + 1))
   printf "Checking $LEN/$NUM_SCRIPTS $script\n"
 
-  remote_count=$(curl ${SERVER}$script -s -L | wc -c)
+  remote_count=$(curl "${SERVER}"$script -s -L | wc -c)
 
-  if [ -e ~/twm/$script ]; then
+  if [ -e ~/twm/"$script" ]; then
     local_count=$(wc -c <"$script")
   else
     local_count=1
   fi
 
-  if [ -e ~/twm/$script ] && [ "$remote_count" -eq "$local_count" ]; then
+  if [ -e ~/twm/"$script" ] && [ "$remote_count" -eq "$local_count" ]; then
     printf "✅ ${BLACK_CYAN}Updated $script${COLOR_RESET}\n"
-  elif [ -e ~/twm/$script ] && [ "$remote_count" -ne "$local_count" ]; then
+  elif [ -e ~/twm/"$script" ] && [ "$remote_count" -ne "$local_count" ]; then
     printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
-    curl ${SERVER}$script -s -L >$script
+    curl "${SERVER}"$script -s -L >"$script"
   else
     printf "🔽 ${BLACK_YELLOW}Downloading $script${COLOR_RESET}\n"
-    curl ${SERVER}$script -s -L -O
+    curl "${SERVER}"$script -s -L -O
   fi
 
   chmod +x "$script"
-  cp $script "$HOME/$script" 2>/dev/null
+  cp "$script" "$HOME/$script" 2>/dev/null
   sleep 0.1s
 done
 
 #cp easyinstall.sh "$HOME/easyinstall.sh"
 printf "\n${BLACK_GREEN}✅ Updated repository source${COLOR_RESET}\n\n${BLACK_CYAN}Starting ./easyinstall.sh $version ...${COLOR_RESET}\n"
 sleep 2s
-./easyinstall.sh $version
+./easyinstall.sh "$version"

@@ -1,4 +1,3 @@
-#!/bin/bash
 clan_id() {
   cd "$TMP" || exit
   #/Executa o comando especificado no SOURCE com a URL do clã e um userAgent.txt aleatório

@@ -3,7 +3,7 @@
 mkdir -p ~/twm
 
 if [ ! -e "~/twm/info.sh" ]; then
-  curl https://raw.githubusercontent.com/sharesourcecode/TitansWarMacro/master/info.sh -s -L >$HOME/twm/info.sh
+  curl https://raw.githubusercontent.com/sharesourcecode/TitansWarMacro/master/info.sh -s -L >"$HOME"/twm/info.sh
   chmod +x ~/twm/info.sh
   sleep 0.5s
 fi
@@ -13,7 +13,7 @@ colors
 script_slogan
 
 #access dir
-cd ~/twm
+cd ~/twm || exit
 
 if [ -z "$@" ]; then
   version="master"
@@ -23,22 +23,22 @@ else
 fi
 
 SERVER="https://raw.githubusercontent.com/sharesourcecode/TitansWarMacro/$version/"
-remote_count=$(curl ${SERVER}easyinstall.sh -s -L | wc -c)
+remote_count=$(curl "${SERVER}"easyinstall.sh -s -L | wc -c)
 if [ -e "easyinstall.sh" ]; then
   local_count=$(wc -c <"easyinstall.sh")
 else
   local_count=1
 fi
 
-cd ~/
+cd ~/ || exit
 printf "${BLACK_CYAN} Installing TWM...\n⌛ Please wait...⌛${COLOR_RESET}\n"
 
 #termux
 if [ -d /data/data/com.termux/files/usr/share/doc ]; then
   termux-wake-lock
-  sed -u -i '/nameserver/d' $PREFIX/etc/resolv.conf &
+  sed -u -i '/nameserver/d' "$PREFIX"/etc/resolv.conf &
   >/dev/null
-  printf "nameserver 114.114.114.114\nnameserver 8.8.8.8" >$PREFIX/etc/resolv.conf
+  printf "nameserver 114.114.114.114\nnameserver 8.8.8.8" >"$PREFIX"/etc/resolv.conf
   LS="/data/data/com.termux/files/usr/share/doc"
   rm -rf ~/.termux/boot/play.sh 2>/dev/null
   mkdir -p ~/.termux/boot
@@ -129,33 +129,33 @@ fi
 
 #starting...
 unset LS
-cd ~/twm
+cd ~/twm || exit
 #script_slogan
 printf "${BLACK_CYAN}\n ⌛ Wait downloading scripts...${COLOR_RESET}\n"
 
 sync_func() {
   SCRIPTS="allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh check.sh clancoliseum.sh clandungeon.sh clanfight.sh clanid.sh coliseum.sh crono.sh flagfight.sh king.sh league.sh loginlogoff.sh play.sh requeriments.sh run.sh svproxy.sh trade.sh twm.sh undying.sh"
-  NUM_SCRIPTS=$(echo $SCRIPTS | wc -w)
+  NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
   LEN=0
   for script in $SCRIPTS; do
     LEN=$((LEN + 1))
     printf "Checking $LEN/$NUM_SCRIPTS $script\n"
-    remote_count=$(curl ${SERVER}$script -s -L | wc -c)
+    remote_count=$(curl "${SERVER}"$script -s -L | wc -c)
 
-    if [ -e ~/twm/$script ]; then
+    if [ -e ~/twm/"$script" ]; then
       local_count=$(wc -c <"$script")
     else
       local_count=1
     fi
 
-    if [ -e ~/twm/$script ] && [ "$remote_count" -eq "$local_count" ]; then
+    if [ -e ~/twm/"$script" ] && [ "$remote_count" -eq "$local_count" ]; then
       printf "✅ ${BLACK_CYAN}Updated $script${COLOR_RESET}\n"
-    elif [ -e ~/twm/$script ] && [ "$remote_count" -ne "$local_count" ]; then
+    elif [ -e ~/twm/"$script" ] && [ "$remote_count" -ne "$local_count" ]; then
       printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
-      curl ${SERVER}$script -s -L >$script
+      curl "${SERVER}"$script -s -L >"$script"
     else
       printf "🔽 ${BLACK_YELLOW}Downloading $script${COLOR_RESET}\n"
-      curl ${SERVER}$script -s -L -O
+      curl "${SERVER}"$script -s -L -O
     fi
     sleep 0.1s
   done
@@ -167,21 +167,21 @@ sync_func() {
 
 sync_func_other() {
   SCRIPTS="requeriments.sh svproxy.sh loginlogoff.sh crono.sh check.sh run.sh clanid.sh allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh clancoliseum.sh clandungeon.sh clanfight.sh coliseum.sh flagfight.sh king.sh league.sh trade.sh undying.sh"
-  curl ${SERVER}play.sh -s -L -O
-  curl ${SERVER}info.sh -s -L >twm.sh
-  curl ${SERVER}twm.sh -s -L | sed -n '3,33p' >>twm.sh
-  NUM_SCRIPTS=$(echo $SCRIPTS | wc -w)
+  curl "${SERVER}"play.sh -s -L -O
+  curl "${SERVER}"info.sh -s -L >twm.sh
+  curl "${SERVER}"twm.sh -s -L | sed -n '3,33p' >>twm.sh
+  NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
   LEN=0
 
   for script in $SCRIPTS; do
     LEN=$((LEN + 1))
     printf "Checking $LEN/$NUM_SCRIPTS $script\n"
     printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
-    curl ${SERVER}$script -s -L >>twm.sh
+    curl "${SERVER}"$script -s -L >>twm.sh
     printf "\n#\n" >>twm.sh
     sleep 0.1s
   done
-  curl ${SERVER}twm.sh -s -L | sed -n '40,120p' >>twm.sh
+  curl "${SERVER}"twm.sh -s -L | sed -n '40,120p' >>twm.sh
 
   #DOS to Unix
   find ~/twm -type f -name '*.sh' -print0 | xargs -0 sed -i 's/\r$//' 2>/dev/null
@@ -197,20 +197,20 @@ else
 fi
 APPISH=$(uname -a | grep -o "\-ish")
 if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = '-ish' ]; then
-  sed -i 's,#!/bin/bash,#!/bin/sh,g' $HOME/twm/*.sh
+  sed -i 's,#!/bin/bash,#!/bin/sh,g' "$HOME"/twm/*.sh
 fi
 
 script_slogan
 printf "✅ ${BLACK_CYAN}Updated scripts!${COLOR_RESET}\n To execute run command: ${GOLD_BLACK}./twm/play.sh${COLOR_RESET}\n       For coliseum run: ${GOLD_BLACK}./twm/play.sh -cl${COLOR_RESET}\n           For cave run: ${GOLD_BLACK}./twm/play.sh -cv${COLOR_RESET}\n"
 tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/play.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
-until [ -z $tipidf ]; do
-  kill -9 $tipidf 2>/dev/null
+until [ -z "$tipidf" ]; do
+  kill -9 "$tipidf" 2>/dev/null
   tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/play.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
   sleep 1s
 done
 tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/twm.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
-until [ -z $tipidf ]; do
-  kill -9 $tipidf 2>/dev/null
+until [ -z "$tipidf" ]; do
+  kill -9 "$tipidf" 2>/dev/null
   tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/twm.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
   sleep 1s
 done
