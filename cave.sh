@@ -104,6 +104,17 @@ cave_start() {
 
 cave_routine() {
   printf "Cave...\n"
+  if [ -n "$CLD" ]; then
+      (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/clan/${CLD}/quest/help/5" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
+      ) </dev/null &>/dev/null &
+      time_exit 17
+      (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/clan/${CLD}/quest/take/5" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
+      ) </dev/null &>/dev/null &
+      time_exit 17
+      #printf "/clan/${CLD}/quest/help/5\n"
+    fi
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/cave/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
@@ -125,5 +136,16 @@ cave_routine() {
       esac
     done
   fi
+  if [ -n "$CLD" ]; then
+      (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL/clan/$CLD/quest/deleteHelp/5" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" &>/dev/null
+      ) </dev/null &>/dev/null &
+      time_exit 17
+      (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL/clan/$CLD/quest/end/5" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" &>/dev/null
+      ) </dev/null &>/dev/null &
+      time_exit 17
+      printf "/clan/$CLD/quest/deleteHelp/5\n"
+    fi
   echo -e "${GREEN_BLACK}Cave (✔)${COLOR_RESET}\n"
 }

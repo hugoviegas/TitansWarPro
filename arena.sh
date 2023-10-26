@@ -123,12 +123,12 @@ arena_duel() {
   ) </dev/null &>/dev/null &
   time_exit 17
   SELL=$(grep -o -E '(/inv/bag/sellAll/1/[?]r[=][0-9]+)' "$TMP"/SRC | sed -n '1p')
-  printf "%s" "$SELL"
+  printf "\n%s" "$SELL"
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${SELL}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &
     time_exit 17
-    echo "\n Sell all itens ✅"
+    echo " Sell all itens ✅"
   arena_deleteEnd
   echo -e "${GREEN_BLACK}arena (✔)${COLOR_RESET}\n"
 }
