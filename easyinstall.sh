@@ -216,16 +216,16 @@ until [ -z "$tipidf" ]; do
 done
 if [ -f ~/twm/runmode_file ]; then
   if awk -v arg="-cl" -v file="$(cat ~/twm/runmode_file)" 'BEGIN { exit !(arg == file) }'; then
-    printf "${BLACK_GREEN}Automatically restarting in 5s after update...${COLOR_RESET}\n"
-    sleep 5s
+    printf "${BLACK_GREEN}Automatically restarting in 3s after update...${COLOR_RESET}\n"
+    sleep 3s
     ~/twm/play.sh -cl
   elif awk -v arg="-cv" -v file="$(cat ~/twm/runmode_file)" 'BEGIN { exit !(arg == file) }'; then
-    printf "${BLACK_GREEN}Automatically restarting in 5s after update...${COLOR_RESET}\n"
-    sleep 5s
+    printf "${BLACK_GREEN}Automatically restarting in 3s after update...${COLOR_RESET}\n"
+    sleep 3s
     ~/twm/play.sh -cv
   else
-    printf "${BLACK_GREEN}Automatically restarting in 5s after update...${COLOR_RESET}\n"
-    sleep 5s
+    printf "${BLACK_GREEN}Automatically restarting in 3s after update...${COLOR_RESET}\n"
+    sleep 3s
     ~/twm/play.sh -boot
   fi
 fi
