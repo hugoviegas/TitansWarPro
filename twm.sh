@@ -1,17 +1,17 @@
 #!/bin/bash
-. ~/twm/info.sh
+. "$HOME"/twm/info.sh
 colors
-RUN=$(cat $HOME/twm/runmode_file)
-cd $HOME/twm
+RUN=$(cat "$HOME"/twm/runmode_file)
+cd "$HOME"/twm || exit
 
 script_ads() {
-  if [ "$RUN" != '-boot' ] && [ -f "$HOME/twm/ads_file" ] && [ -s "$HOME/twm/ads_file" ] && [ "$(cat $HOME/twm/ads_file)" != "$(date +%d)" ]; then
-    if [ "$(cat $HOME/twm/ads_file 2>/dev/null)" != "$(date +%d)" ]; then
+  if [ "$RUN" != '-boot' ] && [ -f "$HOME/twm/ads_file" ] && [ -s "$HOME/twm/ads_file" ] && [ "$(cat "$HOME"/twm/ads_file)" != "$(date +%d)" ]; then
+    if [ "$(cat "$HOME"/twm/ads_file 2>/dev/null)" != "$(date +%d)" ]; then
       xdg-open "https://apps.disroot.org/search?q=Shell+Script&category_general=on&language=pt-BR&time_range=&safesearch=1&theme=beetroot"
-      echo $(date +%d) >$HOME/twm/ads_file
+      date +%d >"$HOME"/twm/ads_file
     fi
   else
-    echo $(date +%d) >$HOME/twm/ads_file
+    date +%d >"$HOME"/twm/ads_file
   fi
 }
 script_ads
@@ -29,7 +29,7 @@ else
 fi
 
 #/sources
-cd ~/twm
+cd ~/twm || exit
 #/twm.sh before sources <<
 #. clandmgfight.sh
 . requeriments.sh
@@ -75,9 +75,9 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
   for i in $(seq 6 -1 1); do
     i=$((i - 1))
     if read -t 1; then
-      >$HOME/twm/al_file
-      >$HOME/twm/ur_file
-      >$HOME/twm/fileAgent.txt
+      >"$HOME"/twm/al_file
+      >"$HOME"/twm/ur_file
+      >"$HOME"/twm/fileAgent.txt
       unset UR
       unset UA
       unset AL
