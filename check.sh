@@ -5,18 +5,16 @@ check_missions() {
   ) </dev/null &>/dev/null &
   time_exit 20
   #open chests
-  if grep -o -E "/quest/openChest/(1|2)/[?]r=[0-9]+" "$TMP"/SRC; then
-    click=$(grep -o -E "/quest/openChest/(1|2)/[?]r=[0-9]+" "$TMP"/SRC)
-    (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    ) </dev/null &>/dev/null &
-    time_exit 20
-    printf "${GREEN_BLACK}Chest opened (✔)${COLOR_RESET}\n"
-  fi
-  (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-  ) </dev/null &>/dev/null &
-  time_exit 20
+  for i in {1..2}; do
+    if grep -o -E "/quest/openChest/$i/[?]r=[0-9]+" "$TMP"/SRC; then
+      click=$(grep -o -E "/quest/openChest/$i/[?]r=[0-9]+" "$TMP"/SRC)
+      (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+      ) </dev/null &>/dev/null &
+      time_exit 20
+      printf "${GREEN_BLACK}Chest opened (✔)${COLOR_RESET}\n"
+    fi
+  done
   #collect quests
   i=0
   for i in {0..15} ; do
