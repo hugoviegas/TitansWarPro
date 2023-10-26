@@ -130,7 +130,7 @@ flagfight_start() {
     time_exit 17
     printf "Flag fight will be started...\n"
 
-    while $(case $(date +%M:%S) in (14:[3-5][0-9]) exit 1 ;; esac) ; do
+    while $(case $(date +%M:%S) in (14:[3-5][0-9]) exit 1 ;; esac); do
       sleep 3s
     done
 
