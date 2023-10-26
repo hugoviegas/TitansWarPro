@@ -115,7 +115,7 @@ flagfight_start() {
   cd $tmp_ram
 
   case $(date +%H:%M) in
-  10:1[0-4] | 16:1[0-4])
+  (10:1[0-4] | 16:1[0-4])
     (
       w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 userAgent.txt)" | grep -o -E '\(([0-9]+)\)' | sed 's/[()]//g' >$full_ram
     ) </dev/null &>/dev/null &
@@ -130,7 +130,7 @@ flagfight_start() {
     time_exit 17
     printf "Flag fight will be started...\n"
 
-    while $(case $(date +%M:%S) in 14:[3-5][0-9]) exit 1 ;; esac) do
+    while $(case $(date +%M:%S) in 14:[3-5][0-9]) exit 1 ;; esac) ; do
       sleep 3s
     done
 
