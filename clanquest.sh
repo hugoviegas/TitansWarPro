@@ -7,7 +7,11 @@ checkQuest() {
   ) </dev/null &>/dev/null &
   time_exit 20
   click=$(grep -o "/quest/\(take\|help\|deleteHelp\|end\)/$*/[?]" "$TMP"/SRC | sed -n '1p')
+<<<<<<< HEAD
   link=${click#"$*/[?]"}
+=======
+  link=${click#"$*/"}
+>>>>>>> 4428848d13c75fe4d8752f871267ee8d91bf3232
   echo "$link"
   echo "$click"
   echo "$*"
