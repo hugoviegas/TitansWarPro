@@ -99,7 +99,7 @@ arena_duel() {
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${ACCESS}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &
     time_exit 17
-    count+=1
+    count=$(count + 1)
     echo " ⚔ Atack $count"
     sleep 0.6s
   done
