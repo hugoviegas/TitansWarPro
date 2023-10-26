@@ -104,8 +104,7 @@ standard_crono() {
    func_trade
    campaign_func
    clanDungeon
-   clan_money
-   coliseum_start
+   #coliseum_start
    check_missions
    messages_info
    func_crono

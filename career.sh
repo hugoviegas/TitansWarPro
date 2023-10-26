@@ -13,6 +13,11 @@ career_func() {
       ) </dev/null &>/dev/null &
       time_exit 17
       echo "/clan/${CLD}/quest/help/6"
+      (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "${URL}/clan/${CLD}/quest/take/6" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" &>/dev/null
+      ) </dev/null &>/dev/null &
+      time_exit 17
+      echo "/clan/${CLD}/quest/take/6"
     fi
 
     (
