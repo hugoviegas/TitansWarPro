@@ -6,9 +6,10 @@ checkQuest() {
   time_exit 20
   clan_id
   if [ -n "${CLD}" ]; then
-  local click
-  click=$(grep -r "/clan/${CLD}/quest/(take|help|deleteHelp|end)/${quest_id}" "$TMP"/SRC | sed -n '1p')
+  local click=$(grep -r -q "/clan/${CLD}/quest/(take|help|deleteHelp|end)/${quest_id}" "$TMP"/SRC ) #| sed -n '1p'
   echo "$click"
+  echo "click"
+  sleep 2s
   if ! echo "$click" | grep -q -o "id=${quest_id}"; then
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
