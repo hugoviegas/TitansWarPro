@@ -109,11 +109,8 @@ clanfight_start() {
     ) </dev/null &>/dev/null &
     time_exit 17
     printf "Clan tournament will be started...\n"
-    while true; do
-      case $(date +%M:%S) in
-      59:[3-5][0-9]) exit 1 ;;
-      *) sleep 3 ;;
-      esac
+    while $(case $(date +%M:%S) in (59:[3-5][0-9]) exit 1 ;; esac) ; do
+      sleep 3
     done
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/clanfight/enterFight" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
