@@ -7,11 +7,11 @@ checkQuest() {
   ) </dev/null &>/dev/null &
   time_exit 20
   click=$(grep -o "/clan/${CLD}/quest/\(take\|help\|deleteHelp\|end\)/$quest_id/[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p')
-  echo "$click"
+  echo "$click/$quest_id/[?]r=[0-9]+"
   echo "click"
   sleep 2s
     (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "${URL}$click/$quest_id/[?]r=[0-9]+" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
     ) </dev/null &>/dev/null &
     time_exit 17
     echo " Quest $quest_id Check..."
