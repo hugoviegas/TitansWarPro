@@ -1,9 +1,13 @@
 checkQuest() {
   quest_id="$@"
+  (
+    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan/$CLD/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+  ) </dev/null &>/dev/null &
+  time_exit 20
   clan_id
   if [ -n "$CLD" ]; then
   #local BREAK=$(($(date +%s) + 1)) || [ "$(date +%s)" -lt "$BREAK" ]
-  while grep -q -o -E '/clan/$CLD/quest/(take|help|deleteHelp|end)/' "$TMP"/SRC ; do
+  while grep -q -o -E "/clan/$CLD/quest/(take|help|deleteHelp|end)/" "$TMP"/SRC ; do
   local click
   click=$(grep -q -o -E "/clan/$CLD/quest/(take|help|deleteHelp|end)/$quest_id" "$TMP"/SRC)
     (
