@@ -15,12 +15,10 @@ check_missions() {
       printf "${GREEN_BLACK}Chest opened (✔)${COLOR_RESET}\n"
     fi
   done
-  #collect quests
+  #collect quests 
   i=0
-  for i in {0..15} ; do
-  #while [ $i -lt 15 ]; do // /inv/chest/?quest_t=quest&quest_id=13&qz=01690126f2e5d7a75a31e6ee149c6cb2
-  if grep -r "/inv/chest/?quest_t=quest&quest_id=13&" "$TMP/SRC"; then
-    click=$(grep -r "/inv/chest/?quest_t=quest&quest_id=13&" "$TMP/SRC" | sed -n '1p')
+  if grep -r -o "/inv/chest/?quest_t=quest&quest_id=13&" "$TMP/SRC"; then
+    click=$(grep -r -o "/inv/chest/?quest_t=quest&quest_id=13&" "$TMP/SRC" | sed -n '1p')
       (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
@@ -30,7 +28,10 @@ check_missions() {
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
       time_exit 20
-    fi
+  fi
+  for i in {0..15} ; do
+  #while [ $i -lt 15 ]; do // /inv/chest/?quest_t=quest&quest_id=13&qz=01690126f2e5d7a75a31e6ee149c6cb2
+  
     if grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP"/SRC; then
       click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p')
       (
