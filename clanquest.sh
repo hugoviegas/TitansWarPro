@@ -6,8 +6,9 @@ checkQuest() {
   time_exit 20
   clan_id
   if [ -n "${CLD}" ]; then
-  local click=$(grep -r -q "/clan/${CLD}/quest/(take|help|deleteHelp|end)/${quest_id}" "$TMP"/SRC ) #| sed -n '1p'
+  local click=$(grep -r -q "/clan/${CLD}/quest/(take|help|deleteHelp|end)/$quest_id" "$TMP"/SRC  | sed -n '1p')
   echo "$click"
+  grep -r -q "/clan/${CLD}/quest/(take|help|deleteHelp|end)/$quest_id" "$TMP"/SRC  | sed -n '1p'
   echo "click"
   sleep 2s
   if ! echo "$click" | grep -q -o "id=${quest_id}"; then
