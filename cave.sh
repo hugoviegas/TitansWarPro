@@ -106,7 +106,7 @@ cave_routine() {
   printf "Cave...\n"
   if [ -n "$CLD" ]; then
       (
-       w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/(take|end)/5" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)"|tail -n0
+       w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/(take|end)/5/[?]r=[0-9]+" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)"|tail -n0
       ) </dev/null &>/dev/null &
       time_exit 17
       echo " Quest Cave Clan."
@@ -134,7 +134,7 @@ cave_routine() {
   fi
   if [ -n "$CLD" ]; then
       (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL/clan/$CLD/quest/(deleteHelp|end)/5" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" &>/dev/null
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL/clan/$CLD/quest/(deleteHelp|end)/5/[?]r=[0-9]+" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" &>/dev/null
       ) </dev/null &>/dev/null &
       time_exit 17
       echo " Completing Quest Cave Clan."
