@@ -37,6 +37,7 @@ cd ~/twm || exit
 . flagfight.sh
 . clanid.sh
 . crono.sh
+. clanquest
 . arena.sh
 . coliseum.sh
 . campaign.sh

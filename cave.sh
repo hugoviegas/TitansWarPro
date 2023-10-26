@@ -105,8 +105,9 @@ cave_start() {
 cave_routine() {
   printf "Cave...\n"
   if [ -n "$CLD" ]; then
+    local click=$(grep -q -o -E '/clan/$CLD/quest/(take|end)/5/[?]r=[0-9]+' "$TMP"/SRC)
       (
-       w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/(take|end)/5/[?]r=[0-9]+" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)"|tail -n0
+       w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump "${URL}$click" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)"|tail -n0
       ) </dev/null &>/dev/null &
       time_exit 17
       echo " Quest Cave Clan."
@@ -117,17 +118,20 @@ cave_routine() {
   time_exit 20
   if grep -q -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
     #/'=\\\&apos
-    local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+    local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
     local BREAK=$(($(date +%s) + 15))
     while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ]; do
       case $CAVE in
-      *gather* | *down* | *runaway* | *attack*)
+      (*gather* | *down* | *runaway* | *attack*)
         (
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAVE" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
         ) </dev/null &>/dev/null &
         time_exit 20
         echo "$CAVE"
         local CAVE=$(grep -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+        ;;
+        (*speedUp*)
+        break
         ;;
       esac
     done
