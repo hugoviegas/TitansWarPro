@@ -80,6 +80,7 @@ arena_deleteEnd() {
     time_exit 17
   fi
 }
+
 completeQuest() {
   quest_id="$@"
   clan_id
@@ -101,6 +102,7 @@ completeQuest() {
     time_exit 17
   fi
 }
+
 arena_duel() {
   # arena_collFight
   # arena_fault
