@@ -111,7 +111,7 @@ login_logoff() {
                 # Troque de diretório para a pasta do usuário
                 cd "$TMP/$username" || exit
                 # Remova a pasta temporária e seus arquivos
-                rm -rf "$TMP"
+                #rm -rf "$TMP"
                 # Defina a variavel para a nova pasta
                 TMP="$TMP/$username"
             fi
