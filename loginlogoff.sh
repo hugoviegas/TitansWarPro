@@ -101,6 +101,19 @@ login_logoff() {
                 chmod 600 $TMP/cookie_file
             fi
 
+
+            (
+                w3m -cookie -o http_proxy=$PROXY -post $TMP/cookie_file -dump "$URL/?sign_in=1" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" &>/dev/null
+            ) </dev/null &>/dev/null &
+            time_exit 17
+            printf "Setting session cookie...\n"
+            (
+                w3m -cookie -o http_proxy=$PROXY -post $TMP/cookie_file -dump "$URL/?sign_in=1" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" &>/dev/null
+            ) </dev/null &>/dev/null &
+            time_exit 17
+            printf "Session configured.\n"
+            rm $TMP/cookie_file &>/dev/null
+
             # Verifique se a pasta temporária TMP já existe (você pode ter definido isso em seu script)
             if [ -d "$TMP/$username" ]; then
                 TMP=$TMP/$username
@@ -117,20 +130,9 @@ login_logoff() {
                 # Defina a variavel para a nova pasta
                 TMP="$TMP/$username"
             fi
-            
+
             #/login2x
             unset username password
-            (
-                w3m -cookie -o http_proxy=$PROXY -post $TMP/cookie_file -dump "$URL/?sign_in=1" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" &>/dev/null
-            ) </dev/null &>/dev/null &
-            time_exit 17
-            printf "Setting session cookie...\n"
-            (
-                w3m -cookie -o http_proxy=$PROXY -post $TMP/cookie_file -dump "$URL/?sign_in=1" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" &>/dev/null
-            ) </dev/null &>/dev/null &
-            time_exit 17
-            printf "Session configured.\n"
-            rm $TMP/cookie_file &>/dev/null
         }
         log_in
 
