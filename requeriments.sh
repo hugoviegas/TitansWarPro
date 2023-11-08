@@ -187,7 +187,7 @@ requer_func () {
    printf "Set up User-Agent[1 to 2]: \n"
    read -n 1 UA
   fi
-  SERVER='curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/'
+  #SERVER='curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/'
   case $UA in
    (0)
     clear ; echo "0" >$HOME/twm/fileAgent.txt

@@ -101,6 +101,21 @@ login_logoff() {
                 chmod 600 $TMP/cookie_file
             fi
 
+            # Verifique se a pasta temporária TMP já existe (você pode ter definido isso em seu script)
+            if [ -d "$TMP" ]; then
+                # Crie a nova pasta dentro da pasta temporária
+                mkdir -p "$TMP/$username"
+
+                # Mova todo o conteúdo da pasta temporária para a nova pasta
+                mv "$TMP"/* "$TMP/$username/"
+                # Troque de diretório para a pasta do usuário
+                cd "$TMP/$username" || exit
+                # Remova a pasta temporária e seus arquivos
+                rm -rf "$TMP"
+                # Defina a variavel para a nova pasta
+                TMP="$TMP/$username"
+            fi
+            
             #/login2x
             unset username password
             (
@@ -131,5 +146,6 @@ login_logoff() {
         fi
 
     done
+    
     messages_info
 }
