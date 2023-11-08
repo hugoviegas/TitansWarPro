@@ -102,12 +102,14 @@ login_logoff() {
             fi
 
             # Verifique se a pasta temporária TMP já existe (você pode ter definido isso em seu script)
-            if [ -d "$TMP" ]; then
+            if [ -d "$TMP/$username" ]; then
+                TMP=$TMP/$username
+            else
                 # Crie a nova pasta dentro da pasta temporária
                 mkdir -p "$TMP/$username"
 
                 # Mova todo o conteúdo da pasta temporária para a nova pasta
-                mv "$TMP"/* "$TMP/$username/"
+                find "$TMP" -type f -exec mv {} "$TMP/$username" \;
                 # Troque de diretório para a pasta do usuário
                 cd "$TMP/$username" || exit
                 # Remova a pasta temporária e seus arquivos
