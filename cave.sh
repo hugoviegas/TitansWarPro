@@ -137,6 +137,7 @@ cave_start() {
 cave_routine() {
   printf "Cave...\n"
   # checkQuest 5
+  clan_id
   quest_id=5
     (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan/${CLD}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
