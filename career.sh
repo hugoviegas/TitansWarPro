@@ -6,7 +6,7 @@ career_func() {
   time_exit 17
   if grep -q -o -E '/career/attack/[?]r[=][0-9]+' "$TMP"/SRC; then
 
-    checkQuest 6
+    checkQuestTest 6
 
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/career/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
