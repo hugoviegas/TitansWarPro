@@ -1,3 +1,29 @@
+checkQuest() {
+  quest_id="$*"
+  clan_id
+  if [ -n "${CLD}" ]; then
+  (
+    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan/${CLD}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+  ) </dev/null &>/dev/null &
+  time_exit 20
+  click=$(grep -o '/quest/\(take\|help\|deleteHelp\|end\)/$*/[?]r[=][0-9]\{8\}' "$TMP"/SRC | sed -n '1p')
+
+  echo "$click"
+    (
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
+    ) </dev/null &>/dev/null &
+    time_exit 20
+    echo " Quest $quest_id Check..."
+  
+  #done
+    
+  else
+    (
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL/clanrating/wantedToClan" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
+    ) </dev/null &>/dev/null &
+    time_exit 17
+  fi
+}
 cave_start() {
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
@@ -38,6 +64,7 @@ cave_start() {
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${ACCESS2}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
         ) </dev/null &>/dev/null &
         time_exit 17
+        # shellcheck disable=SC2059
         printf "${CYAN_BLACK}${ACCESS2}${COLOR_RESET}\n$(w3m -dump -T text/html "$TMP"/SRC | grep -o -E '(g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' | sed 's/g/\ g/g;s/s/\ s/g')\n"
         local num=$((num - 1))
         ;;
@@ -46,6 +73,8 @@ cave_start() {
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${ACCESS2}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
         ) </dev/null &>/dev/null &
         time_exit 17
+        # shellcheck disable=SC2154
+        # shellcheck disable=SC2059
         printf "${PURPLEis_BLACK}${ACCESS2}${COLOR_RESET}\n$(w3m -dump -T text/html "$TMP"/SRC | grep -o -E '(g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' | sed 's/g/\ g/g;s/s/\ s/g')\n"
         local num=$((num - 1))
         ;;
