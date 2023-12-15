@@ -1,3 +1,4 @@
+# shellcheck disable=SC2148
 checkQuest() {
   quest_id="$*"
   clan_id
@@ -6,8 +7,8 @@ checkQuest() {
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan/${CLD}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
   time_exit 20
-  click=$(grep -o "/quest/(take|help|deleteHelp|end)/$quest_id/[?]r[=][0-9]+" "$TMP"/SRC | sed -n '1p')
-
+  # click=$(grep -o "/quest/(take|help|deleteHelp|end)/$quest_id/[?]r[=][0-9]\{8\}" "$TMP"/SRC | head -1)
+  click=$(grep -oE "/quest/(take|help|deleteHelp|end)/$quest_id/\?r=[0-9]{8}" "$TMP"/SRC | head -1)
   echo "$click"
   sleep 5s
     (
@@ -49,6 +50,7 @@ cave_start() {
       DOWN=$(cat "$TMP"/SRC | sed 's/href=/\n/g' | grep '/cave/down' | awk -F\' '{ print $2 }')
       ACCESS2=$(cat "$TMP"/SRC | sed 's/href=/\n/g' | grep '/cave/' | head -n 2 | tail -n 1 | awk -F\' '{ print $2 }')
       ACTION=$(cat "$TMP"/SRC | sed 's/href=/\n/g' | grep '/cave/' | awk -F\' '{ print $2 }' | tr -cd "[[:alpha:]]")
+      # shellcheck disable=SC2034
       MEGA=$(cat "$TMP"/SRC | sed 's/src=/\n/g' | grep '/images/icon/silver.png' | grep "'s'" | tail -n 1 | grep -o 'M')
     }
     condition_func
@@ -121,7 +123,7 @@ cave_start() {
     ) </dev/null &>/dev/null &
     time_exit 20
     local ENDQUEST=$(grep -o -E '/quest/end/2[?]r[=][A_z0-9]+' "$TMP"/SRC)
-    if [ ! -z "$ENDQUEST" ]; then
+    if [ -n "$ENDQUEST" ]; then
       (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${ENDQUEST}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
@@ -152,6 +154,7 @@ cave_routine() {
         ) </dev/null &>/dev/null &
         time_exit 20
         echo "$CAVE"
+        # shellcheck disable=SC2155
         local CAVE=$(grep -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
         ;;
         (*speedUp*)
