@@ -3,7 +3,7 @@ king_fight () {
 
  #/enterFight
  cd "$TMP" || exit
- local LA=4 # interval attack
+ local LA=4.3 # interval attack
  local HPER="38" # % to heal
  local RPER=5 # % to random
  cl_access () {
@@ -15,6 +15,7 @@ king_fight () {
   grep -o -E '(/king/dodge/[?]r[=][0-9]+)' "$TMP"/SRC >DODGE 2> /dev/null
   grep -o -E '(/king/stone/[?]r[=][0-9]+)' "$TMP"/SRC >STONE 2> /dev/null
   grep -o -E '(/king/heal/[?]r[=][0-9]+)' "$TMP"/SRC >HEAL 2> /dev/null
+  grep -o -E '(/king/grass/[?]r[=][0-9]+)' "$TMP"/SRC >GRASS 2> /dev/null
   grep -o -E '([[:upper:]][[:lower:]]{0,15}( [[:upper:]][[:lower:]]{0,13})?)[[:space:]][^[:alnum:][:space:]]' "$TMP"/SRC|sed -n 's,\ [<]s,,;s,\ ,_,;2p' >USER 2> /dev/null
 #  grep -o -P "\p{Lu}{1}\p{Ll}{0,15}[\ ]{0,1}\p{L}{0,14}\s\Ws" $TMP/SRC|sed -n 's,\ [<]s,,;s,\ ,_,;2p' >USER 2> /dev/null
   grep -o -E "(hp)[^A-Za-z0-9_]{1,4}[0-9]{1,6}" "$TMP"/SRC|sed "s,hp[']\/[>],,;s,\ ,," >HP 2> /dev/null
@@ -65,6 +66,11 @@ king_fight () {
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat HEAL)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
    ) </dev/null &>/dev/null &
    time_exit 17
+   sleep 0.3s
+   (
+    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat GRASS)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+   ) </dev/null &>/dev/null &
+   time_exit 17
    cl_access
    cat HP >FULL ; date +%s >last_heal
   sleep 0.3s
@@ -76,7 +82,7 @@ king_fight () {
     ) </dev/null &>/dev/null &
     time_exit 17
     cl_access
-    stone...
+    #stone...
      if awk -v ush="$(cat HP2)" 'BEGIN { exit !(ush < 25) }' ; then
      (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat STONE)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
