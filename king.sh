@@ -3,7 +3,7 @@ king_fight () {
 
  #/enterFight
  cd "$TMP" || exit
- local LA=4.3 # interval attack
+ local LA=4 # interval attack
  local HPER="38" # % to heal
  local RPER=5 # % to random
  cl_access () {
@@ -77,7 +77,7 @@ king_fight () {
     ) </dev/null &>/dev/null &
     time_exit 17
     cl_access
-    #stone...
+    stone...
      if awk -v ush="$(cat HP2)" 'BEGIN { exit !(ush < 25) }' ; then
      (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat STONE)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
