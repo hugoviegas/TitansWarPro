@@ -22,7 +22,7 @@ case $VERSION in
   VERSION="Master"
   ;;
 2)
-  VERSION="Beta"
+  VERSION="beta"
   ;;
 3)
   VERSION="Backup"

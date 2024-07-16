@@ -42,7 +42,7 @@ apk add curl ; apk add w3m ; apk add procps ; apk add coreutils ; apk add --no-c
 > Android(UserLAnd) and Iphone(iSH):
 
 ```bash
-curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/easyinstall.sh -L -O
+curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh -L -O
 ```
 
 > 4 - Dê permissão de execução para o instalador
@@ -50,7 +50,7 @@ curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/easyinstal
 > Android(UserLAnd) and Iphone(iSH):
 
 ```bash
-chmod +x easyinstall.sh
+chmod +x update.sh
 ```
 
 > 5 - Copie e cole este comando para instalar o twm
@@ -58,8 +58,9 @@ chmod +x easyinstall.sh
 > Android(UserLAnd) and Iphone(iSH):
 
 ```bash
-./easyinstall.sh
+./update.sh
 ```
+> Por padrão selecione a opção "1" Master (digite 1 apenas)
 
 > 6 - Para executar o twm
 
@@ -112,20 +113,21 @@ pkg install w3m termux-api procps coreutils ncurses-utils
 > 2 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando):
 
 ```bash
-curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/easyinstall.sh -L -O
+curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh -L -O
 ```
 
 > 3 - Dê permissão de execução para o instalador:
 
 ```bash
-chmod +x easyinstall.sh
+chmod +x update.sh
 ```
 
 > 4 - Copie e cole este comando para instalar o twm:
 
 ```bash
-./easyinstall.sh
+./update.sh
 ```
+> Por padrão selecione a opção "1" Master (digite 1 apenas)
 
 > 5 - Para executar o twm:
 
@@ -166,19 +168,19 @@ rm -rf $HOME/.termux/boot/play.sh
 > 1 - Abra o progama Cygwin(https://www.cygwin.com/setup-x86_64.exe) ou (https://www.cygwin.com/setup-x86.exe) como adiministrador no Windows. Na instalação selecione qualquer link, a parti daí é só dá Next até concluir. Em sequida com adiministrador abra o Cygwin Terminal que foi instalado. Digite, ou copie e cole o comando abaixo para baixar o instalador do twm(O link faz parte do comando):
 
 ```bash
-curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/easyinstall.sh -L -O
+curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh -L -O
 ```
 
 > 2 - Dê permissão de execução para o instalador:
 
 ```bash
-chmod +x easyinstall.sh
+chmod +x update.sh
 ```
 
 > 3 - Copie e cole este comando para instalar o twm:
 
 ```bash
-bash $HOME/easyinstall.sh
+bash $HOME/update.sh
 ```
 
 > 4 - Para executar o twm:
@@ -226,19 +228,19 @@ sudo apt-get install coreutils dnsutils-y
 > 3 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando):
 
 ```bash
-curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/easyinstall.sh -L -O
+curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh -L -O
 ```
 
 > 4 - Dê permissão de execução para o instalador:
 
 ```bash
-chmod +x easyinstall.sh
+chmod +x update.sh
 ```
 
 > 5 - Copie e cole este comando para instalar o twm:
 
 ```bash
-bash easyinstall.sh
+bash update.sh
 ```
 
 > 6 - Comando para executar o twm:

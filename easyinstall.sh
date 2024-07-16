@@ -3,7 +3,7 @@
 mkdir -p ~/twm
 
 if [ ! -e "~/twm/info.sh" ]; then
-  curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/$version/info.sh -s -L >"$HOME"/twm/info.sh
+  curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/info.sh -s -L >"$HOME"/twm/info.sh
   chmod +x ~/twm/info.sh
   sleep 0.5s
 fi
