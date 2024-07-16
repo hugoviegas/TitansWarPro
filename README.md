@@ -9,19 +9,30 @@ Scripts macros para titanswar.net em todos os servidores.
 Lista do que este macro faz:
 
 > Arena: joga um por um até acabar com a mana;
+
 > Carreira: Sempre que tiver disponível ele ira batalhar na carreira e irá recolher a recompensa;
+
 > Caverna: Todas as funções da carvena estão disponíveis. Há opção de caverna 100% onde vai ficar em looping infinito rodando a caverna(não recomendado deixar por muito tempo);
+
 > Cabana do Sábio: Recolher recompensas de missões, recolher prêmios de coleções, e por padrão recolhe recompensas de relíquias;
+
 > Coliseu: na opção padrão do macro ele irá batalhar no coliseu de 00:00 até às 04:00 da manhã todos os dias, e no primeiro dia de cada mês ele batalha um pouco mais. Há a opção de lutar somente no coliseu;
+
 > Campanha: Funções da campanha 100% funcional;
+
 > Troca de Ouro e Prata: Sempre trocando prata por ouro;
+
 > Masmorra do Clã: Sempre que disponível irá batalhar na masmorra;
+
 > Eventos: Todos eventos diários funcionando normalmente, incluindo com chance de derrotar o Rei dos imortais (testados em vários níveis);
+
 > Eventos temporários: Apenas alguns eventos funcionando. Você pode solicitar um evento.
 
 > Funções extras: Usar elixir quando a missão estiver disponível, usar pedra assim que começa o rei, forçar executar uma função (digite "list" a qualquer momento), esquivar aliados em batalhas (conforme escolha ao configurar),instalação facilitada com o arquivo update.sh.
+
 > Criptografia de senha: Pode ficar tranquilo, sua senha não será enviada a nenhum servidor, ela é automaticamente criptografada e salva no seu dispositivo para manter o login automático para as próximas vezes.
 
+---
 **Tutorial de instalação, recomendado para qualquer Android e Iphone (problema de instabilidade)**
 
  **_Alternativa para Android 7 ou superior_**
