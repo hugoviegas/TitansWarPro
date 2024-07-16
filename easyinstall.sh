@@ -2,8 +2,15 @@
 #create fold twm if does not exist
 mkdir -p ~/twm
 
+if [ -z "$@" ]; then
+  version="master"
+else
+  #./easyinstall.sh beta1, or backup
+  version="$@"
+fi
+
 if [ ! -e "~/twm/info.sh" ]; then
-  curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/info.sh -s -L >"$HOME"/twm/info.sh
+  curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/$version/info.sh -s -L >"$HOME"/twm/info.sh
   chmod +x ~/twm/info.sh
   sleep 0.5s
 fi
@@ -15,12 +22,7 @@ script_slogan
 #access dir
 cd ~/twm || exit
 
-if [ -z "$@" ]; then
-  version="master"
-else
-  #./easyinstall.sh beta1, or backup
-  version="$@"
-fi
+#
 
 SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/$version/"
 remote_count=$(curl "${SERVER}"easyinstall.sh -s -L | wc -c)
@@ -76,7 +78,7 @@ if uname | grep -q -i "cygwin"; then
     :
   else
     #/cygwin repository
-    curl -s -L -O "http://raw.githubusercontent.com/sharesourcecode/apt-cyg/master/apt-cyg" &
+    curl -s -L -O "https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/apt-cyg" &
     >/dev/null
     install apt-cyg /bin
   fi

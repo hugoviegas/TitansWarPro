@@ -22,7 +22,7 @@ case $VERSION in
   VERSION="Master"
   ;;
 2)
-  VERSION="beta"
+  VERSION="Beta"
   ;;
 3)
   VERSION="Backup"
@@ -39,8 +39,7 @@ cd ~/twm || exit
 
 SCRIPTS="easyinstall.sh info.sh"
 rm -rf "$HOME/$SCRIPTS" "$SCRIPTS" 2>/dev/null
-printf ${version}
-sleep 4s
+
 SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/${version}/"
 
 NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
