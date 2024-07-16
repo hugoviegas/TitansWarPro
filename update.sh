@@ -29,8 +29,7 @@ case $VERSION in
   ;;
 
 esac
-printf $VERSION
-sleep 4s
+
 version=$(echo "$VERSION" | sed 's/[ \t]//g' | tr "[[:upper:]]" "[[:lower:]]")
 
 printf "\n${CYAN_BLACK}🔧 Preparing${COLOR_RESET} ${GOLD_BLACK}$VERSION${COLOR_RESET} ${CYAN_BLACK}repository source...${COLOR_RESET}\n"
@@ -40,7 +39,8 @@ cd ~/twm || exit
 
 SCRIPTS="easyinstall.sh info.sh"
 rm -rf "$HOME/$SCRIPTS" "$SCRIPTS" 2>/dev/null
-
+printf ${version}
+sleep 4s
 SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/${version}/"
 
 NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
