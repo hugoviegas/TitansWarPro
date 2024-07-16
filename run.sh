@@ -15,7 +15,7 @@ twm_play () {
  #/game time
  case $(date +%H:%M) in
   #/No events time with coliseum
-  (00:00|00:30|01:00|01:30|02:00|02:30|03:00|03:30)
+  (00:[0-5][0-9]|01:00|01:30|02:00|02:30|03:00|03:30)
    standard_crono
    coliseum_start
   ;;
