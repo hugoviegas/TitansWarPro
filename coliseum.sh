@@ -57,7 +57,7 @@ coliseum_fight() {
             ) </dev/null &>/dev/null &
             time_exit 17
             local access_link=$(grep -o -E '/(coliseum/[A-Za-z]+/[?]r[=][0-9]+|coliseum)' $src_ram | grep -v 'dodge' | sed -n 1p) #5
-            printf " 💤	...\n${access_link}\n"
+            printf " 💤	Waiting...\n${access_link}\n"
             sleep 3s
         done
         cl_access() {
@@ -137,10 +137,11 @@ coliseum_fight() {
             #/random
             elif awk -v latk="$(($(date +%s) - $last_atk))" -v atktime="$LA" 'BEGIN { exit !(latk != atktime) }' && ! grep -q -o 'txt smpl grey' $src_ram && awk -v rhp="$RHP" -v enh="$ENH" 'BEGIN { exit !(rhp < enh) }' || awk -v latk="$(($(date +%s) - $last_atk))" -v atktime="$LA" 'BEGIN { exit !(latk != atktime) }' && ! grep -q -o 'txt smpl grey' $src_ram && grep -q -o "$USER" allies.txt; then
                 (
-                    w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$ATKRND" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
+                    w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$GRASS" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
                 ) </dev/null &>/dev/null &
                 time_exit 17
                 cl_access
+                echo USING GRASS........
                 last_atk=$(date +%s) #11.last_atk
             #/attack
             elif awk -v latk="$(($(date +%s) - $last_atk))" -v atktime="$LA" 'BEGIN { exit !(latk > atktime) }'; then
@@ -150,15 +151,6 @@ coliseum_fight() {
                 time_exit 17
                 cl_access
                 last_atk=$(date +%s) #11.last_atk
-                #stone...
-                if awk -v ush="$(cat USH)" 'BEGIN { exit !(ush < 25) }' ; then
-                (
-                    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat STONE)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >$src_ram
-                ) </dev/null &>/dev/null &
-                time_exit 17
-                cl_access
-                echo Using Stone...........
-                fi #...stone
             else
                 (
                     w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/coliseum" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
