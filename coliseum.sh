@@ -137,11 +137,10 @@ coliseum_fight() {
             #/random
             elif awk -v latk="$(($(date +%s) - $last_atk))" -v atktime="$LA" 'BEGIN { exit !(latk != atktime) }' && ! grep -q -o 'txt smpl grey' $src_ram && awk -v rhp="$RHP" -v enh="$ENH" 'BEGIN { exit !(rhp < enh) }' || awk -v latk="$(($(date +%s) - $last_atk))" -v atktime="$LA" 'BEGIN { exit !(latk != atktime) }' && ! grep -q -o 'txt smpl grey' $src_ram && grep -q -o "$USER" allies.txt; then
                 (
-                    w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$GRASS" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
+                    w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$ATKRND" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
                 ) </dev/null &>/dev/null &
                 time_exit 17
                 cl_access
-                echo USING GRASS........
                 last_atk=$(date +%s) #11.last_atk
             #/attack
             elif awk -v latk="$(($(date +%s) - $last_atk))" -v atktime="$LA" 'BEGIN { exit !(latk > atktime) }'; then
