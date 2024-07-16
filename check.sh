@@ -12,7 +12,7 @@ check_missions() {
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
       time_exit 20
-      printf "${GREEN_BLACK}Chest opened (✔)${COLOR_RESET}\n"
+      printf "${GREEN_BLACK}Chest opened ✅${COLOR_RESET}\n"
     fi
   done
   #collect quests 
@@ -43,7 +43,7 @@ check_missions() {
       ) </dev/null &>/dev/null &
       time_exit 20
       echo $click
-      printf "${GREEN_BLACK}Mission Completed (✔)${COLOR_RESET}\n"
+      printf "${GREEN_BLACK}Mission Completed ✅${COLOR_RESET}\n"
     fi
     #i=$((i + 1))
   done
@@ -60,7 +60,7 @@ check_missions() {
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
       time_exit 20
-      printf "${GREEN_BLACK}Relic collected (✔)${COLOR_RESET}\n"
+      printf "${GREEN_BLACK}Relic collected ✅${COLOR_RESET}\n"
     fi
     i=$((i + 1))
   done
@@ -75,9 +75,9 @@ check_missions() {
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &
     time_exit 20
-    printf "${GREEN_BLACK}Collection collected (✔)${COLOR_RESET}\n"
+    printf "${GREEN_BLACK}Collection collected ✅${COLOR_RESET}\n"
   fi
-  printf "${GREEN_BLACK}Missions (✔)${COLOR_RESET}\n"
+  printf "${GREEN_BLACK}Missions ✅${COLOR_RESET}\n"
 }
 
 apply_event() {
@@ -93,6 +93,6 @@ apply_event() {
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${APPLY}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &
     time_exit 20
-    printf "${BLACK_YELLOW}Applied for battle (✔)${COLOR_RESET}\n"
+    printf "${BLACK_YELLOW}Applied for battle ✅${COLOR_RESET}\n"
   fi
 }

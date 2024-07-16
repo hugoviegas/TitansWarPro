@@ -94,7 +94,7 @@ clanfight_fight() {
   unset cf_access _random
   #/end
   func_unset
-  printf "ClanFight(✔)\n"
+  printf "ClanFight ✅\n"
   sleep 10s
   clear
 }

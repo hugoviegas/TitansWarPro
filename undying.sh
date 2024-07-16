@@ -46,7 +46,7 @@ undying_fight () {
 
  #/end
  unset cf_access
- printf "Undying (✔)\n"
+ printf "Undying ✅\n"
  sleep 15s
  apply_event undying
 

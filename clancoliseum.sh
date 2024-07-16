@@ -84,7 +84,7 @@ clancoliseum_fight() {
   rm "$src_ram" "$full_ram"
   unset dir_ram tmp_ram src_ram full_ram ACCESS cf_access
   #/end
-  printf "ClanColiseum(✔)\n"
+  printf "ClanColiseum ✅\n"
   sleep 10s
   clear
 }

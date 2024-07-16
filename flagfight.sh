@@ -89,7 +89,7 @@ flagfight_fight() {
   unset dir_ram tmp_ram src_ram full_ram ACCESS cf_access
 
   #/end
-  printf "flagfight(✔)\n"
+  printf "Flagfight ✅\n"
   sleep 10s
 
   #apply to fight

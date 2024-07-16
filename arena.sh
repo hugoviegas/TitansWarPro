@@ -14,7 +14,7 @@ arena_fault() {
     echo "$ACCESS"
     sleep 1s
   done
-  echo -e "fault (✔)\n"
+  echo -e "fault ✅\n"
 }
 arena_collFight() {
   (
@@ -35,7 +35,7 @@ arena_collFight() {
     ) </dev/null &>/dev/null &
     time_exit 17
     echo "/collfight/enterFight"
-    echo -e "collfight (✔)\n"
+    echo -e "collfight ✅\n"
   fi
 }
 arena_takeHelp() {
@@ -81,6 +81,8 @@ arena_deleteEnd() {
     time_exit 17
   fi
 }
+
+<<Temporario
 checkQuest() {
   quest_id="$*"
   clan_id
@@ -107,14 +109,15 @@ checkQuest() {
     time_exit 17
   fi
 }
+Temporario
 arena_duel() {
   # arena_collFight
   # arena_fault
   # clear
-  printf "arena ...\n"
+  printf "Arena ⚔ ...\n"
   #arena_takeHelp
-  checkQuest 3
-  checkQuest 4
+  # checkQuest 3
+  # checkQuest 4
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/arena/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
@@ -144,9 +147,9 @@ arena_duel() {
     time_exit 17
     echo " Sell all itens ✅"
   #arena_deleteEnd
-  checkQuest 3
-  checkQuest 4
-  echo -e "${GREEN_BLACK}arena (✔)${COLOR_RESET}\n"
+  # checkQuest 3
+  # checkQuest 4
+  echo -e "${GREEN_BLACK}Arena ✅${COLOR_RESET}\n"
 }
 arena_fullmana() {
   echo "energy arena ...\n"
@@ -164,5 +167,5 @@ arena_fullmana() {
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "${URL}/arena/lastPlayer/?r=$(cat ATK1)&fullmana=true" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | head -n5 | tail -n4
   ) </dev/null &>/dev/null &
   time_exit 17
-  echo -e "${GREEN_BLACK}energy arena (✔)${COLOR_RESET}\n"
+  echo -e "${GREEN_BLACK}energy arena ✅${COLOR_RESET}\n"
 }

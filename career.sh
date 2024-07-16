@@ -6,7 +6,7 @@ career_func() {
   time_exit 17
   if grep -q -o -E '/career/attack/[?]r[=][0-9]+' "$TMP"/SRC; then
 
-    checkQuestTest 6
+    # checkQuest 6
 
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/career/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
@@ -30,7 +30,7 @@ career_func() {
       done
     fi
 
-    checkQuest 6
+    # checkQuest 6
 
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
@@ -41,9 +41,9 @@ career_func() {
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${ENDQUEST}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &
     time_exit 20
-    printf "${GREEN_BLACK}career (✔)${COLOR_RESET}\n"
+    printf "${GREEN_BLACK}Career ✅${COLOR_RESET}\n"
   else
-    printf "${GREEN_BLACK}career (✔)${COLOR_RESET}\n"
+    printf "${GREEN_BLACK}Career ✅${COLOR_RESET}\n"
   fi
 
 }

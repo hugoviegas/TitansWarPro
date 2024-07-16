@@ -1,30 +1,4 @@
 # shellcheck disable=SC2148
-checkQuest() {
-  quest_id="$*"
-  clan_id
-  if [ -n "${CLD}" ]; then
-  (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan/${CLD}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-  ) </dev/null &>/dev/null &
-  time_exit 20
-
-  click=$(grep -oE "/quest/(take|help|deleteHelp|end)/$quest_id/\?r=[0-9]{8}" "$TMP"/SRC | head -1)
-  # echo "$click"
-    (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    ) </dev/null &>/dev/null &
-    time_exit 20
-    echo " Quest $quest_id Check..."
-  
-  #done
-    
-  else
-    (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL/clanrating/wantedToClan" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
-    ) </dev/null &>/dev/null &
-    time_exit 17
-  fi
-}
 cave_start() {
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
@@ -128,14 +102,14 @@ cave_start() {
       ) </dev/null &>/dev/null &
       time_exit 20
     fi
-    printf "cave (✔)\n"
+    printf "Cave ✅\n"
     unset ACCESS1 ACCESS2 ACTION DOWN MEGA
   done
 }
 
 cave_routine() {
   printf "Cave...\n"
-  checkQuest 5
+  # checkQuest 5
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/cave/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
@@ -161,8 +135,8 @@ cave_routine() {
         ;;
       esac
     done
-    checkQuest 5
+    # checkQuest 5
   fi
   
-  echo -e "${GREEN_BLACK}Cave (✔)${COLOR_RESET}\n"
+  echo -e "${GREEN_BLACK}Cave ✅${COLOR_RESET}\n"
 }
