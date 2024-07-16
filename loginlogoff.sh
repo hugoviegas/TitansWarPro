@@ -31,7 +31,7 @@ login_logoff () {
   until [ "$check" -lt 1 ]; do
    clear
    printf "Please wait...\n"
-   printf "[Wait to $ACC... (${check}s) - ENTER to other account] \n"
+   printf "[Wait to $ACC... (${check}s) - press ENTER to change account] \n"
    local check=$((check - 1))
    if read -t 1; then
     ACC=""
@@ -133,4 +133,5 @@ login_logoff () {
 
  done
  messages_info
+ standard_crono
 }
