@@ -33,9 +33,11 @@ Lista do que este macro faz:
 > Criptografia de senha: Pode ficar tranquilo, sua senha não será enviada a nenhum servidor, ela é automaticamente criptografada e salva no seu dispositivo para manter o login automático para as próximas vezes.
 
 ---
+
 **Tutorial de instalação, recomendado para qualquer Android e Iphone (problema de instabilidade)**
 
- **_Alternativa para Android 7 ou superior_**
+**_Alternativa para Android 7 ou superior_**
+
 > 1 - Abra o app Termux(https://play.google.com/store/apps/details?id=com.termux) no Android e digite ou cole os comandos abaixo para atualizar os pacotes.
 
 - Podem ocorrer questões.

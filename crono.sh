@@ -97,7 +97,7 @@ func_sleep() {
    esac
 }
 
-standard_crono() {
+scrono() {
    arena_duel
    career_func
    cave_routine
