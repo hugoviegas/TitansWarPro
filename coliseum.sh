@@ -61,24 +61,37 @@ coliseum_fight() {
             sleep 3s
         done
         cl_access() {
-            last_heal=$(($(date +%s) - 90))                                                                                                                       #8.last_heal
-            last_dodge=$(($(date +%s) - 20))                                                                                                                      #9.last_dodge
-            last_atk=$(($(date +%s) - $LA))                                                                                                                       #10.last_atk
-            USH=$(grep -o -E '(hp)[^A-z0-9]{1,4}[0-9]{2,5}' $src_ram | grep -o -E '[0-9]{2,5}' | sed 's,\ ,,g')                                                   #11.USH
-            ENH=$(grep -o -E '(nbsp)[^A-Za-z0-9]{1,2}[0-9]{1,6}' $src_ram | sed -n 's,nbsp[;],,;s,\ ,,;1p')                                                       #12.ENH
-            USER=$(grep -o -E '([[:upper:]][[:lower:]]{0,15}( [[:upper:]][[:lower:]]{0,13})?)[[:space:]][^[:alnum:]]s' $src_ram | sed -n 's,\ [<]s,,;s,\ ,_,;2p') #13.USER
-            ATK=$(grep -o -E '/coliseum/atk/[?]r[=][0-9]+' $src_ram | sed -n 1p)                                                                                  #14.ATK
-            ATKRND=$(grep -o -E '/coliseum/atkrnd/[?]r[=][0-9]+' $src_ram)                                                                                        #15.ATKRND
-            DODGE=$(grep -o -E '/coliseum/dodge/[?]r[=][0-9]+' $src_ram)                                                                                          #16.DODGE
-            HEAL=$(grep -o -E '/coliseum/heal/[?]r[=][0-9]+' $src_ram)                                                                                            #17.HEAL
+            last_heal=$(($(date +%s) - 90))                                                                                                                   #8.last_heal
+            last_dodge=$(($(date +%s) - 20))                                                                                                                   #9.last_dodge
+            last_atk=$(($(date +%s) - $LA))                                                                                                                  #10.last_atk
+            USH=$(grep -o -E '(hp)[^A-z0-9]{1,4}[0-9]{2,5}' $src_ram | grep -o -E '[0-9]{2,5}' | sed 's,\ ,,g')
+            #11.USH
+            ENH=$(grep -o -E '(nbsp)[^A-Za-z0-9]{1,2}[0-9]{1,6}' $src_ram | sed -n 's,nbsp[;],,;s,\ ,,;1p')
+            #12.ENH
+            USER=$(grep -o -E '([[:upper:]][[:lower:]]{0,15}( [[:upper:]][[:lower:]]{0,13})?)[[:space:]][^[:alnum:]]s' $src_ram | sed -n 's,\ [<]s,,;s,\ ,_,;2p')
+            #13.USER
+            ATK=$(grep -o -E '/coliseum/atk/[?]r[=][0-9]+' $src_ram | sed -n 1p)
+            #14.ATK
+            ATKRND=$(grep -o -E '/coliseum/atkrnd/[?]r[=][0-9]+' $src_ram)
+            #15.ATKRND
+            DODGE=$(grep -o -E '/coliseum/dodge/[?]r[=][0-9][a-z]+' $src_ram)
+            #16.DODGE
+            HEAL=$(grep -o -E '/coliseum/heal/[?]r[=][0-9]+' $src_ram)
+            #17.HEAL
+            STONE=$(grep -o -E '/coliseum/stone/[?]r[=][0-9]+' $src_ram)
+            #18.STONE
+            GRASS=$(grep -o -E '/coliseum/grass/[?]r[=][0-9]+' $src_ram)
+            #19.GRASS
             RHP=$(awk -v ush="$USH" -v rper="$RPER" 'BEGIN { printf "%.0f", ush * rper / 100 + ush }')
             HLHP=$(awk -v ush="$(cat $full_ram)" -v hper="$HPER" 'BEGIN { printf "%.0f", ush * hper / 100 }')
             if grep -q -o '/dodge/' $src_ram; then # Exibe batalha se houver link de esquiva...
                 printf "\n     🙇‍ "
                 w3m -dump -T text/html "$src_ram" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{2,5\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\]\ ,\🔴,g;s,\[1\]\ ,\🔵,g;s,\[stone\],\ 💪,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\],\ 💀,g'
                 #    time_exit 17
-            else                                                                                           #...exibiu || aguarda ou finaliza...
-                if grep -q -o '?end_fight=true' $src_ram; then                                             # aguarda como expectador...
+            else
+            #...exibiu || aguarda ou finaliza...
+                if grep -q -o '?end_fight=true' $src_ram; then
+                # aguarda como expectador...
                     if awk -v ltime="$(($(date +%s) - $first_time))" 'BEGIN { exit !(ltime < 300) }'; then # se passar 300s...
                         (
                             w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/coliseum" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
@@ -137,6 +150,15 @@ coliseum_fight() {
                 time_exit 17
                 cl_access
                 last_atk=$(date +%s) #11.last_atk
+                #stone...
+                if awk -v ush="$(cat USH)" 'BEGIN { exit !(ush < 25) }' ; then
+                (
+                    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat STONE)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >$src_ram
+                ) </dev/null &>/dev/null &
+                time_exit 17
+                cl_access
+                echo Using Stone...........
+                fi #...stone
             else
                 (
                     w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/coliseum" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
