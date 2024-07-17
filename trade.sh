@@ -1,5 +1,5 @@
 func_trade() {
-  printf "Trade ⚖️...\n"
+  printf "Trade ⚖️\n"
   (
     w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/trade/exchange" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
   ) &
@@ -11,7 +11,7 @@ func_trade() {
     #printf "$ACCESS\n"
     SILVER_NUMBER=$(echo "$ACCESS" | cut -d'/' -f5 | cut -d'?' -f1)
 
-    printf " Exchange ${BLACK_YELLOW}$SILVER_NUMBER🪙${COLOR_RESET} !\n"
+    ECHO -e " Exchange ${GOLD_BLACK}$SILVER_NUMBER🪙${COLOR_RESET}\n"
     (
       w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$ACCESS" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
     ) &
