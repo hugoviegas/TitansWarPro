@@ -22,13 +22,13 @@ colors() {
 }
 
 script_slogan() {
-     colors="10 9 8 2 1 5 4 3  6 7"
+     colors="10 9 8 2 1 5 4 3 6 7"
      t=339
      w=59
      m=89
      author="author: Hugo Viegas"
      #collaborator="collaborator: @_hviegas"
-     versionNum="3.2.23 (Beta)"
+     versionNum="3.2.24 (Beta)"
      for i in $colors; do
           clear
           t=$((t - 27))
