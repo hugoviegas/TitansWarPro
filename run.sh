@@ -6,7 +6,6 @@ twm_play () {
     kill -9 $pidf 2> /dev/null
     pidf=$(ps ax -o pid=,args=|grep "sh.*twm/twm.sh"|grep -v 'grep'|head -n 1|grep -o -E '([0-9]{3,5})')
     sleep 1s
-    echo pass 1
    done
   fi
  }

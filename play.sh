@@ -8,7 +8,6 @@
       kill -9 ${pidf} 2>/dev/null
       pidf=$(ps ax -o pid=,args= | grep "sh.*twm/twm.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
       sleep 1s
-      echo pass 4
     done
     run_mode() {
       if echo "$RUN" | grep -q -E '[-]cl'; then
@@ -27,7 +26,6 @@
         $HOME/twm/twm.sh -boot
       fi
     }
-    echo pass 5
     run_mode
     sleep 0.1s
   done
