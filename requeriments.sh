@@ -234,4 +234,5 @@ requer_func () {
  #/DOS to Unix
  sed -i 's/^M$//g' "$TMP"/userAgent.txt &>/dev/null
  sed -i 's/\x0D$//g' "$TMP"/userAgent.txt &>/dev/null
+ echo pass 3
 }
