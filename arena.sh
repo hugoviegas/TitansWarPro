@@ -145,7 +145,7 @@ arena_duel() {
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${SELL}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &
     time_exit 17
-    echo " Sell all itens 💰✅"
+    echo " Sell all itens 💰"
   #arena_deleteEnd
   # checkQuest 3
   # checkQuest 4

@@ -129,33 +129,34 @@ cave_routine() {
         RESULT=$(echo "$CAVE" | cut -d'/' -f3)
         case $RESULT in
         *down*)
-        echo " Cave New Search"
+        echo " Cave new search 🔍"
         ;;
         *gather*)
-        echo " Cave Start Mining"
+        echo " Cave start mining ⛏️"
         ;;
         *speedUp*)
-        echo " Cave Seep Up Mining"
+        echo " Cave seepd up mining ⚡"
         ;;
         *runaway*)
-        echo " Cave Run Away"
+        echo " Cave run away 💨"
         ;;
         *attack*)
-        echo " Cave Attack monster"
+        echo " Cave attack monster 🧌"
         ;;
         esac
         #echo "Cave $RESULT"
-        echo "/n"
+        #echo "\n"
         # shellcheck disable=SC2155
         local CAVE=$(grep -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
         ;;
         (*speedUp*)
         break
-        echo -e "${GREEN_BLACK}Cave Done✅${COLOR_RESET}\n"
         ;;
       esac
     done
     # checkQuest 5
   fi
   
+  echo -e "${GREEN_BLACK}Cave Done✅${COLOR_RESET}\n"
+
 }
