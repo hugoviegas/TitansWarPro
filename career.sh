@@ -18,7 +18,7 @@ career_func() {
       local BREAK=$(($(date +%s) + 60))
       while [ -n "$CAREER" ] && [ $(date +%s) -lt "$BREAK" ]; do
         case $CAREER in
-        *attack* | *take*)
+        *attack*)
           (
             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAREER" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
           ) </dev/null &>/dev/null &
@@ -27,6 +27,16 @@ career_func() {
           echo " Career -> $RESULT !"
           local CAREER=$(grep -o -E '/career/(attack|take)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
           ;;
+          *take*)
+          (
+            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAREER" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+          ) </dev/null &>/dev/null &
+          time_exit 20
+          RESULT=$(echo "$CAREER" | cut -d'/' -f3)
+          echo " Career -> $RESULT !"
+          break
+          ;;
+          
         esac
       done
     fi
