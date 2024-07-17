@@ -1,5 +1,6 @@
 twm_play () {
  restart_script () {
+  # shellcheck disable=SC2317
   if [ "$RUN" != '-boot' ]; then
    pidf=$(ps ax -o pid=,args=|grep "sh.*twm/twm.sh"|grep -v 'grep'|head -n 1|grep -o -E '([0-9]{3,5})')
    until [ -z "$pidf" ]; do
