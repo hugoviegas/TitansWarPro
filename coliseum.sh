@@ -18,7 +18,7 @@ coliseum_fight() {
     local LA=4    #2.Interval attack
     local HPER=38 #3.HPER % to heal
     local RPER=5  #4.RPER % to random
-    echo -e "${RED_BLACK}Coliseum ⚔️${COLOR_RESET}"
+    printf "\nColiseum ...\n"
     (
         w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug $URL/settings/graphics/0 -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
     ) </dev/null &>/dev/null &
@@ -57,49 +57,40 @@ coliseum_fight() {
             ) </dev/null &>/dev/null &
             time_exit 17
             local access_link=$(grep -o -E '/(coliseum/[A-Za-z]+/[?]r[=][0-9]+|coliseum)' $src_ram | grep -v 'dodge' | sed -n 1p) #5
-            printf " 💤	Waiting...\n${access_link}\n"
+            printf " 💤	...\n${access_link}\n"
             sleep 3s
         done
         cl_access() {
-            last_heal=$(($(date +%s) - 90))                                                                                                                   #8.last_heal
-            last_dodge=$(($(date +%s) - 20))                                                                                                                   #9.last_dodge
-            last_atk=$(($(date +%s) - $LA))                                                                                                                  #10.last_atk
-            USH=$(grep -o -E '(hp)[^A-z0-9]{1,4}[0-9]{2,5}' $src_ram | grep -o -E '[0-9]{2,5}' | sed 's,\ ,,g')
-            #11.USH
-            ENH=$(grep -o -E '(nbsp)[^A-Za-z0-9]{1,2}[0-9]{1,6}' $src_ram | sed -n 's,nbsp[;],,;s,\ ,,;1p')
-            #12.ENH
-            USER=$(grep -o -E '([[:upper:]][[:lower:]]{0,15}( [[:upper:]][[:lower:]]{0,13})?)[[:space:]][^[:alnum:]]s' $src_ram | sed -n 's,\ [<]s,,;s,\ ,_,;2p')
-            #13.USER
-            ATK=$(grep -o -E '/coliseum/atk/[?]r[=][0-9]+' $src_ram | sed -n 1p)
-            #14.ATK
-            ATKRND=$(grep -o -E '/coliseum/atkrnd/[?]r[=][0-9]+' $src_ram)
-            #15.ATKRND
-            DODGE=$(grep -o -E '/coliseum/dodge/[?]r[=][0-9][a-z]+' $src_ram)
-            #16.DODGE
-            HEAL=$(grep -o -E '/coliseum/heal/[?]r[=][0-9]+' $src_ram)
-            #17.HEAL
+            last_heal=$(($(date +%s) - 90))                                                                                                                       #8.last_heal
+            last_dodge=$(($(date +%s) - 20))                                                                                                                      #9.last_dodge
+            last_atk=$(($(date +%s) - $LA))                                                                                                                       #10.last_atk
+            USH=$(grep -o -E '(hp)[^A-z0-9]{1,4}[0-9]{2,5}' $src_ram | grep -o -E '[0-9]{2,5}' | sed 's,\ ,,g')                                                   #11.USH
+            ENH=$(grep -o -E '(nbsp)[^A-Za-z0-9]{1,2}[0-9]{1,6}' $src_ram | sed -n 's,nbsp[;],,;s,\ ,,;1p')                                                       #12.ENH
+            USER=$(grep -o -E '([[:upper:]][[:lower:]]{0,15}( [[:upper:]][[:lower:]]{0,13})?)[[:space:]][^[:alnum:]]s' $src_ram | sed -n 's,\ [<]s,,;s,\ ,_,;2p') #13.USER
+            ATK=$(grep -o -E '/coliseum/atk/[?]r[=][0-9]+' $src_ram | sed -n 1p)                                                                                  #14.ATK
+            ATKRND=$(grep -o -E '/coliseum/atkrnd/[?]r[=][0-9]+' $src_ram)                                                                                        #15.ATKRND
+            DODGE=$(grep -o -E '/coliseum/dodge/[?]r[=][0-9]+' $src_ram)                                                                                          #16.DODGE
+            HEAL=$(grep -o -E '/coliseum/heal/[?]r[=][0-9]+' $src_ram)                                                                                            #17.HEAL
             RHP=$(awk -v ush="$USH" -v rper="$RPER" 'BEGIN { printf "%.0f", ush * rper / 100 + ush }')
             HLHP=$(awk -v ush="$(cat $full_ram)" -v hper="$HPER" 'BEGIN { printf "%.0f", ush * hper / 100 }')
             if grep -q -o '/dodge/' $src_ram; then # Exibe batalha se houver link de esquiva...
                 printf "\n     🙇‍ "
-                w3m -dump -T text/html "$src_ram" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{2,5\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\]\ ,\🔴,g;s,\[1\]\ ,\🔵,g;s,\[stone\],\ 🪨,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\],\ 💀,g'
+                w3m -dump -T text/html "$src_ram" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{2,5\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\]\ ,\🔴,g;s,\[1\]\ ,\🔵,g;s,\[stone\],\ 💪,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\],\ 💀,g'
                 #    time_exit 17
-            else
-            #...exibiu || aguarda ou finaliza...
-                if grep -q -o '?end_fight=true' $src_ram; then
-                # aguarda como expectador...
+            else                                                                                           #...exibiu || aguarda ou finaliza...
+                if grep -q -o '?end_fight=true' $src_ram; then                                             # aguarda como expectador...
                     if awk -v ltime="$(($(date +%s) - $first_time))" 'BEGIN { exit !(ltime < 300) }'; then # se passar 300s...
                         (
                             w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/coliseum" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
                         ) </dev/null &>/dev/null &
                         time_exit 17
                         printf "\n     🙇‍ "
-                        w3m -dump -T text/html "$src_ram" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{2,5\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\]\ ,\🔴,g;s,\[1\]\ ,\🔵,g;s,\[stone\],\ 🪨,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\],\ 💀,g'
+                        w3m -dump -T text/html "$src_ram" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{2,5\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\]\ ,\🔴,g;s,\[1\]\ ,\🔵,g;s,\[stone\],\ 💪,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\],\ 💀,g'
                         #      time_exit 17
                     fi #...passou 300s
                 else   #...cessa espera || finaliza...
                     BREAK_LOOP=1
-                    echo -e "${RED_BLACK}Battle's over.${COLOR_RESET}"
+                    printf "${BLACK_YELLOW}Battle's over.${COLOR_RESET}\n"
                     sleep 2s
                 fi #...finalizou a batalha
             fi     #...cessou procura por esquiva
@@ -160,17 +151,17 @@ coliseum_fight() {
         #/end
         func_unset
         if awk -v smodplay="$RUN" -v rmodplay="-cl" 'BEGIN { exit !(smodplay != rmodplay) }'; then printf "\nYou can run ./twm/play.sh -cl\n"; fi
-        echo -e "${GREEN_BLACK}Coliseum ✅${COLOR_RESET}"
+        printf "${GREEN_BLACK}Coliseum (✔)${COLOR_RESET}\n"
     else
-        echo -e "${WHITEb_BLACK}It was not possible to start the battle at this time.${COLOR_RESET}"
+        printf "${WHITEb_BLACK}It was not possible to start the battle at this time.${COLOR_RESET}\n"
     fi
 }
 coliseum_start() {
-    if $(case $(date +%H:%M) in
-    (09:2[4-9] | 9:5[4-9] | 10:1[0-4] | 10:2[4-9] | 10:5[4-9] | 12:2[4-9] | 13:5[4-9] | 14:5[4-9] | 15:5[4-9] | 16:1[0-4] | 16:2[4-9] | 18:5[4-9] | 20:5[4-9] | 21:2[4-9] | 21:5[4-9] | 22:2[4-9])
+    if case $(date +%H:%M) in
+    09:2[4-9] | 9:5[4-9] | 10:1[0-4] | 10:2[4-9] | 10:5[4-9] | 12:2[4-9] | 13:5[4-9] | 14:5[4-9] | 15:5[4-9] | 16:1[0-4] | 16:2[4-9] | 18:5[4-9] | 20:5[4-9] | 21:2[4-9] | 21:5[4-9] | 22:2[4-9])
         exit 1
         ;;
-    esac) ; then
+    esac  then
         if echo "$RUN" | grep -q -E '[-]boot'; then
             (
                 w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
