@@ -64,7 +64,6 @@ twm_start() {
   elif echo "$RUN" | grep -q -E '[-]boot'; then
     twm_play
   else
-  echo pass 01
     twm_play
   fi
 }
@@ -72,7 +71,6 @@ func_unset() {
   unset HP1 HP2 YOU USER CLAN ENTER ENTER ATK ATKRND DODGE HEAL GRASS STONE BEXIT OUTGATE LEAVEFIGHT WDRED HLHP
 }
 if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ] ; then
-echo pass 200
  printf "${GREEN_BLACK} Starting with last settings used.${COLOR_RESET}\n"
  num=6
  for i in $(seq 3 -1 1) ; do
