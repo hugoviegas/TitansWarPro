@@ -26,7 +26,7 @@ script_slogan() {
      m=89
      author="author: Hugo Viegas"
      #collaborator="collaborator: @_hviegas"
-     versionNum="3.2.16 (Beta)"
+     versionNum="3.2.17 (Beta)"
      for i in $colors; do
           clear
           t=$((t - 27))
@@ -107,8 +107,8 @@ hpmp() {
      #/e.g.
      #/printf %b "HP ❤️ $NOWHP - $(printf "%.2f" "${HPPER}")% | MP Ⓜ️ $NOWMP - $(printf "%.2f" "${MPPER}")%\n"
 }
-testColour()
-{
+
+testColour() {
    echo -e "${BLACK_BLACK}BLACK_BLACK${COLOR_RESET}\n"
    echo -e "${BLACK_CYAN}BLACK_CYAN${COLOR_RESET}\n"
    echo -e "${BLACK_GREEN}BLACK_GREEN${COLOR_RESET}\n"

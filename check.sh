@@ -42,8 +42,8 @@ check_missions() {
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
       time_exit 20
-      local MISSION_NUMBER=$(echo "$click" | cut -d'/' -f3 | cut -d'?' -f1)
-      echo -e " ${GREEN_BLACK}Mission [$MISSION_NUMBER] Completed ✅${COLOR_RESET}\n"
+      #local MISSION_NUMBER=$(echo "$click" | cut -d'/' -f3 | cut -d'?' -f1)
+      #echo -e " ${GREEN_BLACK}Mission [$MISSION_NUMBER] Completed ✅${COLOR_RESET}\n"
     fi
     #i=$((i + 1))
   done
@@ -60,7 +60,7 @@ check_missions() {
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
       time_exit 20
-      echo -e " ${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}\n"
+      #echo -e " ${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}\n"
     fi
     i=$((i + 1))
   done
