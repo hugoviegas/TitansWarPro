@@ -22,7 +22,7 @@ colors() {
 }
 
 script_slogan() {
-     colors="10 9 8 7 6 5 4 3 2 1"
+     colors="10 9 8 7 6 5 4 3 2 1 6 7"
      t=339
      w=59
      m=89
