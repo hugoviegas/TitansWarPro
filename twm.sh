@@ -1,25 +1,21 @@
 #!/bin/bash
 . "$HOME"/twm/info.sh
-echo pass 06
 colors
 RUN=$(cat "$HOME"/twm/runmode_file)
 cd "$HOME"/twm || exit
-echo pass 07
+
 script_ads() {
   if [ "$RUN" != '-boot' ] && [ -f "$HOME/twm/ads_file" ] && [ -s "$HOME/twm/ads_file" ] && [ "$(cat "$HOME"/twm/ads_file)" != "$(date +%d)" ]; then
     if [ "$(cat "$HOME"/twm/ads_file 2>/dev/null)" != "$(date +%d)" ]; then
       xdg-open "https://apps.disroot.org/search?q=Shell+Script&category_general=on&language=pt-BR&time_range=&safesearch=1&theme=beetroot"
       date +%d >"$HOME"/twm/ads_file
-      echo pass 05
     fi
   else
-  echo pass 04
     date +%d >"$HOME"/twm/ads_file
   fi
 }
-echo pass 02
 script_ads
-echo pass 03
+
 printf "${BLACK_CYAN}\n Starting...\n👉 Please wait...☕👴${COLOR_RESET}\n"
 #. ~/twm/info.sh
 script_slogan
@@ -68,15 +64,15 @@ twm_start() {
   elif echo "$RUN" | grep -q -E '[-]boot'; then
     twm_play
   else
+  echo pass 01
     twm_play
   fi
 }
 func_unset() {
   unset HP1 HP2 YOU USER CLAN ENTER ENTER ATK ATKRND DODGE HEAL GRASS STONE BEXIT OUTGATE LEAVEFIGHT WDRED HLHP
 }
-echo pass 00
 if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ] ; then
-echo pass 1
+echo pass 200
  printf "${GREEN_BLACK} Starting with last settings used.${COLOR_RESET}\n"
  num=6
  for i in $(seq 3 -1 1) ; do
