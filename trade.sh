@@ -9,9 +9,9 @@ func_trade() {
   local BREAK=$(($(date +%s) + 30))
   until [ -z "$ACCESS" ] || [ "$(date +%s)" -gt "$BREAK" ]; do
     #printf "$ACCESS\n"
-    SILVER_NUMBER=$(echo "$ACCESS" | cut -d'/' -f5)
-    
-    printf " Exchange ${BLACK_YELLOW}[ $SILVER_NUMBER ]${COLOR_RESET} gold 🪙"
+    SILVER_NUMBER=$(echo "$ACCESS" | cut -d'/' -f5 | cut -d'?' -f1)
+
+    printf " Exchange ${BLACK_YELLOW}$SILVER_NUMBER🪙${COLOR_RESET} !\n"
     (
       w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$ACCESS" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
     ) &

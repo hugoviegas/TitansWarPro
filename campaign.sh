@@ -17,7 +17,7 @@ campaign_func() {
                 time_exit 20
                 
                 RESULT=$(echo "$CAMPAIGN" | cut -d'/' -f3)
-                echo "Campaign $RESULT"
+                echo " Campaign -> $RESULT !"
                 local CAMPAIGN=$(grep -o -E '/campaign/(go|fight|attack|end)/[?]r[=][0-9]+' $TMP/SRC | head -n 1)
                 ;;
             esac
