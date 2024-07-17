@@ -27,13 +27,13 @@ script_slogan() {
      m=89
      author="author: Hugo Viegas"
      #collaborator="collaborator: @_hviegas"
-     versionNum="3.3"
+     versionNum="3.3.2 (beta)"
      for i in $colors; do
           clear
           t=$((t - 27))
           w=$((w + 1))
           m=$((m - 2))
-          #* //⟨
+          
           printf "\033[1;38;5;${i}m
 ╔══╗╔╗╔══╗╔══╗╔══╗╔══╗  
 ╚╗╔╝╠╣╚╗╔╝║╔╗║║╔╗║║══╣  
