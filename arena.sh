@@ -88,8 +88,6 @@ arena_duel() {
   # clear
   printf "arena ...\n"
   #arena_takeHelp
-  checkQuest 3
-  checkQuest 4
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/arena/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
@@ -118,8 +116,6 @@ arena_duel() {
     ) </dev/null &>/dev/null &
     echo " Sell all itens ✅"
   #arena_deleteEnd
-  # checkQuest 3
-  # checkQuest 4
   echo -e "${GREEN_BLACK}Arena ✅${COLOR_RESET}\n"
 }
 arena_fullmana() {
