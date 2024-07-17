@@ -56,7 +56,7 @@ coliseum_fight() {
                 w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$access_link" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
             ) </dev/null &>/dev/null &
             time_exit 17
-            local access_link=$(grep -o -E '/(coliseum/[A-Za-z]+/[?]r[=][0-9]+|coliseum)' $src_ram | grep -v 'dodge' | sed -n 1p) #5
+            local access_link=$(grep -o -E '/(coliseum/[A-Za-z]+/[?]r[=][0-9]+|coliseum)' $src_ram | grep -v 'dodge' | sed -n 1p | cat -) #5
             printf " 😡	Preparing...\n${access_link}\n"
             sleep 3s
         done
