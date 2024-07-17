@@ -9,17 +9,17 @@ func_trade() {
   local BREAK=$(($(date +%s) + 30))
   until [ -z "$ACCESS" ] || [ "$(date +%s)" -gt "$BREAK" ]; do
     #printf "$ACCESS\n"
+    SILVER_NUMBER=$(echo "$ACCESS" | cut -d'/' -f5)
+    
+    printf " Exchange ${BLACK_YELLOW}[ $SILVER_NUMBER ]${COLOR_RESET} gold 🪙"
     (
       w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$ACCESS" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
     ) &
     time_exit 17
 
-    SILVER_NUMBER=$(echo "$ACCESS" | cut -d'/' -f5)
-    echo " Exchange ${BLACK_YELLOW}$SILVER_NUMBER${COLOR_RESET} gold 🪙"
-
     local ACCESS=$(grep -o -E '/trade/exchange/silver/[0-9]+[?]r[=][0-9]+' $TMP/SRC | head -n 1)
   done
-  printf "${GREEN_BLACK}Trade ✅${COLOR_RESET}\n"
+  echo -e "${GREEN_BLACK}Trade ✅${COLOR_RESET}\n"
 }
 clan_money() {
   clan_id

@@ -18,7 +18,6 @@ campaign_func() {
                 
                 RESULT=$(echo "$CAMPAIGN" | cut -d'/' -f3)
                 echo "Campaign $RESULT"
-                echo "$CAMPAIGN"
                 local CAMPAIGN=$(grep -o -E '/campaign/(go|fight|attack|end)/[?]r[=][0-9]+' $TMP/SRC | head -n 1)
                 ;;
             esac

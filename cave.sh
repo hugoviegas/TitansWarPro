@@ -151,11 +151,11 @@ cave_routine() {
         ;;
         (*speedUp*)
         break
+        echo -e "${GREEN_BLACK}Cave Done✅${COLOR_RESET}\n"
         ;;
       esac
     done
     # checkQuest 5
   fi
   
-  echo -e "${GREEN_BLACK}Cave ✅${COLOR_RESET}\n"
 }

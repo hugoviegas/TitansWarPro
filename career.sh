@@ -25,7 +25,6 @@ career_func() {
           time_exit 20
           RESULT=$(echo "$CAREER" | cut -d'/' -f3)
           echo " Career -> $RESULT !"
-          #echo "$CAREER"
           local CAREER=$(grep -o -E '/career/(attack|take)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
           ;;
         esac
