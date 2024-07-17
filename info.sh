@@ -8,7 +8,7 @@ colors() {
      BLACK_PINK='\033[01;35m\033[01;07m'
      BLACK_RED='\033[01;31m\033[01;07m'
      BLACK_YELLOW='\033[00;33m\033[01;07m'
-     CYAN_BLACK='\033[04;36m\033[02;04m]'
+     CYAN_BLACK='\033[04;36m\033[02;04m'
      CYAN_CYAN='\033[01;36m\033[08;07m'
      COLOR_RESET='\033[00m'
      GOLD_BLACK='\033[33m'
@@ -27,7 +27,7 @@ script_slogan() {
      m=89
      author="author: Hugo Viegas"
      #collaborator="collaborator: @_hviegas"
-     versionNum="3.2.19 (Beta)"
+     versionNum="3.2.20 (Beta)"
      for i in $colors; do
           clear
           t=$((t - 27))
@@ -131,22 +131,22 @@ testColour() {
 
 messages_info() {
      echo " ⚔️ - Titans War Macro - ⚔️ " >$TMP/msg_file
-     printf " -------- MAIL --------\n" >>$TMP/msg_file
+     printf " -------- 📩 MAIL --------\n" >>$TMP/msg_file
      (
           w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/mail" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | tee $TMP/info_file | sed -n '/[|]\ mp/,/\[arrow\]/p' | sed '1,1d;$d;6q' >>$TMP/msg_file
      ) </dev/null &>/dev/null &
      time_exit 17
-     printf " -------- CHAT TITANS --------\n" >>$TMP/msg_file
+     printf " -------- 💬 CHAT TITANS --------\n" >>$TMP/msg_file
      (
           w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/chat/titans/changeRoom" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -n '/\(\»\)/,/\[chat\]/p' | sed '$d;4q' >>$TMP/msg_file
      ) </dev/null &>/dev/null &
      time_exit 17
-     printf " -------- CHAT CLAN --------\n" >>$TMP/msg_file
+     printf " -------- 🗨️ CHAT CLAN --------\n" >>$TMP/msg_file
      (
           w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/chat/clan/changeRoom" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[chat\]/p' | sed '$d;4q' >>$TMP/msg_file
      ) </dev/null &>/dev/null &
      time_exit 17
-     sed -i 's/\[0\]/🔴/g;s/\[0-off\]/⭕/g;s/\[1\]/🔵/g;s/\[1-off\]/🔘/g;s/\[premium\]/👑/g;s/\[level\]/🔝/g' msg_file >>$TMP/msg_file
+     sed -i 's/\[0\]/🔴/g;s/\[0-off\]/⭕/g;s/\[1\]/🔵/g;s/\[1-off\]/🔘/g;s/\[premium\]/👑/g;s/\[level\]/🔼/g;s/\[mail\]/📩/g' msg_file >>$TMP/msg_file
      local TRAIN="~/twm/.${UR}/TRAIN"
      if [ ! -e "~/twm/.${UR}/TRAIN" ] || find "$TRAIN" -mmin +30 >/dev/null 2>&1; then
           hpmp -fix
