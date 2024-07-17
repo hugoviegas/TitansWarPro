@@ -107,6 +107,31 @@ checkQuest() {
     time_exit 17
   fi
 }
+  quest_id="$*"
+  clan_id
+  if [ -n "${CLD}" ]; then
+  (
+  printf "arena ...\n"
+  ) </dev/null &>/dev/null &
+  checkQuest 3
+  checkQuest 4
+
+  echo "$click"
+    (
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
+    ) </dev/null &>/dev/null &
+    time_exit 20
+    echo " Quest $quest_id Check..."
+  
+  #done
+    
+  else
+    (
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL/clanrating/wantedToClan" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
+    ) </dev/null &>/dev/null &
+    time_exit 17
+  fi
+}
 arena_duel() {
   # arena_collFight
   # arena_fault
@@ -139,14 +164,13 @@ arena_duel() {
   SELL=$(grep -o -E '(/inv/bag/sellAll/1/[?]r[=][0-9]+)' "$TMP"/SRC | sed -n '1p')
   #printf "%s\n" "$SELL"
     (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${SELL}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+  echo -e "${GREEN_BLACK}energy arena (✔)${COLOR_RESET}\n"
     ) </dev/null &>/dev/null &
-    time_exit 17
     echo " Sell all itens ✅"
   #arena_deleteEnd
-  checkQuest 3
-  checkQuest 4
-  echo -e "${GREEN_BLACK}arena (✔)${COLOR_RESET}\n"
+  # checkQuest 3
+  # checkQuest 4
+  echo -e "${GREEN_BLACK}Arena ✅${COLOR_RESET}\n"
 }
 arena_fullmana() {
   echo "energy arena ...\n"
@@ -164,5 +188,5 @@ arena_fullmana() {
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "${URL}/arena/lastPlayer/?r=$(cat ATK1)&fullmana=true" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | head -n5 | tail -n4
   ) </dev/null &>/dev/null &
   time_exit 17
-  echo -e "${GREEN_BLACK}energy arena (✔)${COLOR_RESET}\n"
+  echo -e "${GREEN_BLACK}energy arena ✅${COLOR_RESET}\n"
 }
