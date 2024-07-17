@@ -5,7 +5,7 @@ cave_start() {
   ) </dev/null &>/dev/null &
   time_exit 20
   while grep -q -o -E '/cave/[?]quest_t[=]quest&quest_id[=]2&qz[=][a-z0-9]+' "$TMP"/SRC || echo "$RUN" | grep -q -E '[-]cv'; do
-    printf "cave ...\n"
+    printf "Cave 🪨...\n"
     clan_id
     if [ -n "$CLD" ]; then
       (
@@ -108,7 +108,7 @@ cave_start() {
 }
 
 cave_routine() {
-  printf "Cave...\n"
+  printf "Cave 🪨...\n"
   # checkQuest 5
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/cave/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
@@ -126,6 +126,8 @@ cave_routine() {
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAVE" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
         ) </dev/null &>/dev/null &
         time_exit 20
+        RESULT=$(echo "$CAVE" | cut -d'/' -f3)
+        echo "Cave $RESULT"
         echo "$CAVE"
         # shellcheck disable=SC2155
         local CAVE=$(grep -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
