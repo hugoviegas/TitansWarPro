@@ -13,7 +13,8 @@ colors() {
      COLOR_RESET='\033[00m'
      GOLD_BLACK='\033[33m'
      GREEN_BLACK='\033[32m'
-     RED_BLACK='\033[1;38;5;2m'
+     RED_BLACK='\033[0;31m'
+     BLUE_BLACK='033[0;34m'
      PURPLEi_BLACK='\033[03;34m\033[02;03m'
      PURPLEis_BLACK='\033[03;34m\033[02;04m'
      WHITE_BLACK='\033[37m'
@@ -27,14 +28,14 @@ script_slogan() {
      m=89
      author="author: Hugo Viegas"
      #collaborator="collaborator: @_hviegas"
-     versionNum="3.2.21 (Beta)"
+     versionNum="3.2.22 (Beta)"
      for i in $colors; do
           clear
           t=$((t - 27))
           w=$((w + 1))
           m=$((m - 2))
           #* //⟨
-          printf "
+          echo -e "\033[1;38;5;${i}m
 ╔══╗╔╗╔══╗╔══╗╔══╗╔══╗  
 ╚╗╔╝╠╣╚╗╔╝║╔╗║║╔╗║║══╣  
  ║║ ║║ ║║ ║╔╗║║║║║╠══║  
@@ -126,6 +127,7 @@ testColour() {
    echo -e "${WHITE_BLACK}WHITE_BLACK${COLOR_RESET}\n"
    echo -e "${WHITEb_BLACK}WHITEb_BLACK${COLOR_RESET}\n"
    echo -e "${RED_BLACK}RED_BLACK${COLOR_RESET}\n"
+   echo -e "${BLUE_BLACK}BLUE_BLACK${COLOR_RESET}\n"
    sleep 30s
 }
 
