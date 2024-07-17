@@ -33,7 +33,7 @@ else
 fi
 
 cd ~/ || exit
-echo -e "${BLACK_CYAN} Installing TWM...\n⌛ Please wait...⌛${COLOR_RESET}"
+printf "${BLACK_CYAN} Installing TWM...\n⌛ Please wait...⌛${COLOR_RESET}"
 
 #termux
 if [ -d /data/data/com.termux/files/usr/share/doc ]; then
