@@ -18,7 +18,7 @@ coliseum_fight() {
     local LA=4    #2.Interval attack
     local HPER=38 #3.HPER % to heal
     local RPER=5  #4.RPER % to random
-    printf "\nColiseum ...\n"
+    printf "\nColiseum🧱 ...\n"
     (
         w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug $URL/settings/graphics/0 -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
     ) </dev/null &>/dev/null &
@@ -49,7 +49,7 @@ coliseum_fight() {
         time_exit 17
         local access_link=$(grep -o -E '/coliseum(/[A-Za-z]+/[?]r[=][0-9]+|/)' $src_ram | grep -v 'dodge' | sed -n 1p)
         #/wait
-        printf " 😴 Waiting...\n"
+        printf " 😠 Preparing for Battle...\n"
         local first_time=$(date +%s) #6
         until grep -q -o 'coliseum/dodge/' $src_ram || awk -v ltime="$(($(date +%s) - $first_time))" 'BEGIN { exit !(ltime > 30) }'; do
             (
@@ -57,7 +57,7 @@ coliseum_fight() {
             ) </dev/null &>/dev/null &
             time_exit 17
             local access_link=$(grep -o -E '/(coliseum/[A-Za-z]+/[?]r[=][0-9]+|coliseum)' $src_ram | grep -v 'dodge' | sed -n 1p) #5
-            printf " 💤	...\n${access_link}\n"
+            printf " 😡	Preparing...\n${access_link}\n"
             sleep 3s
         done
         cl_access() {
@@ -74,8 +74,8 @@ coliseum_fight() {
             RHP=$(awk -v ush="$USH" -v rper="$RPER" 'BEGIN { printf "%.0f", ush * rper / 100 + ush }')
             HLHP=$(awk -v ush="$(cat $full_ram)" -v hper="$HPER" 'BEGIN { printf "%.0f", ush * hper / 100 }')
             if grep -q -o '/dodge/' $src_ram; then # Exibe batalha se houver link de esquiva...
-                printf "\n     🙇‍ "
-                w3m -dump -T text/html "$src_ram" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{2,5\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\]\ ,\🔴,g;s,\[1\]\ ,\🔵,g;s,\[stone\],\ 💪,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\],\ 💀,g'
+                printf "\n     🧔‍♂️‍ "
+                w3m -dump -T text/html "$src_ram" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{2,5\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\]\ ,\🔴,g;s,\[1\]\ ,\🔵,g;s,\[stone\],\ \n💪,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\],\ 💀,g'
                 #    time_exit 17
             else                                                                                           #...exibiu || aguarda ou finaliza...
                 if grep -q -o '?end_fight=true' $src_ram; then                                             # aguarda como expectador...
@@ -84,8 +84,8 @@ coliseum_fight() {
                             w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/coliseum" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
                         ) </dev/null &>/dev/null &
                         time_exit 17
-                        printf "\n     🙇‍ "
-                        w3m -dump -T text/html "$src_ram" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{2,5\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\]\ ,\🔴,g;s,\[1\]\ ,\🔵,g;s,\[stone\],\ 💪,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\],\ 💀,g'
+                        printf "\n     🧔‍♂️‍ "
+                        w3m -dump -T text/html "$src_ram" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{2,5\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\]\ ,\🔴,g;s,\[1\]\ ,\🔵,g;s,\[stone\],\ \n💪,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\],\ 💀,g'
                         #      time_exit 17
                     fi #...passou 300s
                 else   #...cessa espera || finaliza...
