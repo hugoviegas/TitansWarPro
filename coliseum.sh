@@ -18,7 +18,7 @@ coliseum_fight() {
     local LA=4    #2.Interval attack
     local HPER=38 #3.HPER % to heal
     local RPER=5  #4.RPER % to random
-    printf "\nColiseum ...\n"
+    printf "\nColiseum ⚔️...\n"
     (
         w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug $URL/settings/graphics/0 -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
     ) </dev/null &>/dev/null &

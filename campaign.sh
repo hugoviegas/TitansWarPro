@@ -1,5 +1,5 @@
 campaign_func() {
-    printf "Campaign...\n"
+    printf "Campaign ⛺...\n"
     (
         w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/campaign/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
     ) </dev/null &>/dev/null &
@@ -15,11 +15,14 @@ campaign_func() {
                     w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAMPAIGN" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
                 ) </dev/null &>/dev/null &
                 time_exit 20
+                
+                RESULT=$(echo "$CAMPAIGN" | cut -d'/' -f3)
+                echo "Campaign $RESULT"
                 echo "$CAMPAIGN"
                 local CAMPAIGN=$(grep -o -E '/campaign/(go|fight|attack|end)/[?]r[=][0-9]+' $TMP/SRC | head -n 1)
                 ;;
             esac
         done
     fi
-    echo -e "${GREEN_BLACK}Campaign (✔)${COLOR_RESET}\n"
+    echo -e "${GREEN_BLACK}Campaign ✅${COLOR_RESET}\n"
 }

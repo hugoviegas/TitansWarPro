@@ -1,5 +1,5 @@
 func_trade() {
-  printf "Trade ...\n"
+  printf "Trade ⚖️...\n"
   (
     w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/trade/exchange" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
   ) &
