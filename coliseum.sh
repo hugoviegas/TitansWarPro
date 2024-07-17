@@ -18,7 +18,7 @@ coliseum_fight() {
     local LA=4    #2.Interval attack
     local HPER=38 #3.HPER % to heal
     local RPER=5  #4.RPER % to random
-    echo -e "${RED_BLACK}Coliseum ⚔️${COLOUR_RESET}\n"
+    echo -e "${RED_BLACK}Coliseum ⚔️${COLOR_RESET}"
     (
         w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug $URL/settings/graphics/0 -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
     ) </dev/null &>/dev/null &
@@ -78,10 +78,6 @@ coliseum_fight() {
             #16.DODGE
             HEAL=$(grep -o -E '/coliseum/heal/[?]r[=][0-9]+' $src_ram)
             #17.HEAL
-            STONE=$(grep -o -E '/coliseum/stone/[?]r[=][0-9]+' $src_ram)
-            #18.STONE
-            GRASS=$(grep -o -E '/coliseum/grass/[?]r[=][0-9]+' $src_ram)
-            #19.GRASS
             RHP=$(awk -v ush="$USH" -v rper="$RPER" 'BEGIN { printf "%.0f", ush * rper / 100 + ush }')
             HLHP=$(awk -v ush="$(cat $full_ram)" -v hper="$HPER" 'BEGIN { printf "%.0f", ush * hper / 100 }')
             if grep -q -o '/dodge/' $src_ram; then # Exibe batalha se houver link de esquiva...
@@ -103,7 +99,7 @@ coliseum_fight() {
                     fi #...passou 300s
                 else   #...cessa espera || finaliza...
                     BREAK_LOOP=1
-                    printf "${BLACK_YELLOW}Battle's over.${COLOR_RESET}\n"
+                    echo -e "${BLACK_YELLOW}Battle's over.${COLOR_RESET}"
                     sleep 2s
                 fi #...finalizou a batalha
             fi     #...cessou procura por esquiva
@@ -164,9 +160,9 @@ coliseum_fight() {
         #/end
         func_unset
         if awk -v smodplay="$RUN" -v rmodplay="-cl" 'BEGIN { exit !(smodplay != rmodplay) }'; then printf "\nYou can run ./twm/play.sh -cl\n"; fi
-        printf "${GREEN_BLACK}Coliseum ✅${COLOR_RESET}\n"
+        echo -e "${GREEN_BLACK}Coliseum ✅${COLOR_RESET}"
     else
-        printf "${WHITEb_BLACK}It was not possible to start the battle at this time.${COLOR_RESET}\n"
+        echo -e "${WHITEb_BLACK}It was not possible to start the battle at this time.${COLOR_RESET}"
     fi
 }
 coliseum_start() {

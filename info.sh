@@ -13,7 +13,7 @@ colors() {
      COLOR_RESET='\033[00m'
      GOLD_BLACK='\033[33m'
      GREEN_BLACK='\033[32m'
-     RED_BLACK='\033[31m'
+     RED_BLACK='\033[1;38m'
      PURPLEi_BLACK='\033[03;34m\033[02;03m'
      PURPLEis_BLACK='\033[03;34m\033[02;04m'
      WHITE_BLACK='\033[37m'

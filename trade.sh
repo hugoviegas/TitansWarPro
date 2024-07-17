@@ -1,5 +1,5 @@
 func_trade() {
-  echo -e "${CYAN_BLACK}Trade ⚖️${COLOUR_RESET}"
+  echo -e "${CYAN_BLACK}Trade ⚖️${COLOR_RESET}"
   (
     w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/trade/exchange" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
   ) &
@@ -11,7 +11,7 @@ func_trade() {
     #printf "$ACCESS\n"
     SILVER_NUMBER=$(echo "$ACCESS" | cut -d'/' -f5 | cut -d'?' -f1)
 
-    echo -e " Exchange ${GOLD_BLACK}$SILVER_NUMBER🪙${COLOR_RESET}\n"
+    echo -e " Exchange ${GOLD_BLACK}$SILVER_NUMBER🪙${COLOR_RESET}"
     (
       w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$ACCESS" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
     ) &
@@ -19,7 +19,7 @@ func_trade() {
 
     local ACCESS=$(grep -o -E '/trade/exchange/silver/[0-9]+[?]r[=][0-9]+' $TMP/SRC | head -n 1)
   done
-  echo -e "${GREEN_BLACK}Trade ✅${COLOR_RESET}\n"
+  echo -e "${GREEN_BLACK}Trade ✅${COLOR_RESET}"
 }
 clan_money() {
   clan_id

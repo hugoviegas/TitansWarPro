@@ -1,5 +1,5 @@
 check_missions() {
-  echo -e "${CYAN_BLACK}Checking Missions 📜${COLOUR_RESET}\n"
+  echo -e "${CYAN_BLACK}Checking Missions 📜${COLOR_RESET}"
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
@@ -12,7 +12,7 @@ check_missions() {
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
       time_exit 20
-      echo -e "${GREEN_BLACK}Chest opened ✅${COLOR_RESET}\n"
+      echo -e "${GREEN_BLACK}Chest opened ✅${COLOR_RESET}"
     fi
   done
   #collect quests 
@@ -43,7 +43,7 @@ check_missions() {
       ) </dev/null &>/dev/null &
       time_exit 20
       local MISSION_NUMBER=$(echo "$click" | cut -d'/' -f3 | cut -d'?' -f1)
-      echo -e " ${GREEN_BLACK}Mission [$MISSION_NUMBER] Completed ✅${COLOR_RESET}\n"
+      echo -e " ${GREEN_BLACK}Mission [$MISSION_NUMBER] Completed ✅${COLOR_RESET}"
     fi
     #i=$((i + 1))
   done
@@ -60,7 +60,7 @@ check_missions() {
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
       time_exit 20
-      #echo -e " ${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}\n"
+      #echo -e " ${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}"
     fi
     i=$((i + 1))
   done
@@ -75,9 +75,9 @@ check_missions() {
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &
     time_exit 20
-    echo -e "${GREEN_BLACK}Collection collected ✅${COLOR_RESET}\n"
+    echo -e "${GREEN_BLACK}Collection collected ✅${COLOR_RESET}"
   fi
-  echo -e "${GREEN_BLACK}Missions ✅${COLOR_RESET}\n"
+  echo -e "${GREEN_BLACK}Missions ✅${COLOR_RESET}"
 }
 
 apply_event() {
@@ -93,6 +93,6 @@ apply_event() {
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${APPLY}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &
     time_exit 20
-    printf "${BLACK_YELLOW}Applied for battle ✅${COLOR_RESET}\n"
+    echo -e "${BLACK_YELLOW}Applied for battle ✅${COLOR_RESET}"
   fi
 }

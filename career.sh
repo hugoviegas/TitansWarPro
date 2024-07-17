@@ -1,5 +1,5 @@
 career_func() {
-  echo -e "${CYAN_BLACK}Career 🎖️${COLOUR_RESET}\n"
+  echo -e "${CYAN_BLACK}Career 🎖️${COLOR_RESET}"
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/career/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
@@ -52,9 +52,9 @@ career_func() {
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${ENDQUEST}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &
     time_exit 20
-    echo -e "${GREEN_BLACK}Career ✅${COLOR_RESET}\n"
+    echo -e "${GREEN_BLACK}Career ✅${COLOR_RESET}"
   else
-    echo -e "${GREEN_BLACK}Career ✅${COLOR_RESET}\n"
+    echo -e "${GREEN_BLACK}Career ✅${COLOR_RESET}"
   fi
 
 }

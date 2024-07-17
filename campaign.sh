@@ -1,5 +1,5 @@
 campaign_func() {
-    echo -e "${CYAN_BLACK}Campaign ⛺${COLOUR_RESET}\n"
+    echo -e "${CYAN_BLACK}Campaign ⛺${COLOR_RESET}"
     (
         w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/campaign/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
     ) </dev/null &>/dev/null &
@@ -23,5 +23,5 @@ campaign_func() {
             esac
         done
     fi
-    echo -e "${GREEN_BLACK}Campaign ✅${COLOR_RESET}\n"
+    echo -e "${GREEN_BLACK}Campaign ✅${COLOR_RESET}"
 }

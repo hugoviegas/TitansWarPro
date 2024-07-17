@@ -61,7 +61,7 @@ undying_start () {
    hpmp -fix
    apply_event undying
 
-   echo -e "${GOLD_BLACK}Valley of the Immortals will be started 🧟...${COLOUR_RESET}\n$(date +%Hh:%Mm)"
+   echo -e "${GOLD_BLACK}Valley of the Immortals will be started 🧟...${COLOR_RESET}\n$(date +%Hh:%Mm)"
    until $(case $(date +%M) in (5[5-9]) exit 1 ;; esac) ;
     do
      sleep 2
