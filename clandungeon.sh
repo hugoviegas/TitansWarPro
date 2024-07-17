@@ -18,6 +18,6 @@ clanDungeon() {
       echo " ⚔ Atack $count"
       local CLANDUNGEON=$(grep -o -E '/clandungeon/(attack/[?][r][=][0-9]+|[?]close)' "$TMP"/SRC | head -n 1)
     done
-    echo -e "${GREEN_BLACK}Clan Dungeon ✅${COLOR_RESET}"
+    echo -e "${GREEN_BLACK}Clan Dungeon ✅${COLOR_RESET}\n"
   fi
 }

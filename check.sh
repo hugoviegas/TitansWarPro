@@ -75,9 +75,9 @@ check_missions() {
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &
     time_exit 20
-    echo -e "${GREEN_BLACK}Collection collected ✅${COLOR_RESET}"
+    echo -e "${GREEN_BLACK}Collection collected ✅${COLOR_RESET}\n"
   fi
-  echo -e "${GREEN_BLACK}Missions ✅${COLOR_RESET}"
+  echo -e "${GREEN_BLACK}Missions ✅${COLOR_RESET}\n"
 }
 
 apply_event() {
@@ -93,6 +93,6 @@ apply_event() {
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${APPLY}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &
     time_exit 20
-    echo -e "${BLACK_YELLOW}Applied for battle ✅${COLOR_RESET}"
+    echo -e "${BLACK_YELLOW}Applied for battle ✅${COLOR_RESET}\n"
   fi
 }

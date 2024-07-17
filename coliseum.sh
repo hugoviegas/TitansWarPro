@@ -90,7 +90,7 @@ coliseum_fight() {
                     fi #...passou 300s
                 else   #...cessa espera || finaliza...
                     BREAK_LOOP=1
-                    printf "${BLACK_YELLOW}Battle's over.${COLOR_RESET}\n"
+                    echo -e "${RED_BLACK}Battle's over.${COLOR_RESET}\n"
                     sleep 2s
                 fi #...finalizou a batalha
             fi     #...cessou procura por esquiva
@@ -151,7 +151,7 @@ coliseum_fight() {
         #/end
         func_unset
         if awk -v smodplay="$RUN" -v rmodplay="-cl" 'BEGIN { exit !(smodplay != rmodplay) }'; then printf "\nYou can run ./twm/play.sh -cl\n"; fi
-        printf "${GREEN_BLACK}Coliseum (✔)${COLOR_RESET}\n"
+        echo -e "${RED_BLACK} Coliseum ⚔️${COLOR_RESET}\n"
     else
         printf "${WHITEb_BLACK}It was not possible to start the battle at this time.${COLOR_RESET}\n"
     fi

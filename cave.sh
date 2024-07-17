@@ -157,6 +157,6 @@ cave_routine() {
     # checkQuest 5
   fi
   
-  echo -e "${GREEN_BLACK}Cave Done✅${COLOR_RESET}"
+  echo -e "${GREEN_BLACK}Cave Done✅${COLOR_RESET}\n"
 
 }

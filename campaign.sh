@@ -23,5 +23,5 @@ campaign_func() {
             esac
         done
     fi
-    echo -e "${GREEN_BLACK}Campaign ✅${COLOR_RESET}"
+    echo -e "${GREEN_BLACK}Campaign ✅${COLOR_RESET}\n"
 }

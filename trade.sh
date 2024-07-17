@@ -19,7 +19,7 @@ func_trade() {
 
     local ACCESS=$(grep -o -E '/trade/exchange/silver/[0-9]+[?]r[=][0-9]+' $TMP/SRC | head -n 1)
   done
-  echo -e "${GREEN_BLACK}Trade ✅${COLOR_RESET}"
+  echo -e "${GREEN_BLACK}Trade ✅${COLOR_RESET}\n"
 }
 clan_money() {
   clan_id

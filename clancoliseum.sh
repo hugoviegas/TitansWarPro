@@ -84,7 +84,7 @@ clancoliseum_fight() {
   rm "$src_ram" "$full_ram"
   unset dir_ram tmp_ram src_ram full_ram ACCESS cf_access
   #/end
-  echo -e "${GREEN_BLACK}ClanColiseum ✅${COLOR_RESET}"
+  echo -e "${GREEN_BLACK}ClanColiseum ✅${COLOR_RESET}\n"
   sleep 10s
   clear
 }
