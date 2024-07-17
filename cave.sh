@@ -1,37 +1,11 @@
 # shellcheck disable=SC2148
-checkQuest() {
-  quest_id="$*"
-  clan_id
-  if [ -n "${CLD}" ]; then
-  (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan/${CLD}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-  ) </dev/null &>/dev/null &
-  time_exit 20
-
-  click=$(grep -oE "/quest/(take|help|deleteHelp|end)/$quest_id/\?r=[0-9]{8}" "$TMP"/SRC | head -1)
-  # echo "$click"
-    (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    ) </dev/null &>/dev/null &
-    time_exit 20
-    echo " Quest $quest_id Check..."
-  
-  #done
-    
-  else
-    (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL/clanrating/wantedToClan" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
-    ) </dev/null &>/dev/null &
-    time_exit 17
-  fi
-}
 cave_start() {
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
   time_exit 20
   while grep -q -o -E '/cave/[?]quest_t[=]quest&quest_id[=]2&qz[=][a-z0-9]+' "$TMP"/SRC || echo "$RUN" | grep -q -E '[-]cv'; do
-    printf "cave ...\n"
+    echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}"
     clan_id
     if [ -n "$CLD" ]; then
       (
@@ -67,7 +41,7 @@ cave_start() {
         ) </dev/null &>/dev/null &
         time_exit 17
         # shellcheck disable=SC2059
-        printf "${CYAN_BLACK}${ACCESS2}${COLOR_RESET}\n$(w3m -dump -T text/html "$TMP"/SRC | grep -o -E '(g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' | sed 's/g/\ g/g;s/s/\ s/g')\n"
+        echo -e "${CYAN_BLACK}${ACCESS2}${COLOR_RESET}\n$(w3m -dump -T text/html "$TMP"/SRC | grep -o -E '(g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' | sed 's/g/\ g/g;s/s/\ s/g')\n"
         local num=$((num - 1))
         ;;
       cavespeedUpr)
@@ -77,7 +51,7 @@ cave_start() {
         time_exit 17
         # shellcheck disable=SC2154
         # shellcheck disable=SC2059
-        printf "${PURPLEis_BLACK}${ACCESS2}${COLOR_RESET}\n$(w3m -dump -T text/html "$TMP"/SRC | grep -o -E '(g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' | sed 's/g/\ g/g;s/s/\ s/g')\n"
+        echo -e "${PURPLEis_BLACK}${ACCESS2}${COLOR_RESET}\n$(w3m -dump -T text/html "$TMP"/SRC | grep -o -E '(g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' | sed 's/g/\ g/g;s/s/\ s/g')\n"
         local num=$((num - 1))
         ;;
       cavedownr | cavedownrclanbuiltprivateUpgradetruerrefcave)
@@ -86,7 +60,7 @@ cave_start() {
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${DOWN}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
         ) </dev/null &>/dev/null &
         time_exit 17
-        printf "${GREEN_BLACK}${DOWN}${COLOR_RESET}\n$(w3m -dump -T text/html "$TMP"/SRC | grep -o -E '(g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' | sed 's/g/\ g/g;s/s/\ s/g')\n"
+        echo -e "${GREEN_BLACK}${DOWN}${COLOR_RESET}\n$(w3m -dump -T text/html "$TMP"/SRC | grep -o -E '(g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' | sed 's/g/\ g/g;s/s/\ s/g')\n"
         ;;
       caveattackrcaverunawayr)
         local num=$((num - 1))
@@ -94,12 +68,12 @@ cave_start() {
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${ACCESS1}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
         ) </dev/null &>/dev/null &
         time_exit 17
-        printf "${GOLD_BLACK}${ACCESS1}${COLOR_RESET}\n$(w3m -dump -T text/html "$TMP"/SRC | grep -o -E '(g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' | sed 's/g/\ g/g;s/s/\ s/g')\n"
+        echo -e "${GOLD_BLACK}${ACCESS1}${COLOR_RESET}\n$(w3m -dump -T text/html "$TMP"/SRC | grep -o -E '(g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' | sed 's/g/\ g/g;s/s/\ s/g')\n"
         (
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/cave/runaway" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
         ) </dev/null &>/dev/null &
         time_exit 17
-        printf "${WHITEb_BLACK}/cave/runaway${COLOR_RESET}\n"
+        echo -e "${WHITEb_BLACK}/cave/runaway${COLOR_RESET}\n"
         ;;
       *)
         local num=0
@@ -128,14 +102,14 @@ cave_start() {
       ) </dev/null &>/dev/null &
       time_exit 20
     fi
-    printf "cave (✔)\n"
+    printf "Cave ✅\n"
     unset ACCESS1 ACCESS2 ACTION DOWN MEGA
   done
 }
 
 cave_routine() {
-  printf "Cave...\n"
-  checkQuest 5
+  echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}"
+  # checkQuest 5
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/cave/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
@@ -152,7 +126,26 @@ cave_routine() {
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAVE" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
         ) </dev/null &>/dev/null &
         time_exit 20
-        echo "$CAVE"
+        RESULT=$(echo "$CAVE" | cut -d'/' -f3)
+        case $RESULT in
+        *down*)
+        echo " Cave new search 🔍"
+        ;;
+        *gather*)
+        echo " Cave start mining ⛏️"
+        ;;
+        *speedUp*)
+        echo " Cave seepd up mining ⚡"
+        ;;
+        *runaway*)
+        echo " Cave run away 💨"
+        ;;
+        *attack*)
+        echo " Cave attack monster 🧌"
+        ;;
+        esac
+        #echo "Cave $RESULT"
+        #echo "\n"
         # shellcheck disable=SC2155
         local CAVE=$(grep -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
         ;;
@@ -161,8 +154,9 @@ cave_routine() {
         ;;
       esac
     done
-    checkQuest 5
+    # checkQuest 5
   fi
   
-  echo -e "${GREEN_BLACK}Cave (✔)${COLOR_RESET}\n"
+  echo -e "${GREEN_BLACK}Cave Done✅${COLOR_RESET}\n"
+
 }

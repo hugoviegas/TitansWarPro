@@ -4,94 +4,41 @@ Scripts macros para titanswar.net em todos os servidores.
 
 **Necessário level 16+ e 50 pontos de treinamento para entrar em algumas batalhas**
 
-**_Recomendado para qualquer Android e Iphone_**
+**Este Macro funciona de forma automática para o jogo, a cada 30 minutos são executadas as tarefas básicas do jogo.**
 
-> 1 - No Android abra o app UserLAnd(https://f-droid.org/repo/tech.ula_2927098.apk), instale o Alpine com SSH e entre com a senha que foi criada.
->
-> - No Iphone abra o app iSH(https://ish.app/).
->   Em seguida digite, ou copie e cole para atualizar as listas de pacotes
+Lista do que este macro faz:
 
-> Android(UserLAnd):
+> Arena: joga um por um até acabar com a mana;
 
-```bash
-sudo apk update
-```
+> Carreira: Sempre que tiver disponível ele ira batalhar na carreira e irá recolher a recompensa;
 
-> Iphone(iSH):
+> Caverna: Todas as funções da carvena estão disponíveis. Há opção de caverna 100% onde vai ficar em looping infinito rodando a caverna(não recomendado deixar por muito tempo);
 
-```bash
-apk update
-```
+> Cabana do Sábio: Recolher recompensas de missões, recolher prêmios de coleções, e por padrão recolhe recompensas de relíquias;
 
-> 2 - Digite ou copie e cole este comando para baixar os pacotes necessários
+> Coliseu: na opção padrão do macro ele irá batalhar no coliseu de 00:00 até às 04:00 da manhã todos os dias, e no primeiro dia de cada mês ele batalha um pouco mais. Há a opção de lutar somente no coliseu;
 
-> Android(UserLAnd):
+> Campanha: Funções da campanha 100% funcional;
 
-```bash
-sudo apk add curl ; apk add w3m ; apk add procps ; apk add coreutils ; apk add --no-cache tzdata
-```
+> Troca de Ouro e Prata: Sempre trocando prata por ouro;
 
-> Iphone(iSH):
+> Masmorra do Clã: Sempre que disponível irá batalhar na masmorra;
 
-```bash
-apk add curl ; apk add w3m ; apk add procps ; apk add coreutils ; apk add --no-cache tzdata
-```
+> Eventos: Todos eventos diários funcionando normalmente, incluindo com chance de derrotar o Rei dos imortais (testados em vários níveis);
 
-> 3 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando)
+> Eventos temporários: Apenas alguns eventos funcionando. Você pode solicitar um evento.
 
-> Android(UserLAnd) and Iphone(iSH):
+> Funções extras: Usar elixir quando a missão estiver disponível, usar pedra assim que começa o rei, forçar executar uma função (digite "list" a qualquer momento), esquivar aliados em batalhas (conforme escolha ao configurar),instalação facilitada com o arquivo update.sh.
 
-```bash
-curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/easyinstall.sh -L -O
-```
+> Criptografia de senha: Pode ficar tranquilo, sua senha não será enviada a nenhum servidor, ela é automaticamente criptografada e salva no seu dispositivo para manter o login automático para as próximas vezes.
 
-> 4 - Dê permissão de execução para o instalador
+---
 
-> Android(UserLAnd) and Iphone(iSH):
-
-```bash
-chmod +x easyinstall.sh
-```
-
-> 5 - Copie e cole este comando para instalar o twm
-
-> Android(UserLAnd) and Iphone(iSH):
-
-```bash
-./easyinstall.sh
-```
-
-> 6 - Para executar o twm
-
-> Android(UserLAnd) e Iphone(iSH):
-
-```bash
-./twm/play.sh
-```
-
-Executar em modo caverna no Android(UserLAnd) e Iphone(iSH):
-
-```bash
-./twm/play.sh -cv
-```
-
-Modo de prioridade coliseu no Android(UserLAnd) e Iphone(iSH):
-
-```bash
-./twm/play.sh -cl
-```
-
-- Para interromper `Ctrl c` ou force a parada dos Apps.
-
-- Para desinstalar scripts em ambos sistemas:
-
-```bash
-rm -rf $HOME/twm
-```
+**Tutorial de instalação, recomendado para qualquer Android e Iphone (problema de instabilidade)**
 
 **_Alternativa para Android 7 ou superior_**
 
-> 1 - Abra o app Termux(https://f-droid.org/repo/com.termux_118.apk) no Android e digite ou cole os comandos abaixo para atualizar os pacotes.
+> 1 - Abra o app Termux(https://play.google.com/store/apps/details?id=com.termux) no Android e digite ou cole os comandos abaixo para atualizar os pacotes.
 
 - Podem ocorrer questões.
 
@@ -112,20 +59,22 @@ pkg install w3m termux-api procps coreutils ncurses-utils
 > 2 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando):
 
 ```bash
-curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/easyinstall.sh -L -O
+curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh -L -O
 ```
 
 > 3 - Dê permissão de execução para o instalador:
 
 ```bash
-chmod +x easyinstall.sh
+chmod +x update.sh
 ```
 
 > 4 - Copie e cole este comando para instalar o twm:
 
 ```bash
-./easyinstall.sh
+./update.sh
 ```
+
+> Por padrão selecione a opção "1" Master (digite 1 apenas)
 
 > 5 - Para executar o twm:
 
@@ -161,24 +110,109 @@ rm -rf $HOME/.termux/boot/play.sh
 
 ---
 
+> 1 - No Android abra o app UserLAnd(https://play.google.com/store/apps/details?id=tech.ula), instale o Alpine com SSH e entre com a senha que foi criada.
+>
+> - No Iphone abra o app iSH(https://ish.app/).
+>   Em seguida digite, ou copie e cole para atualizar as listas de pacotes
+
+> Android(UserLAnd):
+
+```bash
+sudo apk update
+```
+
+> Iphone(iSH):
+
+```bash
+apk update
+```
+
+> 2 - Digite ou copie e cole este comando para baixar os pacotes necessários
+
+> Android(UserLAnd):
+
+```bash
+sudo apk add curl ; apk add w3m ; apk add procps ; apk add coreutils ; apk add --no-cache tzdata
+```
+
+> Iphone(iSH):
+
+```bash
+apk add curl ; apk add w3m ; apk add procps ; apk add coreutils ; apk add --no-cache tzdata
+```
+
+> 3 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando)
+
+> Android(UserLAnd) and Iphone(iSH):
+
+```bash
+curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh -L -O
+```
+
+> 4 - Dê permissão de execução para o instalador
+
+> Android(UserLAnd) and Iphone(iSH):
+
+```bash
+chmod +x update.sh
+```
+
+> 5 - Copie e cole este comando para instalar o twm
+
+> Android(UserLAnd) and Iphone(iSH):
+
+```bash
+./update.sh
+```
+
+> Por padrão selecione a opção "1" Master (digite 1 apenas)
+
+> 6 - Para executar o twm
+
+> Android(UserLAnd) e Iphone(iSH):
+
+```bash
+./twm/play.sh
+```
+
+Executar em modo caverna no Android(UserLAnd) e Iphone(iSH):
+
+```bash
+./twm/play.sh -cv
+```
+
+Modo de prioridade coliseu no Android(UserLAnd) e Iphone(iSH):
+
+```bash
+./twm/play.sh -cl
+```
+
+- Para interromper `Ctrl c` ou force a parada dos Apps.
+
+- Para desinstalar scripts em ambos sistemas:
+
+```bash
+rm -rf $HOME/twm
+```
+
 **_Windows com Cygwin_**
 
 > 1 - Abra o progama Cygwin(https://www.cygwin.com/setup-x86_64.exe) ou (https://www.cygwin.com/setup-x86.exe) como adiministrador no Windows. Na instalação selecione qualquer link, a parti daí é só dá Next até concluir. Em sequida com adiministrador abra o Cygwin Terminal que foi instalado. Digite, ou copie e cole o comando abaixo para baixar o instalador do twm(O link faz parte do comando):
 
 ```bash
-curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/easyinstall.sh -L -O
+curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh -L -O
 ```
 
 > 2 - Dê permissão de execução para o instalador:
 
 ```bash
-chmod +x easyinstall.sh
+chmod +x update.sh
 ```
 
 > 3 - Copie e cole este comando para instalar o twm:
 
 ```bash
-bash $HOME/easyinstall.sh
+bash $HOME/update.sh
 ```
 
 > 4 - Para executar o twm:
@@ -226,19 +260,19 @@ sudo apt-get install coreutils dnsutils-y
 > 3 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando):
 
 ```bash
-curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/easyinstall.sh -L -O
+curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh -L -O
 ```
 
 > 4 - Dê permissão de execução para o instalador:
 
 ```bash
-chmod +x easyinstall.sh
+chmod +x update.sh
 ```
 
 > 5 - Copie e cole este comando para instalar o twm:
 
 ```bash
-bash easyinstall.sh
+bash update.sh
 ```
 
 > 6 - Comando para executar o twm:
