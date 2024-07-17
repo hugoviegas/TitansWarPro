@@ -87,7 +87,6 @@ arena_duel() {
   # arena_fault
   # clear
   echo -e "${GOLD_BLACK}Arena ⚔️${COLOR_RESET}"
-  #echo -e "${GOLD_BLACK}Arena ⚔️${COLOR_RESET}"
   #arena_takeHelp
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/arena/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
