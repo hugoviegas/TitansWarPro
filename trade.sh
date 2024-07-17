@@ -14,8 +14,9 @@ func_trade() {
     ) &
     time_exit 17
 
-    SILVER_NUMBER=$(grep -o -E "$ACCESS" | sed 's#.*/\([0-9]*\).*#\1#')
-    echo "$SILVER_NUMBER"
+    SILVER_NUMBER=$(echo "$ACCESS" | cut -d'/' -f5)
+    echo " Exchange ${BLACK_YELLOW}$SILVER_NUMBER${COLOR_RESET} gold 🪙"
+
     local ACCESS=$(grep -o -E '/trade/exchange/silver/[0-9]+[?]r[=][0-9]+' $TMP/SRC | head -n 1)
   done
   printf "${GREEN_BLACK}Trade ✅${COLOR_RESET}\n"

@@ -127,8 +127,25 @@ cave_routine() {
         ) </dev/null &>/dev/null &
         time_exit 20
         RESULT=$(echo "$CAVE" | cut -d'/' -f3)
-        echo "Cave $RESULT"
-        echo "$CAVE"
+        case $RESULT in
+        *down*)
+        echo " Cave New Search"
+        ;;
+        *gather*)
+        echo " Cave Start Mining"
+        ;;
+        *speedUp*)
+        echo " Cave Seep Up Mining"
+        ;;
+        *runaway*)
+        echo " Cave Run Away"
+        ;;
+        *attack*)
+        echo " Cave Attack monster"
+        ;;
+        esac
+        #echo "Cave $RESULT"
+        echo "/n"
         # shellcheck disable=SC2155
         local CAVE=$(grep -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
         ;;
