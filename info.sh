@@ -13,7 +13,7 @@ colors() {
      COLOR_RESET='\033[00m'
      GOLD_BLACK='\033[33m'
      GREEN_BLACK='\033[32m'
-     RED_BLACK='\033[1;38m'
+     RED_BLACK='\033[07m'
      PURPLEi_BLACK='\033[03;34m\033[02;03m'
      PURPLEis_BLACK='\033[03;34m\033[02;04m'
      WHITE_BLACK='\033[37m'
@@ -27,7 +27,7 @@ script_slogan() {
      m=89
      author="author: Hugo Viegas"
      #collaborator="collaborator: @_hviegas"
-     versionNum="3.2.20 (Beta)"
+     versionNum="3.2.21 (Beta)"
      for i in $colors; do
           clear
           t=$((t - 27))
