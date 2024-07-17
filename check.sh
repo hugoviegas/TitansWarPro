@@ -12,7 +12,7 @@ check_missions() {
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
       time_exit 20
-      echo "${GREEN_BLACK}Chest opened ✅${COLOR_RESET}\n"
+      echo -e "${GREEN_BLACK}Chest opened ✅${COLOR_RESET}\n"
     fi
   done
   #collect quests 
@@ -32,13 +32,13 @@ check_missions() {
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1   "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
   time_exit 20
-  local MISSION_NUMBER=$(echo "$click" | cut -d'/' -f4 | cut -d'?' -f1)
+  local MISSION_NUMBER=$(echo "$click" | cut -d'=' -f2 | cut -d'&' -f1)
   echo -e "Quest $MISSION_NUMBER Ended."
   fi
   for i in {0..15} ; do
   #while [ $i -lt 15 ]; do // /inv/chest/?quest_t=quest&quest_id=13&qz=01690126f2e5d7a75a31e6ee149c6cb2
   
-    if grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP"/SRC; then
+    if grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP"/SRC | cat -; then
       click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p' | cat -)
       (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
@@ -77,9 +77,9 @@ check_missions() {
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &
     time_exit 20
-    printf "${GREEN_BLACK}Collection collected ✅${COLOR_RESET}\n"
+    echo -e "${GREEN_BLACK}Collection collected ✅${COLOR_RESET}\n"
   fi
-  printf "${GREEN_BLACK}Missions ✅${COLOR_RESET}\n"
+  echo -e "${GREEN_BLACK}Missions ✅${COLOR_RESET}\n"
 }
 
 apply_event() {
