@@ -1,21 +1,25 @@
 #!/bin/bash
 . "$HOME"/twm/info.sh
+echo pass 06
 colors
 RUN=$(cat "$HOME"/twm/runmode_file)
 cd "$HOME"/twm || exit
-
+echo pass 07
 script_ads() {
   if [ "$RUN" != '-boot' ] && [ -f "$HOME/twm/ads_file" ] && [ -s "$HOME/twm/ads_file" ] && [ "$(cat "$HOME"/twm/ads_file)" != "$(date +%d)" ]; then
     if [ "$(cat "$HOME"/twm/ads_file 2>/dev/null)" != "$(date +%d)" ]; then
       xdg-open "https://apps.disroot.org/search?q=Shell+Script&category_general=on&language=pt-BR&time_range=&safesearch=1&theme=beetroot"
       date +%d >"$HOME"/twm/ads_file
+      echo pass 05
     fi
   else
+  echo pass 04
     date +%d >"$HOME"/twm/ads_file
   fi
 }
+echo pass 02
 script_ads
-
+echo pass 03
 printf "${BLACK_CYAN}\n Starting...\n👉 Please wait...☕👴${COLOR_RESET}\n"
 #. ~/twm/info.sh
 script_slogan
