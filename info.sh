@@ -14,7 +14,6 @@ colors() {
      GOLD_BLACK='\033[33m'
      GREEN_BLACK='\033[32m'
      RED_BLACK='\033[0;31m'
-     BLUE_BLACK='033[0;35m'
      PURPLEi_BLACK='\033[03;34m\033[02;03m'
      PURPLEis_BLACK='\033[03;34m\033[02;04m'
      WHITE_BLACK='\033[37m'
@@ -50,7 +49,6 @@ script_slogan() {
 ╚╩═╩╝╚╝╚╝╚══╝╚╝╚╝╚══╝
 "
 
-          # ⟩\\
           printf "\033[1;38;5;${i}m${author}\n\033[02m${versionNum}${COLOR_RESET}\n"
           sleep 0.3s
      done
@@ -108,27 +106,6 @@ hpmp() {
      MPPER=$(awk -v nowmp="$NOWMP" -v fixmp="$FIXMP" 'BEGIN { printf "%.3f", nowmp / fixmp * 100 }' | awk '{printf "%.2f\n", $1}')
      #/e.g.
      #/printf %b "HP ❤️ $NOWHP - $(printf "%.2f" "${HPPER}")% | MP Ⓜ️ $NOWMP - $(printf "%.2f" "${MPPER}")%\n"
-}
-
-testColour() {
-   echo -e "${BLACK_BLACK}BLACK_BLACK${COLOR_RESET}\n"
-   echo -e "${BLACK_CYAN}BLACK_CYAN${COLOR_RESET}\n"
-   echo -e "${BLACK_GREEN}BLACK_GREEN${COLOR_RESET}\n"
-   echo -e "${BLACK_GRAY}BLACK_GRAY${COLOR_RESET}\n"
-   echo -e "${BLACK_PINK}BLACK_PINK${COLOR_RESET}\n"
-   echo -e "${BLACK_RED}BLACK_RED${COLOR_RESET}\n"
-   echo -e "${CYAN_BLACK}CYAN_BLACK${COLOR_RESET}\n"
-   echo -e "${BLACK_YELLOW}BLACK_YELLOW${COLOR_RESET}\n"
-   echo -e "${CYAN_CYAN}CYAN_CYAN${COLOR_RESET}\n"
-   echo -e "${GOLD_BLACK}GOLD_BLACK${COLOR_RESET}\n"
-   echo -e "${GREEN_BLACK}GREEN_BLACK${COLOR_RESET}\n"
-   echo -e "${PURPLEi_BLACK}PURPLEi_BLACK${COLOR_RESET}\n"
-   echo -e "${PURPLEis_BLACK}PURPLEis_BLACK${COLOR_RESET}\n"
-   echo -e "${WHITE_BLACK}WHITE_BLACK${COLOR_RESET}\n"
-   echo -e "${WHITEb_BLACK}WHITEb_BLACK${COLOR_RESET}\n"
-   echo -e "${RED_BLACK}RED_BLACK${COLOR_RESET}\n"
-   echo -e "${BLUE_BLACK}BLUE_BLACK${COLOR_RESET}\n"
-   sleep 30s
 }
 
 messages_info() {
