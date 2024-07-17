@@ -5,7 +5,7 @@ cave_start() {
   ) </dev/null &>/dev/null &
   time_exit 20
   while grep -q -o -E '/cave/[?]quest_t[=]quest&quest_id[=]2&qz[=][a-z0-9]+' "$TMP"/SRC || echo "$RUN" | grep -q -E '[-]cv'; do
-    printf "Cave 🪨...\n"
+    echo -e "${CYAN_BLACK}Cave 🪨${COLOUR_RESET}\n"
     clan_id
     if [ -n "$CLD" ]; then
       (
@@ -108,7 +108,7 @@ cave_start() {
 }
 
 cave_routine() {
-  printf "Cave 🪨...\n"
+  echo -e "${CYAN_BLACK}Cave 🪨${COLOUR_RESET}\n"
   # checkQuest 5
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/cave/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC

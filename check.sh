@@ -1,5 +1,5 @@
 check_missions() {
-  printf "Checking Missions 📜\n"
+  echo -e "${CYAN_BLACK}Checking Missions 📜${COLOUR_RESET}\n"
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &

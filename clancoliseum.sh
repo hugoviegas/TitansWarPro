@@ -23,7 +23,7 @@ clancoliseum_fight() {
       w3m -dump -T text/html "$src_ram" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{1,6\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\],\🔴,g;s,\[1\],\🔵,g;s,\[stone\],\ 💪,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\]\ ,\ 💀,g'
     else
       echo 1 >BREAK_LOOP
-      printf "${BLACK_YELLOW}Battle's over.${COLOR_RESET}\n"
+      printf "${RED_BLACK}Battle's over.${COLOR_RESET}\n"
       sleep 2s
     fi
   }
@@ -84,7 +84,7 @@ clancoliseum_fight() {
   rm "$src_ram" "$full_ram"
   unset dir_ram tmp_ram src_ram full_ram ACCESS cf_access
   #/end
-  printf "ClanColiseum ✅\n"
+  echo -e "${GREEN_BLACK}ClanColiseum ✅${COLOUR_RESET}\n"
   sleep 10s
   clear
 }

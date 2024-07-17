@@ -8,11 +8,12 @@ colors() {
      BLACK_PINK='\033[01;35m\033[01;07m'
      BLACK_RED='\033[01;31m\033[01;07m'
      BLACK_YELLOW='\033[00;33m\033[01;07m'
-     CYAN_BLACK='\033[36m'
+     CYAN_BLACK='\033[04;36m\033[02;04m]'
      CYAN_CYAN='\033[01;36m\033[08;07m'
      COLOR_RESET='\033[00m'
      GOLD_BLACK='\033[33m'
      GREEN_BLACK='\033[32m'
+     RED_BLACK='\033[31m'
      PURPLEi_BLACK='\033[03;34m\033[02;03m'
      PURPLEis_BLACK='\033[03;34m\033[02;04m'
      WHITE_BLACK='\033[37m'
@@ -26,7 +27,7 @@ script_slogan() {
      m=89
      author="author: Hugo Viegas"
      #collaborator="collaborator: @_hviegas"
-     versionNum="3.2.18 (Beta)"
+     versionNum="3.2.19 (Beta)"
      for i in $colors; do
           clear
           t=$((t - 27))
@@ -124,6 +125,8 @@ testColour() {
    echo -e "${PURPLEis_BLACK}PURPLEis_BLACK${COLOR_RESET}\n"
    echo -e "${WHITE_BLACK}WHITE_BLACK${COLOR_RESET}\n"
    echo -e "${WHITEb_BLACK}WHITEb_BLACK${COLOR_RESET}\n"
+   echo -e "${RED_BLACK}RED_BLACK${COLOR_RESET}\n"
+   sleep 30s
 }
 
 messages_info() {
@@ -143,12 +146,12 @@ messages_info() {
           w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/chat/clan/changeRoom" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[chat\]/p' | sed '$d;4q' >>$TMP/msg_file
      ) </dev/null &>/dev/null &
      time_exit 17
-     sed -i 's/\[0\]/🔴/g;s/\[0-off\]/⭕/g;s/\[1\]/🔵/g;s/\[1-off\]/🔘/g' msg_file >>$TMP/msg_file
+     sed -i 's/\[0\]/🔴/g;s/\[0-off\]/⭕/g;s/\[1\]/🔵/g;s/\[1-off\]/🔘/g;s/\[premium\]/👑/g;s/\[level\]/🔝/g' msg_file >>$TMP/msg_file
      local TRAIN="~/twm/.${UR}/TRAIN"
      if [ ! -e "~/twm/.${UR}/TRAIN" ] || find "$TRAIN" -mmin +30 >/dev/null 2>&1; then
           hpmp -fix
      fi
      printf %b "\033[02mHP ❤️ $NOWHP - ${HPPER}% | MP Ⓜ️ $NOWMP - ${MPPER}%${COLOR_RESET}\n" >>$TMP/msg_file
      # sed :a;N;s/\n//g;ta |
-     printf "${GREEN_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' $TMP/info_file | sed 's/lvl/\ lvl/g;s/g/\ g/g;s/s/\ s/g')${COLOR_RESET}\n" >>$TMP/msg_file
+     printf "${GREEN_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' $TMP/info_file | sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}\n" >>$TMP/msg_file
 }

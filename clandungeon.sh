@@ -1,7 +1,8 @@
 clanDungeon() {
   clan_id
   if [ -n "$CLD" ]; then
-    printf "Checking Clan Dungeon...\n"
+  echo -e "${CYAN_BLACK}Checking clan dungeon 👹${COLOUR_RESET}\n"
+    printf "...\n"
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clandungeon/?close" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &

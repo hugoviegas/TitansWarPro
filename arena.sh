@@ -114,7 +114,7 @@ arena_duel() {
   # arena_collFight
   # arena_fault
   # clear
-  printf "Arena ⚔ ...\n"
+  echo -e "${CYAN_BLACK}Arena ⚔️${COLOUR_RESET}\n"
   #arena_takeHelp
   # checkQuest 3
   # checkQuest 4

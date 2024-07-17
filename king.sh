@@ -39,7 +39,7 @@ king_fight () {
     time_exit 17
    else
     echo 1 >BREAK_LOOP
-    printf "${BLACK_YELLOW}Battle's over.${COLOR_RESET}\n"
+    printf "${RED_BLACK}Battle's over.${COLOR_RESET}\n"
     sleep 3s
    fi
   fi
@@ -130,7 +130,7 @@ king_start () {
    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/king/enterGame" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
   time_exit 17
-  printf "King of the Immortals will be started...\n"
+  echo -e "${GOLD_BLACK}👑King of the Immortals will be started...${COLOUR_RESET}\n"
   until $(case $(date +%M) in (2[5-9]) exit 1 ;; esac) ; do
    sleep 3
   done
