@@ -14,7 +14,7 @@ colors() {
      GOLD_BLACK='\033[33m'
      GREEN_BLACK='\033[32m'
      RED_BLACK='\033[0;31m'
-     BLUE_BLACK='033[0;34m'
+     BLUE_BLACK='033[0;35m'
      PURPLEi_BLACK='\033[03;34m\033[02;03m'
      PURPLEis_BLACK='\033[03;34m\033[02;04m'
      WHITE_BLACK='\033[37m'
@@ -28,14 +28,14 @@ script_slogan() {
      m=89
      author="author: Hugo Viegas"
      #collaborator="collaborator: @_hviegas"
-     versionNum="3.2.27 (Beta)"
+     versionNum="3.2.28 (Beta)"
      for i in $colors; do
           clear
           t=$((t - 27))
           w=$((w + 1))
           m=$((m - 2))
           #* //⟨
-          echo -e "\033[1;38;5;${i}m
+          printf "\033[1;38;5;${i}m
 ╔══╗╔╗╔══╗╔══╗╔══╗╔══╗  
 ╚╗╔╝╠╣╚╗╔╝║╔╗║║╔╗║║══╣  
  ║║ ║║ ║║ ║╔╗║║║║║╠══║  
@@ -132,7 +132,7 @@ testColour() {
 }
 
 messages_info() {
-     echo " ⚔️ - Titans War Macro - ⚔️ " >$TMP/msg_file
+     echo " ⚔️ - Titans War Macro - ⚔️ $versionNum " >$TMP/msg_file
      printf " -------- 📩 MAIL 📩 --------\n" >>$TMP/msg_file
      (
           w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/mail" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | tee $TMP/info_file | sed -n '/[|]\ mp/,/\[arrow\]/p' | sed '1,1d;$d;6q' >>$TMP/msg_file

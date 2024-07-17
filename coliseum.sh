@@ -18,12 +18,12 @@ coliseum_fight() {
     local LA=4    #2.Interval attack
     local HPER=38 #3.HPER % to heal
     local RPER=5  #4.RPER % to random
-    printf "\nColiseum🧱 ...\n"
+    echo -e "${GOLD_BLACK}Coliseum🧱${COLOR_RESET}\n"
     (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL"/settings/graphics/0 -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
     ) </dev/null &>/dev/null &
     time_exit 17
-    printf "/settings/graphics/0\n"
+    # printf "/settings/graphics/0\n"
     (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/coliseum" -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
     ) </dev/null &>/dev/null &
@@ -33,7 +33,7 @@ coliseum_fight() {
             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL/coliseum/?end_fight=true" -o user_agent="$(shuf -n1 userAgent.txt)" | head -n 11 | tail -n 7 | sed "/\[2hit/d;/\[str/d;/combat/d"
         ) </dev/null &>/dev/null &
         time_exit 17
-        printf "/coliseum/?end_fight=true\n"
+        # printf "/coliseum/?end_fight=true\n"
         (
             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/coliseum" -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
         ) </dev/null &>/dev/null &
@@ -56,8 +56,8 @@ coliseum_fight() {
                 w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$access_link" -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
             ) </dev/null &>/dev/null &
             time_exit 17
-            local access_link=$(grep -o -E '/(coliseum/[A-Za-z]+/[?]r[=][0-9]+|coliseum)' "$src_ram" | grep -v 'dodge' | sed -n 1p | cat -) #5
-            echo -e " 😡	Preparing...\n"
+            local access_link=$(grep -o -E '/(coliseum/[A-Za-z]+/[?]r[=][0-9]+|coliseum)' "$src_ram" | grep -v 'dodge' | sed -n 1p) #5
+            echo -e " 😡	Preparing..."
             sleep 3s
         done
         cl_access() {
