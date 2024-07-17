@@ -3,7 +3,7 @@
 mkdir -p ~/twm
 
 if [ ! -e "~/twm/info.sh" ]; then
-  curl https://raw.githubusercontent.com/sharesourcecode/TitansWarMacro/master/info.sh -s -L >"$HOME"/twm/info.sh
+  curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/info.sh -s -L >"$HOME"/twm/info.sh
   chmod +x ~/twm/info.sh
   sleep 0.5s
 fi
@@ -134,7 +134,7 @@ cd ~/twm || exit
 printf "${BLACK_CYAN}\n ⌛ Wait downloading scripts...${COLOR_RESET}\n"
 
 sync_func() {
-  SCRIPTS="allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh check.sh clancoliseum.sh clandungeon.sh clanfight.sh clanid.sh coliseum.sh crono.sh flagfight.sh king.sh league.sh loginlogoff.sh play.sh requeriments.sh run.sh svproxy.sh trade.sh twm.sh undying.sh"
+  SCRIPTS="allies.sh clanquest.sh altars.sh arena.sh campaign.sh career.sh cave.sh check.sh clancoliseum.sh clandungeon.sh clanfight.sh clanid.sh coliseum.sh crono.sh flagfight.sh king.sh league.sh loginlogoff.sh play.sh requeriments.sh run.sh svproxy.sh trade.sh twm.sh undying.sh"
   NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
   LEN=0
   for script in $SCRIPTS; do
@@ -166,7 +166,7 @@ sync_func() {
 }
 
 sync_func_other() {
-  SCRIPTS="requeriments.sh svproxy.sh loginlogoff.sh crono.sh check.sh run.sh clanid.sh allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh clancoliseum.sh clandungeon.sh clanfight.sh coliseum.sh flagfight.sh king.sh league.sh trade.sh undying.sh"
+  SCRIPTS="requeriments.sh svproxy.sh loginlogoff.sh crono.sh check.sh clanquest.sh run.sh clanid.sh allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh clancoliseum.sh clandungeon.sh clanfight.sh coliseum.sh flagfight.sh king.sh league.sh trade.sh undying.sh"
   curl "${SERVER}"play.sh -s -L -O
   curl "${SERVER}"info.sh -s -L >twm.sh
   curl "${SERVER}"twm.sh -s -L | sed -n '3,33p' >>twm.sh
@@ -216,16 +216,16 @@ until [ -z "$tipidf" ]; do
 done
 if [ -f ~/twm/runmode_file ]; then
   if awk -v arg="-cl" -v file="$(cat ~/twm/runmode_file)" 'BEGIN { exit !(arg == file) }'; then
-    printf "${BLACK_GREEN}Automatically restarting in 5s after update...${COLOR_RESET}\n"
-    sleep 5s
+    printf "${BLACK_GREEN}Automatically restarting in 3s after update...${COLOR_RESET}\n"
+    sleep 3s
     ~/twm/play.sh -cl
   elif awk -v arg="-cv" -v file="$(cat ~/twm/runmode_file)" 'BEGIN { exit !(arg == file) }'; then
-    printf "${BLACK_GREEN}Automatically restarting in 5s after update...${COLOR_RESET}\n"
-    sleep 5s
+    printf "${BLACK_GREEN}Automatically restarting in 3s after update...${COLOR_RESET}\n"
+    sleep 3s
     ~/twm/play.sh -cv
   else
-    printf "${BLACK_GREEN}Automatically restarting in 5s after update...${COLOR_RESET}\n"
-    sleep 5s
+    printf "${BLACK_GREEN}Automatically restarting in 3s after update...${COLOR_RESET}\n"
+    sleep 3s
     ~/twm/play.sh -boot
   fi
 fi

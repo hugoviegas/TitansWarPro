@@ -39,7 +39,7 @@ cd ~/twm || exit
 SCRIPTS="easyinstall.sh info.sh"
 rm -rf "$HOME/$SCRIPTS" "$SCRIPTS" 2>/dev/null
 
-SERVER="https://raw.githubusercontent.com/sharesourcecode/TitansWarMacro/${version}/"${TOKEN}""
+SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/${version}/"
 
 NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
 LEN=0

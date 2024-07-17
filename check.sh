@@ -5,30 +5,47 @@ check_missions() {
   ) </dev/null &>/dev/null &
   time_exit 20
   #open chests
-  if grep -o -E "/quest/openChest/(1|2)/[?]r=[0-9]+" "$TMP"/SRC; then
-    click=$(grep -o -E "/quest/openChest/(1|2)/[?]r=[0-9]+" "$TMP"/SRC)
-    (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    ) </dev/null &>/dev/null &
-    time_exit 20
-    printf "${GREEN_BLACK}Chest opened (✔)${COLOR_RESET}\n"
-  fi
-  (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-  ) </dev/null &>/dev/null &
-  time_exit 20
-  #collect quests
+  for i in {1..2}; do
+    if grep -o -E "/quest/openChest/$i/[?]r=[0-9]+" "$TMP"/SRC; then
+      click=$(grep -o -E "/quest/openChest/$i/[?]r=[0-9]+" "$TMP"/SRC)
+      (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+      ) </dev/null &>/dev/null &
+      time_exit 20
+      printf "${GREEN_BLACK}Chest opened (✔)${COLOR_RESET}\n"
+    fi
+  done
+  #collect quests 
   i=0
-  while [ $i -lt 15 ]; do
+  if grep -r -o "/inv/chest/?quest_t=quest&quest_id=13&" "$TMP/SRC"; then
+    click=$(grep -r -o "/inv/chest/?quest_t=quest&quest_id=13&" "$TMP/SRC" | sed -n '1p')
+      (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+      ) </dev/null &>/dev/null &
+      time_exit 20
+      click=$(grep -o -E "/inv/chest/use/[0-9]+/1/[?]r=[0-9]+" "$TMP/SRC" | sed -n '3p')
+      (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+      ) </dev/null &>/dev/null &
+      time_exit 20
+      (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1   "$TMP"/userAgent.txt)" >"$TMP"/SRC
+      ) </dev/null &>/dev/null &
+  time_exit 20
+  fi
+  for i in {0..15} ; do
+  #while [ $i -lt 15 ]; do // /inv/chest/?quest_t=quest&quest_id=13&qz=01690126f2e5d7a75a31e6ee149c6cb2
+  
     if grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP"/SRC; then
       click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p')
       (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
       time_exit 20
+      echo $click
       printf "${GREEN_BLACK}Mission Completed (✔)${COLOR_RESET}\n"
     fi
-    i=$((i + 1))
+    #i=$((i + 1))
   done
   #collect rewards
   (

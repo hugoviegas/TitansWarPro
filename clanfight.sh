@@ -17,6 +17,7 @@ clanfight_fight() {
     grep -o -E '(/[a-z]+/at[a-z]{0,3}k[a-z]{3,6}/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+)' "$TMP"/SRC >ATKRND 2>/dev/null
     grep -o -E '(/clanfight/dodge/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+)' "$TMP"/SRC >DODGE 2>/dev/null
     grep -o -E '(/clanfight/heal/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+)' "$TMP"/SRC >HEAL 2>/dev/null
+    grep -o -E '(/clanfight/grass/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+)' "$TMP"/SRC >GRASS 2>/dev/null
     grep -o -E '([[:upper:]][[:lower:]]{0,20}( [[:upper:]][[:lower:]]{0,17})?)[[:space:]]\(' "$TMP"/SRC | sed -n 's,\ [(],,;s,\ ,_,;2p' >CLAN 2>/dev/null
     #  grep -o -E '([[:upper:]][[:lower:]]{0,15}( [[:upper:]][[:lower:]]{0,13})?)[[:space:]][^[:alnum:]]s' $TMP/SRC|sed -n 's,\ [<]s,,;s,\ ,_,;2p' >USER 2> /dev/null
     grep -o -E "(hp)[^A-Za-z0-9]{1,4}[0-9]{1,6}" "$TMP"/SRC | sed "s,hp[']\/[>],,;s,\ ,," >HP 2>/dev/null
@@ -53,6 +54,11 @@ clanfight_fight() {
     elif awk -v ush="$(cat HP)" -v hlhp="$(cat HLHP)" 'BEGIN { exit !(ush < hlhp) }' && [ "$(($(date +%s) - $(cat last_heal)))" -gt 90 -a "$(($(date +%s) - $(cat last_heal)))" -lt 300 ]; then
       (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat HEAL)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+      ) </dev/null &>/dev/null &
+      time_exit 17
+      sleep 0.3s
+      (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat GRASS)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
       time_exit 17
       cf_access
@@ -109,11 +115,8 @@ clanfight_start() {
     ) </dev/null &>/dev/null &
     time_exit 17
     printf "Clan tournament will be started...\n"
-    while true; do
-      case $(date +%M:%S) in
-      59:[3-5][0-9]) exit 1 ;;
-      *) sleep 3 ;;
-      esac
+    while $(case $(date +%M:%S) in (59:[3-5][0-9]) exit 1 ;; esac) ; do
+      sleep 3
     done
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/clanfight/enterFight" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC

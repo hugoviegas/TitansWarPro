@@ -1,10 +1,11 @@
+# shellcheck disable=SC2148
 arena_fault() {
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/fault" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
   time_exit 17
   local BREAK=$(($(date +%s) + 10))
-  while grep -q -o '/fault/attack' "$TMP"/SRC || [ $(date +%s) -lt "$BREAK" ]; do
+  while grep -q -o '/fault/attack' "$TMP"/SRC || [ "$(date +%s)" -lt "$BREAK" ]; do
     local ACCESS=$(grep -o -E '(/fault/attack/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+)' "$TMP"/SRC | sed -n '1p')
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL$ACCESS" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
@@ -40,26 +41,17 @@ arena_collFight() {
 arena_takeHelp() {
   clan_id
   if [ -n "$CLD" ]; then
-    #  (
-    #   w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/take/3" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)"|tail -n0
-    #  ) </dev/null &>/dev/null &
-    #  time_exit 17
-    #  echo "/clan/$CLD/quest/take/3"
-    (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/help/3" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
-    ) </dev/null &>/dev/null &
-    time_exit 17
-    echo "/clan/$CLD/quest/help/3"
-    #  (
-    #   w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/take/4" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)"|tail -n0
-    #  ) </dev/null &>/dev/null &
-    #  time_exit 17
-    #  echo "/clan/$CLD/quest/take/4"
-    (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/help/4" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
-    ) </dev/null &>/dev/null &
-    time_exit 17
-    echo "/clan/$CLD/quest/help/4"
+  local click=$(grep -q -o -E '/clan/$CLD/quest/(take|help)/' "$TMP"/SRC)
+      (
+       w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump "${URL}'$click'3" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)"|tail -n0
+      ) </dev/null &>/dev/null &
+      time_exit 17
+      echo " Quest Arena 3"
+      (
+       w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump "${URL}'$click'4" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)"|tail -n0
+      ) </dev/null &>/dev/null &
+      time_exit 17
+      echo " Quest Arena 4"
   else
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL/settings/claninvite/1" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
@@ -67,29 +59,47 @@ arena_takeHelp() {
     time_exit 17
   fi
 }
+
 arena_deleteEnd() {
   clan_id
   if [ -n "$CLD" ]; then
+  local click=$(grep -q -o -E '/clan/$CLD/quest/(deleteHelp|end)/' "$TMP"/SRC)
     (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/deleteHelp/3" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "${URL}'$click'3" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
     ) </dev/null &>/dev/null &
     time_exit 17
-    echo "/clan/$CLD/quest/deleteHelp/3"
+    echo "/quest/deleteHelp/3"
     (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/end/3" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL'$click'4" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
     ) </dev/null &>/dev/null &
     time_exit 17
-    echo "/clan/$CLD/quest/end/3"
+    echo "/quest/deleteHelp/4"
+  else
     (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/deleteHelp/4" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL/clanrating/wantedToClan" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
     ) </dev/null &>/dev/null &
     time_exit 17
-    echo "/clan/$CLD/quest/deleteHelp/4"
+  fi
+}
+checkQuest() {
+  quest_id="$*"
+  clan_id
+  if [ -n "${CLD}" ]; then
+  (
+    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan/${CLD}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+  ) </dev/null &>/dev/null &
+  time_exit 20
+  click=$(grep -o "/quest/\(take\|help\|deleteHelp\|end\)/$*/[?]r[=][0-9]\{8\}" "$TMP"/SRC | sed -n '1p')
+
+  echo "$click"
     (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL/clan/$CLD/quest/end/4" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
     ) </dev/null &>/dev/null &
-    time_exit 17
-    echo "/clan/$CLD/quest/end/4"
+    time_exit 20
+    echo " Quest $quest_id Check..."
+  
+  #done
+    
   else
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "$URL/clanrating/wantedToClan" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
@@ -102,23 +112,40 @@ arena_duel() {
   # arena_fault
   # clear
   printf "arena ...\n"
-  arena_takeHelp
+  #arena_takeHelp
+  checkQuest 3
+  checkQuest 4
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/arena/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
   time_exit 17
   local BREAK=$(($(date +%s) + 60))
-  until grep -q -o 'lab/wizard' "$TMP"/SRC || [ $(date +%s) -gt "$BREAK" ]; do
+  local count=0
+  until grep -q -o 'lab/wizard' "$TMP"/SRC || [ "$(date +%s)" -gt "$BREAK" ]; do
     #icon=$(grep -q -o -A 1 "/images/icon/race/0.png" $TMP/SRC|sed -n '1p')
     local ACCESS=$(grep -o -E '(/arena/attack/1/[?]r[=][0-9]+)' "$TMP"/SRC | sed -n '1p') #/arena/attack/1/1234567*/
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${ACCESS}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &
     time_exit 17
-    echo " ⚔ ${ACCESS}"
-    sleep 1s
+    count=$((count + 1))
+    echo " ⚔ Atack $count"
+    sleep 0.6s
   done
-  arena_deleteEnd
+  (
+    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/inv/bag/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+  ) </dev/null &>/dev/null &
+  time_exit 17
+  SELL=$(grep -o -E '(/inv/bag/sellAll/1/[?]r[=][0-9]+)' "$TMP"/SRC | sed -n '1p')
+  #printf "%s\n" "$SELL"
+    (
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${SELL}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+    ) </dev/null &>/dev/null &
+    time_exit 17
+    echo " Sell all itens ✅"
+  #arena_deleteEnd
+  checkQuest 3
+  checkQuest 4
   echo -e "${GREEN_BLACK}arena (✔)${COLOR_RESET}\n"
 }
 arena_fullmana() {

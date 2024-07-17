@@ -8,7 +8,7 @@ campaign_func() {
         #/'=\\\&apos
         local CAMPAIGN=$(grep -o -E '/campaign/(go|fight|attack|end)/[?]r[=][0-9]+' $TMP/SRC | head -n 1)
         local BREAK=$(($(date +%s) + 60))
-        while [ -n "$CAMPAIGN" ] && [ $(date +%s) -lt "$BREAK" ]; do
+        while [ -n "$CAMPAIGN" ] && [ "$(date +%s)" -lt "$BREAK" ]; do
             case $CAMPAIGN in
             *go* | *fight* | *attack* | *end*)
                 (
