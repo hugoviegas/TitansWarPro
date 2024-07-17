@@ -106,7 +106,7 @@ checkQuest() {
     ) </dev/null &>/dev/null &
     time_exit 17
   fi
-}
+
   quest_id="$*"
   clan_id
   if [ -n "${CLD}" ]; then
