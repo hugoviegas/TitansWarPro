@@ -8,8 +8,7 @@ link()
     time_exit 17
 }
 
-testColour()
-{
+testColour() {
    echo -e "${BLACK_BLACK}BLACK_BLACK${COLOR_RESET}\n"
    echo -e "${BLACK_CYAN}BLACK_CYAN${COLOR_RESET}\n"
    echo -e "${BLACK_GREEN}BLACK_GREEN${COLOR_RESET}\n"
@@ -25,4 +24,7 @@ testColour()
    echo -e "${PURPLEis_BLACK}PURPLEis_BLACK${COLOR_RESET}\n"
    echo -e "${WHITE_BLACK}WHITE_BLACK${COLOR_RESET}\n"
    echo -e "${WHITEb_BLACK}WHITEb_BLACK${COLOR_RESET}\n"
+   echo -e "${RED_BLACK}RED_BLACK${COLOR_RESET}\n"
+   echo -e "${BLUE_BLACK}BLUE_BLACK${COLOR_RESET}\n"
+   sleep 30s
 }
