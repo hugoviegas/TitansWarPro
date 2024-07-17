@@ -133,5 +133,5 @@ login_logoff () {
 
  done
  messages_info
- #scrono
+ scrono
 }
