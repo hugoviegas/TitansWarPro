@@ -17,7 +17,7 @@ check_missions() {
   done
   #collect quests 
   i=0
-  if grep -r -o "/inv/chest/?quest_t=quest&quest_id=13&" "$TMP/SRC" | cat -; then
+  if grep -r -o "/inv/chest/?quest_t=quest&quest_id=13&" "$TMP/SRC"; then
     click=$(grep -r -o "/inv/chest/?quest_t=quest&quest_id=13&" "$TMP/SRC" | sed -n '1p' | cat -)
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
@@ -42,8 +42,8 @@ check_missions() {
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
       time_exit 20
-      #local MISSION_NUMBER=$(echo "$click" | cut -d'/' -f3 | cut -d'?' -f1)
-      #echo -e " ${GREEN_BLACK}Mission [$MISSION_NUMBER] Completed ✅${COLOR_RESET}\n"
+      local MISSION_NUMBER=$(echo "$click" | cut -d'/' -f3 | cut -d'?' -f1)
+      echo -e " ${GREEN_BLACK}Mission [$MISSION_NUMBER] Completed ✅${COLOR_RESET}\n"
     fi
     #i=$((i + 1))
   done
@@ -54,7 +54,7 @@ check_missions() {
   time_exit 20
   i=0
   while [ $i -lt 11 ]; do
-    if grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP"/SRC | cat -; then
+    if grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP"/SRC; then
       click=$(grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p' | cat -)
       (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
@@ -69,7 +69,7 @@ check_missions() {
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/collector/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
   time_exit 20
-  if grep -o -E "/collector/reward/element/[?]r=[0-9]+" "$TMP"/SRC | cat -; then
+  if grep -o -E "/collector/reward/element/[?]r=[0-9]+" "$TMP"/SRC; then
     click=$(grep -o -E '/collector/reward/element/[?]r=[0-9]+' "$TMP"/SRC | cat -)
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
