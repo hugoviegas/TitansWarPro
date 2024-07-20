@@ -14,6 +14,7 @@ colors() {
      COLOR_RESET='\033[00m'
      GOLD_BLACK='\033[33m'
      GREEN_BLACK='\033[32m'
+     GREENb_BLACK='\033[1;32m'  # Bold green
      RED_BLACK='\033[0;31m'
      PURPLEi_BLACK='\033[03;34m\033[02;03m'
      PURPLEis_BLACK='\033[03;34m\033[02;04m'
@@ -28,7 +29,7 @@ script_slogan() {
      m=89
      author="author: Hugo Viegas"
      #collaborator="collaborator: @_hviegas"
-     versionNum="3.3.8 (beta)"
+     versionNum="3.3.9 (beta)"
      for i in $colors; do
           clear
           t=$((t - 27))
@@ -131,7 +132,7 @@ messages_info() {
      if [ ! -e "~/twm/.${UR}/TRAIN" ] || find "$TRAIN" -mmin +30 >/dev/null 2>&1; then
           hpmp -fix
      fi
-     printf %b "\033[0;31mHP 🧡 $NOWHP - ${HPPER}% | MP 🔷🔹 $NOWMP - ${MPPER}%${COLOR_RESET}\n" >>$TMP/msg_file
+     printf %b "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}\n" >>"$TMP"/msg_file
      # sed :a;N;s/\n//g;ta |
-     printf "${GREEN_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' $TMP/info_file | sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}\n" >>$TMP/msg_file
+     echo -e "${GREENb_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' "$TMP"/info_file | sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}\n" >>"$TMP"/msg_file
 }
