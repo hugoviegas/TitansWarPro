@@ -22,16 +22,16 @@ func_crono() {
    if [ $MIN = 07 ]; then MIN=7; fi
    if [ $MIN = 08 ]; then MIN=8; fi
    if [ $MIN = 09 ]; then MIN=9; fi
-   printf " \033[02m$URL ⏰$(date +%H):$(date +%M)${COLOR_RESET}\n"
+   echo -e " \033[02m$URL ⏰ $(date +%H):$(date +%M)${COLOR_RESET}"
 }
 
 func_cat() {
    func_crono
 
    if [ $HOUR -lt 6 ] || [ $HOUR -ge 18 ]; then
-      printf "${GOLD_BLACK}"
-   else
       printf "${BLUE_BLACK}"
+   else
+      printf "${GOLD_BLACK}"
    fi
 
    cat $TMP/msg_file
