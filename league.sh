@@ -11,10 +11,7 @@ league_play() {
       ) </dev/null &>/dev/null &
       time_exit 20
       ATK=$(grep -o -E '/league/fight/[0-9]{1,4}/[?]r[=][0-9]+' $TMP/SRC | sed -n '4p')
-      (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/mail" -o user_agent="$(shuf -n1 "$TMP/userAgent.txt")" > "$TMP/league_file"
-      ) </dev/null &>/dev/null &
-      time_exit 20
+      echo -e "$ATK"
     #done
     echo -e "${GREEN_BLACK}League ✅${COLOR_RESET}\n"
   #fi
