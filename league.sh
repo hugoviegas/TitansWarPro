@@ -26,8 +26,13 @@ league_play() {
     ATK=$(grep -o -E '/league/fight/[0-9]{1,4}/[?]r=[0-9]+' "$TMP/SRC" | sed -n '1p')
     echo -e "$ATK"
 
-    # Use sed to extract the relevant content between the specified markers
-    sed -n "/<div class='old_title bold'>/,/style='display:inline-block;text-align/p" "$input_file" > "$output_file"
+    # Use awk to cut the beginning and the end
+    awk '
+    BEGIN { found_start = 0; }
+    /<div class='\''old_title bold'\''>/ { found_start = 1; }
+    found_start && /<img src='\''\/images\/icon\/exp.png'\''/ { exit; }
+    found_start { print; }
+' "$input_file" > "$output_file"
 
     # Optional: Display the cleaned content
     cat "$output_file"
