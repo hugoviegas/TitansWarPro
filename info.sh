@@ -29,7 +29,7 @@ script_slogan() {
      m=89
      author="author: Hugo Viegas"
      #collaborator="collaborator: @_hviegas"
-     versionNum="3.3.15 (beta)"
+     versionNum="3.3.16 (beta)"
      for i in $colors; do
           clear
           t=$((t - 27))

@@ -12,14 +12,18 @@ output_file="cleaned_league_file"
     echo -e "${GOLD_BLACK}League ⚔️${COLOR_RESET}"
     #for num in $(seq 5 -1 1); do
       (
-        w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/league/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >"$TMP"/"$input_file"
+        w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/league/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
       time_exit 20
-      ATK=$(grep -o -E '/league/fight/[0-9]{1,4}/[?]r[=][0-9]+' $TMP/SRC | sed -n '4p')
+      $TMP/SRC > $input_file 
+      ATK=$(grep -o -E '/league/fight/[0-9]{1,4}/[?]r[=][0-9]+' $TMP/SRC | sed -n '1p')
       echo -e "$ATK"
       # Use sed to extract the relevant content
       sed -n "/<div class='old_title bold'>/,/style='display:inline-block;text-align/p" "$input_file" > "$output_file"
-
+      echo "$output_file" | cut -d'<div class='old_title bold'>' -f1 | cut -d'display:inline-block;text-align' -f1 > $output_file
+      #echo "$input_file" | cut -d'<div class='old_title bold'>' -f1 | cut -d'display:inline-block;text-align' -f1 > $input_file
+      cat $output_file
+      sleep 10s
     #done
     echo -e "${GREEN_BLACK}League ✅${COLOR_RESET}\n"
   #fi
