@@ -28,7 +28,7 @@ script_slogan() {
      m=89
      author="author: Hugo Viegas"
      #collaborator="collaborator: @_hviegas"
-     versionNum="3.3.6 (beta)"
+     versionNum="3.3.7 (beta)"
      for i in $colors; do
           clear
           t=$((t - 27))
@@ -51,7 +51,7 @@ script_slogan() {
 "
 
           printf "\033[1;38;5;${i}m${author}\n\033[02m${versionNum}${COLOR_RESET}\n"
-          sleep 0.3s
+          sleep 0.2s
      done
 }
 
@@ -118,12 +118,12 @@ messages_info() {
      time_exit 17
      printf " -------- 💬 CHAT TITANS 🔱 --------\n" >>$TMP/msg_file
      (
-          w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/chat/titans/changeRoom" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -n '/\(\»\)/,/\[chat\]/p' | sed '$d;4q' >>$TMP/msg_file
+          w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/chat/titans/changeRoom" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -n '/\(\»\)/,/\[chat\]/p' | sed '$d;6q' >>$TMP/msg_file
      ) </dev/null &>/dev/null &
      time_exit 17
      printf " -------- 💬 CHAT CLAN 🛡️ --------\n" >>$TMP/msg_file
      (
-          w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/chat/clan/changeRoom" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[chat\]/p' | sed '$d;4q' >>$TMP/msg_file
+          w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/chat/clan/changeRoom" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[chat\]/p' | sed '$d;8q' >>$TMP/msg_file
      ) </dev/null &>/dev/null &
      time_exit 17
      sed -i 's/\[0\]/🔴/g;s/\[0-off\]/⭕/g;s/\[1\]/🔵/g;s/\[1-off\]/🔘/g;s/\[premium\]/👑/g;s/\[level\]/🔼/g;s/\[mail\]/📩/g' msg_file >>$TMP/msg_file
