@@ -31,7 +31,7 @@ func_cat() {
    if [ $HOUR -lt 6 ] || [ $HOUR -ge 18 ]; then
       printf "${GOLD_BLACK}"
    else
-      printf "${BLACK_CYAN}"
+      printf "${BLUE_BLACK}"
    fi
 
    cat $TMP/msg_file
@@ -97,7 +97,7 @@ func_sleep() {
    esac
 }
 
-scrono() {
+start() {
    arena_duel
    career_func
    cave_routine

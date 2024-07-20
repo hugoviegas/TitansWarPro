@@ -10,6 +10,7 @@ colors() {
      BLACK_YELLOW='\033[00;33m\033[01;07m'
      CYAN_BLACK='\033[04;36m\033[02;04m'
      CYAN_CYAN='\033[01;36m\033[08;07m'
+     BLUE_BLACK='\033[0;34m\033[01;07m'
      COLOR_RESET='\033[00m'
      GOLD_BLACK='\033[33m'
      GREEN_BLACK='\033[32m'
@@ -27,7 +28,7 @@ script_slogan() {
      m=89
      author="author: Hugo Viegas"
      #collaborator="collaborator: @_hviegas"
-     versionNum="3.3.4 (beta)"
+     versionNum="3.3.5 (beta)"
      for i in $colors; do
           clear
           t=$((t - 27))
