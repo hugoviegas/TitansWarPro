@@ -31,7 +31,7 @@ func_cat() {
    if [ $HOUR -lt 6 ] || [ $HOUR -ge 18 ]; then
       printf "${GOLD_BLACK}"
    else
-      printf "${CYAN_BLACK}"
+      printf "${BLACK_CYAN}"
    fi
 
    cat $TMP/msg_file
