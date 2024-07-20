@@ -33,11 +33,11 @@ sum_agi=0
 sum_def=0
 
 # Extract values for each occurrence
-while read -r line; do
-    str_value=$(echo "$line" | grep -o -E "alt='str'/> Força: [0-9]+" | awk '{print $NF}')
-    vit_value=$(echo "$line" | grep -o -E "alt='vit'/> Saúde: [0-9]+" | awk '{print $NF}')
-    agi_value=$(echo "$line" | grep -o -E "alt='agi'/> Agilidade: [0-9]+" | awk '{print $NF}')
-    def_value=$(echo "$line" | grep -o -E "alt='def'/> Proteção: [0-9]+" | awk '{print $NF}')
+while read -r "$input_file"; do
+    str_value=$(echo "$input_file" | grep -o -E "alt='str'/> Força: [0-9]+" | awk '{print $NF}')
+    vit_value=$(echo "$input_file" | grep -o -E "alt='vit'/> Saúde: [0-9]+" | awk '{print $NF}')
+    agi_value=$(echo "$input_file" | grep -o -E "alt='agi'/> Agilidade: [0-9]+" | awk '{print $NF}')
+    def_value=$(echo "$input_file" | grep -o -E "alt='def'/> Proteção: [0-9]+" | awk '{print $NF}')
 
     # Sum the values
     sum_str=$((sum_str + str_value))
