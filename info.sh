@@ -29,14 +29,14 @@ script_slogan() {
      m=89
      author="author: Hugo Viegas"
      #collaborator="collaborator: @_hviegas"
-     versionNum="3.3.18 (beta)"
+     versionNum="3.3.19 (beta)"
      for i in $colors; do
           clear
           t=$((t - 27))
           w=$((w + 1))
           m=$((m - 2))
           
-          printf "\033[1;38;5;${i}m
+          echo -e "\033[1;38;5;${i}m
 ╔══╗╔╗╔══╗╔══╗╔══╗╔══╗  
 ╚╗╔╝╠╣╚╗╔╝║╔╗║║╔╗║║══╣  
  ║║ ║║ ║║ ║╔╗║║║║║╠══║  
@@ -51,7 +51,7 @@ script_slogan() {
 ╚╩═╩╝╚╝╚╝╚══╝╚╝╚╝╚══╝
 "
 
-          printf "\033[1;38;5;${i}m${author}\n\033[02m${versionNum}${COLOR_RESET}\n"
+          echo -e "\033[1;38;5;${i}m${author}\n\033[02m${versionNum}${COLOR_RESET}"
           sleep 0.2s
      done
 }

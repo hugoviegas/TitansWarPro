@@ -26,20 +26,36 @@ league_play() {
     ATK=$(grep -o -E '/league/fight/[0-9]{1,4}/[?]r=[0-9]+' "$TMP/SRC" | sed -n '1p')
     echo -e "$ATK"
 
-    # Use awk to cut the beginning and the end
-    awk '
-    BEGIN { found_start = 0; }
-    /<div class='\''old_title bold'\''>/ { found_start = 1; }
-    found_start && /<img src='\''\/images\/icon\/exp.png'\''/ { exit; }
-    found_start { print; }
-' "$input_file" > "$output_file"
+    # Initialize variables to hold sums
+sum_str=0
+sum_vit=0
+sum_agi=0
+sum_def=0
 
-    # Optional: Display the cleaned content
-    cat "$output_file"
-      #echo "$output_file" | cut -d'<div class='old_title bold'>' -f1 | cut -d'display:inline-block;text-align' -f1 > $output_file
-      #echo "$input_file" | cut -d'<div class='old_title bold'>' -f1 | cut -d'display:inline-block;text-align' -f1 > $input_file
-      cat $output_file
-      #sleep 10s
+# Extract values for each occurrence
+while read -r line; do
+    str_value=$(echo "$line" | grep -o -E "alt='str'/> Força: [0-9]+" | awk '{print $NF}')
+    vit_value=$(echo "$line" | grep -o -E "alt='vit'/> Saúde: [0-9]+" | awk '{print $NF}')
+    agi_value=$(echo "$line" | grep -o -E "alt='agi'/> Agilidade: [0-9]+" | awk '{print $NF}')
+    def_value=$(echo "$line" | grep -o -E "alt='def'/> Proteção: [0-9]+" | awk '{print $NF}')
+
+    # Sum the values
+    sum_str=$((sum_str + str_value))
+    sum_vit=$((sum_vit + vit_value))
+    sum_agi=$((sum_agi + agi_value))
+    sum_def=$((sum_def + def_value))
+done < "$output_file"
+
+# Save the results to the original league_file or a new one
+echo "Força: $sum_str" > "$output_file"
+echo "Saúde: $sum_vit" >> "$output_file"
+echo "Agilidade: $sum_agi" >> "$output_file"
+echo "Proteção: $sum_def" >> "$output_file"
+
+# Print the results to the console (optional)
+cat "$output_file"
+
+
     #done
     echo -e "${GREEN_BLACK}League ✅${COLOR_RESET}\n"
   #fi
