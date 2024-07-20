@@ -1,4 +1,9 @@
 league_play() {
+# Define the input and output files
+input_file="league_file"
+output_file="cleaned_league_file"
+
+
   (
     w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
   ) </dev/null &>/dev/null &
@@ -12,6 +17,33 @@ league_play() {
       time_exit 20
       ATK=$(grep -o -E '/league/fight/[0-9]{1,4}/[?]r[=][0-9]+' $TMP/SRC | sed -n '4p')
       echo -e "$ATK"
+      # Use sed to extract the relevant content
+      sed -n "/<div class='old_title bold'>/,/style='display:inline-block;text-align/p" "$input_file" > "$output_file"
+
+      #!/bin/bash
+
+# Sample HTML content (you may want to read this from a file or URL)
+output_file="$TMP/league_file"
+echo "" > "$output_file"
+
+# Extract values for each stat and write to file
+for stat in "str" "vit" "agi" "def"; do
+    value=$(echo "$output_file" | grep -o -E "alt='$stat'/> [^<]+" | head -n 1 | sed 's/.*: //')
+    echo "$stat: $value" >> "$output_file"
+done
+
+# Read values from the file and sum them
+total=0
+while IFS=: read -r stat value; do
+    total=$((total + value))
+done < "$output_file"
+
+# Output the results
+echo "Values saved in $output_file:"
+cat "$output_file"
+echo "Total: $total"
+
+
     #done
     echo -e "${GREEN_BLACK}League ✅${COLOR_RESET}\n"
   #fi
