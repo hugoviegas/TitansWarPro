@@ -16,14 +16,8 @@ time_exit 20
   ) </dev/null &>/dev/null &
   time_exit 20
 
-  (
-    w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/league/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -ne '/images/icon/2hit.png/,/display:inline-block;text-align:left/' >>$TMP/league_players
-  ) </dev/null &>/dev/null &
-  time_exit 20
-
-  # Copy SRC to input_file
-  #cp "$TMP/SRC" "$input_file"
-
+  FPATK=$(grep -o -E 'alt='str'/> Força: [0-9]+' "$TMP/SRC" | sed -n '1p')
+  echo -e "$FPATK"
   # Extract the first occurrence of the desired pattern
   ATK=$(grep -o -E '/league/fight/[0-9]{1,4}/[?]r=[0-9]+' "$TMP/SRC" | sed -n '1p')
   echo -e "$ATK"
