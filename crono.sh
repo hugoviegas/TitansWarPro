@@ -1,4 +1,3 @@
-# /time
 func_crono() {
    HOUR=$(date +%H)
    if [ $HOUR = 00 ]; then HOUR=0; fi
