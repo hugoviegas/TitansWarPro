@@ -29,7 +29,7 @@ func_cat() {
    func_crono
 
    if [ $HOUR -lt 6 ] || [ $HOUR -ge 18 ]; then
-      printf "${BLUE_BLACK}"
+      printf "${RED_BLACK}"
    else
       printf "${GOLD_BLACK}"
    fi
