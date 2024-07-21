@@ -72,7 +72,7 @@ undying_start () {
    #/hp20%+, mp10%+
 
    if awk -v hpper="$HPPER" 'BEGIN { exit !(hpper > 20) }' && awk -v mpper="$MPPER" 'BEGIN { exit !(mpper > 10) }'; then
-    arena_takeHelp
+    #arena_takeHelp
     arena_fullmana
    fi
 
