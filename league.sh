@@ -16,7 +16,7 @@ time_exit 20
   ) </dev/null &>/dev/null &
   time_exit 20
 
-  FPATK=$(grep -o -E 'alt='str'/> Força: [0-9]+' "$TMP/SRC" | sed -n '1p')
+  FPATK=$(grep -o -E "alt='str'/> Força: [0-9]+" "$TMP/SRC" | sed -n '1p') >> league_players
   echo -e "$FPATK"
   # Extract the first occurrence of the desired pattern
   ATK=$(grep -o -E '/league/fight/[0-9]{1,4}/[?]r=[0-9]+' "$TMP/SRC" | sed -n '1p')
