@@ -29,9 +29,9 @@ func_cat() {
    func_crono
 
    if [ $HOUR -lt 6 ] || [ $HOUR -ge 18 ]; then
-      echo "${GOLD_BLACK}"
+      printf "${BLUE_BLACK}"
    else
-      echo "${BLUE_BLACK}"
+      printf "${GOLD_BLACK}"
    fi
 
    cat $TMP/msg_file
