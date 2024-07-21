@@ -115,7 +115,7 @@ king_fight () {
  unset cl_access
  func_unset
  apply_event
- printf "King (✔)\n"
+ echo -e "${RED_BLACK}👑King ✅${COLOR_RESET}"
  sleep 10s
  clear
 }

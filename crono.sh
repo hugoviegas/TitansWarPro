@@ -1,4 +1,3 @@
-# /time
 func_crono() {
    HOUR=$(date +%H)
    if [ $HOUR = 00 ]; then HOUR=0; fi
@@ -22,16 +21,16 @@ func_crono() {
    if [ $MIN = 07 ]; then MIN=7; fi
    if [ $MIN = 08 ]; then MIN=8; fi
    if [ $MIN = 09 ]; then MIN=9; fi
-   printf " \033[02m$URL ⏰$(date +%H):$(date +%M)${COLOR_RESET}\n"
+   echo -e " \033[02m$URL ⏰ $(date +%H):$(date +%M)${COLOR_RESET}"
 }
 
 func_cat() {
    func_crono
 
    if [ $HOUR -lt 6 ] || [ $HOUR -ge 18 ]; then
-      printf "${GOLD_BLACK}"
+      printf "${BLUE_BLACK}"
    else
-      printf "${BLACK_CYAN}"
+      printf "${GOLD_BLACK}"
    fi
 
    cat $TMP/msg_file
@@ -97,7 +96,7 @@ func_sleep() {
    esac
 }
 
-scrono() {
+start() {
    arena_duel
    career_func
    cave_routine

@@ -42,7 +42,7 @@ check_missions() {
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
       time_exit 20
-      local MISSION_NUMBER=$(echo "$click" | cut -d'/' -f3 | cut -d'?' -f1)
+      MISSION_NUMBER=$(echo "$click" | cut -d'/' -f5 | cut -d'?' -f1)
       echo -e " ${GREEN_BLACK}Mission [$MISSION_NUMBER] Completed ✅${COLOR_RESET}"
     fi
     #i=$((i + 1))
