@@ -110,7 +110,7 @@ arena_duel() {
   ) </dev/null &>/dev/null &
   time_exit 17
   SELL=$(grep -o -E '(/inv/bag/sellAll/1/[?]r[=][0-9]+)' "$TMP"/SRC | sed -n '1p')
-  #printf "%s\n" "$SELL"
+  printf "%s\n" "$SELL"
     (
   echo -e "${GREEN_BLACK}energy arena (✔)${COLOR_RESET}\n"
     ) </dev/null &>/dev/null &
