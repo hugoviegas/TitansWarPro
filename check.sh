@@ -117,10 +117,11 @@ use_elixir() {
             break
         fi
 
-        #Using elixir link
+        # Using all elixir
         (
             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
         ) </dev/null &>/dev/null &
         time_exit 20
     done
+    echo -e "${BLACK_YELLOW}Applied all elixir 💊${COLOR_RESET}\n" 
 }
