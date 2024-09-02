@@ -110,6 +110,10 @@ arena_duel() {
   ) </dev/null &>/dev/null &
   time_exit 17
   SELL=$(grep -o -E '(/inv/bag/sellAll/1/[?]r[=][0-9]+)' "$TMP"/SRC | sed -n '1p')
+  (
+    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${SELL}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+  ) </dev/null &>/dev/null &
+    time_exit 17
   #printf "%s\n" "$SELL"
     (
   echo -e "${GREEN_BLACK}energy arena (✔)${COLOR_RESET}\n"
