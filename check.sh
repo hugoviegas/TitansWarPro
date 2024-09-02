@@ -100,27 +100,33 @@ apply_event() {
 }
 
 use_elixir() {
-  (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/inv/chest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+    # Initial fetch to get the starting URLs
+    (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/inv/chest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &
-  time_exit 20
+    time_exit 20
 
-  # Capture the first four matches into an array
-  mapfile -t click < <(grep -o -E "/inv/chest/use/[0-9]+/1/[?]r=[0-9]+" "$TMP/SRC")
-  echo "$click"
-  # Debug: Show the contents of the click array
-    echo "Captured URLs:"
-    for url in "${click[@]}"; do
-        echo "$url"
+    # Loop to process clicks
+    for ((i=1; i<=4; i++)); do
+        # Capture the i-th match into a variable
+        click=$(grep -o -E "/inv/chest/use/[0-9]+/1/[?]r=[0-9]+" "$TMP/SRC" | sed -n "${i}p")
+
+        # Break the loop if no more clicks are found
+        if [[ -z "$click" ]]; then
+            echo "No more URLs to process."
+            break
+        fi
+
+        # Print the URL being processed
+        echo "Processing URL: ${URL}$click"
+
+        # Fetch the new content based on the clicked URL
+        #(
+        #    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+        #) </dev/null &>/dev/null &
+        time_exit 20
+
     done
 
-  # Loop through the clicks and process each one
-  for url in "${click[@]}"; do
-    #(
-    #    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$url" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    #) </dev/null &>/dev/null &
-    #time_exit 20
-    echo 'done'
-done
 sleep 10
 }
