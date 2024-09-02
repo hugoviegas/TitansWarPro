@@ -98,3 +98,21 @@ apply_event() {
     echo -e "${BLACK_YELLOW}Applied for battle ✅${COLOR_RESET}\n"
   fi
 }
+
+use_elixir() {
+  (
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/inv/chest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+    ) </dev/null &>/dev/null &
+  time_exit 20
+
+  # Capture the first four matches into an array
+  mapfile -t click < <(grep -o -E "/inv/chest/use/[0-9]+/1/[?]r=[0-9]+" "$TMP/SRC" | sed -n '1,4p')
+  echo "$click"
+  # Loop through the clicks and process each one
+  for url in "${click[@]}"; do
+    (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$url" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+    ) </dev/null &>/dev/null &
+    time_exit 20
+done
+}

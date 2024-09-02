@@ -59,22 +59,7 @@ undying_start () {
  case $(date +%H:%M) in
   (09:5[5-9]|15:5[5-9]|21:5[5-9])
    hpmp -fix
-    (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/inv/chest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    ) </dev/null &>/dev/null &
-  time_exit 20
-
-  # Capture the first four matches into an array
-  mapfile -t click < <(grep -o -E "/inv/chest/use/[0-9]+/1/[?]r=[0-9]+" "$TMP/SRC" | sed -n '1,4p')
-
-  # Loop through the clicks and process each one
-  for url in "${click[@]}"; do
-    (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$url" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    ) </dev/null &>/dev/null &
-    time_exit 20
-done
-
+   use_elixir
    apply_event undying
 
    echo -e "${GOLD_BLACK}Valley of the Immortals will be started 🧟...${COLOR_RESET}\n$(date +%Hh:%Mm)"
