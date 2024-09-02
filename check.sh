@@ -120,11 +120,10 @@ use_elixir() {
         # Print the URL being processed
         #echo "Processing URL: ${URL}$click"
 
-         #Fetch the new content based on the clicked URL
+        #Fetch the new content based on the clicked URL
         (
             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
         ) </dev/null &>/dev/null &
         time_exit 20
-
     done
 }
