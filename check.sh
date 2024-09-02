@@ -30,11 +30,11 @@ check_missions() {
     #) </dev/null &>/dev/null &
     #time_exit 20
 
-  (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1   "$TMP"/userAgent.txt)" >"$TMP"/SRC
-  ) </dev/null &>/dev/null &
-  time_exit 20
-  fi
+  #(
+  #  w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1   "$TMP"/userAgent.txt)" >"$TMP"/SRC
+  #) </dev/null &>/dev/null &
+  #time_exit 20
+  #fi
   for i in {0..15} ; do
   #while [ $i -lt 15 ]; do // /inv/chest/?quest_t=quest&quest_id=13&qz=01690126f2e5d7a75a31e6ee149c6cb2
   
