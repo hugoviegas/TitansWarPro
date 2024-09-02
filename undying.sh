@@ -65,7 +65,7 @@ undying_start () {
   time_exit 20
 
   # Capture the first four matches into an array
-  mapfile -t click < <(grep -o -E "/inv/chest/use/[0-9]+/1/[?]r=[0-9]+" "$TMP/SRC" | sed -n '1,4p' | cat -)
+  mapfile -t click < <(grep -o -E "/inv/chest/use/[0-9]+/1/[?]r=[0-9]+" "$TMP/SRC" | sed -n '1,4p')
 
   # Loop through the clicks and process each one
   for url in "${click[@]}"; do
