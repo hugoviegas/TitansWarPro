@@ -106,13 +106,21 @@ use_elixir() {
   time_exit 20
 
   # Capture the first four matches into an array
-  mapfile -t click < <(grep -o -E "/inv/chest/use/[0-9]+/1/[?]r=[0-9]+" "$TMP/SRC" | sed -n '1,4p')
+  mapfile -t click < <(grep -o -E "/inv/chest/use/[0-9]+/1/[?]r=[0-9]+" "$TMP/SRC")
   echo "$click"
+  # Debug: Show the contents of the click array
+    echo "Captured URLs:"
+    for url in "${click[@]}"; do
+        echo "$url"
+    done
+
   # Loop through the clicks and process each one
   for url in "${click[@]}"; do
-    (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$url" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    ) </dev/null &>/dev/null &
-    time_exit 20
+    #(
+    #    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$url" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+    #) </dev/null &>/dev/null &
+    #time_exit 20
+    echo 'done'
 done
+sleep 10
 }
