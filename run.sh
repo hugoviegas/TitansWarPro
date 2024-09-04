@@ -29,10 +29,10 @@ twm_play () {
    start
   ;;
   #/Flag Fight 10:15:00 - 16:15:00
-  # (10:1[0-4]|16:1[0-4])
-  # flagfight_start
-  # start
-  # ;;
+   (10:1[0-4]|16:1[0-4])
+   flagfight_start
+   start
+   ;;
   #/Clan coliseum 10:30:00 - 15:00:00
   (10:2[8-9]|14:5[8-9])
    if [ -n $CLD ]; then
