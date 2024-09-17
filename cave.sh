@@ -108,7 +108,7 @@ cave_start() {
 }
 
 cave_routine() {
-  echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET};\n"
+  echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}\n"
   # checkQuest 5
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/cave/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
@@ -131,27 +131,27 @@ cave_routine() {
           *down*)
           tput cuu1
           tput el
-          echo -n" Cave new search 🔍"
+          echo -n "\n Cave new search 🔍"
           ;;
           *gather*)
           tput cuu1
           tput el
-          echo -n" Cave start mining ⛏️"
+          echo -n "\n Cave start mining ⛏️"
           ;;
           *speedUp*)
           tput cuu1
           tput el
-          echo -n " Cave seepd up mining ⚡"
+          echo -n "\n Cave seepd up mining ⚡"
           ;;
           *runaway*)
           tput cuu1
           tput el
-          echo -n " Cave run away 💨"
+          echo -n "\n Cave run away 💨"
           ;;
           *attack*)
           tput cuu1
           tput el
-          echo -n " Cave attack monster 🧌"
+          echo -n "\n Cave attack monster 🧌"
           ;;
         esac
         #echo "Cave $RESULT"
