@@ -102,7 +102,7 @@ cave_start() {
       ) </dev/null &>/dev/null &
       time_exit 20
     fi
-    printf "Cave ✅\n"
+    echo -e "${GREEN_BLACK}Cave Done✅${COLOR_RESET}\n"
     unset ACCESS1 ACCESS2 ACTION DOWN MEGA
   done
 }
