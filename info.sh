@@ -29,7 +29,7 @@ w=59
 m=89
 author="author: Hugo Viegas"
 #collaborator="collaborator: @_hviegas"
-versionNum="3.4.15 (beta)"
+versionNum="3.4.16 (beta)"
 for i in $colors; do
      clear
      t=$((t - 27))
@@ -38,7 +38,6 @@ for i in $colors; do
      
 # shellcheck disable=SC2059
 printf "\033[1;38;5;${i}m
-
 
 ████████╗██╗████████╗ █████╗ ███╗   ██╗███████╗  
 ╚══██╔══╝██║╚══██╔══╝██╔══██╗████╗  ██║██╔════╝  

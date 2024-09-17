@@ -119,44 +119,42 @@ cave_routine() {
     #/'=\\\&apos
     local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
     local BREAK=$(($(date +%s) + 180))
-    while [ -n "$CAVE" ] && [ "$(date +%s)" -ge "$BREAK" ]; do
+    while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ]; do
       case $CAVE in
-      (*gather* | *down* | *runaway* | *attack*)
+      (*gather* | *down* | *runaway* | *attack* | *speedUp*)
         (
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAVE" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
         ) </dev/null &>/dev/null &
         time_exit 20
         RESULT=$(echo "$CAVE" | cut -d'/' -f3)
         case $RESULT in
-        *down*)
-        echo " Cave new search 🔍"
-        ;;
-        *gather*)
-        echo " Cave start mining ⛏️"
-        ;;
-        *speedUp*)
-        echo " Cave seepd up mining ⚡"
-        ;;
-        *runaway*)
-        echo " Cave run away 💨"
-        ;;
-        *attack*)
-        echo " Cave attack monster 🧌"
-        ;;
+          *down*)
+          echo " Cave new search 🔍"
+          ;;
+          *gather*)
+          echo " Cave start mining ⛏️"
+          ;;
+          *speedUp*)
+          echo " Cave seepd up mining ⚡"
+          ;;
+          *runaway*)
+          echo " Cave run away 💨"
+          ;;
+          *attack*)
+          echo " Cave attack monster 🧌"
+          ;;
         esac
         #echo "Cave $RESULT"
         #echo "\n"
         # shellcheck disable=SC2155
-        local CAVE=$(grep -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
-        ;;
-        (*speedUp*)
-        #break
         (
-          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAVE" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/cave/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
         ) </dev/null &>/dev/null &
         time_exit 20
-        RESULT=$(echo "$CAVE" | cut -d'/' -f3)
-        echo speeding Up...
+        local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+        #;;
+        #(*speedUp*)
+        #break
         ;;
       esac
     done
