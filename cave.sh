@@ -131,27 +131,27 @@ cave_routine() {
           *down*)
           tput cuu1
           tput el
-          echo -n "\n Cave new search 🔍"
+          echo " Cave new search 🔍"
           ;;
           *gather*)
           tput cuu1
           tput el
-          echo -n "\n Cave start mining ⛏️"
+          echo " Cave start mining ⛏️"
           ;;
           *speedUp*)
           tput cuu1
           tput el
-          echo -n "\n Cave seepd up mining ⚡"
+          echo " Cave seepd up mining ⚡"
           ;;
           *runaway*)
           tput cuu1
           tput el
-          echo -n "\n Cave run away 💨"
+          echo " Cave run away 💨"
           ;;
           *attack*)
           tput cuu1
           tput el
-          echo -n "\n Cave attack monster 🧌"
+          echo " Cave attack monster 🧌"
           ;;
         esac
         #echo "Cave $RESULT"
