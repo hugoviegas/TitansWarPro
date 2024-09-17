@@ -129,21 +129,23 @@ cave_routine() {
         RESULT=$(echo "$CAVE" | cut -d'/' -f3)
         case $RESULT in
           *down*)
-          echo " Cave new search 🔍"
+          echo -n" Cave new search 🔍"
           ;;
           *gather*)
-          echo " Cave start mining ⛏️"
+          echo -n" Cave start mining ⛏️"
           ;;
           *speedUp*)
-          echo " Cave seepd up mining ⚡"
+          echo -n " Cave seepd up mining ⚡"
           ;;
           *runaway*)
-          echo " Cave run away 💨"
+          echo -n " Cave run away 💨"
           ;;
           *attack*)
-          echo " Cave attack monster 🧌"
+          echo -n " Cave attack monster 🧌"
           ;;
         esac
+        tput cuu1
+        tput el
         #echo "Cave $RESULT"
         #echo "\n"
         # shellcheck disable=SC2155
