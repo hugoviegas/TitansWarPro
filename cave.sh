@@ -110,53 +110,58 @@ cave_start() {
 cave_routine() {
   echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}"
   # checkQuest 5
-  (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/cave/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-  ) </dev/null &>/dev/null &
-  time_exit 20
-  
-  if grep -q -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
-    #/'=\\\&apos
-    local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
-    local BREAK=$(($(date +%s) + 180))
-    while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ]; do
-      case $CAVE in
-      (*gather* | *down* | *runaway* | *attack*)
-        (
-          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAVE" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-        ) </dev/null &>/dev/null &
-        time_exit 20
-        RESULT=$(echo "$CAVE" | cut -d'/' -f3)
-        case $RESULT in
-        *down*)
-        echo " Cave new search 🔍"
-        ;;
-        *gather*)
-        echo " Cave start mining ⛏️"
-        ;;
-        *speedUp*)
-        echo " Cave seepd up mining ⚡"
-        ;;
-        *runaway*)
-        echo " Cave run away 💨"
-        ;;
-        *attack*)
-        echo " Cave attack monster 🧌"
-        ;;
+  BREAK=$(($(date +%s) + 180))
+  until [ "$(date +%s)" -ge "$BREAK" ]; do
+    echo "Waiting..."
+    sleep 5  # Sleep for 5 seconds to avoid busy waiting (adjust as needed)
+
+    (
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/cave/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+    ) </dev/null &>/dev/null &
+    time_exit 20
+    
+    if grep -q -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
+      #/'=\\\&apos
+      local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+      local BREAKW=$(($(date +%s) + 18))
+      while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAKW" ]; do
+        case $CAVE in
+        (*gather* | *down* | *runaway* | *attack*)
+          (
+            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAVE" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+          ) </dev/null &>/dev/null &
+          time_exit 20
+          RESULT=$(echo "$CAVE" | cut -d'/' -f3)
+          case $RESULT in
+          *down*)
+          echo " Cave new search 🔍"
+          ;;
+          *gather*)
+          echo " Cave start mining ⛏️"
+          ;;
+          *speedUp*)
+          echo " Cave seepd up mining ⚡"
+          ;;
+          *runaway*)
+          echo " Cave run away 💨"
+          ;;
+          *attack*)
+          echo " Cave attack monster 🧌"
+          ;;
+          esac
+          #echo "Cave $RESULT"
+          #echo "\n"
+          # shellcheck disable=SC2155
+          local CAVE=$(grep -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+          ;;
+          (*speedUp*)
+          break
+          ;;
         esac
-        #echo "Cave $RESULT"
-        #echo "\n"
-        # shellcheck disable=SC2155
-        local CAVE=$(grep -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
-        ;;
-        (*speedUp*)
-        break
-        ;;
-      esac
-    done
-    # checkQuest 5
-  fi
-  
+      done
+      # checkQuest 5
+    fi
+  done
   echo -e "${GREEN_BLACK}Cave Done✅${COLOR_RESET}\n"
 
 }
