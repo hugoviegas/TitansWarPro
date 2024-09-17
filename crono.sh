@@ -99,12 +99,12 @@ func_sleep() {
 start() {
    arena_duel
    career_func
+   cave_routine
    func_trade
    campaign_func
    clanDungeon
    #coliseum_start
    check_missions
-   cave_start
    messages_info
    func_crono
    func_sleep

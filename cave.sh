@@ -12,7 +12,7 @@ cave_start() {
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/clan/${CLD}/quest/help/5" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
       ) </dev/null &>/dev/null &
       time_exit 17
-      printf "/clan/${CLD}/quest/help/5\n"
+      #printf "/clan/${CLD}/quest/help/5\n"
     fi
     condition_func() {
       (
@@ -118,7 +118,7 @@ cave_routine() {
   if grep -q -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
     #/'=\\\&apos
     local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
-    local BREAK=$(($(date +%s) + 15))
+    local BREAK=$(($(date +%s) + 180))
     while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ]; do
       case $CAVE in
       (*gather* | *down* | *runaway* | *attack*)
