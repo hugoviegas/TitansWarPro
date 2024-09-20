@@ -117,11 +117,11 @@ cave_routine() {
   
   if grep -q -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
     #/'=\\\&apos
-    local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+    local CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
     local BREAK=$(($(date +%s) + 180))
     while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ]; do
       case $CAVE in
-      (*gather* | *down* | *runaway* | *attack* | *speedUp*)
+      (*gather* | *down* | *runaway* | *speedUp*)
         (
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAVE" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
         ) </dev/null &>/dev/null &
@@ -147,11 +147,11 @@ cave_routine() {
           tput cuu1
           tput el
           echo " Cave run away 💨"
-          ;;
-          *attack*)
-          tput cuu1
-          tput el
-          echo " Cave attack monster 🧌"
+          #;;
+          #*attack*)
+          #tput cuu1
+          #tput el
+          #echo " Cave attack monster 🧌"
           ;;
         esac
         #echo "Cave $RESULT"
