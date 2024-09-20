@@ -29,7 +29,7 @@ w=59
 m=89
 author="author: Hugo Viegas"
 #collaborator="collaborator: @_hviegas"
-versionNum="3.4.22 (beta)"
+versionNum="3.4.23 (beta)"
 for i in $colors; do
      clear
      t=$((t - 27))

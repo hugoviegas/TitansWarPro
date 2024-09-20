@@ -118,8 +118,8 @@ cave_routine() {
   if grep -q -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
     #/'=\\\&apos
     local CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
-    local BREAK=$(($(date +%s) + 180))
-    while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ]; do
+    local BREAK=$(($(date +%s) + 120))
+    while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ] && [ "$CAVE" != "attack" ]; do
       case $CAVE in
       (*gather* | *down* | *runaway* | *speedUp*)
         (
