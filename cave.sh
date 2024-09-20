@@ -162,9 +162,16 @@ cave_routine() {
         ) </dev/null &>/dev/null &
         time_exit 20
         local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
-        #;;
-        #(*speedUp*)
-        #break
+        ;;
+        (*attack*)
+        (
+          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/runaway" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+        ) </dev/null &>/dev/null &
+        time_exit 20
+        RESULT=$(echo "$CAVE" | cut -d'/' -f3)
+        tput cuu1
+        tput el
+        echo " Cave run away 💨"
         ;;
       esac
     done
