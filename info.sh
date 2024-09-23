@@ -31,7 +31,7 @@ w=59
 m=89
 author="author: Hugo Viegas"
 #collaborator="collaborator: @_hviegas"
-versionNum="3.4.37 (beta)"
+versionNum="3.4.38 (beta)"
 for i in $colors; do
      clear
      t=$((t - 27))
@@ -111,25 +111,24 @@ hpmp() {
     if echo "$@" | grep -q '\-fix'; then
         # Fetch the train page to get HP and MP values
         (
-            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 userAgent.txt)" > "$TMP/TRAIN"
+            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL"/train -o user_agent="$(shuf -n1 userAgent.txt)" > "$TMP"/TRAIN
         ) </dev/null &>/dev/null &
         time_exit 20
 
         # Extract fixed HP and MP values from the TRAIN page
-        FIXHP=$(grep -o -E '\(([0-9]+)\)' "$TMP/TRAIN" | sed 's/[()]//g')
-        FIXMP=$(grep -o -E ': [0-9]+' "$TMP/TRAIN" | sed -n '5s/: //p')
+        FIXHP=$(grep -o -E '\(([0-9]+)\)' "$TMP"/TRAIN | sed 's/[()]//g')
+        FIXMP=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '5s/: //p')
     fi
 
     # Obtain current HP and MP from the SRC file
-    NOWHP=$(grep -o -E "<img src[=]'/images/icon/health.png' alt[=]'hp'/> <span class[=]'(dred|white)'>[ ]?[0-9]{1,7}[ ]?</span> \| <img src[=]'/images/icon/mana.png' alt[=]'mp'/>" "$TMP/SRC" | tr -c -d "[[:digit:]]")
-    NOWMP=$(grep -o -E "</span> \| <img src='/images/icon/mana.png' alt='mp'/>[ ]?[0-9]{1,7}[ ]?</span><div class='clr'></div></div>" "$TMP/SRC" | tr -c -d "[[:digit:]]")
+    NOWHP=$(grep -o -E "<img src[=]'/images/icon/health.png' alt[=]'hp'/> <span class[=]'(dred|white)'>[ ]?[0-9]{1,7}[ ]?</span> \| <img src[=]'/images/icon/mana.png' alt[=]'mp'/>" "$TMP"/SRC | tr -c -d "[[:digit:]]")
+    NOWMP=$(grep -o -E "</span> \| <img src='/images/icon/mana.png' alt='mp'/>[ ]?[0-9]{1,7}[ ]?</span><div class='clr'></div></div>" "$TMP"/SRC | tr -c -d "[[:digit:]]")
 
     # Calculate percentage of HP and MP based on fixed values
     HPPER=$(awk -v nowhp="$NOWHP" -v fixhp="$FIXHP" 'BEGIN { printf "%.3f", nowhp / fixhp * 100 }' | awk '{printf "%.2f\n", $1}')
     MPPER=$(awk -v nowmp="$NOWMP" -v fixmp="$FIXMP" 'BEGIN { printf "%.3f", nowmp / fixmp * 100 }' | awk '{printf "%.2f\n", $1}')
-
-    # Output the results
-    printf "%b" "HP ❤️ $NOWHP - ${HPPER}% | MP Ⓜ️ $NOWMP - ${MPPER}%\n"
+     #/e.g.
+     #/printf %b "HP ❤️ $NOWHP - $(printf "%.2f" "${HPPER}")% | MP Ⓜ️ $NOWMP - $(printf "%.2f" "${MPPER}")%\n"
 }
 
 messages_info() {
@@ -139,9 +138,7 @@ messages_info() {
 
     # Fetch mail information and extract relevant data
     (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/mail" \
-            -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | tee "$TMP/info_file" | \
-            sed -n '/[|]\ mp/,/\[arrow\]/p' | sed '1,1d;$d;6q' >> "$TMP/msg_file"
+          w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/mail" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | tee $TMP/info_file | sed -n '/[|]\ mp/,/\[arrow\]/p' | sed '1,1d;$d;6q' >>$TMP/msg_file
     ) </dev/null &>/dev/null &
     time_exit 17
 
@@ -175,14 +172,10 @@ messages_info() {
 
     # Check if TRAIN file exists or is older than 30 minutes; if so, run hpmp with -fix option
     local TRAIN="~/twm/.${UR}/TRAIN"
-    if [ ! -e "$TRAIN" ] || find "$TRAIN" -mmin +30 >/dev/null 2>&1; then
+     if [ ! -e "~/twm/.${UR}/TRAIN" ] || find "$TRAIN" -mmin +30 >/dev/null 2>&1; then
         hpmp -fix
     fi
-
-    # Append current HP and MP status to the messages file
-    echo -e "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}" >> "$TMP/msg_file"
-
-    # Append account information to the messages file
-    echo -e "${GREENb_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' "$TMP/info_file" | \
-        sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}" >> "$TMP/msg_file"
+     echo -e "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}" >>"$TMP"/msg_file
+     # sed :a;N;s/\n//g;ta |
+     echo -e "${GREENb_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' "$TMP"/info_file | sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}" >>"$TMP"/msg_file
 }
