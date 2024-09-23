@@ -11,31 +11,50 @@ GOLD_BLACK='\033[33m'
 CYAN_BLACK='\033[36m'
 COLOR_RESET='\033[00m'
 
-# Display version options to the user
-printf "Versions\n 1- Master\n 2- Beta\n 3- Old\n"
-printf "${CYAN_BLACK}Select the version:${COLOR_RESET} \n"
+# Check if a version number is provided as an argument
+if [ $# -eq 1 ]; then
+    case $1 in
+        1)
+            VERSION="Master"
+            ;;
+        2)
+            VERSION="Beta"
+            ;;
+        3)
+            VERSION="Old"
+            ;;
+        *)
+            echo "Invalid selection. Please use 1 for Master, 2 for Beta, or 3 for Old."
+            exit 1  # Exit if an invalid option is selected
+            ;;
+    esac
+else
+    # Display version options to the user
+    printf "Versions\n 1- Master\n 2- Beta\n 3- Old\n"
+    printf "${CYAN_BLACK}Select the version:${COLOR_RESET} \n"
 
-# User input handling
-stty raw  # Set terminal to raw mode to read single character input
-VERSION=$(dd bs=1 count=1 2>/dev/null)  # Read one byte from input
-stty -raw  # Reset terminal to normal mode
+    # User input handling
+    stty raw  # Set terminal to raw mode to read single character input
+    VERSION=$(dd bs=1 count=1 2>/dev/null)  # Read one byte from input
+    stty -raw  # Reset terminal to normal mode
 
-# Determine the version based on user input
-case $VERSION in
-    1)
-        VERSION="Master"
-        ;;
-    2)
-        VERSION="Beta"
-        ;;
-    3)
-        VERSION="Old"
-        ;;
-    *)
-        echo "Invalid selection. Exiting."
-        exit 1  # Exit if an invalid option is selected
-        ;;
-esac
+    # Determine the version based on user input
+    case $VERSION in
+        1)
+            VERSION="Master"
+            ;;
+        2)
+            VERSION="Beta"
+            ;;
+        3)
+            VERSION="Old"
+            ;;
+        *)
+            echo "Invalid selection. Exiting."
+            exit 1  # Exit if an invalid option is selected
+            ;;
+    esac
+fi
 
 # Normalize the version string to lowercase for use in URLs
 version=$(echo "$VERSION" | sed 's/[ \t]//g' | tr "[[:upper:]]" "[[:lower:]]")
