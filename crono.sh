@@ -78,6 +78,7 @@ start() {
     func_trade       # Call trading function 
     campaign_func    # Start campaign function 
     clanDungeon      # Execute clan dungeon function 
+    clan_statue      # Check the clan statue
     check_missions   # Check for missions 
     messages_info    # Display messages information 
     func_crono       # Display current time again 
