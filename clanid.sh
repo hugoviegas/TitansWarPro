@@ -18,11 +18,11 @@ clan_id() {
 check_leader() {
     echo "DEBUG: Starting check_leader function"
 
-    # Fetch clan page and extract user IDs of the first two members
+    # Fetch clan page and extract relevant data
     (
         echo "DEBUG: Fetching clan page..."
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/clan/" \
-        -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[menuList\]/p' | sed '$d;8q' >>"$TMP/CODE"
+        -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[menuList\]/p' | sed '$d;20q' >>"$TMP/CODE"
         echo "DEBUG: Clan page fetched and processed."
     ) </dev/null &>/dev/null &
     time_exit 17
@@ -34,27 +34,14 @@ check_leader() {
         return
     fi
 
-    # Read first two members
-    MEMBER1=$(sed -n '1p' "$TMP/CODE")
-    MEMBER2=$(sed -n '2p' "$TMP/CODE")
-    
-    echo "DEBUG: Member 1 ID: $MEMBER1"
-    echo "DEBUG: Member 2 ID: $MEMBER2"
-
-    # Check if either member matches ACC variable
-    leader=false
-    if [ "$MEMBER1" = "$ACC" ]; then
-        leader=true
-        echo "Leader found: ${ACC}"
-    elif [ "$MEMBER2" = "$ACC" ]; then
-        leader=true
+    # Check if ACC is present in CODE file
+    if grep -q "$ACC" "$TMP/CODE"; then
         echo "Leader found: ${ACC}"
     else
-        echo "No leader found among the first two members."
+        echo "No leader found in the CODE file."
     fi
 
-    # Optionally return or use $leader variable as needed
-    echo "DEBUG: Leader status: $leader"
+    # Optionally return or use any other variable as needed
 }
 
 clan_statue() {
