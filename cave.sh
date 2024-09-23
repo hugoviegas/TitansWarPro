@@ -131,31 +131,31 @@ cave_routine() {
           *down*)
           tput cuu1
           tput el
-          echo " Cave new search 🔍"
+          echo " New search 🔍"
           #echo -e "${CAVE}"
           ;;
           *gather*)
           tput cuu1
           tput el
-          echo " Cave start mining ⛏️"
+          echo " Start mining ⛏️"
           #echo -e "${CAVE}"
           ;;
           *speedUp*)
           tput cuu1
           tput el
-          echo " Cave seepd up mining ⚡"
+          echo " Seepd up mining ⚡"
           #echo -e "${CAVE}"
           ;;
           *runaway*)
           tput cuu1
           tput el
-          echo " Cave run away 💨"
+          echo " Run away 💨"
           #echo -e "${CAVE}"
           #;;
           #*attack*)
           #tput cuu1
           #tput el
-          #echo " Cave attack monster 🧌"
+          #echo " attack monster 🧌"
           ;;
         esac
         #echo "Cave $RESULT"
@@ -176,18 +176,23 @@ cave_routine() {
         RESULT=$(echo "$NEWCAVE" | cut -d'/' -f3)
         tput cuu1
         tput el
-        echo " Cave run away 💨"
+        echo " Run away 💨"
         #echo -e "${NEWCAVE}"
         CAVE=$NEWCAVE
         ;;
       esac
     done
-    if [ "$CAVE" != "speedUp" ]; then
-      (
-          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAVE" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-        ) </dev/null &>/dev/null &
-        time_exit 20
-    fi
+    until [ "$CAVE" == "speedUp" ]; do
+    (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAVE" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+    ) </dev/null &>/dev/null &
+    
+    time_exit 20
+
+    # Update the CAVE variable based on the new content fetched
+    CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r=[0-9]+' "$TMP/SRC" | sed -n '1p')
+
+    done
   fi
   
   echo -e "${GREEN_BLACK}Cave Done✅${COLOR_RESET}\n"
