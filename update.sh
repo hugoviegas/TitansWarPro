@@ -1,16 +1,3 @@
-#!/bin/sh
-
-# Clear the terminal screen
-clear
-
-# Define color codes for output formatting
-BLACK_CYAN='\033[01;36m\033[01;07m'
-BLACK_GREEN='\033[00;32m\033[01;07m'
-BLACK_YELLOW='\033[00;33m\033[01;07m'
-GOLD_BLACK='\033[33m'
-CYAN_BLACK='\033[36m'
-COLOR_RESET='\033[00m'
-
 # Check if a version number is provided as an argument
 if [ $# -eq 1 ]; then
     case $1 in
@@ -38,15 +25,15 @@ else
     VERSION=$(dd bs=1 count=1 2>/dev/null)  # Read one byte from input
     stty -raw  # Reset terminal to normal mode
 
-    # Determine the version based on user input
+    # Determine the version based on user input (ensure it matches expected values)
     case $VERSION in
-        1)
+        [1])
             VERSION="Master"
             ;;
-        2)
+        [2])
             VERSION="Beta"
             ;;
-        3)
+        [3])
             VERSION="Old"
             ;;
         *)
