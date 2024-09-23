@@ -31,7 +31,7 @@ w=59
 m=89
 author="author: Hugo Viegas"
 #collaborator="collaborator: @_hviegas"
-versionNum="3.4.39 (beta)"
+versionNum="3.4.40 (beta)"
 for i in $colors; do
      clear
      t=$((t - 27))
@@ -80,7 +80,8 @@ time_exit() {
 
             # If the process is no longer running, exit the loop
             if [ -z "$TERPID" ]; then
-                break
+                    local TELOOP=0
+                    break &>/dev/null
             elif [ "$TELOOP" -lt 1 ]; then
                 # If the countdown has reached zero, send a PIPE signal followed by a TERM signal
                 kill -s PIPE $TEFPID &>/dev/null
@@ -88,7 +89,8 @@ time_exit() {
                 
                 # Notify the user that the command execution was interrupted
                 printf "${WHITEb_BLACK}Command execution was interrupted!${COLOR_RESET}\n"
-                break
+                    local TELOOP=0
+                    break &>/dev/null
             fi
             
             # Sleep for 1 second before checking again
@@ -132,45 +134,24 @@ hpmp() {
 }
 
 messages_info() {
-    # Write the header for the messages file
-    echo " ⚔️ - Titans War Macro - ⚔️ V: $versionNum " > "$TMP/msg_file"
-    printf " --------- 📩 MAIL 📩 ---------------\n" >> "$TMP/msg_file"
-
-    # Fetch mail information and extract relevant data
+     echo " ⚔️ - Titans War Macro - ⚔️ V: $versionNum " >$TMP/msg_file
+     printf " --------- 📩 MAIL 📩 ---------------\n" >>$TMP/msg_file
     (
           w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/mail" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | tee $TMP/info_file | sed -n '/[|]\ mp/,/\[arrow\]/p' | sed '1,1d;$d;6q' >>$TMP/msg_file
     ) </dev/null &>/dev/null &
     time_exit 17
-
-    # Write chat titans section header
-    printf " --------- 💬 CHAT TITANS 🔱 ---------\n" >> "$TMP/msg_file"
-
-    # Fetch chat titans information and extract relevant data
+     printf " --------- 💬 CHAT TITANS 🔱 ---------\n" >>$TMP/msg_file
     (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/titans/changeRoom" \
-            -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | \
-            sed -n '/\(\»\)/,/\[chat\]/p' | sed '$d;6q' >> "$TMP/msg_file"
+          w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/chat/titans/changeRoom" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -n '/\(\»\)/,/\[chat\]/p' | sed '$d;6q' >>$TMP/msg_file
     ) </dev/null &>/dev/null &
     time_exit 17
-
-    # Write chat clan section header
-    printf " --------- 💬 CHAT CLAN 🛡️ -----------\n" >> "$TMP/msg_file"
-
-    # Fetch chat clan information and extract relevant data
+     printf " --------- 💬 CHAT CLAN 🛡️ -----------\n" >>$TMP/msg_file
     (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/clan/changeRoom" \
-            -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | \
-            sed -ne '/\[[^a-z]\]/,/\[chat\]/p' | sed '$d;8q' >> "$TMP/msg_file"
+          w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/chat/clan/changeRoom" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[chat\]/p' | sed '$d;8q' >>$TMP/msg_file
     ) </dev/null &>/dev/null &
     time_exit 17
-
-    # Replace placeholder text with emojis in the messages file
-    sed -i 's/\[0\]/🔴/g;s/\[0-off\]/⭕/g;s/\[1\]/🔵/g;s/\[1-off\]/🔘/g;s/\[premium\]/👑/g;s/\[level\]/🔼/g;s/\[mail\]/📩/g;s/\[bot\]/⚫/g' "$TMP/msg_file"
-
-    # Add a footer to the messages file
-    printf " --------------------------------------\n" >> "$TMP/msg_file"
-
-    # Check if TRAIN file exists or is older than 30 minutes; if so, run hpmp with -fix option
+     sed -i 's/\[0\]/🔴/g;s/\[0-off\]/⭕/g;s/\[1\]/🔵/g;s/\[1-off\]/🔘/g;s/\[premium\]/👑/g;s/\[level\]/🔼/g;s/\[mail\]/📩/g;s/\[bot\]/⚫/g' msg_file >>$TMP/msg_file
+     printf " --------------------------------------\n" >>$TMP/msg_file
     local TRAIN="~/twm/.${UR}/TRAIN"
      if [ ! -e "~/twm/.${UR}/TRAIN" ] || find "$TRAIN" -mmin +30 >/dev/null 2>&1; then
         hpmp -fix
