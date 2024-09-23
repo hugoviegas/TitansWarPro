@@ -119,7 +119,8 @@ cave_routine() {
     #/'=\\\&apos
     local CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
     local BREAK=$(($(date +%s) + 120))
-    while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ]; do
+    local RESULT=$(echo "$CAVE" | cut -d'/' -f3)
+    while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ] && [ "$RESULT" == "speedUp" ]; do
       case $CAVE in
       (*gather* | *down* | *runaway* | *speedUp*)
         (
@@ -127,6 +128,7 @@ cave_routine() {
         ) </dev/null &>/dev/null &
         time_exit 20
         RESULT=$(echo "$CAVE" | cut -d'/' -f3)
+        echo -e "$RESULT"
         case $RESULT in
           *down*)
           tput cuu1
@@ -181,17 +183,6 @@ cave_routine() {
         CAVE=$NEWCAVE
         ;;
       esac
-    done
-    until [ "$RESULT" == "speedUp" ]; do
-    (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAVE" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    ) </dev/null &>/dev/null &
-    
-    time_exit 20
-
-    # Update the CAVE variable based on the new content fetched
-    CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r=[0-9]+' "$TMP/SRC" | sed -n '1p')
-    RESULT=$(echo "$CAVE" | cut -d'/' -f3)
     done
   fi
   
