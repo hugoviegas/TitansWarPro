@@ -115,10 +115,9 @@ arena_duel() {
   ) </dev/null &>/dev/null &
     time_exit 17
   #printf "%s\n" "$SELL"
-    (
-  echo -e "${GREEN_BLACK}energy arena (✔)${COLOR_RESET}\n"
-    ) </dev/null &>/dev/null &
-    echo " Sell all itens ✅"
+  
+  echo -e "${GREEN_BLACK}energy arena ✅${COLOR_RESET}\n"
+  echo " Sell all itens ✅"
   #arena_deleteEnd
   echo -e "${GREEN_BLACK}Arena ✅${COLOR_RESET}\n"
 }

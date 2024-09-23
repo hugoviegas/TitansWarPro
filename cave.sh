@@ -119,7 +119,7 @@ cave_routine() {
     #/'=\\\&apos
     local CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
     local BREAK=$(($(date +%s) + 120))
-    while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ] && [ "$CAVE" = "speedUp" ]; do
+    while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ]; do
       case $CAVE in
       (*gather* | *down* | *runaway* | *speedUp*)
         (
@@ -182,7 +182,12 @@ cave_routine() {
         ;;
       esac
     done
-    # checkQuest 5
+    if [ "$CAVE" != "speedUp" ]; then
+      (
+          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAVE" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+        ) </dev/null &>/dev/null &
+        time_exit 20
+    fi
   fi
   
   echo -e "${GREEN_BLACK}Cave Done✅${COLOR_RESET}\n"
