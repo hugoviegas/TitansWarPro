@@ -132,21 +132,25 @@ cave_routine() {
           tput cuu1
           tput el
           echo " Cave new search 🔍"
+          echo -e "${CAVE}"
           ;;
           *gather*)
           tput cuu1
           tput el
           echo " Cave start mining ⛏️"
+          echo -e "${CAVE}"
           ;;
           *speedUp*)
           tput cuu1
           tput el
           echo " Cave seepd up mining ⚡"
+          echo -e "${CAVE}"
           ;;
           *runaway*)
           tput cuu1
           tput el
           echo " Cave run away 💨"
+          echo -e "${CAVE}"
           #;;
           #*attack*)
           #tput cuu1
@@ -169,10 +173,12 @@ cave_routine() {
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$NEWCAVE" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
         ) </dev/null &>/dev/null &
         time_exit 20
-        RESULT=$(echo "$CAVE" | cut -d'/' -f3)
+        RESULT=$(echo "$NEWCAVE" | cut -d'/' -f3)
         tput cuu1
         tput el
         echo " Cave run away 💨"
+        echo -e "${NEWCAVE}"
+        CAVE=$NEWCAVE
         ;;
       esac
     done
