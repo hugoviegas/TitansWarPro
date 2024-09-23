@@ -65,6 +65,7 @@ id_allies() {
 
     sort -u tmp.txt -o tmp.txt  # Sort and remove duplicates from friend IDs
     cat tmp.txt | cut -d\> -f2 | sed 's,\ ,_,' > allies.txt  # Format and save to allies.txt
+  fi
 }
 
 clan_allies() {
