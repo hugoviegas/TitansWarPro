@@ -31,7 +31,7 @@ w=59
 m=89
 author="author: Hugo Viegas"
 #collaborator="collaborator: @_hviegas"
-versionNum="3.4.38 (beta)"
+versionNum="3.4.39 (beta)"
 for i in $colors; do
      clear
      t=$((t - 27))
@@ -111,18 +111,18 @@ hpmp() {
     if echo "$@" | grep -q '\-fix'; then
         # Fetch the train page to get HP and MP values
         (
-            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL"/train -o user_agent="$(shuf -n1 userAgent.txt)" > "$TMP"/TRAIN
+               w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 userAgent.txt)" >$TMP/TRAIN
         ) </dev/null &>/dev/null &
         time_exit 20
-
-        # Extract fixed HP and MP values from the TRAIN page
-        FIXHP=$(grep -o -E '\(([0-9]+)\)' "$TMP"/TRAIN | sed 's/[()]//g')
-        FIXMP=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '5s/: //p')
+          #/Fixed HP and MP.
+          #/Needs to run -fix at least once before
+          FIXHP=$(grep -o -E '\(([0-9]+)\)' $TMP/TRAIN | sed 's/[()]//g')
+          FIXMP=$(grep -o -E ': [0-9]+' $TMP/TRAIN | sed -n '5s/: //p')
     fi
 
-    # Obtain current HP and MP from the SRC file
-    NOWHP=$(grep -o -E "<img src[=]'/images/icon/health.png' alt[=]'hp'/> <span class[=]'(dred|white)'>[ ]?[0-9]{1,7}[ ]?</span> \| <img src[=]'/images/icon/mana.png' alt[=]'mp'/>" "$TMP"/SRC | tr -c -d "[[:digit:]]")
-    NOWMP=$(grep -o -E "</span> \| <img src='/images/icon/mana.png' alt='mp'/>[ ]?[0-9]{1,7}[ ]?</span><div class='clr'></div></div>" "$TMP"/SRC | tr -c -d "[[:digit:]]")
+     #/$NOW/HP|MP can be obtained from any SRC file
+     NOWHP=$(grep -o -E "<img src[=]'/images/icon/health.png' alt[=]'hp'/> <span class[=]'(dred|white)'>[ ]?[0-9]{1,7}[ ]?</span> \| <img src[=]'/images/icon/mana.png' alt[=]'mp'/>" $TMP/SRC | tr -c -d "[[:digit:]]")
+     NOWMP=$(grep -o -E "</span> \| <img src='/images/icon/mana.png' alt='mp'/>[ ]?[0-9]{1,7}[ ]?</span><div class='clr'></div></div>" $TMP/SRC | tr -c -d "[[:digit:]]")
 
     # Calculate percentage of HP and MP based on fixed values
     HPPER=$(awk -v nowhp="$NOWHP" -v fixhp="$FIXHP" 'BEGIN { printf "%.3f", nowhp / fixhp * 100 }' | awk '{printf "%.2f\n", $1}')
