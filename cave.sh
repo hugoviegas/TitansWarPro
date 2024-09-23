@@ -119,7 +119,7 @@ cave_routine() {
     #/'=\\\&apos
     local CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
     local BREAK=$(($(date +%s) + 120))
-    while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ] && [ "$CAVE" != "attack" ]; do
+    while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ] && [ "$CAVE" = "speedUp" ]; do
       case $CAVE in
       (*gather* | *down* | *runaway* | *speedUp*)
         (
@@ -132,25 +132,25 @@ cave_routine() {
           tput cuu1
           tput el
           echo " Cave new search 🔍"
-          echo -e "${CAVE}"
+          #echo -e "${CAVE}"
           ;;
           *gather*)
           tput cuu1
           tput el
           echo " Cave start mining ⛏️"
-          echo -e "${CAVE}"
+          #echo -e "${CAVE}"
           ;;
           *speedUp*)
           tput cuu1
           tput el
           echo " Cave seepd up mining ⚡"
-          echo -e "${CAVE}"
+          #echo -e "${CAVE}"
           ;;
           *runaway*)
           tput cuu1
           tput el
           echo " Cave run away 💨"
-          echo -e "${CAVE}"
+          #echo -e "${CAVE}"
           #;;
           #*attack*)
           #tput cuu1
@@ -177,7 +177,7 @@ cave_routine() {
         tput cuu1
         tput el
         echo " Cave run away 💨"
-        echo -e "${NEWCAVE}"
+        #echo -e "${NEWCAVE}"
         CAVE=$NEWCAVE
         ;;
       esac
