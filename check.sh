@@ -36,7 +36,7 @@ check_missions() {
             ) </dev/null &>/dev/null &  # Run in background and suppress output
             time_exit 20  # Wait for the process to finish
             MISSION_NUMBER=$(echo "$click" | cut -d'/' -f5 | cut -d'?' -f1)
-            echo -e " ${GREEN_BLACK}Mission [$MISSION_NUMBER] Completed ✅${COLOR_RESET}"
+            echo -e "${GREEN_BLACK} Mission [$MISSION_NUMBER] Completed ✅${COLOR_RESET}"
         fi
     done
 
