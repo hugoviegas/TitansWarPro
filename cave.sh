@@ -120,7 +120,7 @@ cave_routine() {
     local CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
     local BREAK=$(($(date +%s) + 120))
     local RESULT=$(echo "$CAVE" | cut -d'/' -f3)
-    while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ] && [ "$RESULT" == "speedUp" ]; do
+    until [ "$(date +%s)" -ge "$BREAK" ] && [ "$RESULT" != "speedUp" ]; do
       case $CAVE in
       (*gather* | *down* | *runaway* | *speedUp*)
         (
