@@ -12,8 +12,6 @@ clan_id() {
 
 }
 check_leader() {
-    echo "DEBUG: Starting check_leader function"
-
     # Fetch clan page and extract relevant data
     w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/clan/" \
     -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | \
@@ -21,41 +19,45 @@ check_leader() {
 
     # Ensure the fetch command completed successfully
     if [ $? -ne 0 ]; then
-        echo "DEBUG: Failed to fetch the clan page."
+        echo "Failed to fetch the clan page."
         return 1
     fi
 
     # Check if the CODE file is empty after processing
     if [ ! -s "$TMP/CODE" ]; then
-        echo "DEBUG: No relevant data found in the clan page."
+        echo "No relevant data found in the clan page."
         return 1
     fi
 
     # Read the content of the CODE file
     CODE=$(cat "$TMP/CODE")
 
-    # Display the processed clan data (optional for debugging)
-    echo -e "$CODE"
+    # Find the clan leader (Clã líder) and vice-leader (Vice-líder)
+    LEADERS=$(echo "$CODE" | grep -E 'líder|Vice-líder' | awk -F',' '{print $1}')
 
-    # Find the clan leader
-    LEADER=$(echo "$CODE" | grep 'líder' | head -n1 | awk -F',' '{print $1}')
-    echo "DEBUG: Leader identified as: $LEADER"
+    # Initialize the final variable to false
+    is_leader=false
 
-    # Check if ACC is the leader
-    if echo "$LEADER" | grep -q "$ACC"; then
-        echo "Leader found: ${ACC}"
-    else
-        echo "No leader found matching ACC."
+    # Check if ACC is one of the leaders
+    if echo "$LEADERS" | grep -q "$ACC"; then
+        is_leader=true
     fi
+
+    # Output the result
+    if [ "$is_leader" = true ]; then
+        echo "Leader or Vice-leader found: ${ACC}"
+    else
+        echo "No leader or vice-leader found matching ACC."
+    fi
+
+    # Optionally return or use is_leader variable as needed
+    echo "$is_leader"  # Outputs 'true' or 'false'
 }
-
-
-
 
 clan_statue() {
     clan_id  # Retrieve the current clan ID
     check_leader
-    if [ -n "$CLD" ] && [ $leader == true ]; then  # Proceed only if CLD is set (indicating a valid clan)
+    if [ -n "$CLD" ] && [ "$is_leader" == true ]; then  # Proceed only if CLD is set (indicating a valid clan)
         echo -e "${GOLD_BLACK}Clan Statue Check 🗿${COLOR_RESET}"
 
         # Fetch the code from the arena/quit page
