@@ -15,8 +15,9 @@ check_leader() {
     echo "DEBUG: Starting check_leader function"
 
     # Fetch clan page and extract relevant data
-    w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/clan/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | \
-    sed -ne '/\[[^a-z]\]/,/\[arrow\]/p' | sed '20;+10p' > "$TMP/CODE" 2>/dev/null
+    w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/clan/" \
+    -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | \
+    sed -ne '/\[[^a-z]\]/,/\[arrow\]/p' > "$TMP/CODE" 2>/dev/null
 
     # Ensure the fetch command completed successfully
     if [ $? -ne 0 ]; then
@@ -36,13 +37,18 @@ check_leader() {
     # Display the processed clan data (optional for debugging)
     echo -e "$CODE"
 
-    # Check if ACC is present in the processed data
-    if echo "$CODE" | grep -q "$ACC"; then
+    # Find the clan leader
+    LEADER=$(echo "$CODE" | grep 'líder' | head -n1 | awk -F',' '{print $1}')
+    echo "DEBUG: Leader identified as: $LEADER"
+
+    # Check if ACC is the leader
+    if echo "$LEADER" | grep -q "$ACC"; then
         echo "Leader found: ${ACC}"
     else
-        echo "No leader found in the CODE data."
+        echo "No leader found matching ACC."
     fi
 }
+
 
 
 
