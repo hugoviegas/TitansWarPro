@@ -43,15 +43,6 @@ check_leader() {
         is_leader=true
     fi
 
-    # Output the result
-    if [ "$is_leader" = true ]; then
-        echo "Leader or Vice-leader found: ${ACC}"
-    else
-        echo "No leader or vice-leader found matching ACC."
-    fi
-
-    # Optionally return or use is_leader variable as needed
-    echo "$is_leader"  # Outputs 'true' or 'false'
 }
 
 clan_statue() {
