@@ -19,29 +19,34 @@ check_leader() {
     echo "DEBUG: Starting check_leader function"
 
     # Fetch clan page and extract relevant data
-    (
-        echo "DEBUG: Fetching clan page..."
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/clan/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[menuList\]/p' | sed -n '21,+6p' >>"$TMP/CODE"
-        echo "DEBUG: Clan page fetched and processed."
-    ) </dev/null &>/dev/null &
-    time_exit 17
+    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$TMP/CLM" 2>/dev/null
 
-    # Read members from the CODE file
-    if [ ! -f "$TMP/CODE" ]; then
-        echo "DEBUG: CODE file not found."
-        echo "No members found."
-        return
+    # Ensure the fetch command completed successfully
+    if [ $? -ne 0 ]; then
+        echo "DEBUG: Failed to fetch the clan page."
+        return 1
     fi
 
-    # Check if ACC is present in CODE file
-    if grep -q "$ACC" "$TMP/CODE"; then
+    # Process the CLM file
+    CLM=$(sed "s/\/user\//\\n/g" "$TMP/CLM" | grep 'built/' | awk -F/ '{ print $1 }')
+
+    # Check if CLM is empty after processing
+    if [ -z "$CLM" ]; then
+        echo "DEBUG: No relevant data found in the clan page."
+        return 1
+    fi
+
+    # Display the processed clan data (optional for debugging)
+    echo -e "$CLM"
+
+    # Check if ACC is present in the processed data
+    if echo "$CLM" | grep -q "$ACC"; then
         echo "Leader found: ${ACC}"
     else
-        echo "No leader found in the CODE file."
+        echo "No leader found in the CLM data."
     fi
-
-    # Optionally return or use any other variable as needed
 }
+
 
 clan_statue() {
     clan_id  # Retrieve the current clan ID
