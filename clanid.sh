@@ -10,17 +10,13 @@ clan_id() {
   #/seleciona somente as linhas que contêm a string "built/", e extrai a primeira parte da string
   CLD=$(cat CLD | sed "s/\/clan\//\\n/g" | grep 'built/' | awk -F/ '{ print $1 }')
 
-  ## add an option to check the first two members of the clan look from the link https://furiadetitas.net/clan/
-  ## 
-  ## ex: https://furiadetitas.net/user/528904/ get the name and check with the variable ${ACC}
-  ## if so, make variable leader true.
 }
 check_leader() {
     echo "DEBUG: Starting check_leader function"
 
     # Fetch clan page and extract relevant data
     w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/clan/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | \
-    sed -ne '/\[[^a-z]\]/,/\[user\]/p' | sed '$d;8q' > "$TMP/CODE" 2>/dev/null
+    sed -ne '/\[[^a-z]\]/,/\[arrow\]/p' | sed '20;+10p' > "$TMP/CODE" 2>/dev/null
 
     # Ensure the fetch command completed successfully
     if [ $? -ne 0 ]; then
