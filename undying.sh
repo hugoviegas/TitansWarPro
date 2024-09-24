@@ -59,6 +59,9 @@ undying_start () {
  case $(date +%H:%M) in
   (09:5[5-9]|15:5[5-9]|21:5[5-9])
    hpmp -fix
+
+   use_elixir
+
    apply_event undying
 
    echo -e "${GOLD_BLACK}Valley of the Immortals will be started 🧟...${COLOR_RESET}\n$(date +%Hh:%Mm)"

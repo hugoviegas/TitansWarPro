@@ -1,111 +1,86 @@
 func_crono() {
-   HOUR=$(date +%H)
-   if [ $HOUR = 00 ]; then HOUR=0; fi
-   if [ $HOUR = 01 ]; then HOUR=1; fi
-   if [ $HOUR = 02 ]; then HOUR=2; fi
-   if [ $HOUR = 03 ]; then HOUR=3; fi
-   if [ $HOUR = 04 ]; then HOUR=4; fi
-   if [ $HOUR = 05 ]; then HOUR=5; fi
-   if [ $HOUR = 06 ]; then HOUR=6; fi
-   if [ $HOUR = 07 ]; then HOUR=7; fi
-   if [ $HOUR = 08 ]; then HOUR=8; fi
-   if [ $HOUR = 09 ]; then HOUR=9; fi
-   MIN=$(date +%M)
-   if [ $MIN = 00 ]; then MIN=0; fi
-   if [ $MIN = 01 ]; then MIN=1; fi
-   if [ $MIN = 02 ]; then MIN=2; fi
-   if [ $MIN = 03 ]; then MIN=3; fi
-   if [ $MIN = 04 ]; then MIN=4; fi
-   if [ $MIN = 05 ]; then MIN=5; fi
-   if [ $MIN = 06 ]; then MIN=6; fi
-   if [ $MIN = 07 ]; then MIN=7; fi
-   if [ $MIN = 08 ]; then MIN=8; fi
-   if [ $MIN = 09 ]; then MIN=9; fi
-   echo -e " \033[02m$URL ⏰ $(date +%H):$(date +%M)${COLOR_RESET}"
+    # Get the current hour and minute
+    HOUR=$(date +%H)
+    MIN=$(date +%M)
+
+    # Normalize hour and minute values to integers
+    HOUR=${HOUR#0}  # Remove leading zero from hour
+    MIN=${MIN#0}    # Remove leading zero from minute
+
+    # Display the current URL and time
+    echo -e " \033[02m$URL ⏰ $(date +%H):$(date +%M)${COLOR_RESET}"
 }
 
 func_cat() {
-   func_crono
+    func_crono  # Call func_crono to display the current time
 
-   if [ $HOUR -lt 6 ] || [ $HOUR -ge 18 ]; then
-      printf "${BLUE_BLACK}"
-   else
-      printf "${GOLD_BLACK}"
-   fi
+    # Set color based on the time of day
+    if [ "$HOUR" -lt 6 ] || [ "$HOUR" -ge 18 ]; then
+        printf "${BLUE_BLACK}"  # Night mode
+    else
+        printf "${GOLD_BLACK}"   # Day mode
+    fi
 
-   cat $TMP/msg_file
-   printf "${WHITE_BLACK}"
-   #local BREAK=$(( $(date +%s) + 10 ))
+    cat "$TMP/msg_file"  # Display the contents of msg_file
+    printf "${WHITE_BLACK}"
 
-   list() {
-      printf "\n"
-      grep -o -E '[[:alpha:]]+?[_]?[[:alpha:]]+?[ ]?\() \{' ~/twm/*.sh | awk -F\: '{ print $2 }' | awk -F\( '{ print $1 }'
-      read -t 5
-   }
+    list() {
+        printf "\n"
+        # List functions defined in scripts
+        grep -o -E '[[:alpha:]]+?[_]?[[:alpha:]]+?[ ]?\() \{' ~/twm/*.sh | awk -F\: '{ print $2 }' | awk -F\( '{ print $1 }'
+        read -t 5  # Wait for user input for 5 seconds
+    }
 
-   while true; do
-      printf " \033[02mNo battles now, waiting ${i}s${COLOR_RESET}\n${WHITEb_BLACK}Enter a command or type 'list':${COLOR_RESET} \n"
-      read -t $i cmd
-      if [ "$cmd" = " " ]; then
-         break
-      fi
+    while true; do
+        printf " \033[02mNo battles now, waiting ${i}s${COLOR_RESET}\n${WHITEb_BLACK}Enter a command or type 'list':${COLOR_RESET} \n"
+        read -t "$i" cmd  # Read user command with a timeout
 
-      printf "\n"
-      $cmd
-      sleep 0.5s
-      break
-   done
+        if [ "$cmd" = " " ]; then
+            break  # Exit loop if only space is entered
+        fi
+
+        printf "\n"
+        $cmd  # Execute the command entered by the user
+        sleep 0.5s  # Brief pause before next iteration
+        break  # Exit after executing the command once
+    done
 }
 
 func_sleep() {
-   case $(date +%d) in
-   01)
-      case $(date +%H) in
-      0[012345678])
-         arena_duel
-         coliseum_start
-         reset
-         clear
-         i=60
-         #     printf "\n No battles now, waiting 1m\n"
-         func_cat
-         #     sleep 55s
-         ;;
-      esac
-      ;;
-   esac
-   case $(date +%M) in
-   [25][89])
-      reset
-      clear
-      i=10
-      #   printf "\n No battles now, waiting 15s\n"
-      func_cat
-      #   sleep 10s
-      ;;
-   *)
-      #   check_cave
-      #   check_missions
-      reset
-      clear
-      i=45
-      #   printf "\n No battles now, waiting 30s\n"
-      func_cat
-      #   sleep 25s
-      ;;
-   esac
+    # Check if it's the first day of the month
+    if [ "$(date +%d)" -eq 01 ]; then
+        # Check if the current hour is between 0 and 8 (inclusive)
+        if [ "$(date +%H)" -lt 9 ]; then  # This covers hours 00 to 08
+            arena_duel  # Start arena duel
+            coliseum_start  # Start coliseum activities
+            reset; clear  # Clear the terminal screen
+            i=60  # Set wait time to 60 seconds
+            func_cat  # Call func_cat to display information
+        fi
+    fi
+
+    # Check if the current minute is between 25 and 29 inclusive
+    if [ "$(date +%M)" -ge 25 ] && [ "$(date +%M)" -le 29 ]; then
+        reset; clear  # Clear the terminal screen
+        i=10  # Set wait time to 10 seconds
+        func_cat  # Call func_cat to display information
+    else
+        reset; clear  # Clear the terminal screen for any other minute value
+        i=45  # Set wait time to 45 seconds
+        func_cat  # Call func_cat to display information
+    fi
 }
 
 start() {
-   arena_duel
-   career_func
-   cave_routine
-   func_trade
-   campaign_func
-   clanDungeon
-   #coliseum_start
-   check_missions
-   messages_info
-   func_crono
-   func_sleep
+    arena_duel       # Start arena duel function
+    career_func      # Call career-related function
+    cave_routine     # Execute cave routine function 
+    func_trade       # Call trading function 
+    campaign_func    # Start campaign function 
+    clanDungeon      # Execute clan dungeon function 
+    clan_statue      # Check the clan statue
+    check_missions   # Check for missions 
+    messages_info    # Display messages information 
+    func_crono       # Display current time again 
+    func_sleep       # Call sleep function to manage timing 
 }
