@@ -22,7 +22,7 @@ check_leader() {
     (
         echo "DEBUG: Fetching clan page..."
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/clan/" \
-        -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[menuList\]/p' | sed '$d;20q' >>"$TMP/CODE"
+        -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[menuList\]/p' | sed -n '22,26p' >>"$TMP/CODE"
         echo "DEBUG: Clan page fetched and processed."
     ) </dev/null &>/dev/null &
     time_exit 17
