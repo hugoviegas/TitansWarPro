@@ -72,7 +72,7 @@ twm_start() {
 
 func_unset() {
     # Unset various game-related variables to clear state
-    unset HP1 HP2 YOU USER CLAN ENTER ENTER ATK ATKRND DODGE HEAL GRASS STONE BEXIT OUTGATE LEAVEFIGHT WDRED HLHP CAVE BREAK NEWCAVE FIXHP FIXMP HPPER MPPER
+    unset HP1 HP2 YOU USER CLAN ENTER ENTER ATK ATKRND DODGE HEAL GRASS STONE BEXIT OUTGATE LEAVEFIGHT WDRED CAVE BREAK NEWCAVE
 }
 
 # Check if the user settings file exists and is not empty
