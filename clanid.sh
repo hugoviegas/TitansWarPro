@@ -2,7 +2,7 @@ clan_id() {
   cd "$TMP" || exit
   #/Executa o comando especificado no SOURCE com a URL do clã e um userAgent.txt aleatório
   (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >CLD
+    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > CLD
   ) </dev/null &>/dev/null &
   time_exit 20
   
@@ -13,9 +13,9 @@ clan_id() {
 }
 check_leader() {
     # Fetch clan page and extract relevant data
-    w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/clan/" \
-    -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | \
-    sed -ne '/\[[^a-z]\]/,/\[arrow\]/p' > "$TMP/CODE" 2>/dev/null
+    (
+    w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/clan/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[arrow\]/p' > "$TMP/CODE" 
+    ) </dev/null &>/dev/null &
 
     # Ensure the fetch command completed successfully
     if [ $? -ne 0 ]; then
@@ -62,7 +62,7 @@ clan_statue() {
           w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug "${URL}/clan/${CLD}/built/?goldUpgrade=true&r=$(cat $TMP/CODE)" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | tail -n 0
         ) &
         time_exit 17  # Wait for the process to finish
-        echo "/clan/${CLD}/built/?goldUpgrade=true&r=$(cat $TMP/CODE)"
+        echo " Gold Statue Upgrade..."
 
         # Fetch the code again for silver upgrade
         (
@@ -75,7 +75,7 @@ clan_statue() {
           w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug "${URL}/clan/${CLD}/built/?silverUpgrade=true&r=$(cat $TMP/CODE)" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | tail -n 0
         ) &
         time_exit 17  # Wait for the process to finish
-        echo "/clan/${CLD}/built/?silverUpgrade=true&r=$(cat $TMP/CODE)"
+        echo " Silver Statue Upgrade..."
 
         echo -e "${GREEN_BLACK}Clan Statue ✅${COLOR_RESET}\n"
     fi
