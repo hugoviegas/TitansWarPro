@@ -29,34 +29,33 @@ check_missions() {
     time_exit 20  # Wait for the process to finish
 
     for i in {0..15}; do
-        if grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP/SRC"; then
-            click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p' | cat -)
+        if grep -o -E "/quest/end/${i}[?]r[=][0-9]+" "$TMP"/SRC; then
+            click=$(grep -o -E "/quest/end/${i}[?]r[=][0-9]+" "$TMP"/SRC | sed -n '1p' | cat -)
             (
                 w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$TMP/SRC"
             ) </dev/null &>/dev/null &  # Run in background and suppress output
             time_exit 20  # Wait for the process to finish
-            MISSION_NUMBER=$(echo "$click" | cut -d'/' -f5 | cut -d'?' -f1)
-            echo -e "${GREEN_BLACK} Mission [$MISSION_NUMBER] Completed ✅${COLOR_RESET}"
+            #MISSION_NUMBER=$(echo "$click" | cut -d'/' -f5 | cut -d'?' -f1)
+            echo -e "${GREEN_BLACK} Mission [$i] Completed ✅${COLOR_RESET}"
         fi
     done
 
     # Collect rewards from relics
     (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug --dump_source "${URL}/relic/reward/" --user_agent="$(shuf-n1 "$TMP"/userAgent.txt)" >"$TMP/SRC"
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug --dump_source "${URL}/relic/reward/" --user_agent="$(shuf-n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &  # Run in background and suppress output
     time_exit 20  # Wait for the process to finish
 
     i=0
-    while [ $i -lt 11 ]; do
-        if grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP/SRC"; then
-            click=$(grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p' | cat)
+    for i in {0..11}; do
+        if grep -o -E "/relic/reward/${i}/[?]r[=][0-9]+" "$TMP"/SRC; then
+            click=$(grep -o -E "/relic/reward/${i}/[?]r[=][0-9]+" "$TMP"/SRC | sed -n '1p' | cat -)
             (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
       time_exit 20
-      #echo -e " ${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}"
+      echo -e " ${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}"
         fi
-        i=$((i + 1))  # Increment index for relic collection loop
     done
 
     # Collect collections from the collector page
