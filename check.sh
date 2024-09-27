@@ -46,19 +46,30 @@ check_missions() {
     ) </dev/null &>/dev/null &  # Run in background and suppress output
     time_exit 20  # Wait for the process to finish
 
-    i=0
+    # Loop through relic numbers 0 to 11
     for i in {0..11}; do
+        # Check if a reward link for the current relic exists
         if grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP"/SRC; then
-            click=$(grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p' | cat -)
+            # Extract the first matching reward link
+            click=$(grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p')
+
+            # Debugging: Print the link to see if it's correct
+            echo "Processing link: ${URL}${click}"
+
+            # Fetch the reward page for the current relic
             (
-                w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-            ) </dev/null &>/dev/null &
-            time_exit 20
-            echo -e " ${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}"
+                w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug --dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+            ) </dev/null &>/dev/null &  # Run in background and suppress output
+            time_exit 20  # Wait for the process to finish
+
+            # Confirm that the reward was collected
+            echo -e "${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}"
         else
-            echo -e " ${RED_BLACK}Relic [$i] not found ❌${COLOR_RESET}"
+            # If no reward link was found, indicate that
+            echo -e "${RED_BLACK}Relic [$i] not found ❌${COLOR_RESET}"
         fi
     done
+
 
     # Collect collections from the collector page
     (
