@@ -117,14 +117,13 @@ cave_routine() {
     time_exit 20
     
     # Check if there are any actions available in the cave
-  if grep -q -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
-    local CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
-    BREAK=1  # Definindo BREAK como 1 para o loop rodar uma vez
+  if grep -q -o -E '/cave/(gather|down|runaway|attack)/[?]r[=][0-9]+' "$TMP"/SRC; then
+    local CAVE=$(grep -o -E '/cave/(attack|gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+    #local BREAK=$(($(date +%s) + 30))
     local RESULT=$(echo "$CAVE" | cut -d'/' -f3)
-    i=0
 
     # Loop que roda apenas uma vez
-    until [ "$i" -ge "$BREAK" ] || [ "$RESULT" != "speedUp" ]; do
+    until [ "$RESULT" != "speedUp" ]; do
       case $CAVE in
         (*gather* | *down* | *runaway* | *speedUp*)
           # Buscar dados com base na ação atual da caverna
@@ -175,9 +174,7 @@ cave_routine() {
           CAVE=$NEWCAVE
           ;;
       esac
-
       sleep 0.5s
-      ((i++))  # Incrementar o contador para garantir que o loop rode apenas uma vez
     done
   fi
 
