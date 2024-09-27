@@ -107,78 +107,64 @@ cave_start() {
   done
 }
 
+# Cave Routine Function
 cave_routine() {
     echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}\n"
 
     # Fetch initial cave data
-    (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/cave/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    ) </dev/null &>/dev/null &
-    time_exit 20
-    
+    fetch_page "/cave/"
+
     # Check if there are any actions available in the cave
-  if grep -q -o -E '/cave/(gather|down|runaway|attack)/[?]r[=][0-9]+' "$TMP"/SRC; then
-    local CAVE=$(grep -o -E '/cave/(attack|gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
-    #local BREAK=$(($(date +%s) + 30))
-    local RESULT=$(echo "$CAVE" | cut -d'/' -f3)
+    if grep -q -o -E '/cave/(gather|down|runaway|attack)/[?]r[=][0-9]+' "$TMP"/SRC; then
+        local CAVE=$(grep -o -E '/cave/(attack|gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+        local RESULT=$(echo "$CAVE" | cut -d'/' -f3)
+        echo -e "1- DEBUG $CAVE\n$RESULT"
+        # Loop until the action is not "speedUp"
+        until [ "$RESULT" != "speedUp" ]; do
+            case $CAVE in
+                (*gather* | *down* | *runaway* | *speedUp*)
+                    # Fetch data based on the current cave action
+                    fetch_page "$CAVE"
 
-    # Loop que roda apenas uma vez
-    until [ "$RESULT" != "speedUp" ]; do
-      case $CAVE in
-        (*gather* | *down* | *runaway* | *speedUp*)
-          # Buscar dados com base na ação atual da caverna
-          (
-              w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAVE" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-          ) </dev/null &>/dev/null &
-          time_exit 20
+                    RESULT=$(echo "$CAVE" | cut -d'/' -f3)
 
-          RESULT=$(echo "$CAVE" | cut -d'/' -f3)
+                    # Show feedback based on the current action
+                    case $RESULT in
+                        *down*)
+                            tput cuu1; tput el; echo " New search 🔍"
+                            ;;
+                        *gather*)
+                            tput cuu1; tput el; echo " Start mining ⛏️"
+                            ;;
+                        *speedUp*)
+                            tput cuu1; tput el; echo " Speed up mining ⚡"
+                            ;;
+                        *runaway*)
+                            tput cuu1; tput el; echo " Run away 💨"
+                            ;;
+                    esac
 
-          # Mostrar feedback com base na ação atual
-          case $RESULT in
-            *down*)
-              tput cuu1; tput el; echo " New search 🔍"
-              ;;
-            *gather*)
-              tput cuu1; tput el; echo " Start mining ⛏️"
-              ;;
-            *speedUp*)
-              tput cuu1; tput el; echo " Speed up mining ⚡"
-              ;;
-            *runaway*)
-              tput cuu1; tput el; echo " Run away 💨"
-              ;;
-          esac
+                    # Fetch new cave data after processing the current action
+                    fetch_page "/cave/"
 
-          # Buscar novos dados da caverna após processar a ação atual
-          (
-              w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/cave/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-          ) </dev/null &>/dev/null &
-          time_exit 20
+                    # Update CAVE with the new action
+                    CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+                    ;;
+                (*attack*)
+                    # Modify attack action to runaway
+                    NEWCAVE=$(echo "$CAVE" | sed 's/attack/runaway/')
+                    fetch_page "$NEWCAVE"
 
-          # Atualizar a ação da caverna
-          local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
-          ;;
-        (*attack*)
-          # Modificar a ação de ataque para fuga
-          NEWCAVE=$(echo "$CAVE" | sed 's/attack/runaway/') 
-          (
-            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$NEWCAVE" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-          ) </dev/null &>/dev/null &
-          time_exit 20
+                    RESULT=$(echo "$NEWCAVE" | cut -d'/' -f3)
+                    tput cuu1; tput el; echo " Run away 💨"
 
-          RESULT=$(echo "$NEWCAVE" | cut -d'/' -f3)
-          tput cuu1; tput el; echo " Run away 💨"
-
-          # Atualizar CAVE para a nova ação
-          CAVE=$NEWCAVE
-          ;;
-      esac
-      sleep 0.5s
-    done
-  fi
-
-    
+                    # Update CAVE to the new action
+                    CAVE=$NEWCAVE
+                    ;;
+            esac
+            sleep 0.5s
+        done
+    fi
     echo -e "${GREEN_BLACK}Cave Done ✅${COLOR_RESET}\n"
 }
 
