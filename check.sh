@@ -29,8 +29,8 @@ check_missions() {
     time_exit 20  # Wait for the process to finish
 
     for i in {0..15}; do
-        if grep -o -E "/quest/end/${i}[?]r[=][0-9]+" "$TMP"/SRC; then
-            click=$(grep -o -E "/quest/end/${i}[?]r[=][0-9]+" "$TMP"/SRC | sed -n '1p' | cat -)
+        if grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP"/SRC; then
+            click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p' | cat -)
             (
                 w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$TMP/SRC"
             ) </dev/null &>/dev/null &  # Run in background and suppress output
@@ -42,14 +42,14 @@ check_missions() {
 
     # Collect rewards from relics
     (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug --dump_source "${URL}/relic/reward/" --user_agent="$(shuf-n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug --dump_source "${URL}/relic/reward/" -o user_agent="$(shuf-n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &  # Run in background and suppress output
     time_exit 20  # Wait for the process to finish
 
     i=0
     for i in {0..11}; do
-        if grep -o -E "/relic/reward/${i}/[?]r[=][0-9]+" "$TMP"/SRC; then
-            click=$(grep -o -E "/relic/reward/${i}/[?]r[=][0-9]+" "$TMP"/SRC | sed -n '1p' | cat -)
+        if grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP"/SRC; then
+            click=$(grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p' | cat -)
             (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
       ) </dev/null &>/dev/null &
