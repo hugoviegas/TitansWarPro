@@ -31,7 +31,7 @@ w=59
 m=89
 author="author: Hugo Viegas"
 #collaborator="collaborator: @_hviegas"
-versionNum="3.5.13 (Beta)"
+versionNum="3.5.14 (Beta)"
 for i in $colors; do
      clear
      t=$((t - 27))
@@ -67,44 +67,62 @@ sleep 0.2s
 done
 }
 
+#time_exit() {
+#    # Function to monitor a background process and terminate it if it exceeds a specified timeout.
+#    (
+#        # Get the PID of the last background command
+#        local TEFPID=$(echo "$!" | grep -o -E '([0-9]{2,6})')
+#
+#        # Loop for the specified number of seconds, counting down
+#        for TELOOP in $(seq "$@" -1 0); do
+#            # Check if the process is still running
+#            local TERPID=$(ps ax -o pid= | grep -o "$TEFPID")
+#
+#            # If the process is no longer running, exit the loop
+#            if [ -z "$TERPID" ]; then
+#                    local TELOOP=0
+#                    break &>/dev/null
+#            elif [ "$TELOOP" -lt 1 ]; then
+#                # If the countdown has reached zero, send a PIPE signal followed by a TERM signal
+#                kill -s PIPE $TEFPID &>/dev/null
+#                kill -15 $TEFPID &>/dev/null
+#                
+#                # Notify the user that the command execution was interrupted
+#                printf "${WHITEb_BLACK}Command execution was interrupted!${COLOR_RESET}\n"
+#                    local TELOOP=0
+#                    break &>/dev/null
+#            fi
+#            
+#            # Sleep for 1 second before checking again
+#            sleep 1s
+#        done
+#    )
+#}
+
 time_exit() {
     # Function to monitor a background process and terminate it if it exceeds a specified timeout.
     (
-        # Get the PID of the last background command
-        local TEFPID=$(echo "$!" | grep -o -E '([0-9]{2,6})')
+        local TEFPID=$!  # Get the PID of the last background command
 
         # Loop for the specified number of seconds, counting down
-        for TELOOP in $(seq "$@" -1 0); do
-            # Check if the process is still running
-            local TERPID=$(ps ax -o pid= | grep -o "$TEFPID")
-
-            # If the process is no longer running, exit the loop
-            if [ -z "$TERPID" ]; then
-                    local TELOOP=0
-                    break &>/dev/null
-            elif [ "$TELOOP" -lt 1 ]; then
-                # If the countdown has reached zero, send a PIPE signal followed by a TERM signal
-                kill -s PIPE $TEFPID &>/dev/null
-                kill -15 $TEFPID &>/dev/null
-                
-                # Notify the user that the command execution was interrupted
-                printf "${WHITEb_BLACK}Command execution was interrupted!${COLOR_RESET}\n"
-                    local TELOOP=0
-                    break &>/dev/null
-            fi
+        for ((TELOOP=$1; TELOOP>0; TELOOP--)); do
+            sleep 1s  # Sleep for 1 second
             
-            # Sleep for 1 second before checking again
-            sleep 1s
+            # Check if the process is still running
+            if ! kill -0 "$TEFPID" 2>/dev/null; then
+                return 0  # Process finished successfully
+            fi
         done
+        
+        # If the loop ends, the process has timed out
+        kill -s PIPE "$TEFPID" &>/dev/null
+        kill -15 "$TEFPID" &>/dev/null
+        
+        # Notify the user that the command execution was interrupted
+        printf "${WHITEb_BLACK}Command execution was interrupted!${COLOR_RESET}\n"
     )
 }
 
-link() {
-     (
-          w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "$URL/$1" -o user_agent="$(shuf -n1 userAgent.txt)" >$2
-     ) </dev/null &>/dev/null &
-     time_exit 20
-}
 
 hpmp() {
     # Options: -fix or -now
