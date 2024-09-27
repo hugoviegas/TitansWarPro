@@ -112,6 +112,7 @@ arena_deleteEnd() {
 
 arena_duel() {
     echo -e "${GOLD_BLACK}Arena ⚔️${COLOR_RESET}"
+    checkQuest 3
 
     # Fetch initial arena page
     fetch_page "/arena/"

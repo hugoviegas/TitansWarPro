@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC1091
 . "$HOME"/twm/info.sh
 colors
 RUN=$(cat "$HOME"/twm/runmode_file)
@@ -31,6 +32,7 @@ fi
 cd ~/twm || exit
 #/twm.sh before sources <<
 #. clandmgfight.sh
+
 . requeriments.sh
 . loginlogoff.sh
 . flagfight.sh
@@ -79,8 +81,7 @@ func_unset() {
 fetch_page() {
     local relative_url="$1" # The specific part of the URL you want to fetch (e.g., "/quest/")
     (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${relative_url}" \
-        -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${relative_url}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &# Run in background and suppress output
     time_exit 17 # Wait for the process to finish
 }
@@ -95,6 +96,7 @@ fetch_debug_page() {
     ) </dev/null &>/dev/null &
 
     time_exit 17  # Wait for the process to finish
+    # to use this: fetch_debug_page "..." "$TMP/debug_output.txt"
 }
 
 # Check if the user settings file exists and is not empty
@@ -108,9 +110,9 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
         i=$((i - 1))
         if read -t 1; then
             # Clear relevant files if Enter is pressed
-            >"$HOME/twm/al_file"
-            >"$HOME/twm/ur_file"
-            >"$HOME/twm/fileAgent.txt"
+            : >"$HOME/twm/al_file"
+            : >"$HOME/twm/ur_file"
+            : >"$HOME/twm/fileAgent.txt"
             unset UR UA AL  # Unset user-related variables
             break &>/dev/null  # Exit the loop quietly if Enter is pressed
         fi
