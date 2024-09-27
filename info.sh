@@ -31,7 +31,7 @@ w=59
 m=89
 author="author: Hugo Viegas"
 #collaborator="collaborator: @_hviegas"
-versionNum="3.5.15 (Beta)"
+versionNum="3.5.16 (Beta)"
 for i in $colors; do
      clear
      t=$((t - 27))
@@ -90,22 +90,6 @@ time_exit() {
         # Notify the user that the command execution was interrupted
         printf "${WHITEb_BLACK}Command execution was interrupted!${COLOR_RESET}\n"
     )
-
-
-
-
-# just for fix
-
-
-}
-
-
-
-link() {
-     (
-          w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "$URL/$1" -o user_agent="$(shuf -n1 userAgent.txt)" >$2
-     ) </dev/null &>/dev/null &
-     time_exit 20
 }
 
 hpmp() {
