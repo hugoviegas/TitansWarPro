@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Function to define color codes for terminal output
 colors() {
     # Font colors with formatting and background options
@@ -25,46 +24,38 @@ colors() {
 }
 
 script_slogan() {
-colors="10 9 8 2 1 5 4 3 6 7"
-t=339
-w=59
-m=89
-author="author: Hugo Viegas"
-#collaborator="collaborator: @_hviegas"
-versionNum="3.5.18 (Beta)"
-for i in $colors; do
-     clear
-     t=$((t - 27))
-     w=$((w + 1))
-     m=$((m - 2))
-     
-# shellcheck disable=SC2059
-printf "\033[1;38;5;${i}m
+    colors="10 9 8 2 1 5 4 3 6 7"
+    author="author: Hugo Viegas"
+    #collaborator="collaborator: @_hviegas"
+    versionNum="3.6"
+    for i in $colors; do
+        clear
+        printf "\033[1;38;5;${i}m
 
-████████╗██╗████████╗ █████╗ ███╗   ██╗███████╗  
-╚══██╔══╝██║╚══██╔══╝██╔══██╗████╗  ██║██╔════╝  
-   ██║   ██║   ██║   ███████║██╔██╗ ██║███████╗ 
-   ██║   ██║   ██║   ██╔══██║██║╚██╗██║╚════██║ 
-   ██║   ██║   ██║   ██║  ██║██║ ╚████║███████║  
-   ╚═╝   ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝  
+        ████████╗██╗████████╗ █████╗ ███╗   ██╗███████╗  
+        ╚══██╔══╝██║╚══██╔══╝██╔══██╗████╗  ██║██╔════╝  
+        ██║   ██║   ██║   ███████║██╔██╗ ██║███████╗ 
+        ██║   ██║   ██║   ██╔══██║██║╚██╗██║╚════██║ 
+        ██║   ██║   ██║   ██║  ██║██║ ╚████║███████║  
+        ╚═╝   ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝  
 
-██╗    ██╗ █████╗ ██████╗   
-██║    ██║██╔══██╗██╔══██╗  
-██║ █╗ ██║███████║██████╔╝  
-██║███╗██║██╔══██║██╔══██╗  
-╚███╔███╔╝██║  ██║██║  ██║  
- ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝  
+        ██╗    ██╗ █████╗ ██████╗   
+        ██║    ██║██╔══██╗██╔══██╗  
+        ██║ █╗ ██║███████║██████╔╝  
+        ██║███╗██║██╔══██║██╔══██╗  
+        ╚███╔███╔╝██║  ██║██║  ██║  
+        ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝  
 
-██████╗ ██████╗  ██████╗ 
-██╔══██╗██╔══██╗██╔═══██╗    
-██████╔╝██████╔╝██║   ██║
-██╔═══╝ ██╔══██╗██║   ██║
-██║     ██║  ██║╚██████╔╝
-╚═╝     ╚═╝  ╚═╝ ╚═════╝ 
-"
-printf "\033[1;38;5;${i}m${author}\n\033[02m${versionNum}${COLOR_RESET}\n"
-sleep 0.2s
-done
+        ██████╗ ██████╗  ██████╗ 
+        ██╔══██╗██╔══██╗██╔═══██╗    
+        ██████╔╝██████╔╝██║   ██║
+        ██╔═══╝ ██╔══██╗██║   ██║
+        ██║     ██║  ██║╚██████╔╝
+        ╚═╝     ╚═╝  ╚═╝ ╚═════╝ 
+        "
+        printf "\033[1;38;5;${i}m${author}\n\033[02m${versionNum}${COLOR_RESET}\n"
+        sleep 0.2s
+    done
 }
 
 time_exit() {
@@ -74,7 +65,7 @@ time_exit() {
         local TEFPID=$(echo "$!" | grep -o -E '([0-9]{2,6})')
 
         # Loop for the specified number of seconds, counting down
-        for TELOOP in $(seq "$1" -1 1); do
+        for ((; $1 > 0; $1--)); do
             sleep 1s  # Sleep for 1 second
             
             # Check if the process is still running
@@ -84,8 +75,8 @@ time_exit() {
         done
 
         # If we reach this point, the timeout has been exceeded
-        kill -s PIPE $TEFPID &>/dev/null
-        kill -15 $TEFPID &>/dev/null
+        kill -s PIPE "$TEFPID" &>/dev/null
+        kill -15 "$TEFPID" &>/dev/null
         
         # Notify the user that the command execution was interrupted
         printf "${WHITEb_BLACK}Command execution was interrupted!${COLOR_RESET}\n"
@@ -99,47 +90,45 @@ hpmp() {
     if echo "$@" | grep -q '\-fix'; then
         # Fetch the train page to get HP and MP values
         (
-               w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 userAgent.txt)" >$TMP/TRAIN
+            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 userAgent.txt)" >"$TMP"/TRAIN
         ) </dev/null &>/dev/null &
         time_exit 20
-          #/Fixed HP and MP.
-          #/Needs to run -fix at least once before
-          FIXHP=$(grep -o -E '\(([0-9]+)\)' $TMP/TRAIN | sed 's/[()]//g')
-          FIXMP=$(grep -o -E ': [0-9]+' $TMP/TRAIN | sed -n '5s/: //p')
+        #/Fixed HP and MP.
+        #/Needs to run -fix at least once before
+        FIXHP=$(grep -o -E '\(([0-9]+)\)' "$TMP"/TRAIN | sed 's/[()]//g')
+        FIXMP=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '5s/: //p')
     fi
 
-     #/$NOW/HP|MP can be obtained from any SRC file
-     NOWHP=$(grep -o -E "<img src[=]'/images/icon/health.png' alt[=]'hp'/> <span class[=]'(dred|white)'>[ ]?[0-9]{1,7}[ ]?</span> \| <img src[=]'/images/icon/mana.png' alt[=]'mp'/>" $TMP/SRC | tr -c -d "[[:digit:]]")
-     NOWMP=$(grep -o -E "</span> \| <img src='/images/icon/mana.png' alt='mp'/>[ ]?[0-9]{1,7}[ ]?</span><div class='clr'></div></div>" $TMP/SRC | tr -c -d "[[:digit:]]")
+    #/$NOW/HP|MP can be obtained from any SRC file
+    NOWHP=$(grep -o -E "<img src[=]'/images/icon/health.png' alt[=]'hp'/> <span class[=]'(dred|white)'>[ ]?[0-9]{1,7}[ ]?</span> \| <img src[=]'/images/icon/mana.png' alt[=]'mp'/>" "$TMP"/SRC | tr -c -d "[[:digit:]]")
+    NOWMP=$(grep -o -E "</span> \| <img src='/images/icon/mana.png' alt='mp'/>[ ]?[0-9]{1,7}[ ]?</span><div class='clr'></div></div>" $TMP/SRC | tr -c -d "[[:digit:]]")
 
     # Calculate percentage of HP and MP based on fixed values
     HPPER=$(awk -v nowhp="$NOWHP" -v fixhp="$FIXHP" 'BEGIN { printf "%.3f", nowhp / fixhp * 100 }' | awk '{printf "%.2f\n", $1}')
     MPPER=$(awk -v nowmp="$NOWMP" -v fixmp="$FIXMP" 'BEGIN { printf "%.3f", nowmp / fixmp * 100 }' | awk '{printf "%.2f\n", $1}')
-     #/e.g.
-     #/printf %b "HP ❤️ $NOWHP - $(printf "%.2f" "${HPPER}")% | MP Ⓜ️ $NOWMP - $(printf "%.2f" "${MPPER}")%\n"
 }
 
 messages_info() {
-     echo " ⚔️ - Titans War Macro - ⚔️ V: $versionNum " >$TMP/msg_file
-     printf " --------- 📩 MAIL 📩 ---------------\n" >>$TMP/msg_file
+     echo " ⚔️ - Titans War Macro - ⚔️ V: $versionNum " >"$TMP"/msg_file
+     printf " --------- 📩 MAIL 📩 ---------------\n" >> "$TMP"/msg_file
     (
-          w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/mail" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | tee $TMP/info_file | sed -n '/[|]\ mp/,/\[arrow\]/p' | sed '1,1d;$d;6q' >>$TMP/msg_file
+          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/mail" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tee "$TMP"/info_file | sed -n '/[|]\ mp/,/\[arrow\]/p' | sed '1,1d;$d;6q' >>"$TMP"/msg_file
     ) </dev/null &>/dev/null &
     time_exit 17
-     printf " --------- 💬 CHAT TITANS 🔱 ---------\n" >>$TMP/msg_file
+     printf " --------- 💬 CHAT TITANS 🔱 ---------\n" >>"$TMP"/msg_file
     (
-          w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/chat/titans/changeRoom" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -n '/\(\»\)/,/\[chat\]/p' | sed '$d;6q' >>$TMP/msg_file
+          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/titans/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -n '/\(\»\)/,/\[chat\]/p' | sed '$d;6q' >>"$TMP"/msg_file
     ) </dev/null &>/dev/null &
     time_exit 17
-     printf " --------- 💬 CHAT CLAN 🛡️ -----------\n" >>$TMP/msg_file
+     printf " --------- 💬 CHAT CLAN 🛡️ -----------\n" >>"$TMP"/msg_file
     (
-          w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/chat/clan/changeRoom" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[chat\]/p' | sed '$d;8q' >>$TMP/msg_file
+          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/clan/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[chat\]/p' | sed '$d;8q' >>"$TMP"/msg_file
     ) </dev/null &>/dev/null &
     time_exit 17
      sed -i 's/\[0\]/🔴/g;s/\[0-off\]/⭕/g;s/\[1\]/🔵/g;s/\[1-off\]/🔘/g;s/\[premium\]/👑/g;s/\[level\]/🔼/g;s/\[mail\]/📩/g;s/\[bot\]/⚫/g' msg_file >>$TMP/msg_file
      printf " --------------------------------------\n" >>$TMP/msg_file
-    local TRAIN="~/twm/.${UR}/TRAIN"
-     if [ ! -e "~/twm/.${UR}/TRAIN" ] || find "$TRAIN" -mmin +30 >/dev/null 2>&1; then
+    local TRAIN="$HOME.${UR}/TRAIN"
+     if [ ! -e "$HOME.${UR}/TRAIN" ] || find "$TRAIN" -mmin +30 >/dev/null 2>&1; then
         hpmp -fix
     fi
      echo -e "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}" >>"$TMP"/msg_file
