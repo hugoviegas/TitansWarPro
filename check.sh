@@ -40,23 +40,24 @@ check_missions() {
         fi
     done
 
-    # Fetch the code from the relic/reward page
-(
-  w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/relic/reward/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed "s/href='/\n/g" | grep "relic/reward" | head -n 1 | awk -F\/ '{ print $5 }' | tr -cd "[[:digit:]]" >$TMP/CODE
-) &
-time_exit 17  # Wait for the process to finish
-
-# Collect relic rewards using the captured code
-for i in {0..11}; do
-    # Fetch the reward for the current relic
+    ## Fetch the code from the relic/reward page
     (
-      w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug "${URL}/relic/reward/${i}/?r=$(cat $TMP/CODE)" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | tail -n 0
+    w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/relic/reward/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed "s/href='/\n/g" | grep "relic/reward" | head -n 1 | awk -F\/ '{ print $5 }' | tr -cd "[[:digit:]]" >$TMP/CODE
     ) &
     time_exit 17  # Wait for the process to finish
-    echo "/relic/reward/${i}/?r=$(cat $TMP/CODE)"
-done
 
+    # Collect relic rewards using the captured code
+    for i in {0..11}; do
+        # Fetch the reward for the current relic
+        if (
+        w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug "${URL}/relic/reward/${i}/?r=$(cat $TMP/CODE)" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | tail -n 0
+        ); then
+            time_exit 17  # Wait for the process to finish
 
+            # Print only if the reward was collected
+            echo -e "${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}"
+        fi
+    done
 
     # Collect collections from the collector page
     (
