@@ -25,7 +25,7 @@ case $VERSION in
   VERSION="Beta"
   ;;
 3)
-  VERSION="Backup"
+  VERSION="main"
   ;;
 
 esac
