@@ -1,9 +1,11 @@
 # shellcheck disable=SC2148
 arena_fault() {
-  (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/fault" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-  ) </dev/null &>/dev/null &
-  time_exit 17
+  #(
+  #  w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/fault" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+  #) </dev/null &>/dev/null &
+  #time_exit 17
+  fetch_page "/fault"
+
   local BREAK=$(($(date +%s) + 10))
   while grep -q -o '/fault/attack' "$TMP"/SRC || [ "$(date +%s)" -lt "$BREAK" ]; do
     local ACCESS=$(grep -o -E '(/fault/attack/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+)' "$TMP"/SRC | sed -n '1p')
@@ -88,10 +90,13 @@ arena_duel() {
   # clear
   echo -e "${GOLD_BLACK}Arena ⚔️${COLOR_RESET}"
   #arena_takeHelp
-  (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/arena/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-  ) </dev/null &>/dev/null &
-  time_exit 17
+  #(
+  #  w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/arena/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+  #) </dev/null &>/dev/null &
+  #time_exit 17
+
+  fetch_page "/arena/"
+
   local BREAK=$(($(date +%s) + 60))
   local count=0
   until grep -q -o 'lab/wizard' "$TMP"/SRC || [ "$(date +%s)" -gt "$BREAK" ]; do
@@ -105,16 +110,19 @@ arena_duel() {
     echo " ⚔ Atack $count"
     sleep 0.6s
   done
-  (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/inv/bag/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-  ) </dev/null &>/dev/null &
-  time_exit 17
+  #(
+  #  w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/inv/bag/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+  #) </dev/null &>/dev/null &
+  #time_exit 17
+  fetch_page "/inv/bag/"
+
   SELL=$(grep -o -E '(/inv/bag/sellAll/1/[?]r[=][0-9]+)' "$TMP"/SRC | sed -n '1p')
-  (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${SELL}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-  ) </dev/null &>/dev/null &
-    time_exit 17
-  #printf "%s\n" "$SELL"
+  #(
+  #  w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${SELL}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+  #) </dev/null &>/dev/null &
+  #time_exit 17
+  
+  fetch_page "${SELL}"
   
   echo -e "${GREEN_BLACK}energy arena ✅${COLOR_RESET}\n"
   echo " Sell all itens ✅"

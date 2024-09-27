@@ -75,6 +75,19 @@ func_unset() {
     unset HP1 HP2 YOU USER CLAN ENTER ENTER ATK ATKRND DODGE HEAL GRASS STONE BEXIT OUTGATE LEAVEFIGHT WDRED CAVE BREAK NEWCAVE
 }
 
+#Access any page link
+fetch_page() {
+    local page_path=$1  # The specific part of the URL you want to fetch (e.g., "/quest/")
+    
+    # Fetch the page with the specified path
+    (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${page_path}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$TMP/SRC"
+    ) </dev/null &>/dev/null &  # Run in background and suppress output
+
+    time_exit 20  # Wait for the process to finish
+}
+
+
 # Check if the user settings file exists and is not empty
 if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
     printf "${GREEN_BLACK} Starting with last settings used.${COLOR_RESET}\n"
