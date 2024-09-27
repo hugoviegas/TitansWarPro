@@ -116,10 +116,11 @@ cave_routine() {
     
     # Check for available actions in the cave
     if grep -q -o -E '/cave/(attack|gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
-        local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
-        local BREAK=$(($(date +%s) + 15))
+      local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+      local BREAK=$(($(date +%s) + 5))
+      RESULT=$(echo "$CAVE" | cut -d'/' -f3)
 
-      while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ]; do
+      until [ "$RESULT" != "speedUp" ] && [ "$(date +%s)" -ge "$BREAK" ]; do
         case $CAVE in
           (*gather* | *down* | *runaway* | *attack*)
             # Fetch data based on the current cave action
@@ -149,8 +150,11 @@ cave_routine() {
             # Update CAVE with the new action
             CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
             ;;
-          esac
-        done
+            (*speedUp*)
+              break
+              ;;
+        esac
+      done
         #checkQuest 5
     fi
   echo -e "${GREEN_BLACK}Cave Done ✅${COLOR_RESET}\n"
