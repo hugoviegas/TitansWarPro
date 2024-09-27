@@ -17,7 +17,6 @@ script_ads() {
 script_ads
 
 printf "${BLACK_CYAN}\n Starting...\n👉 Please wait...☕👴${COLOR_RESET}\n"
-#. ~/twm/info.sh
 script_slogan
 sleep 1s
 #/termux

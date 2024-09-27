@@ -9,7 +9,9 @@ arena_fault() {
     # Loop while fault attack is available or until timeout occurs
     while grep -q -o '/fault/attack' "$TMP"/SRC || [ "$(date +%s)" -lt "$BREAK" ]; do
         # Extract the attack URL from the fault page
-        local ACCESS=$(grep -o -E '/fault/attack/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+        local ACCESS  # Declare the variable
+        ACCESS=$(grep -o -E '/fault/attack/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')  # Assign the value
+
 
         if [ -n "$ACCESS" ]; then
             # Fetch the fault attack page
@@ -35,7 +37,8 @@ arena_collFight() {
   if grep -q -o '/collfight/' "$TMP"/SRC; then
     echo "collfight ..."
     echo "/collfight/enterFight"
-    local ACCESS=$(cat "$TMP"/SRC | sed 's/href=/\n/g' | grep 'collfight/take' | head -n1 | awk -F\' '{ print $2 }')
+    local ACCESS
+    ACCESS=$(sed 's/href=/\n/g' "$TMP"/SRC | grep 'collfight/take' | head -n1 | awk -F\' '{ print $2 }')
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL$ACCESS" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n0
     ) </dev/null &>/dev/null &
