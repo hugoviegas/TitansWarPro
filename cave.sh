@@ -109,63 +109,34 @@ cave_start() {
 
 cave_routine() {
     echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}\n"
+    checkQuest 5
 
-    # Fetch initial cave data
+    # Fetch initial cave data using fetch_page
     fetch_page "/cave/"
-
-    # Check if there are any actions available in the cave
-    if grep -q -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC; then
+    
+    # Check for available actions in the cave
+    if grep -q -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
         local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
-        local RESULT=$(echo "$CAVE" | cut -d'/' -f3)
-        echo -e "1- DEBUG $CAVE\n$RESULT"
+        local BREAK=$(($(date +%s) + 15))
 
-        # Loop until the action is not "speedUp"
-        until [ "$RESULT" != "speedUp" ]; do
+        while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ]; do
             case $CAVE in
-                (*gather* | *down* | *runaway* | *speedUp*)
+                (*gather* | *down* | *runaway* | *attack*)
                     # Fetch data based on the current cave action
                     fetch_page "$CAVE"
 
-                    RESULT=$(echo "$CAVE" | cut -d'/' -f3)
-
-                    # Show feedback based on the current action
-                    case $RESULT in
-                        *down*) 
-                            tput cuu1; tput el; echo " New search 🔍"
-                            ;;
-                        *gather*) 
-                            tput cuu1; tput el; echo " Start mining ⛏️"
-                            ;;
-                        *speedUp*) 
-                            tput cuu1; tput el; echo " Speed up mining ⚡"
-                            ;;
-                        *runaway*) 
-                            tput cuu1; tput el; echo " Run away 💨"
-                            ;;
-                    esac
-
-                    # Fetch new cave data after processing the current action
-                    fetch_page "/cave/"
+                    echo "$CAVE"
 
                     # Update CAVE with the new action
-                    CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+                    CAVE=$(grep -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
                     ;;
-
-                (*attack*)
-                    # Modify attack action to runaway
-                    NEWCAVE=$(echo "$CAVE" | sed 's/attack/runaway/')
-                    fetch_page "$NEWCAVE"
-
-                    RESULT=$(echo "$NEWCAVE" | cut -d'/' -f3)
-                    tput cuu1; tput el; echo " Run away 💨"
-
-                    # Update CAVE to the new action
-                    CAVE=$NEWCAVE
+                (*speedUp*)
+                    break
                     ;;
             esac
-            sleep 0.5s
         done
-    else
-        echo "No actions available in the cave."
+        checkQuest 5
     fi
+
+    echo -e "${GREEN_BLACK}Cave Done ✅${COLOR_RESET}\n"
 }
