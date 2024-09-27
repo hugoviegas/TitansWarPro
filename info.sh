@@ -65,7 +65,7 @@ time_exit() {
         local TEFPID=$(echo "$!" | grep -o -E '([0-9]{2,6})')
 
         # Loop for the specified number of seconds, counting down
-        for ((; $1 > 0; $1--)); do
+        for TELOOP in $(seq "$1" -1 1); do
             sleep 1s  # Sleep for 1 second
             
             # Check if the process is still running
