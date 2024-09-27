@@ -119,11 +119,12 @@ cave_routine() {
     # Check if there are any actions available in the cave
     if grep -q -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
         local CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
-        local BREAK=$(($(date +%s) + 5))
+        #local BREAK=$(($(date +%s) + 5)) temporary inactive...
+        BREAK=1
         local RESULT=$(echo "$CAVE" | cut -d'/' -f3)
-
+        i=0
         # Loop until time exceeds BREAK or RESULT is not "speedUp"
-        until [ "$(date +%s)" -ge "$BREAK" ] && [ "$RESULT" != "speedUp" ]; do
+        until [ $i -ge "$BREAK" ] && [ "$RESULT" != "speedUp" ]; do
             case $CAVE in
                 (*gather* | *down* | *runaway* | *speedUp*)
                     # Fetch data based on current cave action
@@ -176,6 +177,7 @@ cave_routine() {
                     ;;
             esac
             sleep 0.5s
+            $i++
         done
     fi
     

@@ -40,37 +40,41 @@ check_missions() {
         fi
     done
 
-    ## Fetch the code from the relic/reward page
-    (
-    w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/relic/reward/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed "s/href='/\n/g" | grep "relic/reward" | head -n 1 | awk -F\/ '{ print $5 }' | tr -cd "[[:digit:]]" >$TMP/CODE
-    ) &
-    time_exit 17  # Wait for the process to finish
-
-    # Collect relic rewards using the captured code
+    # Loop through relics to collect rewards
     for i in {0..11}; do
-        # Fetch the reward for the current relic
-        if (
-        w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug "${URL}/relic/reward/${i}/?r=$(cat $TMP/CODE)" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | tail -n 0
-        ); then
-            time_exit 17  # Wait for the process to finish
+        # Fetch the relic reward page and search for the reward link
+        (
+            w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/relic/reward/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" > "$TMP/SRC"
+        ) </dev/null &>/dev/null &  # Fetch the page and suppress output
+        time_exit 20  # Wait for the process to finish
 
-            # Print only if the reward was collected
-            echo -e "${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}"
+        # Search for the reward link in the updated page
+        if grep -o -E "/relic/reward/${i}[?]r=[0-9]+" "$TMP/SRC"; then
+            click=$(grep -o -E "/relic/reward/${i}[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p' | cat -)
+            
+            # Access the reward link to collect the relic
+            (
+                w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" > "$TMP/SRC"
+            ) </dev/null &>/dev/null &  # Fetch the page and suppress output
+            time_exit 20  # Wait for the process to finish
+
+            # Print success message for the collected relic
+            echo -e "${GREEN_BLACK} Relic [$i] collected ✅ ${COLOR_RESET}"
         fi
     done
 
     # Collect collections from the collector page
     (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/collector/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-  ) </dev/null &>/dev/null &
-  time_exit 20
-  if grep -o -E "/collector/reward/element/[?]r=[0-9]+" "$TMP"/SRC; then
-    click=$(grep -o -E '/collector/reward/element/[?]r=[0-9]+' "$TMP"/SRC | cat -)
-        (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/collector/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &
     time_exit 20
-    echo -e "${GREEN_BLACK}Collection collected ✅${COLOR_RESET}\n"
+    if grep -o -E "/collector/reward/element/[?]r=[0-9]+" "$TMP"/SRC; then
+        click=$(grep -o -E '/collector/reward/element/[?]r=[0-9]+' "$TMP"/SRC | cat -)
+        (
+            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+        ) </dev/null &>/dev/null &
+        time_exit 20
+        echo -e "${GREEN_BLACK}Collection collected ✅${COLOR_RESET}\n"
     fi
   echo -e "${GREEN_BLACK}Missions ✅${COLOR_RESET}\n"
 }
