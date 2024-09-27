@@ -2,21 +2,18 @@ check_missions() {
     echo -e "${GOLD_BLACK}Checking Missions 📜${COLOR_RESET}"
 
     # Fetch the quest page
-    #(
-    #    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$TMP/SRC"
-    #) </dev/null &>/dev/null &  # Run in background and suppress output
-    #time_exit 20  # Wait for the process to finish
     fetch_page "/quest/"
 
     # Open chests for the first two chests
     for i in {1..2}; do
         if grep -o -E "/quest/openChest/$i/[?]r=[0-9]+" "$TMP/SRC"; then
-            click=$(grep -o -E "/quest/openChest/$i/[?]r=[0-9]+" "$TMP"/SRC | cat -)
-            (
-                w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$TMP/SRC"
-            ) </dev/null &>/dev/null &  # Run in background and suppress output
-            time_exit 20  # Wait for the process to finish
-            echo -e "${GREEN_BLACK}Chest opened ✅${COLOR_RESET}"
+            local click=$(grep -o -E "/quest/openChest/$i/[?]r=[0-9]+" "$TMP/SRC" | head -n1)
+            
+            # Fetch the chest opening URL
+            fetch_page "$click"
+            
+            # Confirm chest opening
+            echo -e "${GREEN_BLACK}Chest $i opened ✅${COLOR_RESET}"
         fi
     done
 
@@ -24,65 +21,54 @@ check_missions() {
     i=0
 
     # Fetch the quest page again to check for quest completions
-    #(
-    #    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$TMP/SRC"
-    #) </dev/null &>/dev/null &  # Run in background and suppress output
-    #time_exit 20  # Wait for the process to finish
-    fetch_page "/quest/"
+    (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$TMP/SRC"
+    ) </dev/null &>/dev/null &  # Run in background and suppress output
+    time_exit 20  # Wait for the process to finish
 
     for i in {0..15}; do
-        if grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP"/SRC; then
-            click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p' | cat -)
+        if grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP/SRC"; then
+            click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p' | cat -)
             (
                 w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$TMP/SRC"
             ) </dev/null &>/dev/null &  # Run in background and suppress output
             time_exit 20  # Wait for the process to finish
-            #MISSION_NUMBER=$(echo "$click" | cut -d'/' -f5 | cut -d'?' -f1)
-            echo -e "${GREEN_BLACK} Mission [$i] Completed ✅${COLOR_RESET}"
+            MISSION_NUMBER=$(echo "$click" | cut -d'/' -f5 | cut -d'?' -f1)
+            echo -e "${GREEN_BLACK} Mission [$MISSION_NUMBER] Completed ✅${COLOR_RESET}"
         fi
     done
 
-    # Loop through relics to collect rewards
-    for i in {0..11}; do
-        # Fetch the relic reward page and search for the reward link
-        #(
-        #    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/relic/reward/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" > "$TMP/SRC"
-        #) </dev/null &>/dev/null &  # Fetch the page and suppress output
-        #time_exit 20  # Wait for the process to finish
+    # Collect rewards from relics
+    (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug --dump_source "${URL}/relic/reward/" --user_agent="$(shuf-n1 "$TMP"/userAgent.txt)" >"$TMP/SRC"
+    ) </dev/null &>/dev/null &  # Run in background and suppress output
+    time_exit 20  # Wait for the process to finish
 
-        fetch_page "/relic/reward/"
-        fetch_debug_page "${URL}/relic/reward/" "$TMP/debug_relic.txt"
-
-        # Search for the reward link in the updated page
-        if grep -o -E "/relic/reward/${i}[?]r=[0-9]+" "$TMP/SRC"; then
-            click=$(grep -o -E "/relic/reward/${i}[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p' | cat -)
-            # echo -e "DEBUG: ${URL}   ...   $click"
-            # Access the reward link to collect the relic
+    i=0
+    while [ $i -lt 11 ]; do
+        if grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP/SRC"; then
+            click=$(grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p' | cat)
             (
-                w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" > "$TMP/SRC"
-            ) </dev/null &>/dev/null &  # Fetch the page and suppress output
-            time_exit 20  # Wait for the process to finish
-
-            # Print success message for the collected relic
-            echo -e "${GREEN_BLACK} Relic [$i] collected ✅ ${COLOR_RESET}"
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+      ) </dev/null &>/dev/null &
+      time_exit 20
+      #echo -e " ${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}"
         fi
+        i=$((i + 1))  # Increment index for relic collection loop
     done
 
     # Collect collections from the collector page
-    #(
-    #   w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/collector/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    #) </dev/null &>/dev/null &
-    #time_exit 20
-
-    fetch_page "/collector/"
-
-    if grep -o -E "/collector/reward/element/[?]r=[0-9]+" "$TMP"/SRC; then
-        click=$(grep -o -E '/collector/reward/element/[?]r=[0-9]+' "$TMP"/SRC | cat -)
+    (
+    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/collector/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+  ) </dev/null &>/dev/null &
+  time_exit 20
+  if grep -o -E "/collector/reward/element/[?]r=[0-9]+" "$TMP"/SRC; then
+    click=$(grep -o -E '/collector/reward/element/[?]r=[0-9]+' "$TMP"/SRC | cat -)
         (
-            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-        ) </dev/null &>/dev/null &
-        time_exit 20
-        echo -e "${GREEN_BLACK}Collection collected ✅${COLOR_RESET}\n"
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+    ) </dev/null &>/dev/null &
+    time_exit 20
+    echo -e "${GREEN_BLACK}Collection collected ✅${COLOR_RESET}\n"
     fi
   echo -e "${GREEN_BLACK}Missions ✅${COLOR_RESET}\n"
 }
@@ -90,29 +76,26 @@ check_missions() {
 apply_event() {
   # Apply to fight
   event=("$@")  # Store arguments as an array
-
-  # Fetch event page
-  fetch_page "/$event/"
-
-  # Check for available actions to enter the game or fight
-  if grep -q -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP/SRC"; then
-    APPLY=$(grep -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP/SRC")
-
-    # Fetch the action page for applying to the event
-    fetch_page "${APPLY}"
-
+  (
+    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/$event/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+  ) </dev/null &>/dev/null &
+  time_exit 20
+  if grep -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC; then
+    APPLY=$(grep -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC | cat -)
+    (
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${APPLY}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+    ) </dev/null &>/dev/null &
+    time_exit 20
     echo -e "${BLACK_YELLOW}Applied for battle ✅${COLOR_RESET}\n"
   fi
 }
 
-
 use_elixir() {
     # Initial fetch to get the starting URLs
-    #(
-    #    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/inv/chest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    #) </dev/null &>/dev/null &  # Run in background and suppress output
-    #time_exit 20  # Wait for the process to finish
-    fetch_page "/inv/chest/"
+    (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/inv/chest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+    ) </dev/null &>/dev/null &  # Run in background and suppress output
+    time_exit 20  # Wait for the process to finish
 
     # Loop to process clicks
     for ((i=1; i<=4; i++)); do
@@ -126,9 +109,9 @@ use_elixir() {
         fi
 
         # Using all elixir
-    (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    ) </dev/null &>/dev/null &  # Run in background and suppress output
+        (
+            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$click" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+        ) </dev/null &>/dev/null &  # Run in background and suppress output
         time_exit 20  # Wait for the process to finish
     done
 
