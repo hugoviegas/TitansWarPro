@@ -2,19 +2,21 @@
 #create fold twm if does not exist
 mkdir -p ~/twm
 
-if [ -z "$@" ]; then
+if [ -z "$*" ]; then
   version="master"
 else
-  #./easyinstall.sh beta1, or backup
-  version="$@"
+  # ./easyinstall.sh beta, or backup
+  version="$*"
 fi
 
-if [ ! -e "~/twm/info.sh" ]; then
-  curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/$version/info.sh -s -L >"$HOME"/twm/info.sh
+
+if [ ! -e "$HOME/info.sh" ]; then
+  curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/"$version"/info.sh -s -L >"$HOME"/twm/info.sh
   chmod +x ~/twm/info.sh
   sleep 0.5s
 fi
 
+# shellcheck disable=SC1090
 . ~/twm/info.sh
 colors
 script_slogan
@@ -39,7 +41,7 @@ printf "${BLACK_CYAN} Installing TWM...\n⌛ Please wait...⌛${COLOR_RESET}"
 if [ -d /data/data/com.termux/files/usr/share/doc ]; then
   termux-wake-lock
   sed -u -i '/nameserver/d' "$PREFIX"/etc/resolv.conf &
-  >/dev/null
+  : > /dev/null
   printf "nameserver 114.114.114.114\nnameserver 8.8.8.8" >"$PREFIX"/etc/resolv.conf
   LS="/data/data/com.termux/files/usr/share/doc"
   rm -rf ~/.termux/boot/play.sh 2>/dev/null
@@ -79,7 +81,7 @@ if uname | grep -q -i "cygwin"; then
   else
     #/cygwin repository
     curl -s -L -O "https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/apt-cyg" &
-    >/dev/null
+    : > /dev/null
     install apt-cyg /bin
   fi
 
@@ -87,27 +89,25 @@ if uname | grep -q -i "cygwin"; then
     :
   else
     apt-cyg install w3m -y &
-    >/dev/null
+    : > /dev/null
   fi
 
   if [ -e "${LS}/ncurses-term" ]; then
     :
   else
     apt-cyg install ncurses-term -y &
-    >/dev/null
+    : > /dev/null
   fi
 
-  if [ "${LS}/coreutils" ]; then
+  if [ -e "${LS}/coreutils" ]; then
     :
   else
     apt-cyg install coreutils -y &
-    >/dev/null
   fi
-  if [ "${LS}/procps" ]; then
+  if [ -e "${LS}/procps" ]; then
     :
   else
     apt-cyg install procps -y &
-    >/dev/null
   fi
 fi
 
@@ -142,7 +142,7 @@ sync_func() {
   for script in $SCRIPTS; do
     LEN=$((LEN + 1))
     printf "Checking $LEN/$NUM_SCRIPTS $script\n"
-    remote_count=$(curl "${SERVER}"$script -s -L | wc -c)
+    remote_count=$(curl "${SERVER}$script" -s -L | wc -c)
 
     if [ -e ~/twm/"$script" ]; then
       local_count=$(wc -c <"$script")
@@ -154,17 +154,17 @@ sync_func() {
       printf "✅ ${BLACK_CYAN}Updated $script${COLOR_RESET}\n"
     elif [ -e ~/twm/"$script" ] && [ "$remote_count" -ne "$local_count" ]; then
       printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
-      curl "${SERVER}"$script -s -L >"$script"
+      curl "${SERVER}$script" -s -L >"$script"
     else
       printf "🔽 ${BLACK_YELLOW}Downloading $script${COLOR_RESET}\n"
-      curl "${SERVER}"$script -s -L -O
+      curl "${SERVER}$script" -s -L -O
     fi
     sleep 0.1s
   done
   #DOS to Unix
   find ~/twm -type f -name '*.sh' -print0 | xargs -0 sed -i 's/\r$//' 2>/dev/null
   chmod +x ~/twm/*.sh &
-  >/dev/null
+  : > /dev/null
 }
 
 sync_func_other() {
@@ -179,7 +179,7 @@ sync_func_other() {
     LEN=$((LEN + 1))
     printf "Checking $LEN/$NUM_SCRIPTS $script\n"
     printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
-    curl "${SERVER}"$script -s -L >>twm.sh
+    curl "${SERVER}$script" -s -L >>twm.sh
     printf "\n#\n" >>twm.sh
     sleep 0.1s
   done
@@ -188,7 +188,7 @@ sync_func_other() {
   #DOS to Unix
   find ~/twm -type f -name '*.sh' -print0 | xargs -0 sed -i 's/\r$//' 2>/dev/null
   chmod +x ~/twm/*.sh &
-  >/dev/null
+  : > /dev/null
 }
 
 #/merge
@@ -204,16 +204,19 @@ fi
 
 script_slogan
 printf "✅ ${BLACK_CYAN}Updated scripts!${COLOR_RESET}\n To execute run command: ${GOLD_BLACK}./twm/play.sh${COLOR_RESET}\n       For coliseum run: ${GOLD_BLACK}./twm/play.sh -cl${COLOR_RESET}\n           For cave run: ${GOLD_BLACK}./twm/play.sh -cv${COLOR_RESET}\n"
-tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/play.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
+# Kill all play.sh processes
+tipidf=$(pgrep -f "sh.*twm/play.sh")
 until [ -z "$tipidf" ]; do
   kill -9 "$tipidf" 2>/dev/null
-  tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/play.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
+  tipidf=$(pgrep -f "sh.*twm/play.sh")
   sleep 1s
 done
-tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/twm.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
+
+# Kill all twm.sh processes
+tipidf=$(pgrep -f "sh.*twm/twm.sh")
 until [ -z "$tipidf" ]; do
   kill -9 "$tipidf" 2>/dev/null
-  tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/twm.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
+  tipidf=$(pgrep -f "sh.*twm/twm.sh")
   sleep 1s
 done
 if [ -f ~/twm/runmode_file ]; then

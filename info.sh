@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034
 # Function to define color codes for terminal output
 colors() {
     # Font colors with formatting and background options
@@ -62,9 +63,11 @@ time_exit() {
     # Function to monitor a background process and terminate it if it exceeds a specified timeout.
     (
         # Get the PID of the last background command
-        local TEFPID=$(echo "$!" | grep -o -E '([0-9]{2,6})')
-
+        local TEFPID
+        local TELOOP
+        TEFPID=$(echo "$!" | grep -o -E '([0-9]{2,6})')
         # Loop for the specified number of seconds, counting down
+        # shellcheck disable=SC2034
         for TELOOP in $(seq "$1" -1 1); do
             sleep 1s  # Sleep for 1 second
             
@@ -100,8 +103,8 @@ hpmp() {
     fi
 
     #/$NOW/HP|MP can be obtained from any SRC file
-    NOWHP=$(grep -o -E "<img src[=]'/images/icon/health.png' alt[=]'hp'/> <span class[=]'(dred|white)'>[ ]?[0-9]{1,7}[ ]?</span> \| <img src[=]'/images/icon/mana.png' alt[=]'mp'/>" "$TMP"/SRC | tr -c -d "[[:digit:]]")
-    NOWMP=$(grep -o -E "</span> \| <img src='/images/icon/mana.png' alt='mp'/>[ ]?[0-9]{1,7}[ ]?</span><div class='clr'></div></div>" $TMP/SRC | tr -c -d "[[:digit:]]")
+    NOWHP=$(grep -o -E "<img src[=]'/images/icon/health.png' alt[=]'hp'/> <span class[=]'(dred|white)'>[ ]?[0-9]{1,7}[ ]?</span> \| <img src[=]'/images/icon/mana.png' alt[=]'mp'/>" "$TMP"/SRC | tr -c -d '[:digit:]')
+    NOWMP=$(grep -o -E "</span> \| <img src='/images/icon/mana.png' alt='mp'/>[ ]?[0-9]{1,7}[ ]?</span><div class='clr'></div></div>" "$TMP"/SRC | tr -c -d "[:digit:]")
 
     # Calculate percentage of HP and MP based on fixed values
     HPPER=$(awk -v nowhp="$NOWHP" -v fixhp="$FIXHP" 'BEGIN { printf "%.3f", nowhp / fixhp * 100 }' | awk '{printf "%.2f\n", $1}')
@@ -125,8 +128,8 @@ messages_info() {
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/clan/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[chat\]/p' | sed '$d;8q' >>"$TMP"/msg_file
     ) </dev/null &>/dev/null &
     time_exit 17
-     sed -i 's/\[0\]/🔴/g;s/\[0-off\]/⭕/g;s/\[1\]/🔵/g;s/\[1-off\]/🔘/g;s/\[premium\]/👑/g;s/\[level\]/🔼/g;s/\[mail\]/📩/g;s/\[bot\]/⚫/g' msg_file >>$TMP/msg_file
-     printf " --------------------------------------\n" >>$TMP/msg_file
+     sed -i 's/\[0\]/🔴/g;s/\[0-off\]/⭕/g;s/\[1\]/🔵/g;s/\[1-off\]/🔘/g;s/\[premium\]/👑/g;s/\[level\]/🔼/g;s/\[mail\]/📩/g;s/\[bot\]/⚫/g' msg_file >>"$TMP"/msg_file
+     printf " --------------------------------------\n" >>"$TMP"/msg_file
     local TRAIN="$HOME.${UR}/TRAIN"
      if [ ! -e "$HOME.${UR}/TRAIN" ] || find "$TRAIN" -mmin +30 >/dev/null 2>&1; then
         hpmp -fix
