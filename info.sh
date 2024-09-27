@@ -70,10 +70,11 @@ done
 time_exit() {
     # Function to monitor a background process and terminate it if it exceeds a specified timeout.
     (
-        local TEFPID=$!  # Get the PID of the last background command
+        # Get the PID of the last background command
+        local TEFPID=$(echo "$!" | grep -o -E '([0-9]{2,6})')
 
         # Loop for the specified number of seconds, counting down
-        for ((TELOOP=$1; TELOOP>0; TELOOP--)); do
+        for TELOOP in $(seq "$1" -1 1); do
             sleep 1s  # Sleep for 1 second
             
             # Check if the process is still running
@@ -81,23 +82,23 @@ time_exit() {
                 return 0  # Process finished successfully
             fi
         done
+
+        # If we reach this point, the timeout has been exceeded
+        kill -s PIPE $TEFPID &>/dev/null
+        kill -15 $TEFPID &>/dev/null
         
-        # If the loop ends, the process has timed out
-        kill -s PIPE "$TEFPID" &>/dev/null
-        kill -15 "$TEFPID" &>/dev/null
-        #
-        #
-        #
-        #
-        # just for fix
-        #
-        #
-        #
-        #
         # Notify the user that the command execution was interrupted
         printf "${WHITEb_BLACK}Command execution was interrupted!${COLOR_RESET}\n"
     )
+
+
+
+
+# just for fix
+
+
 }
+
 
 
 link() {
