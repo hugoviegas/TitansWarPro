@@ -40,35 +40,22 @@ check_missions() {
         fi
     done
 
-    # Collect rewards from relics
+    # Fetch the code from the relic/reward page
+(
+  w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/relic/reward/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | sed "s/href='/\n/g" | grep "relic/reward" | head -n 1 | awk -F\/ '{ print $5 }' | tr -cd "[[:digit:]]" >$TMP/CODE
+) &
+time_exit 17  # Wait for the process to finish
+
+# Collect relic rewards using the captured code
+for i in {0..11}; do
+    # Fetch the reward for the current relic
     (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug --dump_source "${URL}/relic/reward/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    ) </dev/null &>/dev/null &  # Run in background and suppress output
-    time_exit 20  # Wait for the process to finish
+      w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug "${URL}/relic/reward/${i}/?r=$(cat $TMP/CODE)" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | tail -n 0
+    ) &
+    time_exit 17  # Wait for the process to finish
+    echo "/relic/reward/${i}/?r=$(cat $TMP/CODE)"
+done
 
-    # Loop through relic numbers 0 to 11
-    for i in {0..11}; do
-        # Check if a reward link for the current relic exists
-        if grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP"/SRC; then
-            # Extract the first matching reward link
-            click=$(grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p')
-
-            # Debugging: Print the link to see if it's correct
-            echo "Processing link: ${URL}${click}"
-
-            # Fetch the reward page for the current relic
-            (
-                w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug --dump_source "${URL}${click}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-            ) </dev/null &>/dev/null &  # Run in background and suppress output
-            time_exit 20  # Wait for the process to finish
-
-            # Confirm that the reward was collected
-            echo -e "${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}"
-        else
-            # If no reward link was found, indicate that
-            echo -e "${RED_BLACK}Relic [$i] not found ❌${COLOR_RESET}"
-        fi
-    done
 
 
     # Collect collections from the collector page

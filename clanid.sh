@@ -62,7 +62,7 @@ clan_statue() {
           w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug "${URL}/clan/${CLD}/built/?goldUpgrade=true&r=$(cat $TMP/CODE)" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | tail -n 0
         ) &
         time_exit 17  # Wait for the process to finish
-        echo "/clan/${CLD}/built/?goldUpgrade=true&r=$(cat $TMP/CODE)"
+        echo " Gold Statue Upgrade..."
 
         # Fetch the code again for silver upgrade
         (
@@ -75,7 +75,7 @@ clan_statue() {
           w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug "${URL}/clan/${CLD}/built/?silverUpgrade=true&r=$(cat $TMP/CODE)" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | tail -n 0
         ) &
         time_exit 17  # Wait for the process to finish
-        echo "/clan/${CLD}/built/?silverUpgrade=true&r=$(cat $TMP/CODE)"
+        echo " Silver Statue Upgrade..."
 
         echo -e "${GREEN_BLACK}Clan Statue ✅${COLOR_RESET}\n"
     fi
