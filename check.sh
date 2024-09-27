@@ -51,6 +51,7 @@ check_missions() {
         #time_exit 20  # Wait for the process to finish
 
         fetch_page "/relic/reward/"
+        fetch_debug_page "${URL}/relic/reward/" "$TMP/debug_relic.txt"
 
         # Search for the reward link in the updated page
         if grep -o -E "/relic/reward/${i}[?]r=[0-9]+" "$TMP/SRC"; then
@@ -89,19 +90,21 @@ check_missions() {
 apply_event() {
   # Apply to fight
   event=("$@")  # Store arguments as an array
-  (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/$event/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-  ) </dev/null &>/dev/null &
-  time_exit 20
-  if grep -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC; then
-    APPLY=$(grep -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC | cat -)
-    (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${APPLY}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    ) </dev/null &>/dev/null &
-    time_exit 20
+
+  # Fetch event page
+  fetch_page "/$event/"
+
+  # Check for available actions to enter the game or fight
+  if grep -q -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP/SRC"; then
+    APPLY=$(grep -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP/SRC")
+
+    # Fetch the action page for applying to the event
+    fetch_page "${APPLY}"
+
     echo -e "${BLACK_YELLOW}Applied for battle ✅${COLOR_RESET}\n"
   fi
 }
+
 
 use_elixir() {
     # Initial fetch to get the starting URLs

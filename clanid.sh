@@ -2,7 +2,7 @@ clan_id() {
   cd "$TMP" || exit
   #/Executa o comando especificado no SOURCE com a URL do clã e um userAgent.txt aleatório
   (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >CLD
+    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > CLD
   ) </dev/null &>/dev/null &
   time_exit 20
   
@@ -13,8 +13,9 @@ clan_id() {
 }
 check_leader() {
     # Fetch clan page and extract relevant data
-    fetch_page "/clan/"
-    sed -ne '/\[[^a-z]\]/,/\[arrow\]/p' "$TMP/SRC" > "$TMP/CODE" 2>/dev/null
+    (
+    w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -dump "${URL}/clan/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[arrow\]/p' > "$TMP/CODE" 
+    ) </dev/null &>/dev/null &
 
     # Ensure the fetch command completed successfully
     if [ $? -ne 0 ]; then
@@ -40,19 +41,9 @@ check_leader() {
     # Check if ACC is one of the leaders
     if echo "$LEADERS" | grep -q "$ACC"; then
         is_leader=true
-        echo "$ACC is a leader or vice-leader."
-    else
-        echo "$ACC is not a leader or vice-leader."
     fi
 
-    # Return the status of the leader check
-    if [ "$is_leader" = true ]; then
-        return 0  # Leader found
-    else
-        return 1  # Not a leader
-    fi
 }
-
 
 clan_statue() {
     clan_id  # Retrieve the current clan ID

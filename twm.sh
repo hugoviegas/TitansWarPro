@@ -76,17 +76,27 @@ func_unset() {
 }
 
 #Access any page link
-fetch_page() {
-    local page_path=$1  # The specific part of the URL you want to fetch (e.g., "/quest/")
-    
-    # Fetch the page with the specified path
-    (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${page_path}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$TMP/SRC"
-    ) </dev/null &>/dev/null &  # Run in background and suppress output
 
-    time_exit 20  # Wait for the process to finish
+fetch_page() {
+    local relative_url="$1" # The specific part of the URL you want to fetch (e.g., "/quest/")
+    (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${relative_url}" \
+        -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+    ) </dev/null &>/dev/null &# Run in background and suppress output
+    time_exit 17 # Wait for the process to finish
 }
 
+fetch_debug_page() {
+    local page_url="$1"     # URL of the page to fetch
+    local output_file="$2"  # File to save the fetched content
+
+    # Fetch the entire page and save it to the specified file
+    (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "$page_url" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tee "$output_file"
+    ) </dev/null &>/dev/null &
+
+    time_exit 17  # Wait for the process to finish
+}
 
 # Check if the user settings file exists and is not empty
 if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then

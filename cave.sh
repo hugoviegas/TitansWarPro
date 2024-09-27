@@ -107,7 +107,6 @@ cave_start() {
   done
 }
 
-# Cave Routine Function
 cave_routine() {
     echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}\n"
 
@@ -115,10 +114,11 @@ cave_routine() {
     fetch_page "/cave/"
 
     # Check if there are any actions available in the cave
-    if grep -q -o -E '/cave/(gather|down|runaway|attack)/[?]r[=][0-9]+' "$TMP"/SRC; then
-        local CAVE=$(grep -o -E '/cave/(attack|gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+    if grep -q -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC; then
+        local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
         local RESULT=$(echo "$CAVE" | cut -d'/' -f3)
         echo -e "1- DEBUG $CAVE\n$RESULT"
+
         # Loop until the action is not "speedUp"
         until [ "$RESULT" != "speedUp" ]; do
             case $CAVE in
@@ -130,16 +130,16 @@ cave_routine() {
 
                     # Show feedback based on the current action
                     case $RESULT in
-                        *down*)
+                        *down*) 
                             tput cuu1; tput el; echo " New search 🔍"
                             ;;
-                        *gather*)
+                        *gather*) 
                             tput cuu1; tput el; echo " Start mining ⛏️"
                             ;;
-                        *speedUp*)
+                        *speedUp*) 
                             tput cuu1; tput el; echo " Speed up mining ⚡"
                             ;;
-                        *runaway*)
+                        *runaway*) 
                             tput cuu1; tput el; echo " Run away 💨"
                             ;;
                     esac
@@ -150,6 +150,7 @@ cave_routine() {
                     # Update CAVE with the new action
                     CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
                     ;;
+
                 (*attack*)
                     # Modify attack action to runaway
                     NEWCAVE=$(echo "$CAVE" | sed 's/attack/runaway/')
@@ -164,7 +165,7 @@ cave_routine() {
             esac
             sleep 0.5s
         done
+    else
+        echo "No actions available in the cave."
     fi
-    echo -e "${GREEN_BLACK}Cave Done ✅${COLOR_RESET}\n"
 }
-
