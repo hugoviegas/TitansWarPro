@@ -109,34 +109,49 @@ cave_start() {
 
 cave_routine() {
     echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}\n"
-    checkQuest 5
+    #checkQuest 5
 
     # Fetch initial cave data using fetch_page
     fetch_page "/cave/"
     
     # Check for available actions in the cave
-    if grep -q -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
+    if grep -q -o -E '/cave/(attack|gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
         local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
         local BREAK=$(($(date +%s) + 15))
 
-        while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ]; do
-            case $CAVE in
-                (*gather* | *down* | *runaway* | *attack*)
-                    # Fetch data based on the current cave action
-                    fetch_page "$CAVE"
+      while [ -n "$CAVE" ] && [ "$(date +%s)" -lt "$BREAK" ]; do
+        case $CAVE in
+          (*gather* | *down* | *runaway* | *attack*)
+            # Fetch data based on the current cave action
+            fetch_page "$CAVE"
 
-                    echo "$CAVE"
+            RESULT=$(echo "$CAVE" | cut -d'/' -f3)
 
-                    # Update CAVE with the new action
-                    CAVE=$(grep -o -E '/cave/(gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
-                    ;;
-                (*speedUp*)
-                    break
-                    ;;
+            # Show feedback based on the current action
+            case $RESULT in
+              *down*) 
+                tput cuu1; tput el; echo " New search 🔍"
+                ;;
+              *gather*) 
+                tput cuu1; tput el; echo " Start mining ⛏️"
+                ;;
+              *speedUp*) 
+                tput cuu1; tput el; echo " Speed up mining ⚡"
+                ;;
+              *runaway*) 
+                tput cuu1; tput el; echo " Run away 💨"
+                ;;
             esac
-        done
-        checkQuest 5
-    fi
 
-    echo -e "${GREEN_BLACK}Cave Done ✅${COLOR_RESET}\n"
+            # Fetch new cave data after processing the current action
+            fetch_page "/cave/"
+
+            # Update CAVE with the new action
+            CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+            ;;
+          esac
+        done
+        #checkQuest 5
+    fi
+  echo -e "${GREEN_BLACK}Cave Done ✅${COLOR_RESET}\n"
 }
