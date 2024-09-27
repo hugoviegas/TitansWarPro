@@ -27,7 +27,7 @@ script_slogan() {
     colors="10 9 8 2 1 5 4 3 6 7"
     author="author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.6"
+    versionNum="3.6.1 (Beta)"
     for i in $colors; do
         clear
         printf "\033[1;38;5;${i}m
@@ -65,7 +65,7 @@ time_exit() {
         local TEFPID=$(echo "$!" | grep -o -E '([0-9]{2,6})')
 
         # Loop for the specified number of seconds, counting down
-        for ((; $1 > 0; $1--)); do
+        for TELOOP in $(seq "$1" -1 1); do
             sleep 1s  # Sleep for 1 second
             
             # Check if the process is still running
