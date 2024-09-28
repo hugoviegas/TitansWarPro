@@ -50,90 +50,83 @@ league_play() {
     # Fetch the number of available fights
     fetch_available_fights
 
-    # Loop based on available fights
-    while (( AVAILABLE_FIGHTS > 0 )); do
-        # Fetch the league page
-        fetch_page "/league/"
+    # Fetch the league page
+    fetch_page "/league/"
 
-        # Get the actual number of enemies found on the page
-        ENEMY_COUNT=$(count_enemies)
-        echo "Enemies found: $ENEMY_COUNT"
+    # Debug: Output the content fetched
+    echo "Content fetched from league page:"
+    cat "$TMP"/SRC
 
-        # Loop through the enemies found
-        for (( i = 1; i <= ENEMY_COUNT; i++ )); do
-            # Using the function to extract enemy stats
-            INDEX=$(( (i - 1) * 4 ))  # Calculate the starting index for each enemy (0-based)
-            E_STRENGTH=$(get_enemy_stat "$INDEX" 1)  # 1st stat
-            E_HEALTH=$(get_enemy_stat "$INDEX" 2)    # 2nd stat
-            E_AGILITY=$(get_enemy_stat "$INDEX" 3)   # 3rd stat
-            E_PROTECTION=$(get_enemy_stat "$INDEX" 4) # 4th stat
+    # Count the number of enemies
+    local TOTAL_ENEMIES=$(count_enemies)
+    echo "Enemies found: $TOTAL_ENEMIES"
 
-            # Print enemy stats
-            echo -e "Enemy Stats:\n"
-            echo -e "${E_STRENGTH:-0}"
-            echo -e "${E_HEALTH:-0}"
-            echo -e "${E_AGILITY:-0}"
-            echo -e "${E_PROTECTION:-0}"
+    # Check if there are any enemies available
+    if [ "$TOTAL_ENEMIES" -eq 0 ]; then
+        echo "No enemies available for fighting."
+        return
+    fi
 
-            # Ensure all values are integers before comparing
-            E_STRENGTH=${E_STRENGTH:-0}
-            E_HEALTH=${E_HEALTH:-0}
-            E_AGILITY=${E_AGILITY:-0}
-            E_PROTECTION=${E_PROTECTION:-0}
+    # Extract all valid enemy links from the league page
+    mapfile -t ENEMY_LINKS < <(grep -o -E "${URL}/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP"/SRC)
 
-            PLAYER_STRENGTH=$(echo "$PLAYER_STRENGTH" | xargs)
-            E_STRENGTH=$(echo "$E_STRENGTH" | xargs)
+    # Loop through each extracted enemy link
+    for click in "${ENEMY_LINKS[@]}"; do
+        ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]{1,3}' | head -n 1)  # Extract the enemy number
+        
+        # Validate that ENEMY_NUMBER is between 1 and 999
+        if [[ "$ENEMY_NUMBER" =~ ^[1-9][0-9]{0,2}$ ]] && [ "$ENEMY_NUMBER" -le 999 ]; then
+            echo "Valid enemy number: $ENEMY_NUMBER"
+        else
+            echo "Invalid enemy number: $ENEMY_NUMBER. It must be between 1 and 999."
+            continue  # Skip if the enemy number is invalid
+        fi
 
-            # Extract the fight button for the current enemy
-            click=$(grep -o -E '/league/fight/[0-9]+/\?r=[0-9]+' "$TMP"/SRC | sed -n "$((i))p")  # Get the i-th fight button
+        # Extract enemy stats
+        INDEX=$((${#ENEMY_LINKS[@]} - ${#ENEMY_LINKS[@]} + 1))  # Get the current index in the loop
+        E_STRENGTH=$(get_enemy_stat "$INDEX" 1)  # 1st stat
+        E_HEALTH=$(get_enemy_stat "$INDEX" 2)    # 2nd stat
+        E_AGILITY=$(get_enemy_stat "$INDEX" 3)   # 3rd stat
+        E_PROTECTION=$(get_enemy_stat "$INDEX" 4) # 4th stat
 
-            # Extract the enemy number and validate it
-            ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]+' | head -n 1)  # Ensure we get the first number
+        # Print enemy stats
+        echo -e "Enemy Stats:\n"
+        echo -e "${E_STRENGTH:-0}"
+        echo -e "${E_HEALTH:-0}"
+        echo -e "${E_AGILITY:-0}"
+        echo -e "${E_PROTECTION:-0}"
 
-            # Validate that ENEMY_NUMBER is between 1 and 999
-            if [[ "$ENEMY_NUMBER" =~ ^[1-9][0-9]{0,2}$ ]] && [ "$ENEMY_NUMBER" -le 999 ]; then
-                echo "Valid enemy number: $ENEMY_NUMBER"
-            else
-                echo "Invalid enemy number: $ENEMY_NUMBER. It must be between 1 and 999."
-                continue  # Skip this iteration if the enemy number is invalid
-            fi
+        # Ensure all values are integers before comparing
+        E_STRENGTH=${E_STRENGTH:-0}
+        E_HEALTH=${E_HEALTH:-0}
+        E_AGILITY=${E_AGILITY:-0}
+        E_PROTECTION=${E_PROTECTION:-0}
 
-            # Check if a fight button was found
-            if [ -n "$click" ]; then
-                # Check if PLAYER_STRENGTH is a valid integer
-                if [[ "$PLAYER_STRENGTH" =~ ^[0-9]+$ ]] && [[ "$E_STRENGTH" =~ ^[0-9]+$ ]]; then
-                    # Compare player's strength with enemy's strength using -gt
-                    if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
-                        echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
-                        echo "Fight $i initiated with enemy number $ENEMY_NUMBER ✅"
-                        fetch_page "$click"
+        # Check if PLAYER_STRENGTH is a valid integer
+        if [[ "$PLAYER_STRENGTH" =~ ^[0-9]+$ ]] && [[ "$E_STRENGTH" =~ ^[0-9]+$ ]]; then
+            # Compare player's strength with enemy's strength using -gt
+            if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
+                echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
+                echo "Fight initiated with enemy number $ENEMY_NUMBER ✅"
+                fetch_page "$click"
 
-                        # After the fight, update the available fights
-                        fetch_available_fights
+                # After the fight, update the available fights
+                fetch_available_fights
 
-                        # Check if available fights are 0 after the update
-                        if (( AVAILABLE_FIGHTS <= 0 )); then
-                            echo "No more available fights. Exiting league play."
-                            return
-                        fi
-
-                        # Break the loop since the player has initiated a fight
-                        break
-                    else
-                        echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
-                    fi
-                else
-                    echo "DEBUG: Invalid values - Player Strength: '$PLAYER_STRENGTH', Enemy Strength: '$E_STRENGTH'"
+                # Check if available fights are 0 after the update
+                if (( AVAILABLE_FIGHTS <= 0 )); then
+                    echo "No more available fights. Exiting league play."
+                    return
                 fi
             else
-                echo "No fight buttons found on attempt $i ❌"
-                break
+                echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
             fi
-        done
+        else
+            echo "DEBUG: Invalid values - Player Strength: '$PLAYER_STRENGTH', Enemy Strength: '$E_STRENGTH'"
+        fi
     done
 
     echo -e "${GREEN_BLACK}League Routine Completed ✅${COLOR_RESET}\n"
 }
-
 
 # https://furiadetitas.net/league/takeReward/?r=52027565# Calculate indices for the current enemy's stats
