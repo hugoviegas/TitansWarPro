@@ -1,17 +1,19 @@
+# Função para buscar o número de lutas disponíveis
 fetch_available_fights() {
     fetch_page "/league/" "LEAGUE_DEBUG_SRC"
     
     if [ -f "$TMP/LEAGUE_DEBUG_SRC" ]; then
-        echo " Looking for available"
+        echo "Looking for available fights..."
+        # Remover tudo antes e depois do número de lutas disponíveis
         AVAILABLE_FIGHTS=$(grep -o -E '<b>[0-5]</b>' "$TMP/LEAGUE_DEBUG_SRC" | head -n 1 | sed -n 's/.*<b>\([0-5]\)<\/b>.*/\1/p')
         echo "Fights left: $AVAILABLE_FIGHTS"
     else
         echo "O arquivo LEAGUE_DEBUG_SRC não foi encontrado."
-        AVAILABLE_FIGHTS=0
+        AVAILABLE_FIGHTS=0  # Define como 0 se o arquivo não for encontrado
     fi
 }
 
-# Function to get enemy stats
+# Função para extrair estatísticas do inimigo
 get_enemy_stat() {
     local index=$1
     local stat_num=$2
@@ -28,7 +30,7 @@ get_enemy_stat() {
     done
 }
 
-# Extract unique enemy links
+# Função para extrair links únicos de inimigos
 extract_unique_enemy_links() {
     local seen_enemies=()
     local unique_links=()
@@ -47,45 +49,69 @@ extract_unique_enemy_links() {
     echo "${unique_links[@]}"
 }
 
-# Main league play logic
+# Função principal para executar as lutas na liga
 league_play() {
     echo -e "${GOLD_BLACK}League ⚔️${COLOR_RESET}"
 
-    PLAYER_STRENGTH=$(player_stats)
+    PLAYER_STRENGTH=$(player_stats)  # Força do jogador
 
-    fetch_page "/league/"
+    # Buscar o número de lutas disponíveis
+    fetch_available_fights
 
-    echo "Content fetched from league page:"
-    cat "$TMP"/SRC
+    # Loop enquanto houver lutas disponíveis
+    while [ "$AVAILABLE_FIGHTS" -gt 0 ]; do
+        fetch_page "/league/"  # Atualizar a página da liga
 
-    ENEMY_LINKS=$(extract_unique_enemy_links)
+        ENEMY_LINKS=$(extract_unique_enemy_links)  # Extrair links de inimigos
 
-    for click in "${ENEMY_LINKS[@]}"; do
-        ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]{1,3}' | head -n 1)
-        
-        if [[ "$ENEMY_NUMBER" =~ ^[1-9][0-9]{0,2}$ ]] && [ "$ENEMY_NUMBER" -le 999 ]; then
-            echo "Valid enemy number: $ENEMY_NUMBER"
-        else
-            echo "Invalid enemy number: $ENEMY_NUMBER."
-            continue
-        fi
+        for click in "${ENEMY_LINKS[@]}"; do
+            ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]{1,3}' | head -n 1)
+            
+            # Verifica se o número do inimigo é válido
+            if [[ "$ENEMY_NUMBER" =~ ^[1-9][0-9]{0,2}$ ]] && [ "$ENEMY_NUMBER" -le 999 ]; then
+                echo "Valid enemy number: $ENEMY_NUMBER"
+            else
+                echo "Invalid enemy number: $ENEMY_NUMBER. Skipping..."
+                continue
+            fi
 
-        fetch_page "$click"
+            # Buscar a página do inimigo
+            fetch_page "$click"
 
-        E_STRENGTH=$(get_enemy_stat "$ENEMY_NUMBER" 1)
-        E_HEALTH=$(get_enemy_stat "$ENEMY_NUMBER" 2)
-        E_AGILITY=$(get_enemy_stat "$ENEMY_NUMBER" 3)
-        E_PROTECTION=$(get_enemy_stat "$ENEMY_NUMBER" 4)
+            # Extrair estatísticas do inimigo
+            E_STRENGTH=$(get_enemy_stat "$ENEMY_NUMBER" 1)
+            E_HEALTH=$(get_enemy_stat "$ENEMY_NUMBER" 2)
+            E_AGILITY=$(get_enemy_stat "$ENEMY_NUMBER" 3)
+            E_PROTECTION=$(get_enemy_stat "$ENEMY_NUMBER" 4)
 
-        echo -e "Enemy Stats:\nStrength: ${E_STRENGTH:-0}\nHealth: ${E_HEALTH:-0}\nAgility: ${E_AGILITY:-0}\nProtection: ${E_PROTECTION:-0}"
+            echo -e "Enemy Stats:\nStrength: ${E_STRENGTH:-0}\nHealth: ${E_HEALTH:-0}\nAgility: ${E_AGILITY:-0}\nProtection: ${E_PROTECTION:-0}"
 
-        E_STRENGTH=${E_STRENGTH:-0}
+            E_STRENGTH=${E_STRENGTH:-0}
 
-        if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
-            echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
-            echo "Fight initiated with enemy number $ENEMY_NUMBER ✅"
-        else
-            echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping."
+            # Comparar força do jogador com a força do inimigo
+            if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
+                echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
+                echo "Fight initiated with enemy number $ENEMY_NUMBER ✅"
+                # Inserir lógica para iniciar a luta aqui
+
+                # Reduz o número de lutas disponíveis
+                ((AVAILABLE_FIGHTS--))
+
+                # Se não houver mais lutas disponíveis, sair do loop
+                if [ "$AVAILABLE_FIGHTS" -le 0 ]; then
+                    break
+                fi
+            else
+                echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
+            fi
+        done
+
+        # Atualizar o número de lutas disponíveis
+        fetch_available_fights
+
+        # Se não houver lutas disponíveis, sair do loop
+        if [ "$AVAILABLE_FIGHTS" -le 0 ]; then
+            break
         fi
     done
 
