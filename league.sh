@@ -121,7 +121,7 @@ league_play() {
                         fetch_page "$click"
                         
                         sleep 1s
-                        if [ $i -ge 4]; then
+                        if [ $i -ge 4 ]; then
                             return #exit from all loops
                         fi
                 fi
