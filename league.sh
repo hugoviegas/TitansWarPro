@@ -25,10 +25,10 @@ league_play() {
     # Print enemy stats along with the enemy number
     echo -e "Enemy Number: $ENEMY_NUMBER"
     echo -e "Enemy Stats:\n"
-    echo -e "Strength: ${E_STRENGTH:-0}"  # Default to 0 if empty
-    echo -e "Health: ${E_HEALTH:-0}"      # Default to 0 if empty
-    echo -e "Agility: ${E_AGILITY:-0}"    # Default to 0 if empty
-    echo -e "Protection: ${E_PROTECTION:-0}"  # Default to 0 if empty
+    echo -e "${E_STRENGTH:-0}"  # Default to 0 if empty
+    echo -e "${E_HEALTH:-0}"      # Default to 0 if empty
+    echo -e "${E_AGILITY:-0}"    # Default to 0 if empty
+    echo -e "${E_PROTECTION:-0}"  # Default to 0 if empty
 
     # Ensure all values are integers before comparing
     E_STRENGTH=${E_STRENGTH:-0}
