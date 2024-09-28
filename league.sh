@@ -1,6 +1,7 @@
 league_play() {
   echo -e "${GOLD_BLACK}League ⚔️${COLOR_RESET}"
 
+  # Assuming you have a way to get the player's strength
   PLAYER_STRENGTH=$(player_stats)  # Call your existing player_stats function
 
   # Loop to click the first fight button 5 times
@@ -17,8 +18,8 @@ league_play() {
     E_AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 3))s/: //p")  # 3rd stat
     E_PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 4))s/: //p") # 4th stat
 
-    # Extract enemy number from the fight button
-    click=$(grep -o -E '/league/fight/[0-9]+/\?r=[0-9]+' "$TMP"/SRC | sed -n '1p')
+    # Extract the fight button for the current enemy
+    click=$(grep -o -E '/league/fight/[0-9]+/\?r=[0-9]+' "$TMP"/SRC | sed -n "${i}p")  # Get the i-th fight button
     ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]+' | head -n 1)
 
     # Print enemy stats along with the enemy number
@@ -33,8 +34,8 @@ league_play() {
     if [ -n "$click" ]; then
       echo "Found fight button: $URL$click"
 
-      # Compare player's strength with enemy's strength
-      if (( PLAYER_STRENGTH > E_STRENGTH )); then
+      # Compare player's strength with enemy's strength using -gt
+      if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
         echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
         echo "Fight $i initiated with enemy number $ENEMY_NUMBER ✅"
 
@@ -52,8 +53,6 @@ league_play() {
 
   echo -e "${GREEN_BLACK}League Routine Completed ✅${COLOR_RESET}\n"
 }
-
-
 
 league_test() {
   (
