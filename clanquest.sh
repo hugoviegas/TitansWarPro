@@ -6,7 +6,7 @@ checkQuest() {
     fetch_page "/clan/${CLD}/quest/"
     
     fetch_debug_page "/clan/${CLD}/quest/" "$TMP/debug_output.txt"
-    click=$(grep -o -E "/quest/(take|help|deleteHelp|end)/$quest_id/\?r=[0-9]{8}" "$TMP"/SRC | sed -n '1p')
+    click=$(grep -o -E "clan/${CLD}/quest/(take|help|deleteHelp|end)/$quest_id/\?r=[0-9]{8}" "$TMP"/SRC | sed -n '1p')
     # Fetch the page
     response=$(curl -s -o "$TMP/SRC" -w "%{http_code}" "${click}")
 

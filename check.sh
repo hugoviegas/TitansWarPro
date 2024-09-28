@@ -26,7 +26,7 @@ check_missions() {
     for i in {0..15}; do
         fetch_page "/quest/"
         if grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP/SRC"; then
-            click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p' | cat)
+            click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p' | cat -)
             fetch_page "$click"
             MISSION_NUMBER=$(echo "$click" | cut -d'/' -f5 | cut -d'?' -f1)
             echo -e "${GREEN_BLACK} Mission [$MISSION_NUMBER] Completed ✅${COLOR_RESET}"
@@ -38,7 +38,7 @@ check_missions() {
     for i in {0..11}; do
         fetch_page "/relic/reward/"
         if grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP/SRC"; then
-            click=$(grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p' | cat)
+            click=$(grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p' | cat -)
             fetch_page "$click"
             echo -e " ${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}"
         fi
