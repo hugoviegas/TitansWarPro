@@ -119,7 +119,7 @@ cave_routine() {
     # Check for available actions in the cave
     if grep -q -o -E '/cave/(attack|gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
       
-      local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+      local CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
       local BREAK=$(($(date +%s) + 5))
       RESULT=$(echo "$CAVE" | cut -d'/' -f3)
       if checkQuest 5; then
@@ -127,9 +127,9 @@ cave_routine() {
       else
         count=8
       fi
-      until [ "$RESULT" != "speedUp" ] && [ "$(date +%s)" -ge "$BREAK" ] && [ "$count" -ge 8 ]; do
+      until [ "$RESULT" == "speedUp" ] && [ "$(date +%s)" -ge "$BREAK" ] && [ "$count" -ge 8 ]; do
         case $CAVE in
-          (*gather* | *down* | *runaway* | *attack*)
+          (*gather* | *down* | *runaway* | *attack* | *speedUp*)
             # Fetch data based on the current cave action
             fetch_page "$CAVE"
             #$NOWHP
@@ -157,11 +157,11 @@ cave_routine() {
             fetch_page "/cave/"
 
             # Update CAVE with the new action
-            CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+            CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+            #;;
+            #(*speedUp*)
+            #  break
             ;;
-            (*speedUp*)
-              break
-              ;;
         esac
       done
       checkQuest 5
