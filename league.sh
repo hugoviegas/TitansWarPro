@@ -52,8 +52,8 @@ league_play() {
     E_STRENGTH=$(echo "$E_STRENGTH" | xargs)
 
     # Extract the fight button for the current enemy
-    click=$(grep -o -E '/league/fight/[0-9]+/\?r=[0-9]+' "$TMP"/SRC | sed -n "${i}p")  # Get the i-th fight button
-    ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]+' | head -n 1)
+    click=$(grep -o -E '/league/fight/[0-9]+/\?r=[0-9]+' "$TMP"/SRC | sed -n "$((i))p")  # Get the i-th fight button
+    ENEMY_NUMBER=$(echo "$click" | grep -o -E '/fight/[0-9]+' | grep -o -E '[0-9]+')
 
     # Check if a fight button was found
     if [ -n "$click" ]; then
