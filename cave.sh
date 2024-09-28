@@ -124,11 +124,13 @@ cave_routine() {
       RESULT=$(echo "$CAVE" | cut -d'/' -f3)
       if checkQuest 5; then
         count=0
+        echo "Quests available speeding up mine to complete!"
       else
         count=8
+        echo "No quests available at the moment"
       fi
       echo " "
-      until [ "$RESULT" != "speedUp" ] && [ "$(date +%s)" -ge "$BREAK" ] && [ "$count" -ge 8 ]; do
+      until [ "$RESULT" == "speedUp" ] && [ "$(date +%s)" -ge "$BREAK" ] && [ "$count" -ge 8 ]; do
         case $CAVE in
           (*gather* | *down* | *runaway* | *attack* | *speedUp*)
             # Fetch data based on the current cave action
@@ -136,12 +138,13 @@ cave_routine() {
             #$NOWHP
 
             RESULT=$(echo "$CAVE" | cut -d'/' -f3)
-
+            echo "DEBUG: $RESULT"
             # Show feedback based on the current action
             case $RESULT in
               *down*) 
                 tput cuu1; tput el; echo " New search 🔍"
                 ((count++))  # Increment count by 1
+                echo "DEBUG: $count"
                 ;;
               *gather*) 
                 tput cuu1; tput el; echo " Start mining ⛏️"
