@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 9 8 2 1 5 4 3 6 7"
     author="author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.6.20 (Beta)"
+    versionNum="3.6.21 (Beta)"
 for i in $colors; do
 clear
 printf "\033[1;38;5;${i}m
@@ -143,8 +143,8 @@ player_stats() {
     fetch_page "/train"
 
     # Print the raw content for debugging
-    echo "Raw content from /train:"
-    cat "$TMP"/TRAIN  # Check the raw output for stats
+    # echo "Raw content from /train:"
+    # cat "$TMP"/TRAIN  # Check the raw output for stats
 
     # Extracting stats using grep and sed
     STRENGTH=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '1s/: //p')
@@ -156,11 +156,6 @@ player_stats() {
     PLAYER_STRENGTH=$(echo "$STRENGTH" | xargs)
     PLAYER_STRENGTH=${PLAYER_STRENGTH//[^0-9]/}
 
-    # Print debug information for player stats
-    echo "DEBUG: Player Strength: '$PLAYER_STRENGTH'"
-    echo "DEBUG: Player Strength2: '$STRENGTH'"
-    echo "DEBUG: Health: '$HEALTH'"
-    echo "DEBUG: Agility: '$AGILITY'"
-    echo "DEBUG: Protection: '$PROTECTION'"
+    echo "$PLAYER_STRENGTH"
 }
 
