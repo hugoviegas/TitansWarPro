@@ -109,70 +109,75 @@ cave_start() {
 }
 
 cave_routine() {
-    echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}"
-    #checkQuest 5
-    if checkQuest 5; then
-      count=0
-      echo "Quests available speeding up mine to complete!"
-    else
-      count=8
-      echo "No quests available at the moment"
-    fi
-    # Fetch initial cave data using fetch_page
-    fetch_page "/cave/"
-    #$NOWHP
+  echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}"
+
+  # Checking for available quests
+  if checkQuest 5; then
+    count=0
+    echo "Quests available speeding up mine to complete!"
+  else
+    count=8
+    echo "No quests available at the moment"
+  fi
+
+  # Fetch initial cave data
+  fetch_page "/cave/"
+
+  # Check for available actions in the cave
+  if grep -q -o -E '/cave/(attack|gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
     
-    # Check for available actions in the cave
-    if grep -q -o -E '/cave/(attack|gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
-      
-      local CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
-      local BREAK=$(($(date +%s) + 5))
-      RESULT=$(echo "$CAVE" | cut -d'/' -f3)
-      
-      echo " "
-      until [ "$RESULT" == "speedUp" ] && [ "$(date +%s)" -ge "$BREAK" ] && [ "$count" -ge 8 ]; do
-        case $CAVE in
-          (*gather* | *down* | *runaway* | *attack*)
-            # Fetch data based on the current cave action
-            fetch_page "$CAVE"
-            #$NOWHP
+    # Get the first cave action
+    local CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+    local BREAK=$(($(date +%s) + 5))  # Break timestamp
+    RESULT=$(echo "$CAVE" | cut -d'/' -f3)
+    
+    echo " "
+    
+    # Simplify the loop logic
+    until [ "$RESULT" == "speedUp" ] || [ "$count" -ge 8 ]; do
+      case $CAVE in
+        (*gather* | *down* | *runaway* | *attack*)
+          # Fetch page and process action
+          fetch_page "$CAVE"
+          RESULT=$(echo "$CAVE" | cut -d'/' -f3)
 
-            RESULT=$(echo "$CAVE" | cut -d'/' -f3)
-            echo "DEBUG: $RESULT"
-            # Show feedback based on the current action
-            case $RESULT in
-              *down*) 
-                tput cuu1; tput el; echo " New search 🔍"
-                ((count++))  # Increment count by 1
-                echo "DEBUG: $count"
-                ;;
-              *gather*) 
-                tput cuu1; tput el; echo " Start mining ⛏️"
-                ;;
-              *speedUp*) 
-                tput cuu1; tput el; echo " Speed up mining ⚡"
-                ;;
-              *runaway*) 
-                tput cuu1; tput el; echo " Run away 💨"
-                ;;
-            esac
-
-            # Fetch new cave data after processing the current action
-            fetch_page "/cave/"
-
-            # Update CAVE with the new action
-            CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
-            ;;
-            (*speedUp*)
-              if [ "$count" -ge 8 ]; then
-                break
-              fi
-              fetch_page "$CAVE"
+          echo "DEBUG: Action - $RESULT"
+          
+          # Feedback based on the current action
+          case $RESULT in
+            *down*) 
+              tput cuu1; tput el; echo " New search 🔍"
+              ((count++))  # Increment count by 1
+              echo "DEBUG: Count is now $count"
+              ;;
+            *gather*) 
+              tput cuu1; tput el; echo " Start mining ⛏️"
+              ;;
+            *runaway*) 
+              tput cuu1; tput el; echo " Run away 💨"
+              ;;
+            *speedUp*) 
               tput cuu1; tput el; echo " Speed up mining ⚡"
-            ;;
-        esac
-      done
-      checkQuest 5
-    fi
+              ;;
+          esac
+
+          # Fetch new cave data and update CAVE
+          fetch_page "/cave/"
+          CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+          ;;
+        (*speedUp*)
+          # Handling for speedUp separately
+          if [ "$count" -ge 8 ]; then
+            break
+          fi
+          fetch_page "$CAVE"
+          tput cuu1; tput el; echo " Speed up mining ⚡"
+          ;;
+      esac
+    done
+
+    checkQuest 5
+  fi
   echo -e "${GREEN_BLACK}Cave Done ✅${COLOR_RESET}\n"
 }
+

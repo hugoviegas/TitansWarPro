@@ -6,12 +6,34 @@ fetch_available_fights() {
         echo "Procurando número de lutas disponíveis..."
         
         # Removendo tudo antes de "<b>" e depois do número
-        AVAILABLE_FIGHTS=$(grep -o -E ': [0-9]+' "$TMP/LEAGUE_DEBUG_SRC" | sed -n '1s/: //p' | tr -d '()' | tr -d ' ')
+        AVAILABLE_FIGHTS=$(grep -o -E '<b>[0-5]</b>' "$TMP/LEAGUE_DEBUG_SRC" | head -n 1 | sed -n 's/.*<b>\([0-5]\)<\/b>.*/\1p')
         echo "Fights left: $AVAILABLE_FIGHTS"
     else
         echo "O arquivo LEAGUE_DEBUG_SRC não foi encontrado."
         AVAILABLE_FIGHTS=0  # Define como 0 se o arquivo não for encontrado
     fi
+}
+
+# Function to get enemy stats
+get_enemy_stat() {
+    local index=$1
+    local stat_num=$2
+    local stat
+
+    # Loop to find the valid stat
+    while true; do
+        # Extract the stat using grep and sed
+        stat=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((index + stat_num))s/: //p" | tr -d '()' | tr -d ' ')
+
+        # Check if the stat is valid (not empty and less than or equal to 5 digits)
+        if [[ -n "$stat" && "${#stat}" -le 5 ]]; then
+            echo "$stat"
+            return
+        fi
+        
+        # Increment the stat_num to check the next one
+        ((stat_num++))
+    done
 }
 
 league_play() {
@@ -28,11 +50,11 @@ league_play() {
     # Calculate indices for the current enemy's stats
     INDEX=$(( (i - 1) * 4 ))  # Calculate the starting index for each enemy (0-based)
 
-    # Extracting enemy stats using grep and sed
-    E_STRENGTH=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 1))s/: //p" | tr -d '()' | tr -d ' ')  # 1st stat
-    E_HEALTH=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 2))s/: //p" | tr -d '()' | tr -d ' ')   # 2nd stat
-    E_AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 3))s/: //p" | tr -d '()' | tr -d ' ')  # 3rd stat
-    E_PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 4))s/: //p" | tr -d '()' | tr -d ' ') # 4th stat
+    # Using the function to extract enemy stats
+    E_STRENGTH=$(get_enemy_stat "$INDEX" 1)  # 1st stat
+    E_HEALTH=$(get_enemy_stat "$INDEX" 2)    # 2nd stat
+    E_AGILITY=$(get_enemy_stat "$INDEX" 3)   # 3rd stat
+    E_PROTECTION=$(get_enemy_stat "$INDEX" 4) # 4th stat
 
     # Print enemy stats along with the enemy number
     #echo -e "Enemy Number: $ENEMY_NUMBER"
