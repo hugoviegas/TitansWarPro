@@ -46,13 +46,13 @@ league_play() {
     fetch_available_fights
 
     # Loop based on available fights
-    while (( AVAILABLE_FIGHTS >= 1 )); do
+    while (( AVAILABLE_FIGHTS > 0 )); do
         # Fetch the league page
         fetch_page "/league/"
 
-        # Calculate indices for the current enemy's stats
-        for (( i = AVAILABLE_FIGHTS; i >= 0; i-- )); do
-            # Using the function to extract enemy stats
+        # Loop through available fights in reverse order
+        for (( i = 1; i <= AVAILABLE_FIGHTS; i++ )); do
+            # Calculate indices for the current enemy's stats
             INDEX=$(( (i - 1) * 4 ))  # Calculate the starting index for each enemy (0-based)
             E_STRENGTH=$(get_enemy_stat "$INDEX" 1)  # 1st stat
             E_HEALTH=$(get_enemy_stat "$INDEX" 2)    # 2nd stat
@@ -77,12 +77,20 @@ league_play() {
 
             # Extract the fight button for the current enemy
             click=$(grep -o -E '/league/fight/[0-9]+/\?r=[0-9]+' "$TMP"/SRC | sed -n "$((i))p")  # Get the i-th fight button
-            ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]+')
+
+            # Extract the enemy number and validate it
+            ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]+' | head -n 1)  # Ensure we get the first number
+
+            # Validate that ENEMY_NUMBER is between 1 and 999
+            if [[ "$ENEMY_NUMBER" =~ ^[1-9][0-9]{0,2}$ ]] && [ "$ENEMY_NUMBER" -le 999 ]; then
+                echo "Valid enemy number: $ENEMY_NUMBER"
+            else
+                echo "Invalid enemy number: $ENEMY_NUMBER. It must be between 1 and 999."
+                continue  # Skip this iteration if the enemy number is invalid
+            fi
 
             # Check if a fight button was found
             if [ -n "$click" ]; then
-                # echo "Found fight button: $URL$click"
-
                 # Check if PLAYER_STRENGTH is a valid integer
                 if [[ "$PLAYER_STRENGTH" =~ ^[0-9]+$ ]] && [[ "$E_STRENGTH" =~ ^[0-9]+$ ]]; then
                     # Compare player's strength with enemy's strength using -gt
@@ -107,14 +115,15 @@ league_play() {
                 fi
             else
                 echo "No fight buttons found on attempt $i ❌"
-                break
+                break  # Break the inner loop if no fight button is found
             fi
         done
+        # Optionally, you could refresh available fights here again if needed
+        fetch_available_fights
     done
 
     echo -e "${GREEN_BLACK}League Routine Completed ✅${COLOR_RESET}\n"
 }
-
 
 
 # https://furiadetitas.net/league/takeReward/?r=52027565# Calculate indices for the current enemy's stats

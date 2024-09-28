@@ -134,7 +134,7 @@ cave_routine() {
     echo " "
     
     # Simplify the loop logic
-    until [ "$RESULT" == "speedUp" ] || [ "$count" -ge 8 ]; do
+    until [ "$RESULT" != "speedUp" ] || [ "$count" -ge 8 ]; do
       case $CAVE in
         (*gather* | *down* | *runaway* | *attack*)
           # Fetch page and process action
