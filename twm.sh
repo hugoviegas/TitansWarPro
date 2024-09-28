@@ -88,17 +88,6 @@ fetch_page() {
     time_exit 17  # Wait for the process to finish
 }
 
-fetch_debug_page() {
-    local page="$1"  # Pass the page you want to fetch as an argument
-    fetch_page "$1" "$2" # Fetch the page
-
-    # Print the raw content for debugging
-    echo "Raw content from $page:"
-    cat "$2"  # Adjust if your temporary file has a different name or path
-    #HOW TO USE: fetch_page "/league/" "$TMP/LEAGUE_DEBUG_SRC"
-}
-
-
 # Check if the user settings file exists and is not empty
 if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
     printf "${GREEN_BLACK} Starting with last settings used.${COLOR_RESET}\n"
