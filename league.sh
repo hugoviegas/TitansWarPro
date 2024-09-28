@@ -35,17 +35,35 @@ extract_unique_enemy_links() {
     local seen_enemies=()
     local unique_links=()
 
+    # Extrair todos os links de luta de inimigos
     local links=$(grep -o -E "${URL}/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP"/SRC)
 
-    while IFS= read -r link; do
-        local enemy_number=$(echo "$link" | grep -o -E '/league/fight/[0-9]+' | cut -d'/' -f4)
+    echo "DEBUG: Links encontrados na página:"
+    echo "$links"
 
+    # Processar cada link individualmente
+    while IFS= read -r link; do
+        echo "DEBUG: Processando link: $link"
+        
+        # Extrair o número do inimigo do link (e.g., 474 de /league/fight/474/?r=5231275)
+        local enemy_number=$(echo "$link" | grep -o -E '/league/fight/[0-9]+' | cut -d'/' -f4)
+        echo "DEBUG: Número do inimigo extraído: $enemy_number"
+
+        # Verificar se o número do inimigo já foi processado
         if [[ ! " ${seen_enemies[*]} " =~ ${enemy_number} ]]; then
+            echo "DEBUG: Número do inimigo $enemy_number ainda não visto, adicionando link."
             unique_links+=("$link")
             seen_enemies+=("$enemy_number")
+        else
+            echo "DEBUG: Número do inimigo $enemy_number já visto, ignorando link duplicado."
         fi
     done <<< "$links"
 
+    # Mostrar links únicos encontrados
+    echo "DEBUG: Links únicos encontrados:"
+    echo "${unique_links[@]}"
+
+    # Retornar ou imprimir os links únicos
     echo "${unique_links[@]}"
 }
 
