@@ -3,7 +3,7 @@ fetch_available_fights() {
     
     # Verifica se o arquivo foi criado
     if [ -f "$TMP/LEAGUE_DEBUG_SRC" ]; then
-        echo " Looking for available fights..."
+        echo " Looking for available"
         
         # Removendo tudo antes de "<b>" e depois do número
         AVAILABLE_FIGHTS=$(grep -o -E '<b>[0-5]</b>' "$TMP/LEAGUE_DEBUG_SRC" | head -n 1 | sed -n 's/.*<b>\([0-5]\)<\/b>.*/\1/p')
