@@ -114,6 +114,7 @@ cave_routine() {
 
     # Fetch initial cave data using fetch_page
     fetch_page "/cave/"
+    #$NOWHP
     
     # Check for available actions in the cave
     if grep -q -o -E '/cave/(attack|gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
@@ -131,6 +132,7 @@ cave_routine() {
           (*gather* | *down* | *runaway* | *attack*)
             # Fetch data based on the current cave action
             fetch_page "$CAVE"
+            #$NOWHP
 
             RESULT=$(echo "$CAVE" | cut -d'/' -f3)
 

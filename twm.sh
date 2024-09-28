@@ -48,7 +48,6 @@ cd ~/twm || exit
 . clancoliseum.sh
 . king.sh
 . undying.sh
-. clandungeon.sh
 . trade.sh
 . career.sh
 . cave.sh

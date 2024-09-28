@@ -28,7 +28,7 @@ altars_fight () {
   fi
  }
  cf_access
- >BREAK_LOOP ; cat HP >old_HP
+ : >BREAK_LOOP ; cat HP >old_HP
  echo $(( $(date +%s) - 20 )) >last_dodge
  echo $(( $(date +%s) - 90 )) >last_heal
  echo $(( $(date +%s) - $LA )) >last_atk

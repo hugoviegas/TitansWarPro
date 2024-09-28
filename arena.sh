@@ -127,7 +127,10 @@ arena_duel() {
     # Extract and execute the sell-all-items action
     local SELL=$(grep -o -E '(/inv/bag/sellAll/1/[?]r[=][0-9]+)' "$TMP"/SRC | sed -n '1p')
     fetch_page "$SELL"
-  
+    
+    checkQuest 3
+    checkQuest 4
+    
     echo " Sell all items ✅"
     echo -e "${GREEN_BLACK}Arena ✅${COLOR_RESET}\n"
 }
@@ -149,8 +152,7 @@ arena_fullmana() {
   ) </dev/null &>/dev/null &
     time_exit 17
     
-    checkQuest 3
-    checkQuest 4
-    
+
+
   echo -e "${GREEN_BLACK}Energy arena ✅${COLOR_RESET}\n"
 }
