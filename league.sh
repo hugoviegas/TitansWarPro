@@ -79,11 +79,11 @@ league_play() {
             echo -e "Enemy Number: $ENEMY_NUMBER"
             echo -e "Enemy Stats:"
             echo -e "  Strength:   ${E_STRENGTH:-0}"
-            sleep 5s
+            #sleep 5s
 
             fetch_available_fights
             k="$AVAILABLE_FIGHTS"
-            echo "$k"
+            #echo "$k"
             # Comparar a força do jogador com a do inimigo
             if [[ "$PLAYER_STRENGTH" =~ ^[0-9]+$ ]] && [[ "$E_STRENGTH" =~ ^[0-9]+$ ]] && [[ "$k" -ge 1 ]]; then
             while [ "$PLAYER_STRENGTH" -lt "$E_STRENGTH" ] || [ "$i" -ge 4 ]; do
@@ -122,7 +122,7 @@ league_play() {
                         
                         sleep 1s
                         if [ $i -ge 4 ]; then
-                            return #exit from all loops
+                            return 1 #exit from all loops
                         fi
                 fi
             done
