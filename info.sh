@@ -143,15 +143,13 @@ player_stats() {
     fetch_page "/train"
 
     # Extracting stats using grep and sed
-    STRENGTH=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '1s/: //p' | tr -d '()' | tr -d ' ')
-    HEALTH=$(grep -o -E '\(([0-9]+)\)' "$TMP"/TRAIN | sed -n 's/[()]//gp' | sed -n '2p' | tr -d '()' | tr -d ' ')
-    AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '3s/: //p' | tr -d '()' | tr -d ' ')
-    PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '4s/: //p' | tr -d '()' | tr -d ' ')
-    #ENERGY=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '5s/: //p')
+    STRENGTH=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '1s/: //p')
+    HEALTH=$(grep -o -E '\(([0-9]+)\)' "$TMP"/TRAIN | sed '2s/: //p')
+    AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '3s/: //p')
+    PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '4s/: //p')
 
-    # Print all the stats
-    #echo -e "Player Stats:\n"
-    echo -e "$STRENGTH"
-    return "$STRENGTH"
- 
+    # Trim whitespace and ensure that STRENGTH only contains numbers
+    PLAYER_STRENGTH=$(echo "$STRENGTH" | xargs)  # This will remove leading/trailing spaces
+    PLAYER_STRENGTH=${PLAYER_STRENGTH//[^0-9]/}   # Remove any non-digit characters
 }
+
