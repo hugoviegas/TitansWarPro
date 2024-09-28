@@ -38,63 +38,6 @@ arena_collFight() {
     echo -e "collfight (✔)\n"
   fi
 }
-arena_takeHelp() {
-    clan_id  # Ensure the clan ID is set
-
-    if [ -n "$CLD" ]; then
-        # Fetch the take or help quest link from the page
-        local click=$(grep -o -E "/clan/$CLD/quest/(take|help)/[0-9]+" "$TMP"/SRC | head -n1)
-
-        if [ -n "$click" ]; then
-            # Process the first take/help quest link
-            fetch_page "$click"
-            time_exit 17
-            echo " Quest Arena 3"
-
-            # Simulate fetching the next quest action
-            local next_click=$(echo "$click" | sed 's/[0-9]\+$/4/')
-            fetch_page "$next_click"
-            time_exit 17
-            echo " Quest Arena 4"
-        else
-            echo "No valid quest actions found for clan $CLD."
-        fi
-    else
-        # If no clan ID is available, fallback to a clan invite settings URL
-        fetch_page "/settings/claninvite/1"
-        time_exit 17
-    fi
-}
-
-
-arena_deleteEnd() {
-    clan_id  # Ensure the clan ID is set
-
-    if [ -n "$CLD" ]; then
-        # Fetch the clan's quest deleteHelp or end link from the page
-        local click=$(grep -o -E "/clan/$CLD/quest/(deleteHelp|end)/[0-9]+" "$TMP"/SRC | head -n1)
-
-        if [ -n "$click" ]; then
-            # Process the first deleteHelp or end link
-            fetch_page "$click"
-            time_exit 17
-            echo "$click"
-
-            # Simulate fetching a similar follow-up action (if applicable)
-            local next_click=$(echo "$click" | sed 's/[0-9]\+$/4/')
-            fetch_page "$next_click"
-            time_exit 17
-            echo "$next_click"
-        else
-            echo "No valid quest actions found for clan $CLD."
-        fi
-    else
-        # If no clan ID is available, fallback to a general clan URL
-        fetch_page "/clanrating/wantedToClan"
-        time_exit 17
-    fi
-}
-
 
 arena_duel() {
     echo -e "${GOLD_BLACK}Arena ⚔️${COLOR_RESET}"
@@ -133,6 +76,7 @@ arena_duel() {
     
     echo " Sell all items ✅"
     echo -e "${GREEN_BLACK}Arena ✅${COLOR_RESET}\n"
+    
 }
 
 arena_fullmana() {

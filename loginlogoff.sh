@@ -133,5 +133,6 @@ login_logoff () {
 
  done
  messages_info
- start
+ clan_id
+ #start
 }
