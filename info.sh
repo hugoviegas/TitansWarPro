@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 9 8 2 1 5 4 3 6 7"
     author="author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.6.18 (Beta)"
+    versionNum="3.6.19 (Beta)"
 for i in $colors; do
 clear
 printf "\033[1;38;5;${i}m
@@ -150,7 +150,8 @@ player_stats() {
     #ENERGY=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '5s/: //p')
 
     # Print all the stats
-    echo -e "Player Stats:\n"
+    #echo -e "Player Stats:\n"
     echo -e "$STRENGTH"
+    return "$STRENGTH"
  
 }
