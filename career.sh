@@ -16,6 +16,7 @@ career_func() {
           fetch_page "$CAREER"
           RESULT=$(echo "$CAREER" | cut -d'/' -f3)
           echo " Career -> $RESULT !"
+          sleep 0.5s
           local CAREER=$(grep -o -E '/career/(attack|take)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
           ;;
           *take*)

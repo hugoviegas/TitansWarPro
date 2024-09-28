@@ -100,45 +100,50 @@ clanDungeon() {
 }
 
 clanElixirQuest() {
-  clanQuest 7
-
-  fetch_page "/lab/alchemy/"
+  # Checking for available quests
+  if checkQuest 7; then
+    fetch_page "/lab/alchemy/"
   
-  # Generate a random number between 1 and 4
-  i=$(shuf -i 1-4 -n 1)
-  
-  # Search for the potion-making link
-  click=$(grep -o -E "/$i/makePotion?r=[0-9]{8}" "$TMP"/SRC | sed -n '1p')
-  
-  # If a link is found, fetch the page to make the potion
-  if [ -n "$click" ]; then
-    fetch_page "/lab/alchemy/$click"
-    fetch_page "/lab/alchemy/$click"
-    sleep 1s
-    # Finalize the quest
-    clanQuest 7
+    # Generate a random number between 1 and 4
+    i=$(shuf -i 1-4 -n 1)
+    
+    # Search for the potion-making link
+    click=$(grep -o -E "/$i/makePotion?r=[0-9]{8}" "$TMP"/SRC | sed -n '1p')
+    
+    # If a link is found, fetch the page to make the potion
+    if [ -n "$click" ]; then
+      fetch_page "/lab/alchemy/$click"
+      fetch_page "/lab/alchemy/$click"
+      sleep 1s
+      # Finalize the quest
+      clanQuest 7
+    fi
+  else
+    echo "No quests available at the moment"
   fi
   
-
 }
 
 clanMerchantQuest() {
-  clanQuest 8
-  # Fetch the coliseum merchant page
-  fetch_page "/coliseum/merchant/"
+  # Checking for available quests
+  if checkQuest 8; then
+    # Fetch the coliseum merchant page
+    fetch_page "/coliseum/merchant/"
 
-  # Generate a random number between 1 and 2
-  i=$(shuf -i 1-2 -n 1)
+    # Generate a random number between 1 and 2
+    i=$(shuf -i 1-2 -n 1)
 
-  # Search for the merchant-making link with reference to the lab
-  click=$(grep -o -E "/coliseum/merchant/$i/startMaking\\?r=[0-9]+&ref=lab" "$TMP"/SRC | sed -n '1p')
+    # Search for the merchant-making link with reference to the lab
+    click=$(grep -o -E "/coliseum/merchant/$i/startMaking\\?r=[0-9]+&ref=lab" "$TMP"/SRC | sed -n '1p')
 
-  # If a link is found, fetch the page to start the merchant process
-  if [ -n "$click" ]; then
-    fetch_page "$click"
-    fetch_page "$click"
-    sleep 1s
-    clanQuest 8
+    # If a link is found, fetch the page to start the merchant process
+    if [ -n "$click" ]; then
+      fetch_page "$click"
+      fetch_page "$click"
+      sleep 1s
+      clanQuest 8
+    fi
+  else
+    echo "No quests available at the moment"
   fi
-  
 }
