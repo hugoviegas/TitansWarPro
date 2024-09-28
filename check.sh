@@ -49,12 +49,16 @@ check_missions() {
 apply_event() {
   # Apply to fight
   event=("$@")  # Store arguments as an array
-
-  fetch_page "/${event[*]}/"
-  if grep -o -E "/${event[*]}/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC; then
-    APPLY=$(grep -o -E "/${event[*]}/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC | cat -)
-    fetch_page "${APPLY}"
-
+  (
+    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/$event/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+  ) </dev/null &>/dev/null &
+  time_exit 20
+  if grep -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC; then
+    APPLY=$(grep -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC | cat -)
+    (
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${APPLY}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+    ) </dev/null &>/dev/null &
+    time_exit 20
     echo -e "${BLACK_YELLOW}Applied for battle ✅${COLOR_RESET}\n"
   fi
 }
