@@ -1,13 +1,12 @@
 fetch_available_fights() {
     fetch_page "/league/"
     
-    # Verifica se o arquivo foi criado e imprime seu conteúdo
+    # Verifica se o arquivo foi criado
     if [ -f "$TMP/LEAGUE_DEBUG_SRC" ]; then
-        echo "Conteúdo do LEAGUE_DEBUG_SRC:"
-        cat "$TMP/LEAGUE_DEBUG_SRC"  # Imprime o conteúdo para depuração
-
-        # Captura o número de lutas disponíveis
-        AVAILABLE_FIGHTS=$(grep -o -E 'Lutas disponiveis:</b> *[0-9]+' "$TMP/LEAGUE_DEBUG_SRC" | grep -o -E '[0-9]+' | head -n 1)
+        echo "Procurando número de lutas disponíveis..."
+        
+        # Captura o número de lutas disponíveis após o <img> e dentro da tag <b>
+        AVAILABLE_FIGHTS=$(grep -oP '<img src=[^>]+>\s*<b>\K[0-9]+' "$TMP/LEAGUE_DEBUG_SRC" | head -n 1)
     else
         echo "O arquivo LEAGUE_DEBUG_SRC não foi encontrado."
         AVAILABLE_FIGHTS=0  # Define como 0 se o arquivo não for encontrado

@@ -12,7 +12,7 @@ check_missions() {
     done
 
     # Collect completed quests
-    for i in {0..15}; do
+    for i in {0..16}; do
     local click
     click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p')
         if [ -n "$click" ]; then
