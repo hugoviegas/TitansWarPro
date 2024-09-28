@@ -36,6 +36,11 @@ get_enemy_stat() {
     done
 }
 
+# Function to count the number of enemies available on the page
+count_enemies() {
+    grep -o -E '/league/fight/[0-9]+/\?r=[0-9]+' "$TMP"/SRC | wc -l
+}
+
 league_play() {
     echo -e "${GOLD_BLACK}League ⚔️${COLOR_RESET}"
 
@@ -50,8 +55,12 @@ league_play() {
         # Fetch the league page
         fetch_page "/league/"
 
-        # Calculate the number of enemies based on available fights
-        for (( i = 1; i <= AVAILABLE_FIGHTS; i++ )); do
+        # Get the actual number of enemies found on the page
+        ENEMY_COUNT=$(count_enemies)
+        echo "Enemies found: $ENEMY_COUNT"
+
+        # Loop through the enemies found
+        for (( i = 1; i <= ENEMY_COUNT; i++ )); do
             # Using the function to extract enemy stats
             INDEX=$(( (i - 1) * 4 ))  # Calculate the starting index for each enemy (0-based)
             E_STRENGTH=$(get_enemy_stat "$INDEX" 1)  # 1st stat
@@ -120,10 +129,6 @@ league_play() {
                 echo "No fight buttons found on attempt $i ❌"
                 break
             fi
-
-            # After checking one enemy, we need to fetch the updated enemy stats
-            # to ensure we get the correct values for the next enemy in the next iteration
-            fetch_page "/league/"
         done
     done
 

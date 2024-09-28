@@ -117,7 +117,6 @@ cave_routine() {
     echo "Quests available speeding up mine to complete!"
   else
     count=7
-    # echo "No quests available at the moment"
   fi
 
   # Fetch initial cave data
@@ -143,14 +142,12 @@ cave_routine() {
         gather|down|runaway|attack)
           # Fetch page and process action
           fetch_page "$CAVE"
-          echo "DEBUG: Action - $RESULT"
 
           # Feedback based on the current action
           case $RESULT in
             down*)
               tput cuu1; tput el; echo " New search 🔍"
               ((count++))  # Increment count by 1
-              echo "DEBUG: Count is now $count"
               ;;
             gather*)
               tput cuu1; tput el; echo " Start mining ⛏️"
@@ -164,12 +161,14 @@ cave_routine() {
               ;;
           esac
           ;;
-        esac
-        # Check if we've exceeded the count limit
-        if [ "$count" -ge 8 ]; then
-          echo "Exceeded action limit, exiting cave routine."
-          break
-        fi
+      esac
+
+      # Check if we've exceeded the count limit
+      if [ "$count" -ge 8 ]; then
+        echo "Exceeded action limit, exiting cave routine."
+        break
+      fi
+
       # Fetch new cave data
       fetch_page "/cave/"
     done
