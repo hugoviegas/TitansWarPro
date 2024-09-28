@@ -4,9 +4,16 @@ league_play() {
     # Get player's strength
     PLAYER_STRENGTH=$(player_stats)
 
-    # Fetch available fights before starting the loop
-    fetch_available_fights
+    ## Extract the number of available fights from the debug output, taking only the first result
     AVAILABLE_FIGHTS=$(grep -o -E ':</b> [0-9]+' "$TMP/LEAGUE_DEBUG_SRC" | grep -o -E '[0-9]+' | head -n 1)
+    echo "AVAILABLE_FIGHTS: $AVAILABLE_FIGHTS"
+
+    # Print the result for debugging
+    if [[ -n "$AVAILABLE_FIGHTS" ]]; then
+        echo "Available Fights: $AVAILABLE_FIGHTS"
+    else
+        echo "No available fights found."
+    fi
 
     # Loop until there are no available fights left
     while (( AVAILABLE_FIGHTS > 0 )); do
