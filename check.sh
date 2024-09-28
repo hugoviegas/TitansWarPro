@@ -17,8 +17,8 @@ check_missions() {
     click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p')
         if [ -n "$click" ]; then
             fetch_page "$click"  # Fetch the mission completion URL
-            MISSION_NUMBER=$(echo "$click" | cut -d'/' -f5 | cut -d'?' -f1)
-            echo -e "${GREEN_BLACK} Mission [$MISSION_NUMBER] Completed ✅${COLOR_RESET}"
+            #MISSION_NUMBER=$(echo "$click" | cut -d'/' -f5 | cut -d'?' -f1)
+            echo -e "${GREEN_BLACK} Mission [$i] Completed ✅${COLOR_RESET}"
         fi
     done
 
@@ -41,6 +41,9 @@ check_missions() {
     fi
 
     echo -e "${GREEN_BLACK}Missions ✅${COLOR_RESET}\n"
+
+    clanElixirQuest
+    clanMerchantQuest
 }
 
 apply_event() {

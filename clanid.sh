@@ -46,7 +46,6 @@ check_leader() {
 }
 
 clan_statue() {
-    clan_id  # Retrieve the current clan ID
     check_leader
     if [ -n "$CLD" ] && [ "$is_leader" == true ]; then  # Proceed only if CLD is set (indicating a valid clan)
         echo -e "${GOLD_BLACK}Clan Statue Check 🗿${COLOR_RESET}"
@@ -98,4 +97,48 @@ clanDungeon() {
     done
     echo -e "${GREEN_BLACK}Clan Dungeon ✅${COLOR_RESET}\n"
   fi
+}
+
+clanElixirQuest() {
+  clanQuest 7
+
+  fetch_page "/lab/alchemy/"
+  
+  # Generate a random number between 1 and 4
+  i=$(shuf -i 1-4 -n 1)
+  
+  # Search for the potion-making link
+  click=$(grep -o -E "/$i/makePotion?r=[0-9]{8}" "$TMP"/SRC | sed -n '1p')
+  
+  # If a link is found, fetch the page to make the potion
+  if [ -n "$click" ]; then
+    fetch_page "/lab/alchemy/$click"
+    fetch_page "/lab/alchemy/$click"
+    sleep 1s
+    # Finalize the quest
+    clanQuest 7
+  fi
+  
+
+}
+
+clanMerchantQuest() {
+  clanQuest 8
+  # Fetch the coliseum merchant page
+  fetch_page "/coliseum/merchant/"
+
+  # Generate a random number between 1 and 2
+  i=$(shuf -i 1-2 -n 1)
+
+  # Search for the merchant-making link with reference to the lab
+  click=$(grep -o -E "/coliseum/merchant/$i/startMaking\\?r=[0-9]+&ref=lab" "$TMP"/SRC | sed -n '1p')
+
+  # If a link is found, fetch the page to start the merchant process
+  if [ -n "$click" ]; then
+    fetch_page "$click"
+    fetch_page "$click"
+    sleep 1s
+    clanQuest 8
+  fi
+  
 }

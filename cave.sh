@@ -109,7 +109,7 @@ cave_start() {
 }
 
 cave_routine() {
-    echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}\n"
+    echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}"
     #checkQuest 5
 
     # Fetch initial cave data using fetch_page
@@ -127,7 +127,8 @@ cave_routine() {
       else
         count=8
       fi
-      until [ "$RESULT" == "speedUp" ] && [ "$(date +%s)" -ge "$BREAK" ] && [ "$count" -ge 8 ]; do
+      echo " "
+      until [ "$RESULT" != "speedUp" ] && [ "$(date +%s)" -ge "$BREAK" ] && [ "$count" -ge 8 ]; do
         case $CAVE in
           (*gather* | *down* | *runaway* | *attack* | *speedUp*)
             # Fetch data based on the current cave action
