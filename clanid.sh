@@ -80,3 +80,22 @@ clan_statue() {
         echo -e "${GREEN_BLACK}Clan Statue ✅${COLOR_RESET}\n"
     fi
 }
+
+clanDungeon() {
+  #clan_id
+  if [ -n "$CLD" ]; then
+  echo -e "${GOLD_BLACK}Checking clan dungeon 👹${COLOR_RESET}"
+    fetch_page "/clandungeon/?close"
+    local CLANDUNGEON
+    CLANDUNGEON=$(grep -o -E '/clandungeon/(attack/[?][r][=][0-9]+|[?]close)' "$TMP"/SRC | head -n 1)
+    local BREAK=$(($(date +%s) + 60))
+    until [ -z "$CLANDUNGEON" ] || [ $(date +%s) -ge "$BREAK" ]; do
+      fetch_page "${CLANDUNGEON}"
+      local count 
+      count=$((count + 1))
+      echo " ⚔ Atack $count"
+      local CLANDUNGEON=$(grep -o -E '/clandungeon/(attack/[?][r][=][0-9]+|[?]close)' "$TMP"/SRC | head -n 1)
+    done
+    echo -e "${GREEN_BLACK}Clan Dungeon ✅${COLOR_RESET}\n"
+  fi
+}
