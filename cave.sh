@@ -132,7 +132,7 @@ cave_routine() {
       echo " "
       until [ "$RESULT" == "speedUp" ] && [ "$(date +%s)" -ge "$BREAK" ] && [ "$count" -ge 8 ]; do
         case $CAVE in
-          (*gather* | *down* | *runaway* | *attack* | *speedUp*)
+          (*gather* | *down* | *runaway* | *attack*)
             # Fetch data based on the current cave action
             fetch_page "$CAVE"
             #$NOWHP
@@ -162,9 +162,13 @@ cave_routine() {
 
             # Update CAVE with the new action
             CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
-            #;;
-            #(*speedUp*)
-            #  break
+            ;;
+            (*speedUp*)
+              if [ "$count" -ge 8 ]; then
+                break
+              fi
+              fetch_page "$CAVE"
+              tput cuu1; tput el; echo " Speed up mining ⚡"
             ;;
         esac
       done

@@ -15,72 +15,70 @@ fetch_available_fights() {
 }
 
 league_play() {
-    echo -e "${GOLD_BLACK}League ⚔️${COLOR_RESET}"
+  echo -e "${GOLD_BLACK}League ⚔️${COLOR_RESET}"
 
-    # Obtém a força do jogador
-    PLAYER_STRENGTH=$(player_stats)
+  # Assuming you have a way to get the player's strength
+  PLAYER_STRENGTH=$(player_stats)  # Call your existing player_stats function
 
-    # Busca lutas disponíveis antes de iniciar o loop
-    fetch_available_fights
+  # Loop to click the first fight button 5 times
+  for i in {1..5}; do
+    # Fetch the league page
+    fetch_page "/league/"
 
-    # Verifica se lutas disponíveis foi encontrado
-    if [[ -z "$AVAILABLE_FIGHTS" ]]; then
-        echo "Nenhuma luta disponível encontrada."
-        return  # Sai da função se não houver lutas disponíveis
-    fi
+    # Calculate indices for the current enemy's stats
+    INDEX=$(( (i - 1) * 4 ))  # Calculate the starting index for each enemy (0-based)
 
-    # Loop until there are no available fights left
-    while (( AVAILABLE_FIGHTS > 0 )); do
-        # Fetch the league page
-        fetch_page "/league/"
+    # Extracting enemy stats using grep and sed
+    E_STRENGTH=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 1))s/: //p" | tr -d '()' | tr -d ' ')  # 1st stat
+    E_HEALTH=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 2))s/: //p" | tr -d '()' | tr -d ' ')   # 2nd stat
+    E_AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 3))s/: //p" | tr -d '()' | tr -d ' ')  # 3rd stat
+    E_PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 4))s/: //p" | tr -d '()' | tr -d ' ') # 4th stat
 
-        # Calculate indices for the current enemy's stats
-        INDEX=$(( (5 - 1) * 4 ))  # Calculate the starting index for each enemy (0-based)
+    # Extract the fight button for the current enemy
+    click=$(grep -o -E '/league/fight/[0-9]+/\?r=[0-9]+' "$TMP"/SRC | sed -n "${i}p")  # Get the i-th fight button
+    ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]+' | head -n 1)
 
-        # Extracting enemy stats using grep and sed
-        E_STRENGTH=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 1))s/: //p" | tr -d '()' | tr -d ' ')
-        #E_HEALTH=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 2))s/: //p" | tr -d '()' | tr -d ' ')
-        #E_AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 3))s/: //p" | tr -d '()' | tr -d ' ')
-        #E_PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 4))s/: //p" | tr -d '()' | tr -d ' ')
+    # Print enemy stats along with the enemy number
+    echo -e "Enemy Number: $ENEMY_NUMBER"
+    echo -e "Enemy Stats:\n"
+    echo -e "${E_STRENGTH:-0}"  # Default to 0 if empty
+    echo -e "${E_HEALTH:-0}"      # Default to 0 if empty
+    echo -e "${E_AGILITY:-0}"    # Default to 0 if empty
+    echo -e "${E_PROTECTION:-0}"  # Default to 0 if empty
 
-        # Extract the fight button for the current enemy
-        click=$(grep -o -E '/league/fight/[0-9]+/\?r=[0-9]+' "$TMP"/SRC | sed -n "1p")  # Get the first fight button
-        ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]+' | head -n 1)
+    # Ensure all values are integers before comparing
+    E_STRENGTH=${E_STRENGTH:-0}
+    E_HEALTH=${E_HEALTH:-0}
+    E_AGILITY=${E_AGILITY:-0}
+    E_PROTECTION=${E_PROTECTION:-0}
+    echo " --- "
+    PLAYER_STRENGTH=$(echo "$PLAYER_STRENGTH" | xargs)
+    E_STRENGTH=$(echo "$E_STRENGTH" | xargs)
 
-        # Ensure all values are integers before comparing
-        E_STRENGTH=${E_STRENGTH:-0}
-        PLAYER_STRENGTH=$(echo "$PLAYER_STRENGTH" | xargs)
-        E_STRENGTH=$(echo "$E_STRENGTH" | xargs)
+    # Check if a fight button was found
+    if [ -n "$click" ]; then
+      echo "Found fight button: $URL$click"
 
-        # Check if a fight button was found
-        if [ -n "$click" ]; then
-            echo "Found fight button: $URL$click"
-
-            # Check if PLAYER_STRENGTH is a valid integer
-            if [[ "$PLAYER_STRENGTH" =~ ^[0-9]+$ ]] && [[ "$E_STRENGTH" =~ ^[0-9]+$ ]]; then
-                # Compare player's strength with enemy's strength using -gt
-                if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
-                    echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
-                    echo "Fight initiated with enemy number $ENEMY_NUMBER ✅"
-                    fetch_page "$click"
-
-                    # Decrement available fights
-                    (( AVAILABLE_FIGHTS-- ))
-                else
-                    echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
-                    (( AVAILABLE_FIGHTS-- ))  # Also decrement fights even if the attack didn't happen
-                fi
-            else
-                echo "Invalid player strength or enemy strength. Skipping to next enemy."
-                (( AVAILABLE_FIGHTS-- ))
-            fi
+      # Check if PLAYER_STRENGTH is a valid integer
+      if [[ "$PLAYER_STRENGTH" =~ ^[0-9]+$ ]] && [[ "$E_STRENGTH" =~ ^[0-9]+$ ]]; then
+        # Compare player's strength with enemy's strength using -gt
+        if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
+            echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
+            echo "Fight $i initiated with enemy number $ENEMY_NUMBER ✅"
+            fetch_page "$click"
         else
-            echo "No fight buttons found. Exiting loop."
-            break
+            echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
+        continue
         fi
-    done
+      else
+      echo "DEBUG: Invalid values - Player Strength: '$PLAYER_STRENGTH', Enemy Strength: '$E_STRENGTH'"
+    fi
+      echo "No fight buttons found on attempt $i ❌"
+      break
+    fi
+  done
 
-    echo -e "${GREEN_BLACK}League Routine Completed ✅${COLOR_RESET}\n"
+  echo -e "${GREEN_BLACK}League Routine Completed ✅${COLOR_RESET}\n"
 }
 
 # https://furiadetitas.net/league/takeReward/?r=52027565# Calculate indices for the current enemy's stats
