@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 9 8 2 1 5 4 3 6 7"
     author="author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.6.15 (Beta)"
+    versionNum="3.6.16 (Beta)"
 for i in $colors; do
 clear
 printf "\033[1;38;5;${i}m
@@ -144,7 +144,7 @@ player_stats() {
 
     # Extracting stats using grep and sed
     STRENGTH=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '1s/: //p')
-    HEALTH=$(grep -o -E '\(([0-9]+)\)' "$TMP"/TRAIN | sed '2s/: //p')
+    HEALTH=$(grep -o -E '\(([0-9]+)\)' "$TMP"/TRAIN | sed -n 's/[()]//gp' | sed -n '2p')
     AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '3s/: //p')
     PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '4s/: //p')
     #ENERGY=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '5s/: //p')

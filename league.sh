@@ -13,10 +13,10 @@ league_play() {
     INDEX=$(( (i - 1) * 4 ))  # Calculate the starting index for each enemy (0-based)
 
     # Extracting enemy stats using grep and sed
-    E_STRENGTH=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 1))s/: //p")  # 1st stat
-    E_HEALTH=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 2))s/: //p")   # 2nd stat
-    E_AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 3))s/: //p")  # 3rd stat
-    E_PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 4))s/: //p") # 4th stat
+    E_STRENGTH=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 1))s/: //p" | tr -d '()' | tr -d ' ')  # 1st stat
+    E_HEALTH=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 2))s/: //p" | tr -d '()' | tr -d ' ')   # 2nd stat
+    E_AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 3))s/: //p" | tr -d '()' | tr -d ' ')  # 3rd stat
+    E_PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 4))s/: //p" | tr -d '()' | tr -d ' ') # 4th stat
 
     # Extract the fight button for the current enemy
     click=$(grep -o -E '/league/fight/[0-9]+/\?r=[0-9]+' "$TMP"/SRC | sed -n "${i}p")  # Get the i-th fight button
@@ -25,25 +25,36 @@ league_play() {
     # Print enemy stats along with the enemy number
     echo -e "Enemy Number: $ENEMY_NUMBER"
     echo -e "Enemy Stats:\n"
-    echo -e "Strength: $E_STRENGTH"
-    echo -e "Health: $E_HEALTH"
-    echo -e "Agility: $E_AGILITY"
-    echo -e "Protection: $E_PROTECTION"
+    echo -e "Strength: ${E_STRENGTH:-0}"  # Default to 0 if empty
+    echo -e "Health: ${E_HEALTH:-0}"      # Default to 0 if empty
+    echo -e "Agility: ${E_AGILITY:-0}"    # Default to 0 if empty
+    echo -e "Protection: ${E_PROTECTION:-0}"  # Default to 0 if empty
+
+    # Ensure all values are integers before comparing
+    E_STRENGTH=${E_STRENGTH:-0}
+    E_HEALTH=${E_HEALTH:-0}
+    E_AGILITY=${E_AGILITY:-0}
+    E_PROTECTION=${E_PROTECTION:-0}
 
     # Check if a fight button was found
     if [ -n "$click" ]; then
       echo "Found fight button: $URL$click"
 
-      # Compare player's strength with enemy's strength using -gt
-      if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
-        echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
-        echo "Fight $i initiated with enemy number $ENEMY_NUMBER ✅"
+      # Check if PLAYER_STRENGTH is a valid integer
+      if [[ "$PLAYER_STRENGTH" =~ ^[0-9]+$ ]] && [[ "$E_STRENGTH" =~ ^[0-9]+$ ]]; then
+        # Compare player's strength with enemy's strength using -gt
+        if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
+          echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
+          echo "Fight $i initiated with enemy number $ENEMY_NUMBER ✅"
 
-        # Click the first fight button (fetch the page)
-        fetch_page "$click"
+          # Click the first fight button (fetch the page)
+          fetch_page "$click"
+        else
+          echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
+          continue  # Move to the next iteration without clicking the fight button
+        fi
       else
-        echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
-        continue  # Move to the next iteration without clicking the fight button
+        echo "Invalid player strength or enemy strength. Skipping to next enemy."
       fi
     else
       echo "No fight buttons found on attempt $i ❌"
