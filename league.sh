@@ -35,6 +35,16 @@ league_play() {
     E_HEALTH=${E_HEALTH:-0}
     E_AGILITY=${E_AGILITY:-0}
     E_PROTECTION=${E_PROTECTION:-0}
+    echo " --- "
+    PLAYER_STRENGTH=$(echo "$PLAYER_STRENGTH" | xargs)
+    E_STRENGTH=$(echo "$E_STRENGTH" | xargs)
+    if ! [[ "$PLAYER_STRENGTH" =~ ^[0-9]+$ ]]; then
+    echo "Error: Player strength is not a valid number."
+    fi
+    if ! [[ "$E_STRENGTH" =~ ^[0-9]+$ ]]; then
+    echo "Error: Enemy strength is not a valid number."
+fi
+echo " --- "
 
     # Check if a fight button was found
     if [ -n "$click" ]; then
@@ -44,19 +54,17 @@ league_play() {
       if [[ "$PLAYER_STRENGTH" =~ ^[0-9]+$ ]] && [[ "$E_STRENGTH" =~ ^[0-9]+$ ]]; then
         # Compare player's strength with enemy's strength using -gt
         if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
-          echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
-          echo "Fight $i initiated with enemy number $ENEMY_NUMBER ✅"
-
-          # Click the first fight button (fetch the page)
-          fetch_page "$click"
+            echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
+            echo "Fight $i initiated with enemy number $ENEMY_NUMBER ✅"
+            fetch_page "$click"
         else
-          echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
-          continue  # Move to the next iteration without clicking the fight button
+            echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
+        continue
         fi
       else
-        echo "Invalid player strength or enemy strength. Skipping to next enemy."
-      fi
-    else
+      echo "Invalid player strength or enemy strength. Skipping to next enemy."
+      echo "DEBUG: Invalid values - Player Strength: '$PLAYER_STRENGTH', Enemy Strength: '$E_STRENGTH'"
+    fi
       echo "No fight buttons found on attempt $i ❌"
       break
     fi
