@@ -5,8 +5,8 @@ fetch_available_fights() {
     if [ -f "$TMP/LEAGUE_DEBUG_SRC" ]; then
         echo "Procurando número de lutas disponíveis..."
         
-        # Captura o número de lutas disponíveis após o <img> e dentro da tag <b>
-        AVAILABLE_FIGHTS=$(grep -oP '<img src=[^>]+>\s*<b>\K[0-9]+' "$TMP/LEAGUE_DEBUG_SRC" | head -n 1)
+        # Removendo tudo antes de "<b>" e depois do número
+        AVAILABLE_FIGHTS=$(sed -n 's/.*<b>\([0-9]\+\)<\/b>.*/\1/p' "$TMP/LEAGUE_DEBUG_SRC" | head -n 1)
     else
         echo "O arquivo LEAGUE_DEBUG_SRC não foi encontrado."
         AVAILABLE_FIGHTS=0  # Define como 0 se o arquivo não for encontrado
@@ -34,7 +34,7 @@ league_play() {
         fetch_page "/league/"
 
         # Calculate indices for the current enemy's stats
-        INDEX=$(( (5 - AVAILABLE_FIGHTS) * 4 ))  # Calculate the starting index for each enemy (0-based)
+        INDEX=$(( (5 - 1) * 4 ))  # Calculate the starting index for each enemy (0-based)
 
         # Extracting enemy stats using grep and sed
         E_STRENGTH=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 1))s/: //p" | tr -d '()' | tr -d ' ')
@@ -82,4 +82,4 @@ league_play() {
     echo -e "${GREEN_BLACK}League Routine Completed ✅${COLOR_RESET}\n"
 }
 
-# https://furiadetitas.net/league/takeReward/?r=52027565
+# https://furiadetitas.net/league/takeReward/?r=52027565# Calculate indices for the current enemy's stats
