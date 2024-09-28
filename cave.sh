@@ -111,13 +111,13 @@ cave_start() {
 cave_routine() {
   echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}"
 
-  # Checking for available quests
+  # Initialize count based on available quests
   if checkQuest 5; then
     count=0
     echo "Quests available speeding up mine to complete!"
   else
     count=8
-    #echo "No quests available at the moment"
+    echo "No quests available, running default actions."
   fi
 
   # Fetch initial cave data
@@ -129,11 +129,11 @@ cave_routine() {
     # Get the first cave action
     local CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
     local BREAK=$(($(date +%s) + 5))  # Break timestamp
-    RESULT=$(echo "$CAVE" | cut -d'/' -f3)
-    
+    local RESULT=$(echo "$CAVE" | cut -d'/' -f3)
+
     echo " "
-    
-    # Simplify the loop logic
+
+    # Loop until the conditions are met
     until [ "$RESULT" != "speedUp" ] || [ "$count" -ge 8 ]; do
       case $CAVE in
         (*gather* | *down* | *runaway* | *attack*)
@@ -165,18 +165,22 @@ cave_routine() {
           fetch_page "/cave/"
           CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
           ;;
+
         (*speedUp*)
           # Handling for speedUp separately
           if [ "$count" -ge 8 ]; then
+            echo "Max speedUp attempts reached."
             break
           fi
           fetch_page "$CAVE"
           tput cuu1; tput el; echo " Speed up mining ⚡"
           ;;
       esac
-      checkQuest 5
+      checkQuest 5  # Keep checking for quests
     done    
+  else
+    echo "No available actions in the cave."
   fi
+
   echo -e "${GREEN_BLACK}Cave Done ✅${COLOR_RESET}\n"
 }
-

@@ -130,6 +130,8 @@ process_enemy() {
                 fi
             else
                 echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
+                # Continue to the next iteration of the loop
+                return  # Simply return here to go back to the calling function without exiting the loop
             fi
         else
             echo "DEBUG: Invalid values - Player Strength: '$PLAYER_STRENGTH', Enemy Strength: '$E_STRENGTH'"
