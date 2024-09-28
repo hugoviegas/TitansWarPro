@@ -1,17 +1,11 @@
 check_missions() {
     echo -e "${GOLD_BLACK}Checking Missions 📜${COLOR_RESET}"
-
-    # Fetch the quest page and relic rewards once
-    fetch_page "/quest/"
-    quest_page="$TMP/SRC"  # Store the fetched quest page content
-    fetch_page "/relic/reward/"
-    relic_page="$TMP/SRC"  # Store the fetched relic page content
-    fetch_page "/collector/"
-    collector_page="$TMP/SRC"  # Store the fetched collector page content
-
     # Open chests for the first two chests
+    fetch_page "/quest/"
     for i in {1..2}; do
-        if click=$(grep -o -E "/quest/openChest/$i/[?]r=[0-9]+" "$quest_page" | head -n1); then
+    local click
+    click=$(grep -o -E "/quest/openChest/$i/[?]r=[0-9]+" "$TMP/SRC" | head -n1)
+        if [ -n "$click" ]; then
             fetch_page "$click"  # Fetch the chest opening URL
             echo -e "${GREEN_BLACK}Chest $i opened ✅${COLOR_RESET}"
         fi
@@ -19,7 +13,9 @@ check_missions() {
 
     # Collect completed quests
     for i in {0..15}; do
-        if click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$quest_page" | sed -n '1p'); then
+    local click
+    click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p')
+        if [ -n "$click" ]; then
             fetch_page "$click"  # Fetch the mission completion URL
             MISSION_NUMBER=$(echo "$click" | cut -d'/' -f5 | cut -d'?' -f1)
             echo -e "${GREEN_BLACK} Mission [$MISSION_NUMBER] Completed ✅${COLOR_RESET}"
@@ -27,15 +23,19 @@ check_missions() {
     done
 
     # Collect rewards from relics
+    fetch_page "/relic/reward/"
     for i in {0..11}; do
-        if click=$(grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$relic_page"); then
+    local click
+    click=$(grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP/SRC")
+        if [ -n "$click" ]; then
             fetch_page "$click"  # Fetch the relic reward URL
             echo -e " ${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}"
         fi
     done
 
     # Collect collections from the collector page
-    if click=$(grep -o -E "/collector/reward/element/[?]r=[0-9]+" "$collector_page"); then
+    fetch_page "/collector/"
+    if click=$(grep -o -E "/collector/reward/element/[?]r=[0-9]+" "$TMP/SRC"); then
         fetch_page "$click"  # Fetch the collection reward URL
         echo -e "${GREEN_BLACK}Collection collected ✅${COLOR_RESET}\n"
     fi

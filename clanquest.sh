@@ -1,7 +1,6 @@
 checkQuest() {
   quest_id="$*"
-  clan_id
-
+  #clan_id
   if [ -n "${CLD}" ]; then
     fetch_page "/clan/${CLD}/quest/"
     

@@ -2,7 +2,7 @@ clan_id() {
   cd "$TMP" || exit
   #/Executa o comando especificado no SOURCE com a URL do clã e um userAgent.txt aleatório
   (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > CLD
+    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$TMP"/CLD
   ) </dev/null &>/dev/null &
   time_exit 20
   
