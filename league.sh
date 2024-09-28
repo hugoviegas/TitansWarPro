@@ -1,8 +1,8 @@
 league_play() {
   echo -e "${GOLD_BLACK}League ⚔️${COLOR_RESET}"
   # Fetch the webpage and save it to SRC
-  fetch_page "/league"
-  fetch_debug_page "/league" "$TMP/debug_league.txt"
+  fetch_page "/league/"
+  fetch_debug_page "/league/" "$TMP/debug_league.txt"
 
   #FPATK=$(grep -o -E "alt='str'/> Força: [0-9]+" "$TMP/SRC" | sed -n '1p') >> league_players
   #echo -e "$FPATK"

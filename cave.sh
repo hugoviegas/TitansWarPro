@@ -1,4 +1,5 @@
 # shellcheck disable=SC2148
+# shellcheck disable=SC2155
 cave_start() {
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
@@ -109,18 +110,23 @@ cave_start() {
 
 cave_routine() {
     echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}\n"
-    checkQuest 5
+    #checkQuest 5
 
     # Fetch initial cave data using fetch_page
     fetch_page "/cave/"
     
     # Check for available actions in the cave
     if grep -q -o -E '/cave/(attack|gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
+      
       local CAVE=$(grep -o -E '/cave/(gather|down|runaway|attack|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
       local BREAK=$(($(date +%s) + 5))
       RESULT=$(echo "$CAVE" | cut -d'/' -f3)
-
-      until [ "$RESULT" != "speedUp" ] && [ "$(date +%s)" -ge "$BREAK" ]; do
+      if checkQuest 5; then
+        count=0
+      else
+        count=8
+      fi
+      until [ "$RESULT" != "speedUp" ] && [ "$(date +%s)" -ge "$BREAK" ] && [ "$count" -ge 8 ]; do
         case $CAVE in
           (*gather* | *down* | *runaway* | *attack*)
             # Fetch data based on the current cave action
@@ -132,6 +138,7 @@ cave_routine() {
             case $RESULT in
               *down*) 
                 tput cuu1; tput el; echo " New search 🔍"
+                ((count++))  # Increment count by 1
                 ;;
               *gather*) 
                 tput cuu1; tput el; echo " Start mining ⛏️"
