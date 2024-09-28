@@ -1,30 +1,17 @@
 league_play() {
-(
-  w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
-) </dev/null &>/dev/null &
-time_exit 20
-#if grep -q -o -E '/league/[?]quest_t[=]quest&quest_id[=]7&qz[=][a-z0-9]+' $TMP/SRC; then
   echo -e "${GOLD_BLACK}League ⚔️${COLOR_RESET}"
-  #for num in $(seq 5 -1 1); do
-    # Define input and output files
-    #input_file="$TMP/league_file"
-    #output_file="$TMP/cleaned_league_file"
+  # Fetch the webpage and save it to SRC
+  fetch_page "/league"
+  fetch_debug_page "/league" "$TMP/debug_league.txt"
 
-    # Fetch the webpage and save it to SRC
-  (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/league/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >"$TMP/SRC"
-  ) </dev/null &>/dev/null &
-  time_exit 20
-
-  FPATK=$(grep -o -E "alt='str'/> Força: [0-9]+" "$TMP/SRC" | sed -n '1p') >> league_players
-  echo -e "$FPATK"
+  #FPATK=$(grep -o -E "alt='str'/> Força: [0-9]+" "$TMP/SRC" | sed -n '1p') >> league_players
+  #echo -e "$FPATK"
   # Extract the first occurrence of the desired pattern
   ATK=$(grep -o -E '/league/fight/[0-9]{1,4}/[?]r=[0-9]+' "$TMP/SRC" | sed -n '1p')
   echo -e "$ATK"
 
-    #done
-    echo -e "${GREEN_BLACK}League ✅${COLOR_RESET}\n"
-  #fi
+  #done
+  echo -e "${GREEN_BLACK}League ✅${COLOR_RESET}\n"
 }
 
 league_test() {

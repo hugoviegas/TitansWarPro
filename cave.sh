@@ -109,7 +109,7 @@ cave_start() {
 
 cave_routine() {
     echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}\n"
-    #checkQuest 5
+    checkQuest 5
 
     # Fetch initial cave data using fetch_page
     fetch_page "/cave/"
@@ -155,7 +155,7 @@ cave_routine() {
               ;;
         esac
       done
-        #checkQuest 5
+      checkQuest 5
     fi
   echo -e "${GREEN_BLACK}Cave Done ✅${COLOR_RESET}\n"
 }

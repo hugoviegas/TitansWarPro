@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 9 8 2 1 5 4 3 6 7"
     author="author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.6.5 (Beta)"
+    versionNum="3.6.6 (Beta)"
 for i in $colors; do
 clear
 printf "\033[1;38;5;${i}m
@@ -45,7 +45,7 @@ printf "\033[1;38;5;${i}m
 ██║ █╗ ██║███████║██████╔╝  
 ██║███╗██║██╔══██║██╔══██╗  
 ╚███╔███╔╝██║  ██║██║  ██║  
-╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝  
+ ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝  
 
 ██████╗ ██████╗  ██████╗ 
 ██╔══██╗██╔══██╗██╔═══██╗    
