@@ -51,7 +51,7 @@ league_play() {
         fetch_page "/league/"
 
         # Calculate indices for the current enemy's stats
-        for (( i = 1; i <= AVAILABLE_FIGHTS; i++ )); do
+        for (( i = AVAILABLE_FIGHTS; i >= 0; i-- )); do
             # Using the function to extract enemy stats
             INDEX=$(( (i - 1) * 4 ))  # Calculate the starting index for each enemy (0-based)
             E_STRENGTH=$(get_enemy_stat "$INDEX" 1)  # 1st stat
@@ -89,6 +89,7 @@ league_play() {
                     if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
                         echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
                         echo "Fight $i initiated with enemy number $ENEMY_NUMBER ✅"
+                        fetch_page "$click"
 
                         # After the fight, update the available fights
                         fetch_available_fights

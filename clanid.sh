@@ -118,8 +118,6 @@ clanElixirQuest() {
       # Finalize the quest
       clanQuest 7
     fi
-  else
-    echo "No quests available at the moment"
   fi
   
 }
@@ -143,7 +141,5 @@ clanMerchantQuest() {
       sleep 1s
       clanQuest 8
     fi
-  else
-    echo "No quests available at the moment"
   fi
 }
