@@ -5,6 +5,7 @@ checkQuest() {
     fetch_page "/clan/${CLD}/quest/"
     fetch_page "/clan/${CLD}/quest/" "$TMP/debug_output.txt"
     click=$(grep -o -E "/quest/(take|help|deleteHelp|end)/$quest_id/\?r=[0-9]{8}" "$TMP"/SRC | sed -n '1p')
+    echo "DEBUG CLICK: $click"
     
     # find click button
     if [ -n "$click" ]; then
@@ -18,5 +19,6 @@ checkQuest() {
     fi
   else
     fetch_page "/clanrating/wantedToClan"
+    echo " Quest ID: $quest_id not ready. 🔎"
   fi
 }

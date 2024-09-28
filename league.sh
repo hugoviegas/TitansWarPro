@@ -1,5 +1,5 @@
 fetch_available_fights() {
-    fetch_page "/league/"
+    fetch_page "/league/" "LEAGUE_DEBUG_SRC"
     
     # Verifica se o arquivo foi criado
     if [ -f "$TMP/LEAGUE_DEBUG_SRC" ]; then
@@ -7,7 +7,7 @@ fetch_available_fights() {
         
         # Removendo tudo antes de "<b>" e depois do número
         AVAILABLE_FIGHTS=$(grep -o -E ': [0-9]+' "$TMP/LEAGUE_DEBUG_SRC" | sed -n '1s/: //p' | tr -d '()' | tr -d ' ')
-        echo "DEBUG: Fights: $AVAILABLE_FIGHTS"
+        echo "Fights left: $AVAILABLE_FIGHTS"
     else
         echo "O arquivo LEAGUE_DEBUG_SRC não foi encontrado."
         AVAILABLE_FIGHTS=0  # Define como 0 se o arquivo não for encontrado

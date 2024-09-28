@@ -111,7 +111,13 @@ cave_start() {
 cave_routine() {
     echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}"
     #checkQuest 5
-
+    if checkQuest 5; then
+      count=0
+      echo "Quests available speeding up mine to complete!"
+    else
+      count=8
+      echo "No quests available at the moment"
+    fi
     # Fetch initial cave data using fetch_page
     fetch_page "/cave/"
     #$NOWHP
@@ -122,13 +128,7 @@ cave_routine() {
       local CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
       local BREAK=$(($(date +%s) + 5))
       RESULT=$(echo "$CAVE" | cut -d'/' -f3)
-      if checkQuest 5; then
-        count=0
-        echo "Quests available speeding up mine to complete!"
-      else
-        count=8
-        echo "No quests available at the moment"
-      fi
+      
       echo " "
       until [ "$RESULT" == "speedUp" ] && [ "$(date +%s)" -ge "$BREAK" ] && [ "$count" -ge 8 ]; do
         case $CAVE in
