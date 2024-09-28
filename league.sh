@@ -1,17 +1,30 @@
 league_play() {
   echo -e "${GOLD_BLACK}League ⚔️${COLOR_RESET}"
-  # Fetch the webpage and save it to SRC
-  fetch_page "/league/"
-  fetch_debug_page "/league/" "$TMP/debug_league.txt"
+  # Fetch the league page
+    fetch_page "/league/"
 
-  #FPATK=$(grep -o -E "alt='str'/> Força: [0-9]+" "$TMP/SRC" | sed -n '1p') >> league_players
-  #echo -e "$FPATK"
-  # Extract the first occurrence of the desired pattern
-  ATK=$(grep -o -E '/league/fight/[0-9]{1,4}/[?]r=[0-9]+' "$TMP/SRC" | sed -n '1p')
-  echo -e "$ATK"
+    # Loop to click the first fight button 5 times
+    for i in {1..5}; do
+        # Extract the first available fight button
+        click=$(grep -o -E '/league/fight/[0-9]+/\?r=[0-9]+' "$TMP"/SRC | sed -n '1p')
 
-  #done
-  echo -e "${GREEN_BLACK}League ✅${COLOR_RESET}\n"
+        # Check if a fight button was found
+        if [ -n "$click" ]; then
+            echo "Found fight button: $URL$click"
+
+            # Click the first fight button (fetch the page)
+            fetch_page "$click"
+            echo "Fight $i initiated with player $(echo "$click" | cut -d'/' -f4) ✅"
+
+            # Fetch the updated league page for the next round
+            fetch_page "/league/"
+        else
+            echo "No fight buttons found on attempt $i ❌"
+            break
+        fi
+    done
+
+    echo -e "${GREEN_BLACK}League Routine Completed ✅${COLOR_RESET}\n"
 }
 
 league_test() {

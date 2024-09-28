@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 9 8 2 1 5 4 3 6 7"
     author="author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.6.11 (Beta)"
+    versionNum="3.6.12 (Beta)"
 for i in $colors; do
 clear
 printf "\033[1;38;5;${i}m
@@ -137,4 +137,25 @@ messages_info() {
      echo -e "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}" >>"$TMP"/msg_file
      # sed :a;N;s/\n//g;ta |
      echo -e "${GREENb_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' "$TMP"/info_file | sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}" >>"$TMP"/msg_file
+}
+
+player_stats() {
+    fetch_page "/train"
+
+    # Extracting stats using grep and sed
+    HEALTH=$(grep -o -E '\(([0-9]+)\)' "$TMP"/TRAIN | sed 's/[()]//g')
+    STRENGTH=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '1s/: //p')
+    AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '3s/: //p')
+    PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '4s/: //p')
+    ENERGY=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '5s/: //p')
+
+    # Print all the stats
+    echo -e "Player Stats:\n"
+    echo -e "Health: $HEALTH"
+    echo -e "Strength: $STRENGTH"
+    echo -e "Agility: $AGILITY"
+    echo -e "Protection: $PROTECTION"
+    echo -e "Energy: $ENERGY"
+
+    sleep 30s
 }
