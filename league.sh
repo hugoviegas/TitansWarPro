@@ -3,7 +3,7 @@ fetch_available_fights() {
     
     # Verifica se o arquivo foi criado
     if [ -f "$TMP/LEAGUE_DEBUG_SRC" ]; then
-        echo "Procurando número de lutas disponíveis..."
+        echo " Looking for available fights..."
         
         # Removendo tudo antes de "<b>" e depois do número
         AVAILABLE_FIGHTS=$(grep -o -E '<b>[0-5]</b>' "$TMP/LEAGUE_DEBUG_SRC" | head -n 1 | sed -n 's/.*<b>\([0-5]\)<\/b>.*/\1/p')
@@ -46,7 +46,7 @@ league_play() {
     fetch_available_fights
 
     # Loop based on available fights
-    while (( AVAILABLE_FIGHTS > 0 )); do
+    while (( AVAILABLE_FIGHTS >= 1 )); do
         # Fetch the league page
         fetch_page "/league/"
 
@@ -65,7 +65,6 @@ league_play() {
             echo -e "${E_HEALTH:-0}"
             echo -e "${E_AGILITY:-0}"
             echo -e "${E_PROTECTION:-0}"
-            echo " --- "
 
             # Ensure all values are integers before comparing
             E_STRENGTH=${E_STRENGTH:-0}
@@ -82,7 +81,7 @@ league_play() {
 
             # Check if a fight button was found
             if [ -n "$click" ]; then
-                echo "Found fight button: $URL$click"
+                # echo "Found fight button: $URL$click"
 
                 # Check if PLAYER_STRENGTH is a valid integer
                 if [[ "$PLAYER_STRENGTH" =~ ^[0-9]+$ ]] && [[ "$E_STRENGTH" =~ ^[0-9]+$ ]]; then
@@ -90,7 +89,6 @@ league_play() {
                     if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
                         echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
                         echo "Fight $i initiated with enemy number $ENEMY_NUMBER ✅"
-                        fetch_page "$click"
 
                         # After the fight, update the available fights
                         fetch_available_fights
