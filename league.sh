@@ -6,7 +6,8 @@ fetch_available_fights() {
         echo "Procurando número de lutas disponíveis..."
         
         # Removendo tudo antes de "<b>" e depois do número
-        AVAILABLE_FIGHTS=$(sed -n 's/.*<b>\([0-9]\+\)<\/b>.*/\1/p' "$TMP/LEAGUE_DEBUG_SRC" | head -n 1)
+        AVAILABLE_FIGHTS=$(grep -o -E ': [0-9]+' "$TMP/LEAGUE_DEBUG_SRC" | sed -n '1s/: //p' | tr -d '()' | tr -d ' ')
+        echo "DEBUG: Fights: $AVAILABLE_FIGHTS"
     else
         echo "O arquivo LEAGUE_DEBUG_SRC não foi encontrado."
         AVAILABLE_FIGHTS=0  # Define como 0 se o arquivo não for encontrado
