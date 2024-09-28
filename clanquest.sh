@@ -3,8 +3,7 @@ checkQuest() {
   #clan_id
   if [ -n "${CLD}" ]; then
     fetch_page "/clan/${CLD}/quest/"
-    
-    fetch_debug_page "/clan/${CLD}/quest/" "$TMP/debug_output.txt"
+    fetch_page "/clan/${CLD}/quest/" "$TMP/debug_output.txt"
     click=$(grep -o -E "/quest/(take|help|deleteHelp|end)/$quest_id/\?r=[0-9]{8}" "$TMP"/SRC | sed -n '1p')
     
     # find click button
