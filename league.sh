@@ -86,7 +86,7 @@ league_play() {
             #echo "$k"
             # Comparar a força do jogador com a do inimigo
             if [[ "$PLAYER_STRENGTH" =~ ^[0-9]+$ ]] && [[ "$E_STRENGTH" =~ ^[0-9]+$ ]] && [[ "$k" -ge 1 ]]; then
-            while [ "$PLAYER_STRENGTH" -lt "$E_STRENGTH" ] || [ "$i" -ge 4 ]; do
+            
                 if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
 
                     echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
@@ -97,7 +97,7 @@ league_play() {
                     echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
                     # Incrementar o índice para o próximo inimigo
                     #local i=0
-
+                    while [ "$PLAYER_STRENGTH" -lt "$E_STRENGTH" ] || [ "$i" -ge 4 ]; do
                         fetch_page "/league/"
                         j=$((j + 2))
                         ((i++))
@@ -117,15 +117,19 @@ league_play() {
                         echo -e "Enemy Stats:"
                         echo -e "  Strength:   ${E_STRENGTH:-0}"
 
-                        echo "${URL}$click"
+                        if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
+
+                        echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
+                        echo "Fight $j initiated with enemy number $ENEMY_NUMBER ✅"
                         fetch_page "$click"
+                break
                         
                         sleep 1s
                         if [ $i -ge 4 ]; then
                             return 1 #exit from all loops
                         fi
+                    done
                 fi
-            done
             else
                 echo "DEBUG: Invalid values - Player Strength: '$PLAYER_STRENGTH', Enemy Strength: '$E_STRENGTH'"
             fi
