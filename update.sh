@@ -70,7 +70,7 @@ cd ~/twm || exit
 SCRIPTS="easyinstall.sh info.sh"
 
 # Remove any existing scripts in both home and current directories
-rm -rf "$HOME/$SCRIPTS" "$SCRIPTS" 2>/dev/null
+rm -rf "${HOME}*/$SCRIPTS" "$SCRIPTS" 2>/dev/null
 
 # Define the server URL based on selected version
 SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/${version}/"
