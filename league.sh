@@ -1,18 +1,32 @@
+fetch_available_fights() {
+    fetch_page "/league/"
+    
+    # Verifica se o arquivo foi criado e imprime seu conteúdo
+    if [ -f "$TMP/LEAGUE_DEBUG_SRC" ]; then
+        echo "Conteúdo do LEAGUE_DEBUG_SRC:"
+        cat "$TMP/LEAGUE_DEBUG_SRC"  # Imprime o conteúdo para depuração
+
+        # Captura o número de lutas disponíveis
+        AVAILABLE_FIGHTS=$(grep -o -E 'Lutas disponiveis:</b> *[0-9]+' "$TMP/LEAGUE_DEBUG_SRC" | grep -o -E '[0-9]+' | head -n 1)
+    else
+        echo "O arquivo LEAGUE_DEBUG_SRC não foi encontrado."
+        AVAILABLE_FIGHTS=0  # Define como 0 se o arquivo não for encontrado
+    fi
+}
+
 league_play() {
     echo -e "${GOLD_BLACK}League ⚔️${COLOR_RESET}"
 
-    # Get player's strength
+    # Obtém a força do jogador
     PLAYER_STRENGTH=$(player_stats)
 
-    ## Extract the number of available fights from the debug output, taking only the first result
-    AVAILABLE_FIGHTS=$(grep -o -E ':</b> [0-9]+' "$TMP/LEAGUE_DEBUG_SRC" | grep -o -E '[0-9]+' | head -n 1)
-    echo "AVAILABLE_FIGHTS: $AVAILABLE_FIGHTS"
+    # Busca lutas disponíveis antes de iniciar o loop
+    fetch_available_fights
 
-    # Print the result for debugging
-    if [[ -n "$AVAILABLE_FIGHTS" ]]; then
-        echo "Available Fights: $AVAILABLE_FIGHTS"
-    else
-        echo "No available fights found."
+    # Verifica se lutas disponíveis foi encontrado
+    if [[ -z "$AVAILABLE_FIGHTS" ]]; then
+        echo "Nenhuma luta disponível encontrada."
+        return  # Sai da função se não houver lutas disponíveis
     fi
 
     # Loop until there are no available fights left
@@ -25,9 +39,9 @@ league_play() {
 
         # Extracting enemy stats using grep and sed
         E_STRENGTH=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 1))s/: //p" | tr -d '()' | tr -d ' ')
-        E_HEALTH=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 2))s/: //p" | tr -d '()' | tr -d ' ')
-        E_AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 3))s/: //p" | tr -d '()' | tr -d ' ')
-        E_PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 4))s/: //p" | tr -d '()' | tr -d ' ')
+        #E_HEALTH=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 2))s/: //p" | tr -d '()' | tr -d ' ')
+        #E_AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 3))s/: //p" | tr -d '()' | tr -d ' ')
+        #E_PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 4))s/: //p" | tr -d '()' | tr -d ' ')
 
         # Extract the fight button for the current enemy
         click=$(grep -o -E '/league/fight/[0-9]+/\?r=[0-9]+' "$TMP"/SRC | sed -n "1p")  # Get the first fight button
