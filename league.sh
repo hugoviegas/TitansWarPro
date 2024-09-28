@@ -34,12 +34,8 @@ league_play() {
     E_AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 3))s/: //p" | tr -d '()' | tr -d ' ')  # 3rd stat
     E_PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n "$((INDEX + 4))s/: //p" | tr -d '()' | tr -d ' ') # 4th stat
 
-    # Extract the fight button for the current enemy
-    click=$(grep -o -E '/league/fight/[0-9]+/\?r=[0-9]+' "$TMP"/SRC | sed -n "${i}p")  # Get the i-th fight button
-    ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]+' | head -n 1)
-
     # Print enemy stats along with the enemy number
-    echo -e "Enemy Number: $ENEMY_NUMBER"
+    #echo -e "Enemy Number: $ENEMY_NUMBER"
     echo -e "Enemy Stats:\n"
     echo -e "${E_STRENGTH:-0}"  # Default to 0 if empty
     echo -e "${E_HEALTH:-0}"      # Default to 0 if empty
@@ -55,6 +51,10 @@ league_play() {
     PLAYER_STRENGTH=$(echo "$PLAYER_STRENGTH" | xargs)
     E_STRENGTH=$(echo "$E_STRENGTH" | xargs)
 
+    # Extract the fight button for the current enemy
+    click=$(grep -o -E '/league/fight/[0-9]+/\?r=[0-9]+' "$TMP"/SRC | sed -n "${i}p")  # Get the i-th fight button
+    ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]+' | head -n 1)
+
     # Check if a fight button was found
     if [ -n "$click" ]; then
       echo "Found fight button: $URL$click"
@@ -65,7 +65,7 @@ league_play() {
         if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
             echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
             echo "Fight $i initiated with enemy number $ENEMY_NUMBER ✅"
-            fetch_page "$click"
+            #fetch_page "$click"
         else
             echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
         continue
