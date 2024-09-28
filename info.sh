@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.6.54 (Beta)"
+    versionNum="3.6.55 (Beta)"
 for i in $colors; do
 clear
 printf "\033[1;38;5;${i}m

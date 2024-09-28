@@ -83,75 +83,54 @@ league_play() {
     fetch_page "/league/"
 
     # Debug: Exibe o conteúdo da página de liga
-    echo "DEBUG: Conteúdo da página de liga:"
-    cat "$TMP"/SRC
+    # echo "DEBUG: Conteúdo da página de liga:"
+    # cat "$TMP"/SRC
 
     # Extrai os links únicos de inimigos
     ENEMY_LINKS=$(extract_unique_enemy_links)
 
     # Verifica se os links foram corretamente extraídos
     if [ -z "$ENEMY_LINKS" ]; then
-        echo "DEBUG: Nenhum link de inimigo encontrado. Encerrando a rotina da liga."
+        echo "Nenhum link de inimigo encontrado. Encerrando a rotina da liga."
         return
     fi
 
     # Debug: Exibe os links de inimigos
-    echo "DEBUG: Links de inimigos encontrados: $ENEMY_LINKS"
+    # echo "DEBUG: Links de inimigos encontrados: $ENEMY_LINKS"
 
     # Itera sobre cada link de inimigo
     for click in $ENEMY_LINKS; do
-        # Garante que está processando um link real, ignorando texto extra
+        # Garante que está processando um link real
         if [[ "$click" =~ ^/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}$ ]]; then
-            echo "DEBUG: Processando link: $click"
-
             # Extrai o número do inimigo do link
             ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]{1,3}' | head -n 1)
-            echo "DEBUG: Número do inimigo extraído: $ENEMY_NUMBER"
 
             # Valida se o número do inimigo é um número válido
             if [[ "$ENEMY_NUMBER" =~ ^[0-9]+$ ]]; then
-                echo "Valid enemy number: $ENEMY_NUMBER"
-            else
-                echo "Invalid enemy number: $ENEMY_NUMBER. Skipping..."
-                continue
-            fi
+                # Carrega a página do inimigo
+                fetch_page "$click"
 
-            # Carrega a página do inimigo
-            fetch_page "$click"
+                # Extrai as estatísticas do inimigo
+                E_STRENGTH=$(get_enemy_stat "$ENEMY_NUMBER" 1)  # Força
+                E_HEALTH=$(get_enemy_stat "$ENEMY_NUMBER" 2)    # Saúde
+                E_AGILITY=$(get_enemy_stat "$ENEMY_NUMBER" 3)   # Agilidade
+                E_PROTECTION=$(get_enemy_stat "$ENEMY_NUMBER" 4) # Proteção
 
-            # Debug: Verifica o conteúdo da página de luta do inimigo
-            echo "DEBUG: Conteúdo da página de luta do inimigo:"
-            cat "$TMP"/SRC
-
-            # Extrai as estatísticas do inimigo
-            E_STRENGTH=$(get_enemy_stat "$ENEMY_NUMBER" 1)  # Força
-            E_HEALTH=$(get_enemy_stat "$ENEMY_NUMBER" 2)    # Saúde
-            E_AGILITY=$(get_enemy_stat "$ENEMY_NUMBER" 3)   # Agilidade
-            E_PROTECTION=$(get_enemy_stat "$ENEMY_NUMBER" 4) # Proteção
-
-            # Debug: Exibe as estatísticas do inimigo
-            echo -e "Enemy Stats:\nStrength: ${E_STRENGTH:-0}\nHealth: ${E_HEALTH:-0}\nAgility: ${E_AGILITY:-0}\nProtection: ${E_PROTECTION:-0}"
-
-            # Verifica se as estatísticas foram extraídas corretamente
-            if [[ -z "$E_STRENGTH" ]]; then
-                echo "Erro ao extrair estatísticas do inimigo. Pulando para o próximo inimigo."
-                continue
-            fi
-
-            # Compara a força do jogador com a força do inimigo
-            if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
-                echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
-                echo "Fight initiated with enemy number $ENEMY_NUMBER ✅"
-                # Lógica para iniciar a luta aqui
-            else
-                echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
+                # Compara a força do jogador com a força do inimigo
+                if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
+                    echo "Luta iniciada contra o inimigo número $ENEMY_NUMBER ✅"
+                    # Lógica para iniciar a luta aqui
+                else
+                    echo "Força do jogador ($PLAYER_STRENGTH) não é suficiente para atacar o inimigo $ENEMY_NUMBER ($E_STRENGTH)."
+                fi
             fi
         else
-            echo "DEBUG: Ignorando entrada não válida: $click"
+            # Se houver entradas não válidas, podemos ignorar sem imprimir
+            continue
         fi
     done
 
-    echo -e "${GREEN_BLACK}League Routine Completed ✅${COLOR_RESET}\n"
+    echo -e "${GREEN_BLACK}Rotina da Liga Completa ✅${COLOR_RESET}\n"
 }
 
 # https://furiadetitas.net/league/takeReward/?r=52027565# Calculate indices for the current enemy's stats
