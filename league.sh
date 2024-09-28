@@ -8,6 +8,7 @@ league_play() {
   for i in {1..5}; do
     # Fetch the league page
     fetch_page "/league/"
+    fetch_page "/league/" "$TMP/LEAGUE_DEBUG_SRC"
 
     # Calculate indices for the current enemy's stats
     INDEX=$(( (i - 1) * 4 ))  # Calculate the starting index for each enemy (0-based)
@@ -23,12 +24,11 @@ league_play() {
     ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]+' | head -n 1)
 
     # Print enemy stats along with the enemy number
-    echo -e "Enemy Number: $ENEMY_NUMBER"
-    echo -e "Enemy Stats:\n"
-    echo -e "${E_STRENGTH:-0}"  # Default to 0 if empty
-    echo -e "${E_HEALTH:-0}"      # Default to 0 if empty
-    echo -e "${E_AGILITY:-0}"    # Default to 0 if empty
-    echo -e "${E_PROTECTION:-0}"  # Default to 0 if empty
+    echo -e "Enemy Number: $ENEMY_NUMBER\nEnemy Stats:"
+    echo -e "Strength: ${E_STRENGTH:-0}"
+    echo -e "Health: ${E_HEALTH:-0}"
+    echo -e "Agility: ${E_AGILITY:-0}"
+    echo -e "Protection: ${E_PROTECTION:-0}\n"
 
     # Ensure all values are integers before comparing
     E_STRENGTH=${E_STRENGTH:-0}
@@ -38,13 +38,6 @@ league_play() {
     echo " --- "
     PLAYER_STRENGTH=$(echo "$PLAYER_STRENGTH" | xargs)
     E_STRENGTH=$(echo "$E_STRENGTH" | xargs)
-    if ! [[ "$PLAYER_STRENGTH" =~ ^[0-9]+$ ]]; then
-    echo "Error: Player strength is not a valid number."
-    fi
-    if ! [[ "$E_STRENGTH" =~ ^[0-9]+$ ]]; then
-    echo "Error: Enemy strength is not a valid number."
-fi
-echo " --- "
 
     # Check if a fight button was found
     if [ -n "$click" ]; then
@@ -62,7 +55,6 @@ echo " --- "
         continue
         fi
       else
-      echo "Invalid player strength or enemy strength. Skipping to next enemy."
       echo "DEBUG: Invalid values - Player Strength: '$PLAYER_STRENGTH', Enemy Strength: '$E_STRENGTH'"
     fi
       echo "No fight buttons found on attempt $i ❌"
@@ -115,3 +107,4 @@ echo "Total: $total"
 
 
 }
+https://furiadetitas.net/league/takeReward/?r=52027565

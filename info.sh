@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 9 8 2 1 5 4 3 6 7"
     author="author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.6.21 (Beta)"
+    versionNum="3.6.22 (Beta)"
 for i in $colors; do
 clear
 printf "\033[1;38;5;${i}m
@@ -147,10 +147,10 @@ player_stats() {
     # cat "$TMP"/TRAIN  # Check the raw output for stats
 
     # Extracting stats using grep and sed
-    STRENGTH=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '1s/: //p')
-    HEALTH=$(grep -o -E '\(([0-9]+)\)' "$TMP"/TRAIN | sed '2s/: //p')
-    AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '3s/: //p')
-    PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/TRAIN | sed -n '4s/: //p')
+    STRENGTH=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n '1s/: //p')
+    HEALTH=$(grep -o -E '\(([0-9]+)\)' "$TMP"/SRC | sed '2s/: //p')
+    AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n '3s/: //p')
+    PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n '4s/: //p')
 
     # Trim whitespace and ensure that STRENGTH only contains numbers
     PLAYER_STRENGTH=$(echo "$STRENGTH" | xargs)
