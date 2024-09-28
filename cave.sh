@@ -117,7 +117,7 @@ cave_routine() {
     echo "Quests available speeding up mine to complete!"
   else
     count=8
-    echo "No quests available at the moment"
+    #echo "No quests available at the moment"
   fi
 
   # Fetch initial cave data
@@ -174,9 +174,8 @@ cave_routine() {
           tput cuu1; tput el; echo " Speed up mining ⚡"
           ;;
       esac
-    done
-
-    checkQuest 5
+      checkQuest 5
+    done    
   fi
   echo -e "${GREEN_BLACK}Cave Done ✅${COLOR_RESET}\n"
 }
