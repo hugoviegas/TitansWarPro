@@ -116,7 +116,7 @@ cave_routine() {
     count=0
     echo "Quests available speeding up mine to complete!"
   else
-    count=8
+    count=7
     # echo "No quests available at the moment"
   fi
 
@@ -135,12 +135,6 @@ cave_routine() {
       # Break the loop if speedUp is found and count is less than 8
       if [[ "$RESULT" == "speedUp" && "$count" -lt 8 ]]; then
         tput cuu1; tput el; echo " Speed up mining ⚡"
-        break
-      fi
-
-      # Check if we've exceeded the count limit
-      if [ "$count" -ge 8 ]; then
-        echo "Exceeded action limit, exiting cave routine."
         break
       fi
 
@@ -170,8 +164,12 @@ cave_routine() {
               ;;
           esac
           ;;
-      esac
-
+        esac
+        # Check if we've exceeded the count limit
+        if [ "$count" -ge 8 ]; then
+          echo "Exceeded action limit, exiting cave routine."
+          break
+        fi
       # Fetch new cave data
       fetch_page "/cave/"
     done

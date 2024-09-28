@@ -120,6 +120,10 @@ league_play() {
                 echo "No fight buttons found on attempt $i ❌"
                 break
             fi
+
+            # After checking one enemy, we need to fetch the updated enemy stats
+            # to ensure we get the correct values for the next enemy in the next iteration
+            fetch_page "/league/"
         done
     done
 
