@@ -204,19 +204,17 @@ fi
 
 script_slogan
 printf "✅ ${BLACK_CYAN}Updated scripts!${COLOR_RESET}\n To execute run command: ${GOLD_BLACK}./twm/play.sh${COLOR_RESET}\n       For coliseum run: ${GOLD_BLACK}./twm/play.sh -cl${COLOR_RESET}\n           For cave run: ${GOLD_BLACK}./twm/play.sh -cv${COLOR_RESET}\n"
-# Kill all play.sh processes
-tipidf=$(pgrep -f "sh.*twm/play.sh")
+# shellcheck disable=SC2009
+tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/play.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
 until [ -z "$tipidf" ]; do
   kill -9 "$tipidf" 2>/dev/null
-  tipidf=$(pgrep -f "sh.*twm/play.sh")
+  tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/play.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
   sleep 1s
 done
-
-# Kill all twm.sh processes
-tipidf=$(pgrep -f "sh.*twm/twm.sh")
+tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/twm.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
 until [ -z "$tipidf" ]; do
   kill -9 "$tipidf" 2>/dev/null
-  tipidf=$(pgrep -f "sh.*twm/twm.sh")
+  tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/twm.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
   sleep 1s
 done
 if [ -f ~/twm/runmode_file ]; then
