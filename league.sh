@@ -16,6 +16,7 @@ fetch_available_fights() {
         AVAILABLE_FIGHTS=0  # Define como 0 se o arquivo não for encontrado
         return 1  # Retorna um código de erro
     fi
+    
 }
 
 # Função para extrair estatísticas dos inimigos
@@ -47,107 +48,81 @@ league_play() {
 
     PLAYER_STRENGTH=$(player_stats)  # Obtendo a força do jogador
     fetch_available_fights  # Buscando lutas disponíveis
-    
-    # Loop até que não haja mais lutas disponíveis
-    for i in $(seq 1 "$AVAILABLE_FIGHTS"); do
-        j=1
 
-        fetch_page "/league/"
-        # Extract the fight button for the current enemy
-        click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight button
-        echo "${URL}$click"
-        # Verificar se o link contém a palavra "/league/refreshFights/"
-        if [[ "$click" == *"/league/refreshFights/"* ]]; then
-            echo "Limite de ataques finalizado. Encerrando..."
-            break  # Sair do loop se o limite de ataques for atingido
-        fi
+    # Definir uma variável para controlar o estado do loop
+    action="check_fights"
+    fights_done=0
+    j=1  # Index for fight buttons (skipping every 2 links)
+    enemy_index=1  # Separate index for enemy stats
 
-        # Verificar se o link de refresh está presente
-        if [ -n "$click" ]; then
-            ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]+' | head -n 1)
+    while [ "$fights_done" -lt "$AVAILABLE_FIGHTS" ] || [ "$AVAILABLE_FIGHTS" -gt 0 ]; do
+        case "$action" in
+            check_fights)
+                echo "DEBUG: Player Stats = $PLAYER_STRENGTH"
+                echo "DEBUG: Button j = $j"
+                echo "DEBUG: Enemy Index = $enemy_index"
+                echo "DEBUG: Fights done = $fights_done"
+                fetch_page "/league/"
+                
+                click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight button
+                #echo "${URL}$click"
+                if [[ "$click" == *"/league/refreshFights/"* ]]; then
+                    echo "Limite de ataques finalizado. Encerrando..."
+                    action="exit_loops"
+                elif [ -n "$click" ]; then
+                    ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]+' | head -n 1)
+
+                    # Extrair as estatísticas do inimigo usando enemy_index
+                    INDEX=$(( (enemy_index - 1) * 4 ))
+
+                    E_STRENGTH=$(get_enemy_stat "$INDEX" 1)
+                    E_HEALTH=$(get_enemy_stat "$INDEX" 2)
+                    E_AGILITY=$(get_enemy_stat "$INDEX" 3)
+                    E_PROTECTION=$(get_enemy_stat "$INDEX" 4)
+
+                    echo -e "Enemy Number: $ENEMY_NUMBER"
+                    echo -e "Enemy Stats: Strength: ${E_STRENGTH:-0}"
+                    action="fight_or_skip"
+                else
+                    echo "No fight buttons found for button $j ❌"
+                    action="exit_loops"
+                fi
+                ;;
             
-            # Calcular índices para as estatísticas do inimigo
-            INDEX=$(( (i - 1) * 4 ))
-
-            # Extrair as estatísticas do inimigo
-            E_STRENGTH=$(get_enemy_stat "$INDEX" 1)
-            E_HEALTH=$(get_enemy_stat "$INDEX" 2)
-            E_AGILITY=$(get_enemy_stat "$INDEX" 3)
-            E_PROTECTION=$(get_enemy_stat "$INDEX" 4)
-
-            # Exibir informações do inimigo
-            echo -e "Enemy Number: $ENEMY_NUMBER"
-            echo -e "Enemy Stats:"
-            echo -e "  Strength:   ${E_STRENGTH:-0}"
-            #sleep 5s
-
-            fetch_available_fights
-            k="$AVAILABLE_FIGHTS"
-            #echo "$k"
-            # Comparar a força do jogador com a do inimigo
-            if [[ "$PLAYER_STRENGTH" =~ ^[0-9]+$ ]] && [[ "$E_STRENGTH" =~ ^[0-9]+$ ]] && [[ "$k" -ge 1 ]]; then
-            
+            fight_or_skip)
                 if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
-
                     echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
-                    echo "Fight $j initiated with enemy number $ENEMY_NUMBER ✅"
+                    echo -e "Fight $((fights_done + 1)) initiated with enemy number $ENEMY_NUMBER ✅ .\n"
                     fetch_page "$click"
-                break
+                    action="check_fights"
+                    fights_done=$((fights_done + 1))  # Count the fight
+                    enemy_index=1  # Reset enemy index after a fight
+                    j=1  # Reset button index after a fight
+                    fetch_available_fights  # Recheck available fights
                 else
                     echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
-                    # Incrementar o índice para o próximo inimigo
-                    #local i=0
-                    while [ "$PLAYER_STRENGTH" -lt "$E_STRENGTH" ] || [ "$i" -ge 4 ]; do
-                        fetch_page "/league/"
-                        j=$((j + 2))
-                        ((i++))
+                    enemy_index=$((enemy_index + 1))  # Move to the next enemy
+                    j=$((j + 2))  # Move to the next button (skip every 2 links)
 
-                        click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP"/SRC | sed -n "${j}p")  # Get the j-th fight button
-                        ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]+' | head -n 1)
-                        INDEX=$(( (i - 1) * 4 ))
-
-                        # Extrair novamente as estatísticas do inimigo para o próximo índice
-                        E_STRENGTH=$(get_enemy_stat "$INDEX" 1)
-                        E_HEALTH=$(get_enemy_stat "$INDEX" 2)
-                        E_AGILITY=$(get_enemy_stat "$INDEX" 3)
-                        E_PROTECTION=$(get_enemy_stat "$INDEX" 4)
-
-                        # Exibir informações do inimigo
-                        echo -e "Enemy Number: $ENEMY_NUMBER"
-                        echo -e "Enemy Stats:"
-                        echo -e "  Strength:   ${E_STRENGTH:-0}"
-
-                        if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
-
-                        echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
-                        echo "Fight $j initiated with enemy number $ENEMY_NUMBER ✅"
-                        fetch_page "$click"
-                break
-                        
-                        sleep 1s
-                        if [ $i -ge 4 ]; then
-                            return 1 #exit from all loops
-                        fi
-                    done
+                    if [ "$enemy_index" -gt 4 ]; then  # Limite de inimigos (assuming 4 enemies)
+                        enemy_index=1  # Reset enemy index after checking all enemies
+                        action="exit_loops"  # Exit if no viable enemies
+                    else
+                        action="check_fights"
+                    fi
                 fi
-            else
-                echo "DEBUG: Invalid values - Player Strength: '$PLAYER_STRENGTH', Enemy Strength: '$E_STRENGTH'"
-            fi
-        else
-            if grep -q -E '/league/refreshFights/\?r=[0-9]+' "$TMP"/SRC; then
-                echo "Refresh fights link found. Stopping the fight loop."
+                ;;
+            
+            exit_loops)
                 break
-            fi
-        echo "No fight buttons found on attempt $i ❌"
-        break
-        fi
+                ;;
+        esac
     done
 
-    click=$(grep -o -E "league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
-    fetch_page "$click"
-    unset click ENEMY_NUMBER PLAYER_STRENGTH E_STRENGTH AVAILABLE_FIGHTS i j
+    # Recompensa
+    #click=$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
+    #fetch_page "$click"
+    unset click ENEMY_NUMBER PLAYER_STRENGTH E_STRENGTH AVAILABLE_FIGHTS fights_done enemy_index j
 
     echo -e "${GREEN_BLACK}League Routine Completed ✅${COLOR_RESET}\n"
 }
-
-# https://furiadetitas.net/league/takeReward/?r=52027565

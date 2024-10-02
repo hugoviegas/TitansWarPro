@@ -17,19 +17,7 @@ check_missions() {
     click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p')
         if [ -n "$click" ]; then
             fetch_page "$click"  # Fetch the mission completion URL
-            #MISSION_NUMBER=$(echo "$click" | cut -d'/' -f5 | cut -d'?' -f1)
             echo -e "${GREEN_BLACK} Mission [$i] Completed ✅${COLOR_RESET}"
-        fi
-    done
-
-    # Collect rewards from relics
-    fetch_page "/relic/reward/"
-    for i in {0..11}; do
-    local click
-    click=$(grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP/SRC")
-        if [ -n "$click" ]; then
-            fetch_page "$click"  # Fetch the relic reward URL
-            echo -e " ${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}"
         fi
     done
 
@@ -46,19 +34,26 @@ check_missions() {
     clanMerchantQuest
 }
 
+check_rewards(){
+    # Collect rewards from relics
+    fetch_page "/relic/reward/"
+    for i in {0..11}; do
+    local click
+    click=$(grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP/SRC")
+        if [ -n "$click" ]; then
+            fetch_page "$click"  # Fetch the relic reward URL
+            echo -e " ${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}"
+        fi
+    done
+}
+
 apply_event() {
   # Apply to fight
   event=("$@")  # Store arguments as an array
-  (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/$event/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-  ) </dev/null &>/dev/null &
-  time_exit 20
+  fetch_page "/$event/"
   if grep -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC; then
-    APPLY=$(grep -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC | cat -)
-    (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${APPLY}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    ) </dev/null &>/dev/null &
-    time_exit 20
+    APPLY=$(grep -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC)
+    fetch_page "$APPLY"
     echo -e "${BLACK_YELLOW}Applied for battle ✅${COLOR_RESET}\n"
   fi
 }
