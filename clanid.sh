@@ -137,6 +137,7 @@ clanMerchantQuest() {
     # If a link is found, fetch the page to start the merchant process
     if [ -n "$click" ]; then
       fetch_page "$click"
+      click=$(grep -o -E "/lab/alchemy/$i/makePotion\\?r=[0-9]+" "$TMP"/SRC | sed -n '1p')
       fetch_page "$click"
       sleep 1s
       clanQuest 8
