@@ -45,6 +45,8 @@ get_enemy_stat() {
 # Função principal para jogar na liga
 league_play() {
     echo -e "${GOLD_BLACK}League ⚔️${COLOR_RESET}"
+    checkQuest 2
+    checkQuest 1
 
     PLAYER_STRENGTH=$(player_stats)  # Obtendo a força do jogador
     fetch_available_fights  # Buscando lutas disponíveis
@@ -120,9 +122,13 @@ league_play() {
     done
 
     # Recompensa
-    #click=$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
-    #fetch_page "$click"
+    click=$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
+    fetch_page "$click"
+    
     unset click ENEMY_NUMBER PLAYER_STRENGTH E_STRENGTH AVAILABLE_FIGHTS fights_done enemy_index j
+
+    checkQuest 2
+    checkQuest 1
 
     echo -e "${GREEN_BLACK}League Routine Completed ✅${COLOR_RESET}\n"
 }
