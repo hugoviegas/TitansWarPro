@@ -11,6 +11,7 @@ clan_id() {
   CLD=$(cat CLD | sed "s/\/clan\//\\n/g" | grep 'built/' | awk -F/ '{ print $1 }')
 
 }
+
 check_leader() {
     # Fetch clan page and extract relevant data
     (
