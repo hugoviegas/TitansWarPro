@@ -60,10 +60,10 @@ league_play() {
     while [ "$fights_done" -lt "$AVAILABLE_FIGHTS" ] || [ "$AVAILABLE_FIGHTS" -gt 0 ]; do
         case "$action" in
             check_fights)
-                echo "DEBUG: Player Stats = $PLAYER_STRENGTH"
-                echo "DEBUG: Button j = $j"
-                echo "DEBUG: Enemy Index = $enemy_index"
-                echo "DEBUG: Fights done = $fights_done"
+                #echo "DEBUG: Player Stats = $PLAYER_STRENGTH"
+                #echo "DEBUG: Button j = $j"
+                #echo "DEBUG: Enemy Index = $enemy_index"
+                #echo "DEBUG: Fights done = $fights_done"
                 fetch_page "/league/"
                 
                 click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight button
@@ -119,12 +119,11 @@ league_play() {
                 break
                 ;;
         esac
+       # Recompensa
+        click=$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
+        fetch_page "$click" 
     done
 
-    # Recompensa
-    click=$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
-    fetch_page "$click"
-    
     unset click ENEMY_NUMBER PLAYER_STRENGTH E_STRENGTH AVAILABLE_FIGHTS fights_done enemy_index j
 
     checkQuest 2

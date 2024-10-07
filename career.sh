@@ -7,25 +7,24 @@ career_func() {
 
     fetch_page "/career/"
     if grep -q -o -E '/career/(attack|take)/[?]r[=][0-9]+' "$TMP"/SRC; then
-      #/'=\\\&apos
-      local CAREER=$(grep -o -E '/career/(attack|take)/[?]r[=][0-9]+' "$TMP"/SRC)
+      local CAREER
+      CAREER=$(grep -o -E '/career/(attack|take)/[?]r[=][0-9]+' "$TMP"/SRC)
       local BREAK=$(($(date +%s) + 60))
       while [ -n "$CAREER" ] && [ $(date +%s) -lt "$BREAK" ]; do
         case $CAREER in
-        *attack*)
+        (*attack*)
           fetch_page "$CAREER"
           RESULT=$(echo "$CAREER" | cut -d'/' -f3)
           echo " Career -> $RESULT !"
           sleep 0.5s
-          local CAREER=$(grep -o -E '/career/(attack|take)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+          CAREER=$(grep -o -E '/career/(attack|take)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
           ;;
-          *take*)
+          (*take*)
           fetch_page "$CAREER"
           RESULT=$(echo "$CAREER" | cut -d'/' -f3)
           echo " Career -> $RESULT !"
-          break
+          CAREER=$(grep -o -E '/career/(attack|take)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
           ;;
-          
         esac
       done
     fi
@@ -36,5 +35,4 @@ career_func() {
   else
     echo -e "${GREEN_BLACK}Career ✅${COLOR_RESET}\n"
   fi
-
 }

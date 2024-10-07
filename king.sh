@@ -139,7 +139,8 @@ king_start () {
   ) </dev/null &>/dev/null &
   time_exit 17
   printf "\nKing\n$URL\n"
-  cat "$TMP"/SRC|sed 's/href=/\n/g'|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
+  grep -o -E '(/[a-z]+(/[a-z]+/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+|/))' "$TMP"/SRC | sed -n '1p' >ACCESS 2>/dev/null
+  #cat "$TMP"/SRC|sed 's/href=/\n/g'|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
   printf " 👣 Entering...\n$(cat ACCESS)\n"
   #/wait
   printf " 😴 Waiting...\n"
