@@ -100,12 +100,12 @@ if uname | grep -q -i "cygwin"; then
   fi
 
   if [ -e "${LS}/coreutils" ]; then
-    :
+    : > /dev/null
   else
     apt-cyg install coreutils -y &
   fi
   if [ -e "${LS}/procps" ]; then
-    :
+    : > /dev/null
   else
     apt-cyg install procps -y &
   fi
@@ -136,7 +136,7 @@ cd ~/twm || exit
 printf "${BLACK_CYAN}\n ⌛ Wait downloading scripts...${COLOR_RESET}\n"
 
 sync_func() {
-  SCRIPTS="allies.sh clanquest.sh altars.sh arena.sh campaign.sh career.sh cave.sh check.sh clancoliseum.sh clandungeon.sh clanfight.sh clanid.sh coliseum.sh crono.sh flagfight.sh king.sh league.sh loginlogoff.sh play.sh requeriments.sh run.sh svproxy.sh trade.sh twm.sh undying.sh"
+  SCRIPTS="allies.sh clanquest.sh altars.sh arena.sh campaign.sh career.sh cave.sh check.sh clancoliseum.sh clanfight.sh clanid.sh coliseum.sh crono.sh flagfight.sh king.sh league.sh loginlogoff.sh play.sh requeriments.sh run.sh svproxy.sh trade.sh twm.sh undying.sh"
   NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
   LEN=0
   for script in $SCRIPTS; do
@@ -204,19 +204,17 @@ fi
 
 script_slogan
 printf "✅ ${BLACK_CYAN}Updated scripts!${COLOR_RESET}\n To execute run command: ${GOLD_BLACK}./twm/play.sh${COLOR_RESET}\n       For coliseum run: ${GOLD_BLACK}./twm/play.sh -cl${COLOR_RESET}\n           For cave run: ${GOLD_BLACK}./twm/play.sh -cv${COLOR_RESET}\n"
-# Kill all play.sh processes
-tipidf=$(pgrep -f "sh.*twm/play.sh")
+# shellcheck disable=SC2009
+tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/play.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
 until [ -z "$tipidf" ]; do
   kill -9 "$tipidf" 2>/dev/null
-  tipidf=$(pgrep -f "sh.*twm/play.sh")
+  tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/play.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
   sleep 1s
 done
-
-# Kill all twm.sh processes
-tipidf=$(pgrep -f "sh.*twm/twm.sh")
+tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/twm.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
 until [ -z "$tipidf" ]; do
   kill -9 "$tipidf" 2>/dev/null
-  tipidf=$(pgrep -f "sh.*twm/twm.sh")
+  tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/twm.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
   sleep 1s
 done
 if [ -f ~/twm/runmode_file ]; then

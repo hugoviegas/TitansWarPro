@@ -23,7 +23,7 @@ members_allies() {
     cat allies.txt  # Show contents of allies.txt
 
     echo -e "${BLACK_CYAN}Wait to continue. 👈${COLOR_RESET}"
-    sleep 5  # Pause before continuing
+    sleep 2  # Pause before continuing
 }
 
 id_allies() {

@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC1091
 . "$HOME"/twm/info.sh
 colors
 RUN=$(cat "$HOME"/twm/runmode_file)
@@ -31,6 +32,7 @@ fi
 cd ~/twm || exit
 #/twm.sh before sources <<
 #. clandmgfight.sh
+
 . requeriments.sh
 . loginlogoff.sh
 . flagfight.sh
@@ -46,7 +48,6 @@ cd ~/twm || exit
 . clancoliseum.sh
 . king.sh
 . undying.sh
-. clandungeon.sh
 . trade.sh
 . career.sh
 . cave.sh
@@ -77,22 +78,12 @@ func_unset() {
 #Access any page link
 
 fetch_page() {
-    local relative_url="$1" # The specific part of the URL you want to fetch (e.g., "/quest/")
-    (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${relative_url}" \
-        -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
-    ) </dev/null &>/dev/null &# Run in background and suppress output
-    time_exit 17 # Wait for the process to finish
-}
+    local relative_url="$1"  # The specific part of the URL you want to fetch (e.g., "/quest/")
+    local output_file="${2:-$TMP/SRC}"  # Use the second argument if provided, otherwise default to $TMP/SRC
 
-fetch_debug_page() {
-    local page_url="$1"     # URL of the page to fetch
-    local output_file="$2"  # File to save the fetched content
-
-    # Fetch the entire page and save it to the specified file
     (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "$page_url" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tee "$output_file"
-    ) </dev/null &>/dev/null &
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${relative_url}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$output_file"
+    ) </dev/null &>/dev/null  # Run in background and suppress output
 
     time_exit 17  # Wait for the process to finish
 }
@@ -108,9 +99,9 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
         i=$((i - 1))
         if read -t 1; then
             # Clear relevant files if Enter is pressed
-            >"$HOME/twm/al_file"
-            >"$HOME/twm/ur_file"
-            >"$HOME/twm/fileAgent.txt"
+            : >"$HOME/twm/al_file"
+            : >"$HOME/twm/ur_file"
+            : >"$HOME/twm/fileAgent.txt"
             unset UR UA AL  # Unset user-related variables
             break &>/dev/null  # Exit the loop quietly if Enter is pressed
         fi

@@ -25,10 +25,10 @@ colors() {
 }
 
 script_slogan() {
-    colors="10 9 8 2 1 5 4 3 6 7"
+    colors="10 8 2 1 3 6 7"
     author="author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.6"
+    versionNum="3.7.9 (beta)" # to change the version number every time has an update
 for i in $colors; do
 clear
 printf "\033[1;38;5;${i}m
@@ -45,7 +45,7 @@ printf "\033[1;38;5;${i}m
 ██║ █╗ ██║███████║██████╔╝  
 ██║███╗██║██╔══██║██╔══██╗  
 ╚███╔███╔╝██║  ██║██║  ██║  
-╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝  
+ ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝  
 
 ██████╗ ██████╗  ██████╗ 
 ██╔══██╗██╔══██╗██╔═══██╗    
@@ -138,3 +138,24 @@ messages_info() {
      # sed :a;N;s/\n//g;ta |
      echo -e "${GREENb_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' "$TMP"/info_file | sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}" >>"$TMP"/msg_file
 }
+
+player_stats() {
+    fetch_page "/train"
+
+    # Print the raw content for debugging
+    # echo "Raw content from /train:"
+    # cat "$TMP"/TRAIN  # Check the raw output for stats
+
+    # Extracting stats using grep and sed
+    STRENGTH=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n '1s/: //p')
+    HEALTH=$(grep -o -E '\(([0-9]+)\)' "$TMP"/SRC | sed '2s/: //p')
+    AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n '3s/: //p')
+    PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n '4s/: //p')
+
+    # Trim whitespace and ensure that STRENGTH only contains numbers
+    PLAYER_STRENGTH=$(echo "$STRENGTH" | xargs)
+    PLAYER_STRENGTH=${PLAYER_STRENGTH//[^0-9]/}
+
+    echo "$PLAYER_STRENGTH"
+}
+

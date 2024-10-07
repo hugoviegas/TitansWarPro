@@ -1,24 +1,18 @@
 campaign_func() {
     echo -e "${GOLD_BLACK}Campaign ⛺${COLOR_RESET}"
-    (
-        w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/campaign/" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
-    ) </dev/null &>/dev/null &
-    time_exit 20
+    fetch_page "/campaign/"
     if grep -q -o -E '/campaign/(go|fight|attack|end)/[?]r[=][0-9]+' $TMP/SRC; then
-        #/'=\\\&apos
-        local CAMPAIGN=$(grep -o -E '/campaign/(go|fight|attack|end)/[?]r[=][0-9]+' $TMP/SRC | head -n 1)
-        local BREAK=$(($(date +%s) + 60))
+        local CAMPAIGN
+        CAMPAIGN=$(grep -o -E '/campaign/(go|fight|attack|end)/[?]r[=][0-9]+' $TMP/SRC | head -n 1)
+        local BREAK=$(($(date +%s) + 90))
         while [ -n "$CAMPAIGN" ] && [ "$(date +%s)" -lt "$BREAK" ]; do
             case $CAMPAIGN in
-            *go* | *fight* | *attack* | *end*)
-                (
-                    w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$CAMPAIGN" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
-                ) </dev/null &>/dev/null &
-                time_exit 20
+            (*go* | *fight* | *attack* | *end*)
+                fetch_page "$CAMPAIGN"
                 
                 RESULT=$(echo "$CAMPAIGN" | cut -d'/' -f3)
                 echo " Campaign -> $RESULT !"
-                local CAMPAIGN=$(grep -o -E '/campaign/(go|fight|attack|end)/[?]r[=][0-9]+' $TMP/SRC | head -n 1)
+                CAMPAIGN=$(grep -o -E '/campaign/(go|fight|attack|end)/[?]r[=][0-9]+' $TMP/SRC | head -n 1)
                 ;;
             esac
         done
