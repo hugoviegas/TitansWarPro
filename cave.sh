@@ -123,23 +123,22 @@ cave_routine() {
   fetch_page "/cave/"
 
   # Check for available actions in the cave
-  if grep -q -o -E '/cave/(attack|gather|down|runaway)/[?]r[=][0-9]+' "$TMP"/SRC; then
-
     # Start the main loop
     while true; do
       # Get the first cave action
       local CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
       local RESULT=$(echo "$CAVE" | cut -d'/' -f3)
 
+      #echo -e "$count and $RESULT .\n" 
       # Break the loop if speedUp is found and count is less than 8
-      if [[ "$RESULT" == "speedUp" && "$count" -lt 8 ]]; then
+      if [[ "$RESULT" == "speedUp" && "$count" -ge 8 ]]; then
         tput cuu1; tput el; echo " Speed up mining ⚡"
         break
       fi
 
       # Process the current cave action
       case $RESULT in
-        gather|down|runaway|attack)
+        gather|down|runaway|speedUp)
           # Fetch page and process action
           fetch_page "$CAVE"
 
@@ -163,16 +162,11 @@ cave_routine() {
           ;;
       esac
 
-      # Check if we've exceeded the count limit
-      if [ "$count" -ge 8 ]; then
-        echo "Exceeded action limit, exiting cave routine."
-        break
-      fi
-
       # Fetch new cave data
       fetch_page "/cave/"
     done
-  fi
+
+    checkQuest 5
 
   echo -e "${GREEN_BLACK}Cave Done ✅${COLOR_RESET}\n"
 }
