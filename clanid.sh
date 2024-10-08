@@ -12,7 +12,7 @@ clan_id() {
         echo "CLAN ID not found!"
         return 1
     else
-        echo "CLAN ID found: $CLD"
+        # echo "CLAN ID found: $CLD"
         echo "$CLD" > CLD  # Save the extracted CLAN ID back to CLD file
     fi
 }
