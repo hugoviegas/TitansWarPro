@@ -30,8 +30,6 @@ check_missions() {
 
     echo -e "${GREEN_BLACK}Missions ✅${COLOR_RESET}\n"
 
-    clanElixirQuest
-    clanMerchantQuest
 }
 
 check_rewards(){

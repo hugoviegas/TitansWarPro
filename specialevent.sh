@@ -1,4 +1,4 @@
-currentEvent() {
+specialEvent() {
   # Fetch the page and store the output in $TMP/SRC
   fetch_page
   

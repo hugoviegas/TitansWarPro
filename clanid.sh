@@ -20,15 +20,15 @@ checkQuest() {
     # Find the click button
     if [ -n "$click" ]; then
       fetch_page "/clan/${CLD}$click"
-      echo " Quest $quest_id Check... 🔎"
+      echo " Clan quest $quest_id Check... 🔎"
       return 0  # Success if found
     else
-      echo " Quest ID: $quest_id not ready. 🔎"
+      echo " Clan quest $quest_id is not ready. 🔎"
       return 1  # Not found
     fi
   else
     fetch_page "/clanrating/wantedToClan"
-    echo " Quest ID: $quest_id not ready. 🔎"
+    echo " Clan quest $quest_id was not found. 🔎"
     return 1  # Fail in case CLD is empty
   fi
 }
@@ -166,4 +166,18 @@ clanMerchantQuest() {
       checkQuest 8
     fi
   fi
+}
+
+clanQuests() {
+  echo -e "${GOLD_BLACK}Clan Missions 🔱🎯${COLOR_RESET}"
+    if checkQuest 7; then
+    clanElixirQuest
+    fi
+    if checkQuest 8; then
+    clanMerchantQuest
+    fi    
+    if checkQuest 5; then
+    cave_routine
+    fi
+    echo -e "${GREEN_BLACK}Clan missions done ✅${COLOR_RESET}\n"
 }
