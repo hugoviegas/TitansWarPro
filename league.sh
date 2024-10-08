@@ -45,8 +45,8 @@ get_enemy_stat() {
 # Função principal para jogar na liga
 league_play() {
     echo -e "${GOLD_BLACK}League ⚔️${COLOR_RESET}"
-    checkQuest 2
-    checkQuest 1
+    checkQuest 2 apply
+    checkQuest 1 apply
 
     PLAYER_STRENGTH=$(player_stats)  # Obtendo a força do jogador
     fetch_available_fights  # Buscando lutas disponíveis
@@ -146,8 +146,8 @@ league_play() {
 
     unset click ENEMY_NUMBER PLAYER_STRENGTH E_STRENGTH AVAILABLE_FIGHTS fights_done enemy_index j
 
-    checkQuest 2
-    checkQuest 1
+    checkQuest 2 end
+    checkQuest 1 end
 
     echo -e "${GREEN_BLACK}League Routine Completed ✅${COLOR_RESET}\n"
 }

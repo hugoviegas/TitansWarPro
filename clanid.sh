@@ -10,28 +10,39 @@ clan_id() {
 }
 
 checkQuest() {
-  quest_id="$*"
+  quest_id="$1"
+  action="$2"  # Segundo argumento que define se é "apply" ou "end"
+
   if [ -n "${CLD}" ]; then
     fetch_page "/clan/${CLD}/quest/"
     fetch_page "/clan/${CLD}/quest/" "$TMP/debug_output.txt"
-    click=$(grep -o -E "/quest/(take|help|deleteHelp|end)/$quest_id/\?r=[0-9]{8}" "$TMP"/SRC | sed -n '1p')
-    #echo "DEBUG CLICK: $click"
     
-    # Find the click button
+    # Dependendo do valor de $action, alterar os padrões de busca do grep
+    if [ "$action" == "apply" ]; then
+      click=$(grep -o -E "/quest/(take|help)/$quest_id/\?r=[0-9]{8}" "$TMP/SRC" | sed -n '1p')
+    elif [ "$action" == "end" ]; then
+      click=$(grep -o -E "/quest/(deleteHelp|end)/$quest_id/\?r=[0-9]{8}" "$TMP/SRC" | sed -n '1p')
+    else
+      echo "Ação inválida: $action. Use 'apply' ou 'end'."
+      return 1  # Retorna falha se a ação for inválida
+    fi
+    
+    # Verificar se encontrou o botão correto
     if [ -n "$click" ]; then
       fetch_page "/clan/${CLD}$click"
-      echo " Clan quest $quest_id Check... 🔎"
-      return 0  # Success if found
+      echo " Clan quest $quest_id Check ($action) ... 🔎"
+      return 0  # Sucesso se o botão foi encontrado
     else
-      echo " Clan quest $quest_id is not ready. 🔎"
-      return 1  # Not found
+      echo " Clan quest $quest_id ($action) is not ready. 🔎"
+      return 1  # Não encontrou o botão
     fi
   else
     fetch_page "/clanrating/wantedToClan"
     echo " Clan quest $quest_id was not found. 🔎"
-    return 1  # Fail in case CLD is empty
+    return 1  # Falha se CLD estiver vazio
   fi
 }
+
 
 check_leader() {
     # Fetch clan page and extract relevant data
@@ -146,7 +157,7 @@ clanElixirQuest() {
     click=$(grep -o -E "/lab/alchemy/$i/makePotion[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p')
     fetch_page "$click"
     # Finalize the quest
-    checkQuest 7
+    checkQuest 7 end
   fi
   
 }
@@ -177,22 +188,22 @@ clanMerchantQuest() {
     click=$(grep -o -E "/coliseum/merchant/$i/startMaking[?]r=[0-9]+&ref=lab" "$TMP"/SRC | sed -n '1p')
     fetch_page "$click"
     sleep 1s
-    checkQuest 8
+    checkQuest 8 end
   fi
 }
 
 clanQuests() {
   echo -e "${GOLD_BLACK}Clan Missions 🔱🎯${COLOR_RESET}"
-    if checkQuest 7; then
+    if checkQuest 7 apply; then
     clanElixirQuest
     fi
-    if checkQuest 8; then
+    if checkQuest 8 apply; then
     clanMerchantQuest
     fi    
-    if checkQuest 5; then
+    if checkQuest 5 apply; then
     cave_routine
     fi
-    if checkQuest 1  || checkQuest 2 ; then
+    if checkQuest 1 apply || checkQuest 2 apply; then
     league_play
     fi
     echo -e "${GREEN_BLACK}Clan missions done ✅${COLOR_RESET}\n"

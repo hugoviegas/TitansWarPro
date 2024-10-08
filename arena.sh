@@ -41,8 +41,8 @@ arena_collFight() {
 
 arena_duel() {
     echo -e "${GOLD_BLACK}Arena ⚔️${COLOR_RESET}"
-    checkQuest 3
-    checkQuest 4
+    checkQuest 3 apply
+    checkQuest 4 apply
 
     # Fetch initial arena page
     fetch_page "/arena/"
@@ -71,8 +71,8 @@ arena_duel() {
     local SELL=$(grep -o -E '(/inv/bag/sellAll/1/[?]r[=][0-9]+)' "$TMP"/SRC | sed -n '1p')
     fetch_page "$SELL"
     
-    checkQuest 3
-    checkQuest 4
+    checkQuest 3 end
+    checkQuest 4 end
     
     echo " Sell all items ✅"
     echo -e "${GREEN_BLACK}Arena ✅${COLOR_RESET}\n"

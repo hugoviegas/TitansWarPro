@@ -3,7 +3,7 @@ career_func() {
   fetch_page "/career/"
   if grep -q -o -E '/career/attack/[?]r[=][0-9]+' "$TMP"/SRC; then
 
-    checkQuest 6
+    checkQuest 6 apply
 
     fetch_page "/career/"
     if grep -q -o -E '/career/(attack|take)/[?]r[=][0-9]+' "$TMP"/SRC; then
@@ -29,7 +29,7 @@ career_func() {
       done
     fi
 
-    checkQuest 6
+    checkQuest 6 end
 
     echo -e "${GREEN_BLACK}Career ✅${COLOR_RESET}\n"
     return 0

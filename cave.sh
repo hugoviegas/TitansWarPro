@@ -48,8 +48,6 @@ cave_start() {
       # Fetch new cave data
       fetch_page "/cave/"
 
-    # checkQuest 5
-
     if awk -v smodplay="$RUN" -v rmodplay="-cv" 'BEGIN { exit !(smodplay != rmodplay) }'; then
       echo -e "\nYou can run ./twm/play.sh -cv"
     fi
@@ -64,7 +62,7 @@ cave_routine() {
   echo -e "${GOLD_BLACK}Cave 🪨${COLOR_RESET}"
 
   # Checking for available quests
-  if checkQuest 5; then
+  if checkQuest 5 apply; then
     count=0
     echo "Quests available speeding up mine to complete!"
   else
@@ -117,7 +115,7 @@ cave_routine() {
       fetch_page "/cave/"
     done
 
-    checkQuest 5
+    checkQuest 5 end
 
   echo -e "${GREEN_BLACK}Cave Done ✅${COLOR_RESET}\n"
 }
