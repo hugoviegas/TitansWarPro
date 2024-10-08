@@ -45,8 +45,8 @@ get_enemy_stat() {
 # Função principal para jogar na liga
 league_play() {
     echo -e "${GOLD_BLACK}League ⚔️${COLOR_RESET}"
-    #checkQuest 2
-    #checkQuest 1
+    checkQuest 2
+    checkQuest 1
 
     PLAYER_STRENGTH=$(player_stats)  # Obtendo a força do jogador
     fetch_available_fights  # Buscando lutas disponíveis
@@ -60,14 +60,14 @@ league_play() {
     while [ "$fights_done" -lt "$AVAILABLE_FIGHTS" ] || [ "$AVAILABLE_FIGHTS" -gt 0 ]; do
         case "$action" in
             check_fights)
-                echo "DEBUG: Player Stats = $PLAYER_STRENGTH"
-                echo "DEBUG: Button j = $j"
-                echo "DEBUG: Enemy Index = $enemy_index"
-                echo "DEBUG: Fights done = $fights_done"
+                #echo "DEBUG: Player Stats = $PLAYER_STRENGTH"
+                #echo "DEBUG: Button j = $j"
+                #echo "DEBUG: Enemy Index = $enemy_index"
+                #echo "DEBUG: Fights done = $fights_done"
                 fetch_page "/league/"
                 
                 click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight button
-                echo "${URL}$click"
+                #echo "${URL}$click"
                 if [[ "$click" == *"/league/refreshFights/"* ]]; then
                     echo "Limite de ataques finalizado. Encerrando..."
                     action="exit_loops"
@@ -82,8 +82,8 @@ league_play() {
                     E_AGILITY=$(get_enemy_stat "$INDEX" 3)
                     E_PROTECTION=$(get_enemy_stat "$INDEX" 4)
 
-                    echo -e "Enemy Number: $ENEMY_NUMBER"
-                    echo -e "Enemy Stats: Strength: ${E_STRENGTH:-0}"
+                    #echo -e "Enemy Number: $ENEMY_NUMBER"
+                    #echo -e "Enemy Stats: Strength: ${E_STRENGTH:-0}"
                     action="fight_or_skip"
                 else
                     echo "No fight buttons found for button $j ❌"
@@ -106,9 +106,25 @@ league_play() {
                     enemy_index=$((enemy_index + 1))  # Move to the next enemy
                     j=$((j + 2))  # Move to the next button (skip every 2 links)
 
-                    if [ "$enemy_index" -gt 4 ]; then  # Limite de inimigos (assuming 4 enemies)
-                        enemy_index=1  # Reset enemy index after checking all enemies
-                        action="exit_loops"  # Exit if no viable enemies
+                    if [ "$enemy_index" -gt 4 ]; then  # If there are more than 4 enemies
+                        echo "Reached the last enemy. Attacking the last one and using a potion."
+                        j=$((j - 2))  # Move to the previous button (skip every 2 links)
+                        
+                        # Attack the last enemy
+                        last_click=$(grep -o -E "/league/fight/$j/\?r=[0-9]{1,8}" "$TMP/SRC" | tail -n 1)
+                        fetch_page "$last_click"
+                        fights_done=$((fights_done + 1))  # Count the fight
+                        fetch_available_fights  # Recheck available fights
+                        sleep 0.8s
+                        # Use potion
+                        potion_click=$(grep -o -E "/league/potion/\?r=[0-9]+" "$TMP/SRC" | sed -n 1p)
+                        fetch_page "$potion_click"
+
+                        # Reset the index to attack the first enemy
+                        enemy_index=1
+                        j=1
+                        E_STRENGTH=50
+                        action="fight_or_skip"
                     else
                         action="check_fights"
                     fi
@@ -119,15 +135,18 @@ league_play() {
                 break
                 ;;
         esac
-       # Recompensa
-        clickReward=$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
-        fetch_page "$clickReward" 
+        # Recompensa
+        if [ "$AVAILABLE_FIGHTS" -eq 0 ]; then
+            clickReward=$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
+            fetch_page "$clickReward" 
+        fi
     done
 
     unset click ENEMY_NUMBER PLAYER_STRENGTH E_STRENGTH AVAILABLE_FIGHTS fights_done enemy_index j
 
-    #checkQuest 2
-    #checkQuest 1
+    checkQuest 2
+    checkQuest 1
 
     echo -e "${GREEN_BLACK}League Routine Completed ✅${COLOR_RESET}\n"
 }
+# https://furiadetitas.net/league/potion/?r=35352215
