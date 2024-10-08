@@ -67,7 +67,7 @@ id_allies() {
     fi
 
     sort -u tmp.txt -o tmp.txt  # Sort and remove duplicates from friend IDs
-    tmp.txt | cut -d\> -f2 | sed 's,\ ,_,' > allies.txt  # Format and save to allies.txt
+    cat < tmp.txt | cut -d\> -f2 | sed 's,\ ,_,' > allies.txt  # Format and save to allies.txt
   fi
 }
 
@@ -77,13 +77,14 @@ clan_allies() {
     if [ -n "$CLD" ]; then
     cd "$TMP" || exit
     echo "" >callies.txt
-    tmp.txt | cut -d/ -f3 >ids.txt
+    cat < tmp.txt | cut -d/ -f3 >ids.txt
+
     printf "${BLACK_CYAN}\nClan allies by Leader/Deputy on friends list\n${COLOR_RESET}\n"
-    Lnl=$(ids.txt | wc -l)
+    Lnl=$(cat < ids.txt | wc -l)
     nl=1
     ts=0
     for num in $(seq "$Lnl" -1 "$nl"); do
-      IDN=$(ids.txt | tail -n "$Lnl" | head -n 1)
+      IDN=$(cat < ids.txt | tail -n "$Lnl" | head -n 1)
             if [ -n "$IDN" ]; then
                 echo -e "${Lnl} ${PURPLEis_BLACK}/user/${IDN}${COLOR_RESET}"
 
@@ -91,8 +92,8 @@ clan_allies() {
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/user/${IDN}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
                 ) </dev/null &>/dev/null &
                 time_exit 17
-        LEADPU=$("$TMP"/SRC | sed 's,/clan/,\n/clan/,g' | grep -E "</a>, <span class='blue'|</a>, <span class='green'" | cut -d\< -f1 | cut -d\> -f2)
-        alCLAN=$("$TMP"/SRC | grep -E -o '/clan/[0-9]{1,3}' | tail -n1)
+        LEADPU=$(cat < "$TMP"/SRC | sed 's,/clan/,\n/clan/,g' | grep -E "</a>, <span class='blue'|</a>, <span class='green'" | cut -d\< -f1 | cut -d\> -f2)
+        alCLAN=$(cat < "$TMP"/SRC | grep -E -o '/clan/[0-9]{1,3}' | tail -n1)
         printf "${PURPLEi_BLACK} ${LEADPU} - ${alCLAN}${COLOR_RESET}\n"
                 if [ -n "$LEADPU" ]; then
                     ts=$((ts + 1))  # Increment ally count
