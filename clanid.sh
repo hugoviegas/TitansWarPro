@@ -1,13 +1,22 @@
 clan_id() {
-  cd "$TMP" || exit
-  #/Executa o comando especificado no SOURCE com a URL do clã e um userAgent.txt aleatório
-  fetch_page "/clan" "CLD"
-  
-  #/Lê o conteúdo do arquivo CLD, substitui cada ocorrência de "/clan/" por uma nova linha,
-  #/seleciona somente as linhas que contêm a string "built/", e extrai a primeira parte da string
-  CLD=$(cat CLD | sed "s/\/clan\//\\n/g" | grep 'built/' | awk -F/ '{ print $1 }')
+    cd "$TMP" || exit 1
 
+    # Fetch the clan page and save the output to CLD file
+    fetch_page "/clan" "CLD"
+
+    # Extract the first occurrence of /clan/ followed by digits and store the ID in CLD
+    CLD=$(grep -oP '/clan/(\d+)/' CLD | head -n 1 | awk -F'/' '{ print $3 }')
+
+    # Check if we found a valid CLAN ID
+    if [[ -z "$CLD" ]]; then
+        echo "CLAN ID not found!"
+        return 1
+    else
+        echo "CLAN ID found: $CLD"
+        echo "$CLD" > CLD  # Save the extracted CLAN ID back to CLD file
+    fi
 }
+
 
 checkQuest() {
   quest_id="$1"
