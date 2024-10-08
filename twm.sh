@@ -38,7 +38,7 @@ cd ~/twm || exit
 . flagfight.sh
 . clanid.sh
 . crono.sh
-. clanquest.sh
+. specialevent.sh
 . arena.sh
 . coliseum.sh
 . campaign.sh
@@ -76,8 +76,43 @@ func_unset() {
 }
 
 #Access any page link
-
 fetch_page() {
+    local relative_url="${1:-/}"  # Default to root if no relative URL is provided
+    local output_file="${2:-$TMP/SRC}"  # Default output file if not provided
+    local user_agent_file="$TMP/userAgent.txt"  # User agent file
+    local user_agent=$(shuf -n1 "$user_agent_file")  # Pick a random user agent
+    local retries=3  # Number of retry attempts
+    local attempt=1
+    local timeout=17  # Timeout in seconds
+
+    # Retry logic
+    while [ "$attempt" -le "$retries" ]; do
+        # Fetch page using w3m with cookies and custom user agent
+        w3m -cookie -o http_proxy="$PROXY" \
+            -o accept_encoding=UTF-8 \
+            -debug -dump_source "${URL}${relative_url}" \
+            -o user_agent="$user_agent" \
+            > "$output_file" 2>/dev/null
+
+        # Check if fetch was successful (file not empty or contains valid content)
+        if [ -s "$output_file" ]; then
+            break  # Exit loop if fetch was successful
+        else
+            echo "Attempt $attempt to fetch $relative_url failed. Retrying..."
+            ((attempt++))
+            sleep 1s  # Pause before retrying
+        fi
+    done
+
+    if [ "$attempt" -gt "$retries" ]; then
+        echo "Failed to fetch $relative_url after $retries attempts."
+        return 1  # Return an error if all attempts failed
+    fi
+
+    time_exit "$timeout"  # Wait for the timeout period after fetching
+}
+
+fetch_page_bk() {
     local relative_url="$1"  # The specific part of the URL you want to fetch (e.g., "/quest/")
     local output_file="${2:-$TMP/SRC}"  # Use the second argument if provided, otherwise default to $TMP/SRC
 
