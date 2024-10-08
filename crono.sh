@@ -1,4 +1,4 @@
-# shellcheck disable=SC2317
+
 # shellcheck disable=SC2154
 func_crono() {
     # Get the current hour and minute
@@ -13,7 +13,6 @@ func_crono() {
     echo -e " \033[02m$URL ⏰ $(date +%H):$(date +%M)${COLOR_RESET}"
 }
 
-# Função principal 'func_cat'
 func_cat() {
     func_crono  # Call func_crono to display the current time
 
@@ -29,20 +28,10 @@ func_cat() {
 
     list() {
         printf "\n"
-        
-        # Verifique se os arquivos .sh existem no diretório antes de prosseguir
-        if [ -z "$(ls ~/twm/*.sh 2>/dev/null)" ]; then
-            echo "Nenhum arquivo de script encontrado no diretório ~/twm/"
-            return 1  # Saia da função se não houver arquivos
-        fi
-
-        # Listar funções definidas nos scripts
-        grep -o -E '[[:alpha:]]+?[_]?[[:alpha:]]+?[ ]?\() \{' ~/twm/*.sh | awk -F : '{ print $2 }' | awk -F '{ print $1 }'
-
-        # Esperar por entrada do usuário por 5 segundos
-        read -r -t 6  # Se não houver input, apenas continua
+        # List functions defined in scripts
+        grep -o -E '[[:alpha:]]+?[_]?[[:alpha:]]+?[ ]?\() \{' ~/twm/*.sh | awk -F\: '{ print $2 }' | awk -F \( '{ print $1 }'
+        read -r -t 5  # Wait for user input for 5 seconds
     }
-
 
     while true; do
         printf " \033[02mNo battles now, waiting ${i}s${COLOR_RESET}\n${WHITEb_BLACK}Enter a command or type 'list':${COLOR_RESET} \n"
@@ -58,7 +47,6 @@ func_cat() {
         break  # Exit after executing the command once
     done
 }
-
 
 func_sleep() {
     # Check if it's the first day of the month

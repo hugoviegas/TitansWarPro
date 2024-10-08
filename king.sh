@@ -144,7 +144,7 @@ king_start () {
   printf " 👣 Entering...\n$(cat ACCESS)\n"
   #/wait
   printf " 😴 Waiting...\n"
-  "$TMP"/SRC|grep -o 'king/kingatk/' >EXIT 2> /dev/null
+  grep -o 'king/kingatk/' >EXIT 2> /dev/null
   local BREAK=$(( $(date +%s) + 30 ))
   until [ -s "EXIT" ] || [ "$(date +%s)" -gt "$BREAK" ] ; do
    printf " 💤	...\n$(cat ACCESS)\n"
@@ -152,8 +152,8 @@ king_start () {
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat ACCESS)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
    ) </dev/null &>/dev/null &
    time_exit 17
-   "$TMP"/SRC|sed 's/href=/\n/g'|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
-   "$TMP"/SRC|grep -o 'king/kingatk/' >EXIT 2> /dev/null
+   sed 's/href=/\n/g'|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
+   grep -o 'king/kingatk/' >EXIT 2> /dev/null
    sleep 2
   done
   king_fight

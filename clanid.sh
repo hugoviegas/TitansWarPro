@@ -5,7 +5,7 @@ clan_id() {
   
   #/Lê o conteúdo do arquivo CLD, substitui cada ocorrência de "/clan/" por uma nova linha,
   #/seleciona somente as linhas que contêm a string "built/", e extrai a primeira parte da string
-  CLD=$(CLD | sed "s/\/clan\//\\n/g" | grep 'built/' | awk -F/ '{ print $1 }')
+  CLD=$(sed "s/\/clan\//\\n/g" | grep 'built/' | awk -F/ '{ print $1 }')
 
 }
 
