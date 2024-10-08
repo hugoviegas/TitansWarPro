@@ -151,4 +151,3 @@ league_play() {
 
     echo -e "${GREEN_BLACK}League Routine Completed ✅${COLOR_RESET}\n"
 }
-# https://furiadetitas.net/league/potion/?r=35352215
