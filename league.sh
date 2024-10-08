@@ -104,14 +104,15 @@ league_play() {
                 else
                     echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
                     enemy_index=$((enemy_index + 1))  # Move to the next enemy
+                    echo "$enemy_index"
                     j=$((j + 2))  # Move to the next button (skip every 2 links)
                     last_click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight 
-                    if [ "$enemy_index" -gt 3 ] && [ -n "$last_click" ]; then  # If there are more than 4 enemies
+                    if [ "$enemy_index" -gt 3 ] || [ -n "$last_click" ]; then  # If there are more than 4 enemies
                         echo "Reached the last enemy. Attacking the last one and using a potion."
                         j=$((j - 2))  # Move to the previous button (skip every 2 links)
                         
                         # Attack the last enemy
-                        last_click=$(grep -o -E "/league/fight/$j/\?r=[0-9]{1,8}" "$TMP/SRC" | tail -n 1)
+                        last_click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")
                         fetch_page "$last_click"
                         fights_done=$((fights_done + 1))  # Count the fight
                         fetch_available_fights  # Recheck available fights
