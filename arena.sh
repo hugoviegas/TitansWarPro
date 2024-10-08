@@ -96,7 +96,5 @@ arena_fullmana() {
   ) </dev/null &>/dev/null &
     time_exit 17
     
-
-
   echo -e "${GREEN_BLACK}Energy arena ✅${COLOR_RESET}\n"
 }

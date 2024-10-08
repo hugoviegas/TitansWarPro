@@ -23,14 +23,17 @@ specialEvent() {
       click=$(grep -o -E "/questrnd/take/\?r=[0-9]{8}" "$TMP"/SRC | sed -n '1p')
       if [ -n "$click" ]; then
         fetch_page "$click"
-        echo " Claimed reward"
-      return 0  # Success if found
+        echo -e " Claimed reward\n"
+        return 0  # Success if found
       else
+      echo " "
       return 1  # Not found
       fi
       ;;
       *)
+        echo " "
         return 1
       ;;
   esac
+
 }

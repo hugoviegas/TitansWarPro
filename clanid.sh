@@ -121,50 +121,63 @@ clanDungeon() {
 
 clanElixirQuest() {
   # Checking for available quests
-  if checkQuest 7; then
-    fetch_page "/lab/alchemy/"
+  fetch_page "/lab/alchemy/"
+
+  # Generate a random number between 1 and 4
+  i=$(shuf -i 1-4 -n 1)
+  fetch_page "/lab/alchemy/$i/"
+  # Search for the potion-making link /lab/alchemy/1/makePotion?r=42378359
+  click=$(grep -o -E "/lab/alchemy/$i/makePotion[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p')
   
-    # Generate a random number between 1 and 4
-    i=$(shuf -i 1-4 -n 1)
-    fetch_page "/lab/alchemy/$i/"
-    # Search for the potion-making link /lab/alchemy/1/makePotion?r=42378359
+  # If a link is found, fetch the page to make the potion
+  if [ -n "$click" ]; then
+    case $i in
+    (1)
+      echo " Buying elixir strength" ;;
+    (2)
+      echo " Buying elixir health" ;;
+    (3)
+      echo " Buying elixir agility" ;;
+    (4)
+      echo " Buying elixir protection" ;;    
+    esac
+    fetch_page "$click"
+    sleep 1s
     click=$(grep -o -E "/lab/alchemy/$i/makePotion[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p')
-    
-    # If a link is found, fetch the page to make the potion
-    if [ -n "$click" ]; then
-      fetch_page "$click"
-      sleep 1s
-      click=$(grep -o -E "/lab/alchemy/$i/makePotion[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p')
-      fetch_page "$click"
-      # Finalize the quest
-      checkQuest 7
-    fi
+    fetch_page "$click"
+    # Finalize the quest
+    checkQuest 7
   fi
   
 }
 
 clanMerchantQuest() {
   # Checking for available quests
-  if checkQuest 8; then
-    # Fetch the coliseum merchant page
-    fetch_page "/coliseum/merchant/"
+  # Fetch the coliseum merchant page
+  fetch_page "/coliseum/merchant/"
 
-    # Generate a random number between 1 and 2
-    i=$(shuf -i 1-2 -n 1)
-    # /coliseum/merchant/2/startMaking?r=42378359&ref=lab
-    # Search for the merchant-making link with reference to the lab
+  # Generate a random number between 1 and 2
+  i=$(shuf -i 1-2 -n 1)
+  # /coliseum/merchant/2/startMaking?r=42378359&ref=lab
+  # Search for the merchant-making link with reference to the lab
+  click=$(grep -o -E "/coliseum/merchant/$i/startMaking[?]r=[0-9]+&ref=lab" "$TMP"/SRC | sed -n '1p')
+
+  # If a link is found, fetch the page to start the merchant process
+  if [ -n "$click" ]; then
+    case $i in
+      (1)
+        echo " Buying Stones 🪨"
+        ;;
+      (2)
+        echo " Buying Grass 🍃"
+    esac
+    fetch_page "$click"
     click=$(grep -o -E "/coliseum/merchant/$i/startMaking[?]r=[0-9]+&ref=lab" "$TMP"/SRC | sed -n '1p')
-
-    # If a link is found, fetch the page to start the merchant process
-    if [ -n "$click" ]; then
-      fetch_page "$click"
-      click=$(grep -o -E "/coliseum/merchant/$i/startMaking[?]r=[0-9]+&ref=lab" "$TMP"/SRC | sed -n '1p')
-      fetch_page "$click"
-      click=$(grep -o -E "/coliseum/merchant/$i/startMaking[?]r=[0-9]+&ref=lab" "$TMP"/SRC | sed -n '1p')
-      fetch_page "$click"
-      sleep 1s
-      checkQuest 8
-    fi
+    fetch_page "$click"
+    click=$(grep -o -E "/coliseum/merchant/$i/startMaking[?]r=[0-9]+&ref=lab" "$TMP"/SRC | sed -n '1p')
+    fetch_page "$click"
+    sleep 1s
+    checkQuest 8
   fi
 }
 
@@ -178,6 +191,9 @@ clanQuests() {
     fi    
     if checkQuest 5; then
     cave_routine
+    fi
+    if checkQuest 1  || checkQuest 2 ; then
+    league_play
     fi
     echo -e "${GREEN_BLACK}Clan missions done ✅${COLOR_RESET}\n"
 }
