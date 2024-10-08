@@ -10,7 +10,7 @@ career_func() {
       local CAREER
       CAREER=$(grep -o -E '/career/(attack|take)/[?]r[=][0-9]+' "$TMP"/SRC)
       local BREAK=$(($(date +%s) + 60))
-      while [ -n "$CAREER" ] && [ $(date +%s) -lt "$BREAK" ]; do
+      while [ -n "$CAREER" ] && [ "$(date +%s)" -lt "$BREAK" ]; do
         case $CAREER in
         (*attack*)
           fetch_page "$CAREER"

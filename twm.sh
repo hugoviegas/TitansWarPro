@@ -25,6 +25,7 @@ if [ -d /data/data/com.termux/files/usr/share/doc ]; then
   termux-wake-lock
   LS='/data/data/com.termux/files/usr/share/doc'
 else
+  # shellcheck disable=SC2034
   LS='/usr/share/doc'
 fi
 
@@ -80,6 +81,7 @@ fetch_page() {
     local relative_url="${1:-/}"  # Default to root if no relative URL is provided
     local output_file="${2:-$TMP/SRC}"  # Default output file if not provided
     local user_agent_file="$TMP/userAgent.txt"  # User agent file
+    # shellcheck disable=SC2155
     local user_agent=$(shuf -n1 "$user_agent_file")  # Pick a random user agent
     local retries=3  # Number of retry attempts
     local attempt=1
@@ -126,13 +128,11 @@ fetch_page_bk() {
 # Check if the user settings file exists and is not empty
 if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
     printf "${GREEN_BLACK} Starting with last settings used.${COLOR_RESET}\n"
-    
-    num=6  # Number of seconds to wait before reconfiguration prompt
 
     # Countdown loop for reconfiguration prompt
     for i in $(seq 3 -1 1); do
         i=$((i - 1))
-        if read -t 1; then
+        if read -r -t 1; then
             # Clear relevant files if Enter is pressed
             : >"$HOME/twm/al_file"
             : >"$HOME/twm/ur_file"

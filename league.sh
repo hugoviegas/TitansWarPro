@@ -1,3 +1,4 @@
+# shellcheck disable=SC2034
 fetch_available_fights() {
     fetch_page "/league/" "LEAGUE_DEBUG_SRC"
     

@@ -1,3 +1,5 @@
+
+# shellcheck disable=SC2154
 func_crono() {
     # Get the current hour and minute
     HOUR=$(date +%H)
@@ -11,6 +13,23 @@ func_crono() {
     echo -e " \033[02m$URL ⏰ $(date +%H):$(date +%M)${COLOR_RESET}"
 }
 
+list() {
+    printf "\n"
+    
+    # Verifique se os arquivos .sh existem no diretório antes de prosseguir
+    if [ -z "$(ls ~/twm/*.sh 2>/dev/null)" ]; then
+        echo "Nenhum arquivo de script encontrado no diretório ~/twm/"
+        return 1  # Saia da função se não houver arquivos
+    fi
+
+    # Listar funções definidas nos scripts
+    grep -o -E '[[:alpha:]]+?[_]?[[:alpha:]]+?[ ]?\() \{' ~/twm/*.sh | awk -F : '{ print $2 }' | awk -F \( '{ print $1 }'
+
+    # Esperar por entrada do usuário por 5 segundos
+    read -r -t 5  # Se não houver input, apenas continua
+}
+
+# Função principal 'func_cat'
 func_cat() {
     func_crono  # Call func_crono to display the current time
 
@@ -24,25 +43,24 @@ func_cat() {
     cat "$TMP/msg_file"  # Display the contents of msg_file
     printf "${WHITE_BLACK}"
 
-    list() {
-        printf "\n"
-        # List functions defined in scripts
-        grep -o -E '[[:alpha:]]+?[_]?[[:alpha:]]+?[ ]?\() \{' ~/twm/*.sh | awk -F\: '{ print $2 }' | awk -F\( '{ print $1 }'
-        read -t 5  # Wait for user input for 5 seconds
-    }
-
     while true; do
         printf " \033[02mNo battles now, waiting ${i}s${COLOR_RESET}\n${WHITEb_BLACK}Enter a command or type 'list':${COLOR_RESET} \n"
-        read -t "$i" cmd  # Read user command with a timeout
+        read -r -t "$i" cmd  # Read user command with a timeout
 
         if [ "$cmd" = " " ]; then
             break  # Exit loop if only space is entered
         fi
 
         printf "\n"
-        $cmd  # Execute the command entered by the user
+        
+        # Executar o comando inserido, ou chamar a função 'list' se for esse o comando
+        if [ "$cmd" = "list" ]; then
+            list  # Chamar a função 'list' definida fora
+        else
+            $cmd  # Executar o comando inserido pelo usuário
+        fi
+        
         sleep 0.5s  # Brief pause before next iteration
-        break  # Exit after executing the command once
     done
 }
 

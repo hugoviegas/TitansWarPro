@@ -1,6 +1,6 @@
 altars_fight () {
  cd "$TMP" || exit
- event=altars
+ #event=altars
  apply_event
 
  #/enterFight
@@ -31,11 +31,14 @@ altars_fight () {
  : >BREAK_LOOP ; cat HP >old_HP
  echo $(( $(date +%s) - 20 )) >last_dodge
  echo $(( $(date +%s) - 90 )) >last_heal
- echo $(( $(date +%s) - $LA )) >last_atk
+ echo $(( $(date +%s) - LA )) >last_atk
  until [ -s "BREAK_LOOP" ] ; do
   cf_access
   #/dodge/
-  if ! grep -q -o 'txt smpl grey' "$TMP"/src.html && [ "$(( $(date +%s) - $(cat last_dodge) ))" -gt 20 -a "$(( $(date +%s) - $(cat last_dodge) ))" -lt 300 ] && awk -v ush="$(cat HP)" -v oldhp="$(cat old_HP)" 'BEGIN { exit !(ush < oldhp) }' ; then
+  if ! grep -q -o 'txt smpl grey' "$TMP"/src.html && \
+   [ "$(( $(date +%s) - $(cat last_dodge) ))" -gt 20 ] && \
+   [ "$(( $(date +%s) - $(cat last_dodge) ))" -lt 300 ] && \
+   awk -v ush="$(cat HP)" -v oldhp="$(cat old_HP)" 'BEGIN { exit !(ush < oldhp) }'; then
 #   sleep 3s
    (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat DODGE)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/src.html
@@ -44,7 +47,10 @@ altars_fight () {
    cf_access
    cat HP >old_HP ; date +%s >last_dodge
   #/heal/
-  elif awk -v ush="$(cat HP)" -v hlhp="$(cat HLHP)" 'BEGIN { exit !(ush < hlhp) }' && [ "$(( $(date +%s) - $(cat last_heal) ))" -gt 90 -a "$(( $(date +%s) - $(cat last_heal) ))" -lt 300 ] ; then
+  elif awk -v ush="$(cat HP)" -v hlhp="$(cat HLHP)" 'BEGIN { exit !(ush < hlhp) }' && \
+   [ "$(( $(date +%s) - $(cat last_heal) ))" -gt 90 ] && \
+   [ "$(( $(date +%s) - $(cat last_heal) ))" -lt 300 ]; then
+
    (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat HEAL)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/src.html
    ) </dev/null &>/dev/null &
@@ -88,39 +94,32 @@ altars_fight () {
 altars_start () {
  case $(date +%H:%M) in
  (13:5[5-9]|20:5[5-9])
+
   (
    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | grep -o -E '\(([0-9]+)\)' | sed 's/[()]//g' >"$TMP"/FULL
   ) </dev/null &>/dev/null &
   time_exit 17
-  (
-   w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/altars/?close=reward" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/src.html
-  ) </dev/null &>/dev/null &
-  time_exit 17
-  (
-   w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/altars/enterFight" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/src.html
-  ) </dev/null &>/dev/null &
-  time_exit 17
+
+  fetch_page "/altars/?close=reward" "$TMP"/src.html
+  fetch_page "/altars/enterFight" "$TMP"/src.html
   printf "Ancient Altars will be started...\n"
-  until $(case $(date +%M) in (55|56|57|58|59) exit 1 ;; esac) ;
+
+  until (case $(date +%M) in (55|56|57|58|59) exit 1 ;; esac) ;
   do
    sleep 2
   done
-  (
-   w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/altars/enterFight" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/src.html
-  ) </dev/null &>/dev/null &
-  time_exit 17
-  printf "\nAltars\n$URL\n"
+  fetch_page "/altars/enterFight" "$TMP"/src.html
+  echo -e "${GOLD_BLACK}Altars will be started...${COLOR_RESET}"
   grep -o -E '(/altars(/[A-Za-z]+/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+|/))' "$TMP"/src.html | sed -n 1p >ACCESS 2> /dev/null
-  printf " 👣 Entering...\n$(cat ACCESS)\n"
+  echo -e " 👣 Entering..."
   #/wait
-  printf " 😴 Waiting...\n"
+  echo -e " 😴 Waiting..."
   local BREAK=$(( $(date +%s) + 30 ))
   until grep -q -o 'altars/dodge/' ACCESS || [ "$(date +%s)" -gt "$BREAK" ] ; do
    printf "$URL\n 💤	...\n$(cat ACCESS)\n"
-   (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/altars" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/src.html
-   ) </dev/null &>/dev/null &
-   time_exit 17
+   
+   fetch_page "/altars" "$TMP"/src.html
+   
    grep -o -E '(/altars(/[A-Za-z]+/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+|/))' "$TMP"/src.html | sed -n 1p >ACCESS 2> /dev/null
    sleep 3
   done

@@ -4,12 +4,12 @@ twm_play() {
         # shellcheck disable=SC2317
         if [ "$RUN" != '-boot' ]; then
             # Get the PID of the running twm script
-            pidf=$(ps ax -o pid=,args= | grep "sh.*twm/twm.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
+            pidf=$(pgrep -f "sh.*twm/twm.sh" | head -n 1)
             
             # Loop until there are no more PIDs found
             until [ -z "$pidf" ]; do
-                kill -9 $pidf 2> /dev/null  # Forcefully kill the process
-                pidf=$(ps ax -o pid=,args= | grep "sh.*twm/twm.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
+                kill -9 "$pidf" 2> /dev/null  # Forcefully kill the process
+                pidf=$(pgrep -f "sh.*twm/twm.sh" | head -n 1)
                 sleep 1s  # Wait for a second before checking again
             done
         fi

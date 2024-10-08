@@ -57,7 +57,7 @@ else
 fi
 
 # Normalize the version string to lowercase for use in URLs
-version=$(echo "$VERSION" | sed 's/[ \t]//g' | tr "[[:upper:]]" "[[:lower:]]")
+version=$(echo "$VERSION" | sed 's/[ \t]//g' | tr "[:upper:]" "[:lower:]")
 
 # Inform the user about the preparation of the repository source
 printf "\n${CYAN_BLACK}🔧 Preparing${COLOR_RESET} ${GOLD_BLACK}$VERSION${COLOR_RESET} ${CYAN_BLACK}repository source...${COLOR_RESET}\n"
@@ -70,7 +70,7 @@ cd ~/twm || exit
 SCRIPTS="easyinstall.sh info.sh"
 
 # Remove any existing scripts in both home and current directories
-rm -rf "$HOME/$SCRIPTS" "$SCRIPTS" 2>/dev/null
+rm -rf "${HOME}:?/$SCRIPTS" "$SCRIPTS" 2>/dev/null
 
 # Define the server URL based on selected version
 SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/${version}/"
