@@ -82,7 +82,7 @@ league_play() {
                     E_AGILITY=$(get_enemy_stat "$INDEX" 3)
                     E_PROTECTION=$(get_enemy_stat "$INDEX" 4)
 
-                    #echo -e "Enemy Number: $ENEMY_NUMBER"
+                    echo -e "Enemy Number: $ENEMY_NUMBER"
                     #echo -e "Enemy Stats: Strength: ${E_STRENGTH:-0}"
                     action="fight_or_skip"
                 else
@@ -94,38 +94,39 @@ league_play() {
             fight_or_skip)
                 if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
                     echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
-                    echo -e "Fight $((fights_done + 1)) initiated with enemy number $ENEMY_NUMBER ✅ .\n"
-                    fetch_page "$click"
-                    action="check_fights"
+                    fetch_page "$click" # click
                     fights_done=$((fights_done + 1))  # Count the fight
+                    echo -e "Fight $fights_done initiated with enemy number $ENEMY_NUMBER ✅ .\n"
                     enemy_index=1  # Reset enemy index after a fight
                     j=1  # Reset button index after a fight
                     fetch_available_fights  # Recheck available fights
+                    action="check_fights" # back to check fights
                 else
                     echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
                     enemy_index=$((enemy_index + 1))  # Move to the next enemy
-                    echo "$enemy_index"
+                    #echo "$enemy_index"
                     j=$((j + 2))  # Move to the next button (skip every 2 links)
-                    last_click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight 
-                    if [ "$enemy_index" -gt 3 ] || [ -n "$last_click" ]; then  # If there are more than 4 enemies
-                        echo "Reached the last enemy. Attacking the last one and using a potion."
+                    last_click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight
+                    #echo "$last_click" 
+                    fetch_available_fights  # Recheck available fights
+                    if [ -z "$last_click" ] && [ "$AVAILABLE_FIGHTS" -gt 1 ]; then  # If there are more than 4 enemies
+                        echo " Reached the last enemy. Attacking the last one and using a potion..."
                         j=$((j - 2))  # Move to the previous button (skip every 2 links)
                         
                         # Attack the last enemy
-                        last_click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")
-                        fetch_page "$last_click"
+                        click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")
+                        fetch_page "$click"
                         fights_done=$((fights_done + 1))  # Count the fight
                         fetch_available_fights  # Recheck available fights
-                        sleep 0.8s
+                        
                         # Use potion
-                        potion_click=$(grep -o -E "/league/potion/\?r=[0-9]+" "$TMP/SRC" | sed -n 1p)
-                        fetch_page "$potion_click"
-
-                        # Reset the index to attack the first enemy
-                        enemy_index=1
-                        j=1
-                        E_STRENGTH=50
-                        action="fight_or_skip"
+                            potion_click=$(grep -o -E "/league/potion/\?r=[0-9]+" "$TMP/SRC" | sed -n 1p)
+                            fetch_page "$potion_click"
+                            E_STRENGTH=50 # set a fake strength to the first enemy
+                            # Reset the index to attack the first enemy
+                            enemy_index=1
+                            j=1
+                            action="fight_or_skip"
                     else
                         action="check_fights"
                     fi
