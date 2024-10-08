@@ -128,6 +128,8 @@ fetch_page_bk() {
 # Check if the user settings file exists and is not empty
 if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
     printf "${GREEN_BLACK} Starting with last settings used.${COLOR_RESET}\n"
+    
+    num=6  # Number of seconds to wait before reconfiguration prompt
 
     # Countdown loop for reconfiguration prompt
     for i in $(seq 3 -1 1); do
