@@ -134,7 +134,7 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
     # Countdown loop for reconfiguration prompt
     for i in $(seq 3 -1 1); do
         i=$((i - 1))
-        if read -r -t 1; then
+        if read -t 1; then
             # Clear relevant files if Enter is pressed
             : >"$HOME/twm/al_file"
             : >"$HOME/twm/ur_file"
