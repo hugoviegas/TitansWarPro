@@ -45,8 +45,8 @@ get_enemy_stat() {
 # Função principal para jogar na liga
 league_play() {
     echo -e "${GOLD_BLACK}League ⚔️${COLOR_RESET}"
-    checkQuest 2
-    checkQuest 1
+    #checkQuest 2
+    #checkQuest 1
 
     PLAYER_STRENGTH=$(player_stats)  # Obtendo a força do jogador
     fetch_available_fights  # Buscando lutas disponíveis
@@ -60,14 +60,14 @@ league_play() {
     while [ "$fights_done" -lt "$AVAILABLE_FIGHTS" ] || [ "$AVAILABLE_FIGHTS" -gt 0 ]; do
         case "$action" in
             check_fights)
-                #echo "DEBUG: Player Stats = $PLAYER_STRENGTH"
-                #echo "DEBUG: Button j = $j"
-                #echo "DEBUG: Enemy Index = $enemy_index"
-                #echo "DEBUG: Fights done = $fights_done"
+                echo "DEBUG: Player Stats = $PLAYER_STRENGTH"
+                echo "DEBUG: Button j = $j"
+                echo "DEBUG: Enemy Index = $enemy_index"
+                echo "DEBUG: Fights done = $fights_done"
                 fetch_page "/league/"
                 
                 click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight button
-                #echo "${URL}$click"
+                echo "${URL}$click"
                 if [[ "$click" == *"/league/refreshFights/"* ]]; then
                     echo "Limite de ataques finalizado. Encerrando..."
                     action="exit_loops"
@@ -120,14 +120,14 @@ league_play() {
                 ;;
         esac
        # Recompensa
-        click=$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
-        fetch_page "$click" 
+        clickReward=$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
+        fetch_page "$clickReward" 
     done
 
     unset click ENEMY_NUMBER PLAYER_STRENGTH E_STRENGTH AVAILABLE_FIGHTS fights_done enemy_index j
 
-    checkQuest 2
-    checkQuest 1
+    #checkQuest 2
+    #checkQuest 1
 
     echo -e "${GREEN_BLACK}League Routine Completed ✅${COLOR_RESET}\n"
 }

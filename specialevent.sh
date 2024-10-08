@@ -1,3 +1,4 @@
+#!/bin/bash
 specialEvent() {
   # Fetch the page and store the output in $TMP/SRC
   fetch_page
@@ -33,4 +34,3 @@ specialEvent() {
       ;;
   esac
 }
-# https://furiadetitas.net/questrnd/take/?r=14109318
