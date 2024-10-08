@@ -32,7 +32,9 @@ career_func() {
     checkQuest 6
 
     echo -e "${GREEN_BLACK}Career ✅${COLOR_RESET}\n"
+    return 0
   else
     echo -e "${GREEN_BLACK}Career ✅${COLOR_RESET}\n"
+    return 1
   fi
 }
