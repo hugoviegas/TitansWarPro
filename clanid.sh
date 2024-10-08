@@ -1,7 +1,7 @@
 clan_id() {
   cd "$TMP" || exit
   #/Executa o comando especificado no SOURCE com a URL do clã e um userAgent.txt aleatório
-  fetch_page "/clan"
+  fetch_page "/clan" "CLD"
   
   #/Lê o conteúdo do arquivo CLD, substitui cada ocorrência de "/clan/" por uma nova linha,
   #/seleciona somente as linhas que contêm a string "built/", e extrai a primeira parte da string
