@@ -53,13 +53,17 @@ pkg update -y ; pkg upgrade
 Também:
 
 ```bash
-pkg install w3m termux-api procps coreutils ncurses-utils
+pkg install w3m termux-api procps coreutils ncurses-utils wget
 ```
 
 > 2 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando):
 
 ```bash
 curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh -L -O
+```
+caso não funcione tente este comando
+```bash
+wget clone https://raw.githubusercontent.com/hugoviegas/TitansWarPro/refs/heads/master/update.sh
 ```
 
 > 3 - Dê permissão de execução para o instalador:
