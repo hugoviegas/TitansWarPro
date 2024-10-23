@@ -53,19 +53,13 @@ pkg update -y ; pkg upgrade
 Também:
 
 ```bash
-pkg install w3m termux-api procps coreutils ncurses-utils wget
+pkg install w3m termux-api procps coreutils ncurses-utils
 ```
 
 > 2 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando):
 
 ```bash
-curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh -L -O
-```
-
-caso não funcione tente este comando
-
-```bash
-wget clone https://raw.githubusercontent.com/hugoviegas/TitansWarPro/refs/heads/master/update.sh
+wget https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/update.sh
 ```
 
 > 3 - Dê permissão de execução para o instalador:
@@ -152,7 +146,7 @@ apk add wget ; apk add w3m ; apk add procps ; apk add coreutils ; apk add --no-c
 > Android(UserLAnd) and Iphone(iSH):
 
 ```bash
-wget clone https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh
+wget https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/update.sh
 ```
 
 > 4 - Dê permissão de execução para o instalador
@@ -206,7 +200,7 @@ rm -rf $HOME/twm
 > 1 - Abra o progama Cygwin(https://www.cygwin.com/setup-x86_64.exe) ou (https://www.cygwin.com/setup-x86.exe) como adiministrador no Windows. Na instalação selecione qualquer link, a parti daí é só dá Next até concluir. Em sequida com adiministrador abra o Cygwin Terminal que foi instalado. Digite, ou copie e cole o comando abaixo para baixar o instalador do twm(O link faz parte do comando):
 
 ```bash
-wget clone https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh
+wget https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/update.sh
 ```
 
 > 2 - Dê permissão de execução para o instalador:
@@ -266,7 +260,7 @@ sudo apt-get install coreutils dnsutils-y
 > 3 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando):
 
 ```bash
-wget clone https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh
+wget https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/update.sh
 ```
 
 > 4 - Dê permissão de execução para o instalador:
