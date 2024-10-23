@@ -59,7 +59,7 @@ pkg install w3m termux-api procps coreutils ncurses-utils wget
 > 2 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando):
 
 ```bash
-curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh
+curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh -L -O
 ```
 
 caso não funcione tente este comando
@@ -266,7 +266,7 @@ sudo apt-get install coreutils dnsutils-y
 > 3 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando):
 
 ```bash
-wget https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh -L -O
+wget https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh
 ```
 
 > 4 - Dê permissão de execução para o instalador:
