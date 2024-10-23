@@ -11,7 +11,7 @@ fi
 
 
 if [ ! -e "$HOME/info.sh" ]; then
-  wget https://raw.githubusercontent.com/hugoviegas/TitansWarPro/"$version"/info.sh >"$HOME"/twm/info.sh
+  wget clone https://raw.githubusercontent.com/hugoviegas/TitansWarPro/"$version"/info.sh >"$HOME"/twm/info.sh
   chmod +x ~/twm/info.sh
   sleep 0.5s
 fi
@@ -27,7 +27,7 @@ cd ~/twm || exit
 #
 
 SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/$version/"
-remote_count=$(wget "${SERVER}"easyinstall.sh | wc -c)
+remote_count=$(wget clone "${SERVER}"easyinstall.sh | wc -c)
 if [ -e "easyinstall.sh" ]; then
   local_count=$(wc -c <"easyinstall.sh")
 else
@@ -80,7 +80,7 @@ if uname | grep -q -i "cygwin"; then
     :
   else
     #/cygwin repository
-    wget "https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/apt-cyg" &
+    wget clone "https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/apt-cyg" &
     : > /dev/null
     install apt-cyg /bin
   fi
@@ -142,7 +142,7 @@ sync_func() {
   for script in $SCRIPTS; do
     LEN=$((LEN + 1))
     printf "Checking $LEN/$NUM_SCRIPTS $script\n"
-    remote_count=$(wget "${SERVER}$script" | wc -c)
+    remote_count=$(wget clone "${SERVER}$script" | wc -c)
 
     if [ -e ~/twm/"$script" ]; then
       local_count=$(wc -c <"$script")
@@ -154,10 +154,10 @@ sync_func() {
       printf "✅ ${BLACK_CYAN}Updated $script${COLOR_RESET}\n"
     elif [ -e ~/twm/"$script" ] && [ "$remote_count" -ne "$local_count" ]; then
       printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
-      wget "${SERVER}$script" >"$script"
+      wget clone "${SERVER}$script" >"$script"
     else
       printf "🔽 ${BLACK_YELLOW}Downloading $script${COLOR_RESET}\n"
-      wget "${SERVER}$script" 
+      wget clone "${SERVER}$script" 
     fi
     sleep 0.1s
   done
@@ -169,9 +169,9 @@ sync_func() {
 
 sync_func_other() {
   SCRIPTS="requeriments.sh svproxy.sh loginlogoff.sh crono.sh check.sh clanquest.sh run.sh clanid.sh allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh clancoliseum.sh clandungeon.sh clanfight.sh coliseum.sh flagfight.sh king.sh league.sh trade.sh undying.sh"
-  wget "${SERVER}"play.sh 
-  wget "${SERVER}"info.sh >twm.sh
-  wget "${SERVER}"twm.sh | sed -n '3,33p' >>twm.sh
+  wget clone "${SERVER}"play.sh 
+  wget clone "${SERVER}"info.sh >twm.sh
+  wget clone "${SERVER}"twm.sh | sed -n '3,33p' >>twm.sh
   NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
   LEN=0
 
@@ -179,11 +179,11 @@ sync_func_other() {
     LEN=$((LEN + 1))
     printf "Checking $LEN/$NUM_SCRIPTS $script\n"
     printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
-    wget "${SERVER}$script" >>twm.sh
+    wget clone "${SERVER}$script" >>twm.sh
     printf "\n#\n" >>twm.sh
     sleep 0.1s
   done
-  wget "${SERVER}"twm.sh | sed -n '40,120p' >>twm.sh
+  wget clone "${SERVER}"twm.sh | sed -n '40,120p' >>twm.sh
 
   #DOS to Unix
   find ~/twm -type f -name '*.sh' -print0 | xargs -0 sed -i 's/\r$//' 2>/dev/null

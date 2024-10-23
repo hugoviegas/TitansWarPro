@@ -85,7 +85,7 @@ for script in $SCRIPTS; do
     printf "Checking $LEN/$NUM_SCRIPTS $script\n"
 
     # Get the size of the remote script
-    remote_count=$(wget "${SERVER}${script}" | wc -c)
+    remote_count=$(wget clone "${SERVER}${script}" | wc -c)
 
     # Get the size of the local script if it exists, otherwise set to 1 (to indicate it does not exist)
     if [ -e ~/twm/"$script" ]; then
@@ -99,10 +99,10 @@ for script in $SCRIPTS; do
         printf "✅ ${BLACK_CYAN}Updated $script${COLOR_RESET}\n"
     elif [ -e ~/twm/"$script" ] && [ "$remote_count" -ne "$local_count" ]; then
         printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
-        wget "${SERVER}${script}" >"$script"  # Update existing script with new content
+        wget clone "${SERVER}${script}" >"$script"  # Update existing script with new content
     else
         printf "🔽 ${BLACK_YELLOW}Downloading $script${COLOR_RESET}\n"
-        wget "${SERVER}${script}"  # Download new script if it doesn't exist locally
+        wget clone "${SERVER}${script}"  # Download new script if it doesn't exist locally
     fi
 
     chmod +x "$script"  # Make the script executable
