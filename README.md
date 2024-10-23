@@ -59,7 +59,7 @@ pkg install w3m termux-api procps coreutils ncurses-utils
 > 2 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando):
 
 ```bash
-wget https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/update.sh
+curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh -L -O
 ```
 
 > 3 - Dê permissão de execução para o instalador:
@@ -132,13 +132,13 @@ apk update
 > Android(UserLAnd):
 
 ```bash
-sudo apk add wget ; apk add w3m ; apk add procps ; apk add coreutils ; apk add --no-cache tzdata
+sudo apk add curl ; apk add w3m ; apk add procps ; apk add coreutils ; apk add --no-cache tzdata
 ```
 
 > Iphone(iSH):
 
 ```bash
-apk add wget ; apk add w3m ; apk add procps ; apk add coreutils ; apk add --no-cache tzdata
+apk add curl ; apk add w3m ; apk add procps ; apk add coreutils ; apk add --no-cache tzdata
 ```
 
 > 3 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando)
@@ -146,7 +146,7 @@ apk add wget ; apk add w3m ; apk add procps ; apk add coreutils ; apk add --no-c
 > Android(UserLAnd) and Iphone(iSH):
 
 ```bash
-wget https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/update.sh
+curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh -L -O
 ```
 
 > 4 - Dê permissão de execução para o instalador
@@ -200,7 +200,7 @@ rm -rf $HOME/twm
 > 1 - Abra o progama Cygwin(https://www.cygwin.com/setup-x86_64.exe) ou (https://www.cygwin.com/setup-x86.exe) como adiministrador no Windows. Na instalação selecione qualquer link, a parti daí é só dá Next até concluir. Em sequida com adiministrador abra o Cygwin Terminal que foi instalado. Digite, ou copie e cole o comando abaixo para baixar o instalador do twm(O link faz parte do comando):
 
 ```bash
-wget https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/update.sh
+curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh -L -O
 ```
 
 > 2 - Dê permissão de execução para o instalador:
@@ -248,7 +248,7 @@ sudo apt-get update -y
 > 2 - Digite ou copie e cole este comando para baixar os pacotes necessários:
 
 ```bash
-sudo apt-get install wget w3m procps -y
+sudo apt-get install curl w3m procps -y
 ```
 
 Opcional:
@@ -260,7 +260,7 @@ sudo apt-get install coreutils dnsutils-y
 > 3 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando):
 
 ```bash
-wget https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/update.sh
+curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh -L -O
 ```
 
 > 4 - Dê permissão de execução para o instalador:
