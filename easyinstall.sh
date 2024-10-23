@@ -11,7 +11,7 @@ fi
 
 
 if [ ! -e "$HOME/info.sh" ]; then
-  curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/"$version"/info.sh -s -L >"$HOME"/twm/info.sh
+  wget https://raw.githubusercontent.com/hugoviegas/TitansWarPro/"$version"/info.sh >"$HOME"/twm/info.sh
   chmod +x ~/twm/info.sh
   sleep 0.5s
 fi
@@ -27,7 +27,7 @@ cd ~/twm || exit
 #
 
 SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/$version/"
-remote_count=$(curl "${SERVER}"easyinstall.sh -s -L | wc -c)
+remote_count=$(wget "${SERVER}"easyinstall.sh | wc -c)
 if [ -e "easyinstall.sh" ]; then
   local_count=$(wc -c <"easyinstall.sh")
 else
@@ -80,7 +80,7 @@ if uname | grep -q -i "cygwin"; then
     :
   else
     #/cygwin repository
-    curl -s -L -O "https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/apt-cyg" &
+    wget "https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/apt-cyg" &
     : > /dev/null
     install apt-cyg /bin
   fi
@@ -115,17 +115,17 @@ fi
 APPISH=$(uname -a | grep -o "\-ish")
 if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = '-ish' ]; then
   LS='/usr/share/doc'
-  printf "${BLACK_CYAN}Install the necessary packages for Alpine on app ISh(Iphone):${COLOR_RESET}\n apk update\n apk add curl ; apk add w3m ; apk add coreutils ; apk add --no-cache tzdata\n\n"
+  printf "${BLACK_CYAN}Install the necessary packages for Alpine on app ISh(Iphone):${COLOR_RESET}\n apk update\n apk add wget ; apk add w3m ; apk add coreutils ; apk add --no-cache tzdata\n\n"
   sleep 5s
 #/UserLAnd Terminal
 elif [ "$SHELL" != "/bin/ash" ] && [ "$APPISH" != '-ish' ] && uname -m | grep -q -E '(aarch64|armhf|armv7|mips64)' && [ ! -d /data/data/com.termux/files/usr/share/doc ]; then
   LS='/usr/share/doc'
-  printf "${BLACK_CYAN}Install the necessary packages for Alpine on app UserLAnd(Android):${COLOR_RESET}\n apk update\n sudo apk add curl ; sudo apk add w3m ; sudo apk add coreutils ; sudo apk add --no-cache tzdata\n\n"
+  printf "${BLACK_CYAN}Install the necessary packages for Alpine on app UserLAnd(Android):${COLOR_RESET}\n apk update\n sudo apk add wget ; sudo apk add w3m ; sudo apk add coreutils ; sudo apk add --no-cache tzdata\n\n"
   sleep 5s
 #/other linux
 elif [ "$SHELL" != "/bin/ash" ] && [ "$APPISH" != '-ish' ] && uname -m | grep -q -E "(ppc64le|riscv64|s390x|x86|x86_64)" && [ ! -d /data/data/com.termux/files/usr/share/doc ]; then
   LS='/usr/share/doc'
-  printf "${BLACK_CYAN}Install required packages for Linux or Windows WSL:${COLOR_RESET}\n sudo apt update\n sudo apt install curl coreutils ncurses-term procps w3m -y\n"
+  printf "${BLACK_CYAN}Install required packages for Linux or Windows WSL:${COLOR_RESET}\n sudo apt update\n sudo apt install wget coreutils ncurses-term procps w3m -y\n"
   sleep 5s
 fi
 
@@ -142,7 +142,7 @@ sync_func() {
   for script in $SCRIPTS; do
     LEN=$((LEN + 1))
     printf "Checking $LEN/$NUM_SCRIPTS $script\n"
-    remote_count=$(curl "${SERVER}$script" -s -L | wc -c)
+    remote_count=$(wget "${SERVER}$script" | wc -c)
 
     if [ -e ~/twm/"$script" ]; then
       local_count=$(wc -c <"$script")
@@ -154,10 +154,10 @@ sync_func() {
       printf "✅ ${BLACK_CYAN}Updated $script${COLOR_RESET}\n"
     elif [ -e ~/twm/"$script" ] && [ "$remote_count" -ne "$local_count" ]; then
       printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
-      curl "${SERVER}$script" -s -L >"$script"
+      wget "${SERVER}$script" >"$script"
     else
       printf "🔽 ${BLACK_YELLOW}Downloading $script${COLOR_RESET}\n"
-      curl "${SERVER}$script" -s -L -O
+      wget "${SERVER}$script" 
     fi
     sleep 0.1s
   done
@@ -169,9 +169,9 @@ sync_func() {
 
 sync_func_other() {
   SCRIPTS="requeriments.sh svproxy.sh loginlogoff.sh crono.sh check.sh clanquest.sh run.sh clanid.sh allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh clancoliseum.sh clandungeon.sh clanfight.sh coliseum.sh flagfight.sh king.sh league.sh trade.sh undying.sh"
-  curl "${SERVER}"play.sh -s -L -O
-  curl "${SERVER}"info.sh -s -L >twm.sh
-  curl "${SERVER}"twm.sh -s -L | sed -n '3,33p' >>twm.sh
+  wget "${SERVER}"play.sh 
+  wget "${SERVER}"info.sh >twm.sh
+  wget "${SERVER}"twm.sh | sed -n '3,33p' >>twm.sh
   NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
   LEN=0
 
@@ -179,11 +179,11 @@ sync_func_other() {
     LEN=$((LEN + 1))
     printf "Checking $LEN/$NUM_SCRIPTS $script\n"
     printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
-    curl "${SERVER}$script" -s -L >>twm.sh
+    wget "${SERVER}$script" >>twm.sh
     printf "\n#\n" >>twm.sh
     sleep 0.1s
   done
-  curl "${SERVER}"twm.sh -s -L | sed -n '40,120p' >>twm.sh
+  wget "${SERVER}"twm.sh  | sed -n '40,120p' >>twm.sh
 
   #DOS to Unix
   find ~/twm -type f -name '*.sh' -print0 | xargs -0 sed -i 's/\r$//' 2>/dev/null
