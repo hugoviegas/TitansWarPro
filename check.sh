@@ -57,6 +57,9 @@ apply_event() {
 }
 
 use_elixir() {
+    if [ "$FUNC_use_elixir" = "no" ]; then
+        return
+    fi
     # Initial fetch to get the starting URLs
     fetch_page "/inv/chest/"
 

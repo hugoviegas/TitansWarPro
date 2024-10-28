@@ -54,6 +54,8 @@ cd ~/twm || exit
 . svproxy.sh
 . check.sh
 . league.sh
+. specialevent.sh
+. function.sh
 #/twm.sh after sources >>
 #/functions
 twm_start() {
