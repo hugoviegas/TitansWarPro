@@ -171,7 +171,7 @@ sync_func() {
 }
 
 sync_func_other() {
-  SCRIPTS="requeriments.sh svproxy.sh loginlogoff.sh crono.sh check.sh clanquest.sh run.sh clanid.sh allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh clancoliseum.sh clandungeon.sh clanfight.sh coliseum.sh flagfight.sh king.sh league.sh trade.sh undying.sh"
+  SCRIPTS="requeriments.sh svproxy.sh loginlogoff.sh crono.sh check.sh run.sh clanid.sh allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh clancoliseum.sh clandungeon.sh clanfight.sh coliseum.sh flagfight.sh king.sh league.sh trade.sh undying.sh"
   curl "${SERVER}"play.sh -s -L -O
   curl "${SERVER}"info.sh -s -L >twm.sh
   curl "${SERVER}"twm.sh -s -L | sed -n '3,33p' >>twm.sh
