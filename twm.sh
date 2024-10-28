@@ -1,6 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC1091
-. "$HOME"/twm/info.lib
+. "$HOME"/twm/info.sh
 colors
 RUN=$(cat "$HOME"/twm/runmode_file)
 cd "$HOME"/twm || exit
@@ -25,7 +25,6 @@ if [ -d /data/data/com.termux/files/usr/share/doc ]; then
   termux-wake-lock
   LS='/data/data/com.termux/files/usr/share/doc'
 else
-  # shellcheck disable=SC2034
   LS='/usr/share/doc'
 fi
 
@@ -34,28 +33,28 @@ cd ~/twm || exit
 #/twm.sh before sources <<
 #. clandmgfight.sh
 
-. requeriments.lib
-. loginlogoff.lib
-. flagfight.lib
-. clanid.lib
-. crono.lib
-. clanquest.lib
-. arena.lib
-. coliseum.lib
-. campaign.lib
-. run.lib
-. altars.lib
-. clanfight.lib
-. clancoliseum.lib
-. king.lib
-. undying.lib
-. trade.lib
-. career.lib
-. cave.lib
-. allies.lib
-. svproxy.lib
-. check.lib
-. league.lib
+. requeriments.sh
+. loginlogoff.sh
+. flagfight.sh
+. clanid.sh
+. crono.sh
+. clanquest.sh
+. arena.sh
+. coliseum.sh
+. campaign.sh
+. run.sh
+. altars.sh
+. clanfight.sh
+. clancoliseum.sh
+. king.sh
+. undying.sh
+. trade.sh
+. career.sh
+. cave.sh
+. allies.sh
+. svproxy.sh
+. check.sh
+. league.sh
 #/twm.sh after sources >>
 #/functions
 twm_start() {
@@ -71,51 +70,14 @@ twm_start() {
     fi
 }
 
-
 func_unset() {
     # Unset various game-related variables to clear state
     unset HP1 HP2 YOU USER CLAN ENTER ENTER ATK ATKRND DODGE HEAL GRASS STONE BEXIT OUTGATE LEAVEFIGHT WDRED CAVE BREAK NEWCAVE
 }
 
 #Access any page link
+
 fetch_page() {
-    local relative_url="${1:-/}"  # Default to root if no relative URL is provided
-    local output_file="${2:-$TMP/SRC}"  # Default output file if not provided
-    local user_agent_file="$TMP/userAgent.txt"  # User agent file
-    # shellcheck disable=SC2155
-    local user_agent=$(shuf -n1 "$user_agent_file")  # Pick a random user agent
-    local retries=3  # Number of retry attempts
-    local attempt=1
-    local timeout=17  # Timeout in seconds
-
-    # Retry logic
-    while [ "$attempt" -le "$retries" ]; do
-        # Fetch page using w3m with cookies and custom user agent
-        w3m -cookie -o http_proxy="$PROXY" \
-            -o accept_encoding=UTF-8 \
-            -debug -dump_source "${URL}${relative_url}" \
-            -o user_agent="$user_agent" \
-            > "$output_file" 2>/dev/null
-
-        # Check if fetch was successful (file not empty or contains valid content)
-        if [ -s "$output_file" ]; then
-            break  # Exit loop if fetch was successful
-        else
-            echo "Attempt $attempt to fetch $relative_url failed. Retrying..."
-            ((attempt++))
-            sleep 1s  # Pause before retrying
-        fi
-    done
-
-    if [ "$attempt" -gt "$retries" ]; then
-        echo "Failed to fetch $relative_url after $retries attempts."
-        return 1  # Return an error if all attempts failed
-    fi
-
-    time_exit "$timeout"  # Wait for the timeout period after fetching
-}
-
-fetch_page_bk() {
     local relative_url="$1"  # The specific part of the URL you want to fetch (e.g., "/quest/")
     local output_file="${2:-$TMP/SRC}"  # Use the second argument if provided, otherwise default to $TMP/SRC
 
