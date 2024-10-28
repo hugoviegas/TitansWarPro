@@ -1,6 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC1091
-. "$HOME"/twm/info.sh
+. "$HOME"/twm/info.lib
 colors
 RUN=$(cat "$HOME"/twm/runmode_file)
 cd "$HOME"/twm || exit
@@ -34,28 +34,28 @@ cd ~/twm || exit
 #/twm.sh before sources <<
 #. clandmgfight.sh
 
-. requeriments.sh
-. loginlogoff.sh
-. flagfight.sh
-. clanid.sh
-. crono.sh
-. specialevent.sh
-. arena.sh
-. coliseum.sh
-. campaign.sh
-. run.sh
-. altars.sh
-. clanfight.sh
-. clancoliseum.sh
-. king.sh
-. undying.sh
-. trade.sh
-. career.sh
-. cave.sh
-. allies.sh
-. svproxy.sh
-. check.sh
-. league.sh
+. requeriments.lib
+. loginlogoff.lib
+. flagfight.lib
+. clanid.lib
+. crono.lib
+. clanquest.lib
+. arena.lib
+. coliseum.lib
+. campaign.lib
+. run.lib
+. altars.lib
+. clanfight.lib
+. clancoliseum.lib
+. king.lib
+. undying.lib
+. trade.lib
+. career.lib
+. cave.lib
+. allies.lib
+. svproxy.lib
+. check.lib
+. league.lib
 #/twm.sh after sources >>
 #/functions
 twm_start() {
@@ -70,6 +70,7 @@ twm_start() {
         twm_play  # Default action is to start the main game loop
     fi
 }
+
 
 func_unset() {
     # Unset various game-related variables to clear state

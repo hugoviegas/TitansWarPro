@@ -40,9 +40,12 @@ printf "${BLACK_CYAN} Installing TWM...\n⌛ Please wait...⌛${COLOR_RESET}"
 #termux
 if [ -d /data/data/com.termux/files/usr/share/doc ]; then
   termux-wake-lock
-  sed -u -i '/nameserver/d' "$PREFIX"/etc/resolv.conf &
-  : > /dev/null
-  printf "nameserver 114.114.114.114\nnameserver 8.8.8.8" >"$PREFIX"/etc/resolv.conf
+  if ! grep -q "nameserver 114.114.114.114" "$PREFIX"/etc/resolv.conf; then
+    printf "nameserver 114.114.114.114\n" >> "$PREFIX"/etc/resolv.conf
+  fi
+  if ! grep -q "nameserver 8.8.8.8" "$PREFIX"/etc/resolv.conf; then
+    printf "nameserver 8.8.8.8\n" >> "$PREFIX"/etc/resolv.conf
+  fi
   LS="/data/data/com.termux/files/usr/share/doc"
   rm -rf ~/.termux/boot/play.sh 2>/dev/null
   mkdir -p ~/.termux/boot
