@@ -30,7 +30,7 @@ func_cat() {
         printf "\n"
         # List functions defined in scripts
         grep -o -E '[[:alpha:]]+?[_]?[[:alpha:]]+?[ ]?\() \{' ~/twm/*.sh | awk -F\: '{ print $2 }' | awk -F \( '{ print $1 }'
-        read -r -t 5  # Wait for user input for 5 seconds
+        read -r -t 30  # Wait for user input for 5 seconds
     }
 
     while true; do
@@ -42,9 +42,21 @@ func_cat() {
         fi
 
         printf "\n"
-        $cmd  # Execute the command entered by the user
-        sleep 0.5s  # Brief pause before next iteration
-        break  # Exit after executing the command once
+        
+        # Lista de comandos que não interrompem o loop
+        commands_no_break=("config" "requer_func")
+        
+        # Executa o comando
+        $cmd
+
+        # Checa se o comando está na lista de comandos que não requerem break
+        if [[ " ${commands_no_break[@]} " =~ " ${cmd} " ]]; then
+            # Pausa breve antes de continuar o loop
+            sleep 0.5s
+            continue
+        else
+            break  # Sai do loop para comandos que não estão na lista
+        fi
     done
 }
 

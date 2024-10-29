@@ -171,7 +171,7 @@ done
     fi
 }
 coliseum_start() {
-    if [ "$FUNC_coliseum" = "no" ]; then
+    if [ "$FUNC_coliseum" = "n" ]; then
         return
     fi
     if case $(date +%H:%M ) in
