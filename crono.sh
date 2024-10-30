@@ -6,8 +6,8 @@ func_crono() {
     MIN=$(date +%M)
 
     # Normalize hour and minute values to integers
-    HOUR=${HOUR#0}  # Remove leading zero from hour
-    MIN=${MIN#0}    # Remove leading zero from minute
+    # HOUR=${HOUR#0}  # Remove leading zero from hour
+    # MIN=${MIN#0}    # Remove leading zero from minute
 
     # Display the current URL and time
     echo -e " \033[02m$URL ⏰ $(date +%H):$(date +%M)${COLOR_RESET}"
