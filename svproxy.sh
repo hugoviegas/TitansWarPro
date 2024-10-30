@@ -1,25 +1,28 @@
-func_proxy() {
-    # Use drill to get the IP address of the specified URL and format it as a proxy
-    SPROXY=$(drill "${URL}" 2>/dev/null | grep -o -E "([0-9]{1,3}\.){3}[0-9]{1,3}" | sed -n 's/^.*$/&:80/;1p')
-    
-    # Set the PROXY variable using the retrieved IP address
-    PROXY="http://$SPROXY"
+func_proxy () {
+	case "$UR" in
+	'1'|'2'|'3'|4|6|7|9|'11'|'12')
+# Set fallback proxy for UR values 1, 4, 6, 7, 9, 11, or 12
+		PROXY="$(echo 'aHR0cDovLzEzOC4yMDEuMTc4LjE4Mzo4MA==' | base64 -d)"
+		;;
+	5)
+# Set fallback proxy for UR value 5
+		PROXY="$(echo 'aHR0cDovLzE0NC43Ni43Ny44Nzo4MA==' | base64 -d)"
+		;;
+	8|'13')
+# Set fallback proxy for UR values 8 or 13
+		PROXY="$(echo 'aHR0cDovLzE3Ni45LjIxLjIwOjgw' | base64 -d)"
+		;;
+	'10')
+# Set fallback proxy for UR value 10
+		PROXY="$(echo 'aHR0cDovLzE0OC4yNTEuMjQ0LjI3Ojgw' | base64 -d)"
+		;;
+	*)
+# Handle invalid UR values by printing an error message
+		echo "Invalid UR value"
+		;;
+	esac
 
-    # Check if the server proxy is one of the known values or if SPROXY is empty
-    if echo "$SVPROXY" | grep -q '8.8.8.8:80' || echo "$SVPROXY" | grep -q '1.1.1.1:80' || [ -z "$SPROXY" ]; then
-        # Set PROXY based on the value of UR
-        if [ "$UR" -eq '1' ] || echo "$UR" | grep -q '3'; then
-            PROXY="http://176.9.21.20:80"  # Fallback proxy for UR 1 or 3
-        elif [ "$UR" -ge 4 ]; then
-            PROXY="http://138.201.178.183:80"  # Fallback proxy for UR 4 or higher
-        elif echo "$UR" | grep -q "2"; then
-            PROXY="http://148.251.244.27:80"  # Fallback proxy for UR 2
-        fi
-    fi
-
-    # Print the server and proxy information to the console
-    printf "${BLACK_GRAY} Server: ${URL}|${PROXY} ${COLOR_RESET}\n"
-    
-    # Unset SVPROXY to clean up the environment
-    unset SVPROXY
+# Print the server and proxy information to the console
+	printf "${BLACK_GRAY} Server: ${URL}|${PROXY} ${COLOR_RESET}\n"
+	sleep 2s
 }
