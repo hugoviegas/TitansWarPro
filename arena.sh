@@ -40,7 +40,9 @@ arena_collFight() {
 }
 
 arena_duel() {
-    echo -e "${GOLD_BLACK}Arena ⚔️${COLOR_RESET}"
+    # Exibe o título da Arena com emoji de espada e cor
+    echo_t "Arena " "$GOLD_BLACK" "$COLOR_RESET" "after" "⚔️"
+
     checkQuest 3 apply
     checkQuest 4 apply
 
@@ -50,16 +52,18 @@ arena_duel() {
     local BREAK=$(($(date +%s) + 60))
     local count=0
 
-    # Loop until wizard lab link is found or time exceeds the BREAK point
+    # Loop até o link do laboratório de mago ser encontrado ou o tempo exceder o BREAK
     until grep -q -o 'lab/wizard' "$TMP"/SRC || [ "$(date +%s)" -gt "$BREAK" ]; do
-        # Extract attack link from the arena page
+        # Extrai o link de ataque da página da arena
         local ACCESS=$(grep -o -E '(/arena/attack/1/[?]r[=][0-9]+)' "$TMP"/SRC | sed -n '1p')
 
         # Fetch the attack page
         fetch_page "$ACCESS"
         
         count=$((count + 1))
-        echo " ⚔ Attack $count"
+        
+        # Mostra o número do ataque
+        echo_t "Attack $count" "" "" "before" "⚔"
         
         sleep 0.6s
     done
@@ -67,17 +71,22 @@ arena_duel() {
     # Fetch the bag inventory page after the duel
     fetch_page "/inv/bag/"
 
-    # Extract and execute the sell-all-items action
+    # Extrai e executa a ação de vender todos os itens
     local SELL=$(grep -o -E '(/inv/bag/sellAll/1/[?]r[=][0-9]+)' "$TMP"/SRC | sed -n '1p')
     fetch_page "$SELL"
     
     checkQuest 3 end
     checkQuest 4 end
     
-    echo -e "$(translate_and_cache "$LANGUAGE" "Sell all items ✅")"
-    echo -e "${GREEN_BLACK}Arena ✅${COLOR_RESET}\n"
+    # Exibe a confirmação de todos os itens vendidos
+    echo_t "Sell all items " "" "" "after" "✅"
     
+    # Exibe a confirmação da conclusão da Arena com emoji de check e cor verde
+    echo_t "Arena " "$GREEN_BLACK" "$COLOR_RESET" "after" "✅"
+    
+    echo  # Linha em branco para separar
 }
+
 
 arena_fullmana() {
   echo "energy arena ...\n"

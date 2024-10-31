@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.8.33 (Beta)" # To change the version number every time has an update!!!!
+    versionNum="3.8.34 (Beta)" # To change the version number every time has an update!
 for i in $colors; do
 clear
 printf "\033[1;38;5;${i}m
@@ -74,6 +74,45 @@ language_setup() {
 }
 language_setup
 
+# Função para imprimir com printf, usando tradução e cores
+printf_t() {
+  local text="$1"
+  local color_start="$2"
+  local color_end="$3"
+  local emoji_position="$4"  # "before" ou "after"
+  local emoji="$5"
+
+  # Traduz o texto
+  local translated_text="$(translate_and_cache "$LANGUAGE" "$text")"
+
+  # Adiciona o emoji conforme a posição especificada
+  if [[ "$emoji_position" == "before" ]]; then
+    printf "${color_start}%s %s${color_end}\n" "$emoji" "$translated_text"
+  else
+    printf "${color_start}%s %s${color_end}\n" "$translated_text" "$emoji"
+  fi
+}
+
+# Função para imprimir com echo, usando tradução e cores
+echo_t() {
+  local text="$1"
+  local color_start="$2"
+  local color_end="$3"
+  local emoji_position="$4"  # "before" ou "after"
+  local emoji="$5"
+
+  # Traduz o texto
+  local translated_text="$(translate_and_cache "$LANGUAGE" "$text")"
+
+  # Adiciona o emoji conforme a posição especificada
+  if [[ "$emoji_position" == "before" ]]; then
+    echo -e "${color_start}${emoji} ${translated_text}${color_end}"
+  else
+    echo -e "${color_start}${translated_text} ${emoji}${color_end}"
+  fi
+}
+
+
 time_exit() {
     # Function to monitor a background process and terminate it if it exceeds a specified timeout.
     (
@@ -97,7 +136,8 @@ time_exit() {
         kill -15 "$TEFPID" &>/dev/null
         
         # Notify the user that the command execution was interrupted
-        printf "${WHITEb_BLACK}%s${COLOR_RESET}\n" "$(translate_and_cache "$LANGUAGE" "Command execution was interrupted!")"
+        #printf "${WHITEb_BLACK}%s${COLOR_RESET}\n" "$(translate_and_cache "$LANGUAGE" "Command execution was interrupted!")"
+        printf_t "Command execution was interrupted!" "$WHITEb_BLACK" "$COLOR_RESET" "before" "⚠️"
 
     )
 }
