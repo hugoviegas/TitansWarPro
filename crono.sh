@@ -5,10 +5,6 @@ func_crono() {
     HOUR=$(date +%H)
     MIN=$(date +%M)
 
-    # Normalize hour and minute values to integers
-    # HOUR=${HOUR#0}  # Remove leading zero from hour
-    # MIN=${MIN#0}    # Remove leading zero from minute
-
     # Display the current URL and time
     echo -e " \033[02m$URL ⏰ $HOUR:$MIN${COLOR_RESET}"
 }
@@ -24,10 +20,20 @@ func_cat() {
     fi
 
     cat "$TMP/msg_file"  # Display the contents of msg_file
-    echo -e -n "${WHITE_BLACK}"
+    printf "${WHITE_BLACK}"
 
+    list() {
+        printf "\n"
+        # List functions defined in scripts
+        grep -o -E '[[:alpha:]]+?[_]?[[:alpha:]]+?[ ]?\() \{' ~/twm/*.sh | awk -F\: '{ print $2 }' | awk -F \( '{ print $1 }'
+        read -r -t 30  # Wait for user input for 5 seconds
+    }
+    
     while true; do
-        printf " \033[02mNo battles now, waiting ${i}s${COLOR_RESET}\n${WHITEb_BLACK}Enter a command or type 'list':${COLOR_RESET} \n"
+       
+        echo -e "\033[02m$(get_translation "pt" "No battles now, waiting ${i}s")${COLOR_RESET}"
+        echo -e "${WHITEb_BLACK}$(get_translation "pt" "Enter a command or type 'list':")${COLOR_RESET}"
+
         read -t "$i" cmd  # Read user command with a timeout
 
         if [ "$cmd" = " " ]; then
@@ -43,7 +49,7 @@ func_cat() {
         $cmd
 
         # Checa se o comando está na lista de comandos que não requerem break
-        if [[ " ${commands_no_break[*]} " =~ ${cmd} ]]; then
+        if [[ " ${commands_no_break[@]} " =~ " ${cmd} " ]]; then
             # Pausa breve antes de continuar o loop
             sleep 0.5s
             continue
@@ -51,13 +57,6 @@ func_cat() {
             break  # Sai do loop para comandos que não estão na lista
         fi
     done
-}
-
-list() {
-    printf "\n"
-    # List functions defined in scripts
-    grep -o -E '[[:alpha:]]+?[_]?[[:alpha:]]+?[ ]?\() \{' ~/twm/*.sh | awk -F\: '{ print $2 }' | awk -F \( '{ print $1 }'
-    read -r -t 30  # Wait for user input for 5 seconds
 }
 
 func_sleep() {

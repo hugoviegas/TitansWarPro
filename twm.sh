@@ -32,10 +32,9 @@ fi
 cd ~/twm || exit
 #/twm.sh before sources <<
 #. clandmgfight.sh
-
+. language.sh
 . requeriments.sh
 . loginlogoff.sh
-. language.sh
 . flagfight.sh
 . clanid.sh
 . crono.sh

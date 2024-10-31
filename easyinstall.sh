@@ -114,6 +114,13 @@ if uname | grep -q -i "cygwin"; then
   fi
 fi
 
+if [ -e "${LS}/jq" ]; then
+    :
+  else
+    apt-cyg install jq -y &
+    : > /dev/null
+  fi
+
 #/ish Iphone
 APPISH=$(uname -a | grep -o "\-ish")
 if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = '-ish' ]; then
