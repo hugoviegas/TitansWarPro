@@ -20,7 +20,7 @@ clan_id() {
 
 checkQuest() {
   quest_id="$1"
-  action="$2"  # Segundo argumento que define se é "apply" ou "end"
+  action="$2" # Segundo argumento que define se é "apply" ou "end"
 
   if [ -n "${CLD}" ]; then
     fetch_page "/clan/${CLD}/quest/"
@@ -32,23 +32,23 @@ checkQuest() {
     elif [ "$action" == "end" ]; then
       click=$(grep -o -E "/quest/(deleteHelp|end)/$quest_id/\?r=[0-9]{8}" "$TMP/SRC" | sed -n '1p')
     else
-      echo "Ação inválida: $action. Use 'apply' ou 'end'."
-      return 1  # Retorna falha se a ação for inválida
+      echo "$(translate_and_cache "$LANGUAGE" "Invalid action:")" $action. "$(translate_and_cache "$LANGUAGE" "Use 'apply' or 'end'.")"
+      return 1 # Retorna falha se a ação for inválida
     fi
-    
+
     # Verificar se encontrou o botão correto
     if [ -n "$click" ]; then
       fetch_page "/clan/${CLD}$click"
-      echo " Clan quest $quest_id Check ($action) ... 🔎"
-      return 0  # Sucesso se o botão foi encontrado
+      echo "$(translate_and_cache "$LANGUAGE" "Clan quest") $quest_id $(translate_and_cache "$LANGUAGE" "Check") ($action) ... 🔎"
+      return 0 # Sucesso se o botão foi encontrado
     else
-      echo " Clan quest $quest_id ($action) is not ready. 🔎"
-      return 1  # Não encontrou o botão
+      echo "$(translate_and_cache "$LANGUAGE" "Clan quest") $quest_id ($action) $(translate_and_cache "$LANGUAGE" "is not ready.") 🔎"
+      return 1 # Não encontrou o botão
     fi
   else
     fetch_page "/clanrating/wantedToClan"
-    echo " Clan quest $quest_id was not found. 🔎"
-    return 1  # Falha se CLD estiver vazio
+    echo "$(translate_and_cache "$LANGUAGE" "Clan quest") $quest_id $(translate_and_cache "$LANGUAGE" "was not found.") 🔎"
+    return 1 # Falha se CLD estiver vazio
   fi
 }
 
@@ -69,8 +69,16 @@ check_leader() {
   # Read the content of the CODE file
   CODE=$(cat "$TMP/CODE")
 
-  # Find the clan leader (Clã líder) and vice-leader (Vice-líder)
-  LEADERS=$(echo "$CODE" | grep -E 'líder|Vice-líder' | awk -F',' '{print $1}')
+  # Create variables for leader titles that can be translated
+  LEADER_TITLE=$(translate_and_cache "$LANGUAGE" "leader")
+  VICE_LEADER_TITLE=$(translate_and_cache "$LANGUAGE" "Vice-leader")
+
+  # Combine them into a grep pattern, escaping any special characters
+  LEADER_PATTERN=$(echo "${LEADER_TITLE}|${VICE_LEADER_TITLE}" | sed 's/[[\.*^$/]/\\&/g')
+  # echo "$LEADER_PATTERN"
+
+  # Modified grep command using the translated pattern
+  LEADERS=$(echo "$CODE" | grep -E "${LEADER_PATTERN}" | awk -F',' '{print $1}')
 
   # Initialize the final variable to false
   is_leader=false

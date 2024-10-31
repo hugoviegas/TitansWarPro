@@ -15,7 +15,7 @@
   fi
 
   # Exporta a variável para torná-la disponível globalmente
-  export LANGUAGE
+  export LANGUAGE LANGUAGE_FILE
 
   while true; do
     # Get the PID of the running twm.sh script

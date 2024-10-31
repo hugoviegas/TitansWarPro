@@ -47,33 +47,33 @@ translate_and_cache() {
         return
     fi
 
-    # Verificar se já existe a tradução usando o texto original
-    if grep -q "^$text|" "$TRANSLATIONS_FILE"; then
-        # Se a tradução existir, obtê-la do arquivo
-        translated_text=$(grep "^$text|" "$TRANSLATIONS_FILE" | cut -d'|' -f2-)
+    # Verificar se já existe a tradução no arquivo de cache
+    translated_text=$(grep "^$text|" "$TRANSLATIONS_FILE" | tail -n 1 | cut -d'|' -f2-)
+    
+    if [ -n "$translated_text" ]; then
+        # Se a tradução existir, retornar a tradução armazenada
         echo "$translated_text"
     else
-        # Se não existe, traduzir
+        # Se a tradução não existe, chamar a função para traduzir
         translated_text=$(get_translation "$target_lang" "$text")
 
-        # Verificar se a tradução foi bem-sucedida
+        # Verificar se a tradução foi bem-sucedida e salvar no cache
         if [ -n "$translated_text" ]; then
-            translations["$text"]="$translated_text"
-            # Salvar no arquivo, removendo espaços
             echo "$text|$translated_text" >> "$TRANSLATIONS_FILE"
             echo "$translated_text"
         else
-            echo "$text"  # Retornar o texto original se a tradução falhar
+            # Se falhar, retornar o texto original
+            echo "$text"
         fi
     fi
 }
-
 # Inicializar
 load_translations
 
 # Exemplo de uso
 SOURCE="en"
-#echo -e "$(translate_and_cache "pt" "Hello world!")"
-#echo -e "$(translate_and_cache "pt" "Enter a command or type 'list'")"
-#echo -e "$(translate_and_cache "pt" "No battles now, waiting 0s")"
-#echo -e "$(translate_and_cache "pt" "No battles now, waiting 45s")"
+#echo -e "$(translate_and_cache "$LANGUAGE" "Hello world!")"
+#echo -e "$(translate_and_cache "$LANGUAGE" "Enter a command or type \*list\*:")"
+#echo -e "$(translate_and_cache "$LANGUAGE" "No battles now, waiting 0s")"
+#echo -e "$(translate_and_cache "$LANGUAGE" "No battles now, waiting 45s")"
+#echo -e "${BLACK_YELLOW}$(translate_and_cache "$LANGUAGE" "[Wait to *$ACC*... (${check}s) - press ENTER to change account]")${COLOR_RESET}" //this is case we have variable and colour
