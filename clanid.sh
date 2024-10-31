@@ -75,7 +75,7 @@ check_leader() {
 
   # Combine them into a grep pattern, escaping any special characters
   LEADER_PATTERN=$(echo "${LEADER_TITLE}|${VICE_LEADER_TITLE}" | sed 's/[[\.*^$/]/\\&/g')
-  echo "$LEADER_PATTERN"
+  # echo "$LEADER_PATTERN"
 
   # Modified grep command using the translated pattern
   LEADERS=$(echo "$CODE" | grep -E "${LEADER_PATTERN}" | awk -F',' '{print $1}')
