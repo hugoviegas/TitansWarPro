@@ -33,6 +33,7 @@ load_translations() {
     fi
 }
 
+# Função para traduzir e armazenar em cache
 translate_and_cache() {
     local target_lang="$1"
     local text="$2"
@@ -65,7 +66,6 @@ translate_and_cache() {
         fi
     fi
 }
-
 # Inicializar
 load_translations
 
