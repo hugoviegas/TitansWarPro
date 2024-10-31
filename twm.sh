@@ -108,9 +108,8 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
             unset UR UA AL  # Unset user-related variables
             break &>/dev/null  # Exit the loop quietly if Enter is pressed
         fi
-       
-        printf_t " Press " "$COLOR_RESET" && printf_t "${GOLD_BLACK}[Enter]${COLOR_RESET} " && printf_t "to reconfigure " && printf_t "${GREEN_BLACK}${i}s${COLOR_RESET}\n"
 
+        echo_t " To reconfigure please press the button [Enter] ${i}s" "${GOLD_BLACK}" "${COLOR_RESET}" 
 
     done
 fi

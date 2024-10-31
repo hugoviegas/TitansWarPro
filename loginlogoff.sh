@@ -26,13 +26,13 @@ login_logoff () {
  ACC=$(cat $TMP/acc_file)
 
  if [ -n "$ACC" ] && [ -n "$URL" ]; then
-  local check=3
+  local check=4
 
   until [ "$check" -lt 1 ]; do
    clear
    echo_t "Please wait..."
    echo -e -n "[Login using: $ACC...] (${check}s) - "
-   echo_t "$LANGUAGE" "press ENTER to change account"
+   echo_t "press [ENTER] to change your user account"
 
    local check=$((check - 1))
    if read -t 1; then

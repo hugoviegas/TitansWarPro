@@ -258,15 +258,15 @@ esac
 		clear
 
 # Display options for user agent selection
-print_t "Simulate your real or random device." "$BLACK_CYAN" "$COLOR_RESET"
-print_t "1) Manual" "$BLACK_CYAN" "$COLOR_RESET"
-print_t "2) Automatic" "$BLACK_CYAN" "$COLOR_RESET"
+printf_t "Simulate your real or random device." "$BLACK_CYAN" "$COLOR_RESET"
+printf_t "1) Manual" "$BLACK_CYAN" "$COLOR_RESET"
+printf_t "2) Automatic" "$BLACK_CYAN" "$COLOR_RESET"
 
 # Check if a user agent file exists and is not empty
 if [ -f "$HOME/twm/fileAgent.txt" ] && [ -s "$HOME/twm/fileAgent.txt" ]; then
     UA=$(cat "$HOME/twm/fileAgent.txt") # Read existing user agent
 else
-    print_t "Set up User-Agent [1 to 2]: " "$COLOR_RESET"
+    printf_t "Set up User-Agent [1 to 2]: " "$COLOR_RESET"
     read -r -n 1 UA # Read user input for user agent selection
 fi
 

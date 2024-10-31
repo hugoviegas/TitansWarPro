@@ -54,11 +54,9 @@ cave_process() {
                         echo_t "Start mining" "" "" "after" "⛏️"
                         ;;
                     runaway*)
-                        echo "$(translate_and_cache "$LANGUAGE" "") "
                         echo_t "Run away" "" "" "after" "💨"
                         ;;
                     speedUp*)
-                        echo "$(translate_and_cache "$LANGUAGE" "") "
                         echo_t "Speed up mining" "" "" "after" "⚡"
                         ;;
                 esac
