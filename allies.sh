@@ -19,7 +19,7 @@ members_allies() {
         sort -u allies.txt -o allies.txt
     fi
 
-    echo_t "Allies for Coliseum and King of the Immortals: " "$BLACK_CYAN" "$COLOR_RESET" "before" "🧱 👑"
+    echo_t "Allies for Coliseum and King of the Immortals: " "$BLACK_CYAN" "$COLOR_RESET" "after" "🧱 👑"
     cat allies.txt
 
     echo_t "Wait to continue. " "$BLACK_CYAN" "$COLOR_RESET" "after" "👈"
@@ -118,10 +118,10 @@ conf_allies() {
     printf_t "The script will consider users on your friends list and Clan as allies. Leader on friend list will add Clan allies." "$BLACK_CYAN" "$COLOR_RESET" "before" ""
 
     # Opções de configuração com emojis para cada item do menu
-    printf_t "1) Add/Update alliances (All Battles)" "" "" "before" "🔵👨 🔴🧑‍🦰"
-    printf_t "2) Add/Update just Herois alliances (Coliseum/King of immortals)" "" "" "before" "👫"
-    printf_t "3) Add/Update just Clan alliances (Altars, Clan Coliseum and Clan Fight)" "" "" "before" "🔴 🔵"
-    printf_t "4) Do nothing" "" "" "before" "🚶"
+    printf_t "1) Add/Update alliances (All Battles)" "" "" "after" "🔵👨 🔴🧑‍🦰"
+    printf_t "2) Add/Update just Herois alliances (Coliseum/King of immortals)" "" "" "after" "👫"
+    printf_t "3) Add/Update just Clan alliances (Altars, Clan Coliseum and Clan Fight)" "" "" "after" "🔴 🔵"
+    printf_t "4) Do nothing" "" "" "after" "🚶"
 
     # Verifica se o arquivo de alianças existe e possui conteúdo; caso contrário, pede ao usuário para configurar
     if [ -f "$HOME/twm/al_file" ] && [ -s "$HOME/twm/al_file" ]; then
@@ -139,7 +139,7 @@ conf_allies() {
             members_allies
             ALD=1
             echo "1" > "$HOME/twm/al_file"
-            printf_t "Alliances on all battles active" "" "" "before" "🔵👨 🔴🧑‍🦰"
+            printf_t "Alliances on all battles active" "" "" "after" "🔵👨 🔴🧑‍🦰"
         ;;
         # Opção 2: Ativa alianças apenas em Herois
         2) 
@@ -150,7 +150,7 @@ conf_allies() {
             fi
             ALD=1
             echo "2" > "$HOME/twm/al_file"
-            printf_t "Just Herois alliances now." "" "" "before" "👫"
+            printf_t "Just Herois alliances now." "" "" "after" "👫"
         ;;
         # Opção 3: Ativa alianças apenas no Clan
         3) 
@@ -161,11 +161,11 @@ conf_allies() {
             fi
             unset ALD
             echo "3" > "$HOME/twm/al_file"
-            printf_t "Just Clan alliances now." "" "" "before" "🔴 🔵"
+            printf_t "Just Clan alliances now." "" "" "after" "🔴 🔵"
         ;;
         # Opção 4: Não faz nada
         4) 
-            printf_t "Nothing changed." "" "" "before" "🚶"
+            printf_t "Nothing changed." "" "" "after" "🚶"
             ALD=1
             echo "4" > "$HOME/twm/al_file"
             : >> "$TMP"/allies.txt

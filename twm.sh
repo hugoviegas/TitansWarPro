@@ -91,7 +91,7 @@ fetch_page() {
 
 # Check if the user settings file exists and is not empty
 if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
-    printf "${GREEN_BLACK} Starting with last settings used.${COLOR_RESET}\n"
+    echo_t "Starting with last settings used." "${GREEN_BLACK}" "${COLOR_RESET}"
     
     num=6  # Number of seconds to wait before reconfiguration prompt
 
@@ -107,7 +107,12 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
             break &>/dev/null  # Exit the loop quietly if Enter is pressed
         fi
         
-        printf " Hit${GOLD_BLACK} [Enter]${COLOR_RESET} to${GOLD_BLACK} reconfigure${GREEN_BLACK} ${i}s${COLOR_RESET}\n"
+        print_t " Hit " "$COLOR_RESET" "" "before" ""
+        print_t "[Enter]" "$GOLD_BLACK" "$COLOR_RESET" "after" ""
+        print_t " to " "$COLOR_RESET" "" "before" ""
+        print_t " reconfigure " "$GOLD_BLACK" "" "before" ""
+        print_t "${GREEN_BLACK} ${i}s${COLOR_RESET}" "$COLOR_RESET" "" "after" "\n"
+
     done
 fi
 

@@ -52,7 +52,7 @@ coliseum_fight() {
         local access_link=$(grep -o -E '/coliseum(/[A-Za-z]+/[?]r[=][0-9]+|/)' "$src_ram" | grep -v 'dodge' | sed -n 1p | cat -)
         #/wait
         # printf " 😠 %s\n" "$(translate_and_cache "$LANGUAGE" "Preparing for Battle, waiting for other players...")\n"
-        echo -e "😠 $(translate_and_cache "$LANGUAGE" " Preparing for Battle, waiting for other players...")"
+        echo_t " Preparing for Battle, waiting for other players..." "" "" "before" "😠"
 
 
         local first_time=$(date +%s) #6
@@ -62,7 +62,7 @@ coliseum_fight() {
             ) </dev/null &>/dev/null &
             time_exit 17
             local access_link=$(grep -o -E '/(coliseum/[A-Za-z]+/[?]r[=][0-9]+|coliseum)' "$src_ram" | grep -v 'dodge' | sed -n 1p) #5
-            echo -e " 😡	Preparing..."
+            echo_t " 	Preparing..." "" "" "before" "😡"
             sleep 3s
         done
         cl_access() {
@@ -95,7 +95,7 @@ coliseum_fight() {
                     fi #...passou 300s
                 else   #...cessa espera || finaliza...
                     BREAK_LOOP=1
-                    echo -e "${RED_BLACK}Battle's over.${COLOR_RESET}\n"
+                    echo_t "Battle's over." "${RED_BLACK}" "${COLOR_RESET}"
                     sleep 2s
                 fi #...finalizou a batalha
             fi     #...cessou procura por esquiva
@@ -170,7 +170,7 @@ done
         echo -e "${RED_BLACK} Coliseum ⚔️${COLOR_RESET}\n"
     else
         # shellcheck disable=SC2154
-        echo -e "${WHITEb_BLACK}It was not possible to start the battle at this time.${COLOR_RESET}"
+        echo_t "It was not possible to start the battle at this time." "${WHITEb_BLACK}" "${COLOR_RESET}"
     fi
 }
 coliseum_start() {
@@ -205,6 +205,6 @@ coliseum_start() {
             coliseum_fight
         fi
     else
-        printf "Battle or event time...\n" && sleep 5s
+        printf_t "Battle or event time...\n" && sleep 5s
     fi
 }

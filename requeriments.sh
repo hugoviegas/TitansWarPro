@@ -7,46 +7,47 @@ requer_func () {
 # Function to display server options (in multiple languages)
 	options_one () {
 		clear
-		printf " 1)${BLACK_CYAN} Brazil, Português: Furia de Titãs online \033[00m
-			 2)${BLACK_CYAN} Deutsch: Krieg der Titanen online \033[00m
-			 3)${BLACK_CYAN} Español: Guerra de Titanes online \033[00m
-			 4)${BLACK_CYAN} Français: Combat des Titans online \033[00m
-			 5)${BLACK_CYAN} Indian, English: Titan's War India \033[00m
-			 6)${BLACK_CYAN} Indonesian: Titan's War Indonesia \033[00m
-			 7)${BLACK_CYAN} Italiano: Guerra di Titani online \033[00m
-			 8)${BLACK_CYAN} Polski: Wojna Tytanów online \033[00m
-			 9)${BLACK_CYAN} Română: Războiul Titanilor online \033[00m
-			10)${BLACK_CYAN} Русский: Битва Титанов онлайн \033[00m
-			11)${BLACK_CYAN} Srpski: Rat Titana online \033[00m
-			12)${BLACK_CYAN} 中文, Chinese: 泰坦之战 \033[00m
-			13)${BLACK_CYAN} English, Global: Titan's War online \033[00m
-			 C)${BLACK_YELLOW} ❌ Cancel \033[00m
+		printf "1)${BLACK_CYAN} Brazil, Português: Furia de Titãs online \033[00m
+						2)${BLACK_CYAN} Deutsch: Krieg der Titanen online \033[00m
+						3)${BLACK_CYAN} Español: Guerra de Titanes online \033[00m
+						4)${BLACK_CYAN} Français: Combat des Titans online \033[00m
+						5)${BLACK_CYAN} Indian, English: Titan's War India \033[00m
+						6)${BLACK_CYAN} Indonesian: Titan's War Indonesia \033[00m
+						7)${BLACK_CYAN} Italiano: Guerra di Titani online \033[00m
+						8)${BLACK_CYAN} Polski: Wojna Tytanów online \033[00m
+						9)${BLACK_CYAN} Română: Războiul Titanilor online \033[00m
+						10)${BLACK_CYAN} Русский: Битва Титанов онлайн \033[00m
+						11)${BLACK_CYAN} Srpski: Rat Titana online \033[00m
+						12)${BLACK_CYAN} 中文, Chinese: 泰坦之战 \033[00m
+						13)${BLACK_CYAN} English, Global: Titan's War online \033[00m
+						C)${BLACK_YELLOW} ❌ Cancel \033[00m
 			" | sed 's/\t\t\t//g'
 	}
 
 	options_two () {
 		clear
-		printf " 1)${BLACK_CYAN} Brazil, Português: Furia de Titãs ${BLACK_GREEN}[ENTER]\033[00m
-			 2)${CYAN_CYAN} Deutsch: Krieg der Titanen online \033[00m
-			 3)${CYAN_CYAN} Español: Guerra de Titanes online \033[00m
-			 4)${CYAN_CYAN} Français: Combat des Titans online \033[00m
-			 5)${CYAN_CYAN} Indian, English: Titan's War India \033[00m
-			 6)${CYAN_CYAN} Indonesian: Titan's War Indonesia \033[00m
-			 7)${CYAN_CYAN} Italiano: Guerra di Titani online \033[00m
-			 8)${CYAN_CYAN} Polski: Wojna Tytanów online \033[00m
-			 9)${CYAN_CYAN} Română: Războiul Titanilor online \033[00m
-			${BLACK_RED}1\033[00m${BLACK_GREEN}0\033[00m)${BLACK_CYAN} Русский: Битва Титанов онлайн \033[00m
-			${BLACK_RED}1\033[00m${BLACK_GREEN}1\033[00m)${BLACK_CYAN} Srpski: Rat Titana online \033[00m
-			${BLACK_RED}1\033[00m${BLACK_GREEN}2\033[00m)${BLACK_CYAN} 中文, Chinese: 泰坦之战 \033[00m
-			${BLACK_RED}1\033[00m${BLACK_GREEN}3\033[00m)${BLACK_CYAN} English, Global: Titan's War online \033[00m
-			 C)${BLACK_YELLOW} ❌ Cancel \033[00m
+		printf "1)${BLACK_CYAN} Brazil, Português: Furia de Titãs ${BLACK_GREEN}[ENTER]\033[00m
+						2)${CYAN_CYAN} Deutsch: Krieg der Titanen online \033[00m
+						3)${CYAN_CYAN} Español: Guerra de Titanes online \033[00m
+						4)${CYAN_CYAN} Français: Combat des Titans online \033[00m
+						5)${CYAN_CYAN} Indian, English: Titan's War India \033[00m
+						6)${CYAN_CYAN} Indonesian: Titan's War Indonesia \033[00m
+						7)${CYAN_CYAN} Italiano: Guerra di Titani online \033[00m
+						8)${CYAN_CYAN} Polski: Wojna Tytanów online \033[00m
+						9)${CYAN_CYAN} Română: Războiul Titanilor online \033[00m
+						${BLACK_RED}1\033[00m${BLACK_GREEN}0\033[00m)${BLACK_CYAN} Русский: Битва Титанов онлайн \033[00m
+						${BLACK_RED}1\033[00m${BLACK_GREEN}1\033[00m)${BLACK_CYAN} Srpski: Rat Titana online \033[00m
+						${BLACK_RED}1\033[00m${BLACK_GREEN}2\033[00m)${BLACK_CYAN} 中文, Chinese: 泰坦之战 \033[00m
+						${BLACK_RED}1\033[00m${BLACK_GREEN}3\033[00m)${BLACK_CYAN} English, Global: Titan's War online \033[00m
+						C)${BLACK_YELLOW} ❌ Cancel \033[00m
 			" | sed 's/\t\t\t//g'
 	}
 
 # Function to handle invalid input for the first menu
 invalid_one () {
     options_one
-    echo -e "$(translate_and_cache "pt" "Select number Server [1 to 11]: \033[01;31m\033[01;07m$UR◄ invalid option\033[00m")"
+    #echo "Select number Server [1 to 11]: $UR◄ invalid option"
+		echo_t "Select number Server [1 to 11]: $UR◄ invalid option"
     sleep 0.2s
     menu_one
 }
@@ -55,7 +56,7 @@ invalid_one () {
 invalid_two () {
     clear
     options_two
-    echo -e "$(translate_and_cache "pt" "Select number Server [1 to 11]: \033[01;31m\033[01;07m1$UR◄ invalid option\033[00m")"
+    echo_t "Select number Server [1 to 11]: $UR◄ invalid option"
     sleep 0.2s
     menu_two
 }
@@ -63,7 +64,7 @@ invalid_two () {
 # Function for the second menu of options
 	menu_two () {
 		options_two
-		echo -e "$(translate_and_cache "pt" "Select number Server [1 to 11]: ")"  # Default selection shown to user
+		echo_t "Select number Server [1 to 11]: "  # Default selection shown to user
 		read -r -n 1 UR # Read user input without waiting for Enter
 
 # Process user input for server selection
@@ -96,8 +97,7 @@ invalid_two () {
 # Function for the first menu of options
 	menu_one () {
 		options_one
-		echo -e "$(translate_and_cache "pt" "Select number Server [1 to 11]: ")"  # Default selection shown to user
-
+		echo_t "Select number Server [1 to 11]: "  # Default selection shown to user
 		read -r -n 1 UR
 
 # Process user input for server selection in the first menu
@@ -107,7 +107,8 @@ invalid_two () {
 			echo "$UR" >"$HOME/twm/ur_file"
 			;;
 		$'\177') menu_one ;; # Go back if Backspace is pressed
-		'c'|'C') # If ‘c’ or ‘C’ is pressed, terminate play.sh and exit
+		# If ‘c’ or ‘C’ is pressed, terminate play.sh and exit
+		'c'|'C') 
 			pidf=$(ps ax -o pid=,args= | grep "sh.*twm/play.sh"|grep -v 'grep'|head -n 1|grep -o -E '([0-9]{3,5})')
 			until [ -z "$pidf" ]; do
 				kill -9 "$pidf" 2> /dev/null
@@ -257,18 +258,18 @@ esac
 		clear
 
 # Display options for user agent selection
-printf "${BLACK_CYAN} Simulate your real or random device. \033[00m
-1)${BLACK_CYAN} Manual \033[00m
-2)${BLACK_CYAN} Automatic \033[00m
-" | sed 's/\t\t\t//g'
+print_t "Simulate your real or random device." "$BLACK_CYAN" "$COLOR_RESET"
+print_t "1) Manual" "$BLACK_CYAN" "$COLOR_RESET"
+print_t "2) Automatic" "$BLACK_CYAN" "$COLOR_RESET"
 
 # Check if a user agent file exists and is not empty
 if [ -f "$HOME/twm/fileAgent.txt" ] && [ -s "$HOME/twm/fileAgent.txt" ]; then
     UA=$(cat "$HOME/twm/fileAgent.txt") # Read existing user agent
 else
-    printf "$(get_translation "pt" "Set up User-Agent [1 to 2]: \n")"
+    print_t "Set up User-Agent [1 to 2]: " "$COLOR_RESET"
     read -r -n 1 UA # Read user input for user agent selection
 fi
+
 
 # Handle user agent selection based on input
 		case $UA in
@@ -284,7 +285,7 @@ fi
 			clear
 			echo "0" >"$HOME/twm/fileAgent.txt" # Save selection to file
 			xdg-open "$(echo "aHR0cHM6Ly93d3cud2hhdHNteXVhLmluZm8=" | base64 -d)" &>/dev/null  # Open URL for manual entry
-			printf "$(translate_and_cache "pt" "Copy and paste your User Agent here and press ENTER:")"
+			printf_t "Copy and paste your User Agent here and press ENTER: "
 			read UA # Read user input for custom user agent
 			echo "$UA" >"$TMP/userAgent.txt" # Save the custom user agent
 
@@ -295,18 +296,18 @@ fi
 			fi
 			;;
 		(2)
-			printf " ...\n${BLACK_PINK}"
+			printf " ...\n${GREEN_BLACK}"
 			echo 'TW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkxLjAuNDQ3Mi4xMjQgU2FmYXJpLzUzNy4zNgpNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvOTIuMC40NTE1LjEwNyBTYWZhcmkvNTM3LjM2Ck1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzcpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS85MS4wLjQ0NzIuMTE0IFNhZmFyaS81MzcuMzYKTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NDsgcnY6OTAuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC85MC4wCk1vemlsbGEvNS4wIChXaW5kb3dzIE5UIDEwLjA7IFdpbjY0OyB4NjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS85MS4wLjQ0NzIuMTY0IFNhZmFyaS81MzcuMzYKTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTVfNykgQXBwbGVXZWJLaXQvNjA1LjEuMTUgKEtIVE1MLCBsaWtlIEdlY2tvKSBWZXJzaW9uLzE0LjEuMSBTYWZhcmkvNjA1LjEuMTUKTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NDsgcnY6ODkuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC84OS4wCk1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzcpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS85Mi4wLjQ1MTUuMTA3IFNhZmFyaS81MzcuMzYKTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkyLjAuNDUxNS4xMzEgU2FmYXJpLzUzNy4zNgpNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBydjo3OC4wKSBHZWNrby8yMDEwMDEwMSBGaXJlZm94Lzc4LjAKTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTVfNykgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkxLjAuNDQ3Mi4xNjQgU2FmYXJpLzUzNy4zNgpNb3ppbGxhLzUuMCAoWDExOyBVYnVudHU7IExpbnV4IHg4Nl82NDsgcnY6OTAuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC85MC4wCk1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwLjE1OyBydjo5MC4wKSBHZWNrby8yMDEwMDEwMSBGaXJlZm94LzkwLjAKTW96aWxsYS81LjAgKFgxMTsgTGludXggeDg2XzY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvOTEuMC40NDcyLjExNCBTYWZhcmkvNTM3LjM2Ck1vemlsbGEvNS4wIChYMTE7IExpbnV4IHg4Nl82NDsgcnY6OTAuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC85MC4wCk1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwLjE1OyBydjo4OS4wKSBHZWNrby8yMDEwMDEwMSBGaXJlZm94Lzg5LjAKTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkyLjAuNDUxNS4xMDcgU2FmYXJpLzUzNy4zNiBFZGcvOTIuMC45MDIuNTUKTW96aWxsYS81LjAgKFgxMTsgVWJ1bnR1OyBMaW51eCB4ODZfNjQ7IHJ2Ojg5LjApIEdlY2tvLzIwMTAwMTAxIEZpcmVmb3gvODkuMApNb3ppbGxhLzUuMCAoTWFjaW50b3NoOyBJbnRlbCBNYWMgT1MgWCAxMF8xNV83KSBBcHBsZVdlYktpdC82MDUuMS4xNSAoS0hUTUwsIGxpa2UgR2Vja28pIFZlcnNpb24vMTQuMS4yIFNhZmFyaS82MDUuMS4xNQpNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvOTEuMC40NDcyLjEyNCBTYWZhcmkvNTM3LjM2IEVkZy85MS4wLjg2NC42NwpNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvOTIuMC40NTE1LjEwNyBTYWZhcmkvNTM3LjM2IEVkZy85Mi4wLjkwMi42MgpNb3ppbGxhLzUuMCAoWDExOyBMaW51eCB4ODZfNjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS85Mi4wLjQ1MTUuMTA3IFNhZmFyaS81MzcuMzYKTW96aWxsYS81LjAgKFgxMTsgTGludXggeDg2XzY0OyBydjo3OC4wKSBHZWNrby8yMDEwMDEwMSBGaXJlZm94Lzc4LjAKTW96aWxsYS81LjAgKFgxMTsgTGludXggeDg2XzY0OyBydjo4OS4wKSBHZWNrby8yMDEwMDEwMSBGaXJlZm94Lzg5LjAKTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkxLjAuNDQ3Mi4xMjQgU2FmYXJpLzUzNy4zNiBFZGcvOTEuMC44NjQuNjQKTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkxLjAuNDQ3Mi4xMTQgU2FmYXJpLzUzNy4zNgpNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvOTEuMC40NDcyLjEyNCBTYWZhcmkvNTM3LjM2IEVkZy85MS4wLjg2NC43MApNb3ppbGxhLzUuMCAoTWFjaW50b3NoOyBJbnRlbCBNYWMgT1MgWCAxMF8xNV83KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvOTIuMC40NTE1LjEzMSBTYWZhcmkvNTM3LjM2Ck1vemlsbGEvNS4wIChYMTE7IExpbnV4IHg4Nl82NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkxLjAuNDQ3Mi4xNjQgU2FmYXJpLzUzNy4zNgpNb3ppbGxhLzUuMCAoV2luZG93cyBOVCA2LjE7IFdpbjY0OyB4NjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS85MS4wLjQ0NzIuMTI0IFNhZmFyaS81MzcuMzYKTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkxLjAuNDQ3Mi4xNjQgU2FmYXJpLzUzNy4zNiBFZGcvOTEuMC44NjQuNzEKTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTVfNikgQXBwbGVXZWJLaXQvNjA1LjEuMTUgKEtIVE1MLCBsaWtlIEdlY2tvKSBWZXJzaW9uLzE0LjEuMSBTYWZhcmkvNjA1LjEuMTUKTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkyLjAuNDUxNS4xMTUgU2FmYXJpLzUzNy4zNgpNb3ppbGxhLzUuMCAoV2luZG93cyBOVCA2LjM7IFdpbjY0OyB4NjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS85MS4wLjQ0NzIuMTI0IFNhZmFyaS81MzcuMzYKTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTRfNikgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkxLjAuNDQ3Mi4xMTQgU2FmYXJpLzUzNy4zNgpNb3ppbGxhLzUuMCAoTWFjaW50b3NoOyBJbnRlbCBNYWMgT1MgWCAxMF8xNV83KSBBcHBsZVdlYktpdC82MDUuMS4xNSAoS0hUTUwsIGxpa2UgR2Vja28pIFZlcnNpb24vMTQuMSBTYWZhcmkvNjA1LjEuMTUKTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgNi4xOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvOTIuMC40NTE1LjEwNyBTYWZhcmkvNTM3LjM2Ck1vemlsbGEvNS4wIChXaW5kb3dzIE5UIDEwLjA7IFdpbjY0OyB4NjQ7IHJ2Ojc4LjApIEdlY2tvLzIwMTAwMTAxIEZpcmVmb3gvNzguMApNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvOTEuMC40NDcyLjEyNCBTYWZhcmkvNTM3LjM2IE9QUi83Ny4wLjQwNTQuMjAzCk1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzYpIEFwcGxlV2ViS2l0LzYwNS4xLjE1IChLSFRNTCwgbGlrZSBHZWNrbykgVmVyc2lvbi8xNC4wLjMgU2FmYXJpLzYwNS4xLjE1Ck1vemlsbGEvNS4wIChXaW5kb3dzIE5UIDEwLjA7IFdpbjY0OyB4NjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS85MS4wLjQ0NzIuMTY0IFNhZmFyaS81MzcuMzYgT1BSLzc3LjAuNDA1NC4yNzcKTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTVfNykgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkxLjAuNDQ3Mi4xMjQgU2FmYXJpLzUzNy4zNgpNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvOTEuMC40NDcyLjc3IFNhZmFyaS81MzcuMzYKTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzc2LjAuMzgwOS4xMDAgU2FmYXJpLzUzNy4zNgpNb3ppbGxhLzUuMCAoV2luZG93cyBOVCA2LjE7IFdpbjY0OyB4NjQ7IHJ2OjkwLjApIEdlY2tvLzIwMTAwMTAxIEZpcmVmb3gvOTAuMApNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXT1c2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkxLjAuNDQ3Mi4xMjQgU2FmYXJpLzUzNy4zNgpNb3ppbGxhLzUuMCAoTWFjaW50b3NoOyBJbnRlbCBNYWMgT1MgWCAxMF8xNV83KSBBcHBsZVdlYktpdC82MDUuMS4xNSAoS0hUTUwsIGxpa2UgR2Vja28pIFZlcnNpb24vMTUuMCBTYWZhcmkvNjA1LjEuMTUKTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkwLjAuNDQzMC45MyBTYWZhcmkvNTM3LjM2Ck1vemlsbGEvNS4wIChXaW5kb3dzIE5UIDEwLjA7IFdpbjY0OyB4NjQ7IHJ2OjkxLjApIEdlY2tvLzIwMTAwMTAxIEZpcmVmb3gvOTEuMApNb3ppbGxhLzUuMCAoTWFjaW50b3NoOyBJbnRlbCBNYWMgT1MgWCAxMF8xNV83KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvOTEuMC40NDcyLjc3IFNhZmFyaS81MzcuMzYKTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTRfNikgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkyLjAuNDUxNS4xMDcgU2FmYXJpLzUzNy4zNgpNb3ppbGxhLzUuMCAoTWFjaW50b3NoOyBJbnRlbCBNYWMgT1MgWCAxMC4xNTsgcnY6OTEuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC85MS4wCk1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzcpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS85MS4wLjQ0NzIuMTA2IFNhZmFyaS81MzcuMzYKTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkxLjAuNDQ3Mi4xMDYgU2FmYXJpLzUzNy4zNgpNb3ppbGxhLzUuMCAoV2luZG93cyBOVCA2LjE7IFdpbjY0OyB4NjQ7IHJ2Ojg5LjApIEdlY2tvLzIwMTAwMTAxIEZpcmVmb3gvODkuMApNb3ppbGxhLzUuMCAoV2luZG93cyBOVCA2LjM7IFdpbjY0OyB4NjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS85Mi4wLjQ1MTUuMTA3IFNhZmFyaS81MzcuMzYKTW96aWxsYS81LjAgKFgxMTsgRmVkb3JhOyBMaW51eCB4ODZfNjQ7IHJ2Ojg5LjApIEdlY2tvLzIwMTAwMTAxIEZpcmVmb3gvODkuMApNb3ppbGxhLzUuMCAoWDExOyBGZWRvcmE7IExpbnV4IHg4Nl82NDsgcnY6OTAuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC85MC4wCk1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzEzXzYpIEFwcGxlV2ViS2l0LzYwNS4xLjE1IChLSFRNTCwgbGlrZSBHZWNrbykgVmVyc2lvbi8xMy4xLjIgU2FmYXJpLzYwNS4xLjE1Ck1vemlsbGEvNS4wIChNYWNpbnRvc2g7IEludGVsIE1hYyBPUyBYIDEwXzE1XzcpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS85MC4wLjQ0MzAuMjEyIFNhZmFyaS81MzcuMzYKTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkxLjAuNDQ3Mi4xNjQgU2FmYXJpLzUzNy4zNiBPUFIvNzcuMC40MDU0LjI3NQpNb3ppbGxhLzUuMCAoV2luZG93cyBOVCA2LjE7IFdpbjY0OyB4NjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS85Mi4wLjQ1MTUuMTMxIFNhZmFyaS81MzcuMzYKTW96aWxsYS81LjAgKFgxMTsgTGludXggeDg2XzY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvOTAuMC40NDMwLjIxMiBTYWZhcmkvNTM3LjM2Ck1vemlsbGEvNS4wIChYMTE7IExpbnV4IHg4Nl82NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkwLjAuNDQzMC45MyBTYWZhcmkvNTM3LjM2Ck1vemlsbGEvNS4wIChYMTE7IExpbnV4IHg4Nl82NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzkxLjAuNDQ3Mi4xMjQgU2FmYXJpLzUzNy4zNgpNb3ppbGxhLzUuMCAoWDExOyBMaW51eCB4ODZfNjQpIEFwcGxlV2ViS2l0LzUzNy4zNiAoS0hUTUwsIGxpa2UgR2Vja28pIENocm9tZS85MS4wLjQ0NzIuNzcgU2FmYXJpLzUzNy4zNgpNb3ppbGxhLzUuMCAoTWFjaW50b3NoOyBJbnRlbCBNYWMgT1MgWCAxMF8xNV83KSBBcHBsZVdlYktpdC82MDUuMS4xNSAoS0hUTUwsIGxpa2UgR2Vja28pIFZlcnNpb24vMTMuMS4zIFNhZmFyaS82MDUuMS4xNQpNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBydjo5MS4wKSBHZWNrby8yMDEwMDEwMSBGaXJlZm94LzkxLjAKTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgNi4xOyBXT1c2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzg2LjAuNDI0MC4xOTggU2FmYXJpLzUzNy4zNgpNb3ppbGxhLzUuMCAoV2luZG93cyBOVCA2LjM7IFdpbjY0OyB4NjQ7IHJ2OjkwLjApIEdlY2tvLzIwMTAwMTAxIEZpcmVmb3gvOTAuMAo=' | base64 -d >"$TMP/userAgent.txt"
 			echo "0" >"$HOME/twm/fileAgent.txt" # Save selection to file
-			printf "$(translate_and_cache "pt" "Automatic User Agent selected")\n${COLOR_RESET}"
+			printf_t "Automatic User Agent selected" "${COLOR_RESET}"
 			;;
 		(*)
 			clear # Clear the screen for invalid input handling
 			if [ -n "$UA" ]; then
-				printf "$(translate_and_cache "pt" "\n Invalid option: $(echo "$UA")")"
+				printf_t "Invalid option: $(echo "$UA")"
 				kill -9 $$ # Terminate the script on invalid input
 			else
-				printf "$(translate_and_cache "pt" "\n Time exceeded!\n")"
+				printf_t "\n Time exceeded!\n"
 			fi
 			;;
 		esac
@@ -320,7 +321,7 @@ fi
 		user_agent # Call function to set up user agent if conditions are met.
 	else
 # Display a random user agent from the existing list.
-		printf "${BLACK_PINK}\nUser-Agent: $(shuf -n 1 "$TMP/userAgent.txt")\n${COLOR_RESET}\n"
+		echo_t "User-Agent: $(shuf -n 1 "$TMP"/userAgent.txt)" "${BLACK_PINK}" "${COLOR_RESET}"
 	fi
 
 # Convert DOS line endings to Unix format in the user agent file (if necessary)

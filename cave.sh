@@ -4,7 +4,7 @@ cave_process() {
     local mode="$1"
     local BREAK
 
-    echo_t "Cave" "$GOLD_BLACK" "$COLOR_RESET" "after" " 🪨"
+    echo_t "Cave" "$GOLD_BLACK" "$COLOR_RESET" "after" "🪨"
 
     # Determinar o tempo de execução
     if [ "$mode" == "start" ]; then
@@ -35,7 +35,7 @@ cave_process() {
 
         # Verificar limites de speedUp
         if [[ "$RESULT" == "speedUp" && (( "$mode" == "start" && count -ge 20 )) || (( "$mode" == "routine" && count -ge 8 )) ]]; then
-            echo_t "Cave limit reached" "" "" "after" " ⛏️"
+            echo_t "Cave limit reached" "" "" "after" "⛏️"
             break
         fi
 
@@ -47,19 +47,19 @@ cave_process() {
                 # Feedback baseado na ação atual
                 case $RESULT in
                     down*)
-                        echo_t "New search" "" "" "after" " 🔍"
+                        echo_t "New search" "" "" "after" "🔍"
                         ((count++))  # Incrementar contador
                         ;;
                     gather*)
-                        echo_t "Start mining" "" "" "after" " ⛏️"
+                        echo_t "Start mining" "" "" "after" "⛏️"
                         ;;
                     runaway*)
                         echo "$(translate_and_cache "$LANGUAGE" "") "
-                        echo_t "Run away" "" "" "after" " 💨"
+                        echo_t "Run away" "" "" "after" "💨"
                         ;;
                     speedUp*)
                         echo "$(translate_and_cache "$LANGUAGE" "") "
-                        echo_t "Speed up mining" "" "" "after" " ⚡"
+                        echo_t "Speed up mining" "" "" "after" "⚡"
                         ;;
                 esac
                 ;;
@@ -81,7 +81,7 @@ cave_process() {
         fi
     done
 
-    echo_e "Cave Done" "${GREEN_BLACK}" "${COLOR_RESET}" "✅\n"
+    echo_t "Cave Done" "${GREEN_BLACK}" "${COLOR_RESET}" "✅\n"
     
     # Se for o modo start, mudar o modo de execução e reiniciar o script
     if [ "$mode" == "start" ]; then

@@ -9,7 +9,7 @@ clan_id() {
 
     # Check if we found a valid CLAN ID
     if [[ -z "$CLD" ]]; then
-        echo "CLAN ID not found!"
+        echo_t "CLAN ID not found!"
         return 1
     else
         # echo "CLAN ID found: $CLD"
@@ -32,24 +32,24 @@ checkQuest() {
     elif [ "$action" == "end" ]; then
       click=$(grep -o -E "/quest/(deleteHelp|end)/$quest_id/\?r=[0-9]{8}" "$TMP/SRC" | sed -n '1p')
     else
-      echo "$(translate_and_cache "$LANGUAGE" "Invalid action:")" $action. "$(translate_and_cache "$LANGUAGE" "Use 'apply' or 'end'.")"
+      echo_t "Invalid action:" && printf "$action." && echo_t "Use 'apply' or 'end'."
       return 1 # Retorna falha se a ação for inválida
     fi
 
     # Verificar se encontrou o botão correto
     if [ -n "$click" ]; then
-      fetch_page "/clan/${CLD}$click"
-      echo "$(translate_and_cache "$LANGUAGE" "Clan quest") $quest_id $(translate_and_cache "$LANGUAGE" "Check") ($action) ... 🔎"
-      return 0 # Sucesso se o botão foi encontrado
+        fetch_page "/clan/${CLD}$click"
+        echo_t "$(translate_and_cache "$LANGUAGE" "Clan quest") $quest_id $(translate_and_cache "$LANGUAGE" "Check") ($action) ... 🔎" "$COLOR_RESET"
+        return 0 # Sucesso se o botão foi encontrado
     else
-      echo "$(translate_and_cache "$LANGUAGE" "Clan quest") $quest_id ($action) $(translate_and_cache "$LANGUAGE" "is not ready.") 🔎"
-      return 1 # Não encontrou o botão
+        echo_t "$(translate_and_cache "$LANGUAGE" "Clan quest") $quest_id ($action) $(translate_and_cache "$LANGUAGE" "is not ready.") 🔎" "$COLOR_RESET"
+        return 1 # Não encontrou o botão
     fi
-  else
-    fetch_page "/clanrating/wantedToClan"
-    echo "$(translate_and_cache "$LANGUAGE" "Clan quest") $quest_id $(translate_and_cache "$LANGUAGE" "was not found.") 🔎"
-    return 1 # Falha se CLD estiver vazio
-  fi
+    else
+        fetch_page "/clanrating/wantedToClan"
+        echo_t "$(translate_and_cache "$LANGUAGE" "Clan quest") $quest_id $(translate_and_cache "$LANGUAGE" "was not found.") 🔎" "$COLOR_RESET"
+        return 1 # Falha se CLD estiver vazio
+    fi
 }
 
 
@@ -62,7 +62,7 @@ check_leader() {
 
   # Check if the CODE file is empty after processing
   if [ ! -s "$TMP/CODE" ]; then
-      echo "No relevant data found in the clan page."
+      echo_t "No relevant data found in the clan page."
       return 1
   fi
 
@@ -106,7 +106,7 @@ clan_statue() {
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "${URL}/clan/${CLD}/built/?goldUpgrade=true&r=$(cat "$TMP"/CODE)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
         ) &
         time_exit 17  # Wait for the process to finish
-        echo " Gold Statue Upgrade..."
+        echo_t " Gold Statue Upgrade..."
 
         # Fetch the code again for silver upgrade
         (
@@ -119,7 +119,7 @@ clan_statue() {
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "${URL}/clan/${CLD}/built/?silverUpgrade=true&r=$(cat "$TMP"/CODE)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
         ) &
         time_exit 17  # Wait for the process to finish
-        echo " Silver Statue Upgrade..."
+        echo_t " Silver Statue Upgrade..."
 
         echo -e "${GREEN_BLACK}Clan Statue ✅${COLOR_RESET}\n"
     fi
@@ -159,13 +159,13 @@ clanElixirQuest() {
   if [ -n "$click" ]; then
     case $i in
     (1)
-      echo " Buying elixir strength" ;;
+      echo_t " Buying elixir strength" ;;
     (2)
-      echo " Buying elixir health" ;;
+      echo_t " Buying elixir health" ;;
     (3)
-      echo " Buying elixir agility" ;;
+      echo_t " Buying elixir agility" ;;
     (4)
-      echo " Buying elixir protection" ;;    
+      echo_t " Buying elixir protection" ;;    
     esac
     fetch_page "$click"
     sleep 1s
@@ -192,10 +192,10 @@ clanMerchantQuest() {
   if [ -n "$click" ]; then
     case $i in
       (1)
-        echo " Buying Stones 🪨"
+        echo_t " Buying Stones" "" "" "after" "🪨"
         ;;
       (2)
-        echo " Buying Grass 🍃"
+        echo_t " Buying Grass" "" "" "after" "🍃"
     esac
     fetch_page "$click"
     click=$(grep -o -E "/coliseum/merchant/$i/startMaking[?]r=[0-9]+&ref=lab" "$TMP"/SRC | sed -n '1p')
@@ -208,7 +208,8 @@ clanMerchantQuest() {
 }
 
 clanQuests() {
-  echo -e "${GOLD_BLACK}Clan Missions 🔱🎯${COLOR_RESET}"
+  #echo -e "${GOLD_BLACK}Clan Missions ${COLOR_RESET}"
+  printf "${GOLD_BLACK}" && printf_t "Clan missions " && echo -e "🔱🎯${COLOR_RESET}\n"
     if checkQuest 7 apply; then
     clanElixirQuest
     fi
@@ -221,5 +222,5 @@ clanQuests() {
     if checkQuest 1 apply || checkQuest 2 apply; then
     league_play
     fi
-    echo -e "${GREEN_BLACK}Clan missions done ✅${COLOR_RESET}\n"
+    printf "${GREEN_BLACK}" && printf_t "Clan missions done " && echo -e "✅${COLOR_RESET}\n"
 }
