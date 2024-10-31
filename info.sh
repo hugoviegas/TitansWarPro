@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.8.29 (Beta)" # To change the version number every time has an update!
+    versionNum="3.8.30 (Beta)" # To change the version number every time has an update!!!
 for i in $colors; do
 clear
 printf "\033[1;38;5;${i}m
@@ -58,6 +58,22 @@ printf "\033[1;38;5;${i}m${author}\n\033[02m${versionNum}${COLOR_RESET}\n"
 sleep 0.2s
 done
 }
+language_setup() {
+    echo "$RUN" > "$HOME/twm/runmode_file"  # Save the run mode to a file
+    LANGUAGE_FILE="$HOME/twm/language_file"  # Caminho para o arquivo de idioma
+    
+    # Verifica se o arquivo existe e se contém um idioma válido
+    if [ -f "$LANGUAGE_FILE" ] && [ -s "$LANGUAGE_FILE" ]; then
+        LANGUAGE=$(cat "$LANGUAGE_FILE")
+    else
+        LANGUAGE="en"  # Define o idioma para o padrão
+        echo "$LANGUAGE" > "$LANGUAGE_FILE"  # Salva o idioma padrão no arquivo
+    fi
+
+    # Exporta a variável para torná-la disponível globalmente
+    export LANGUAGE
+}
+language_setup
 
 time_exit() {
     # Function to monitor a background process and terminate it if it exceeds a specified timeout.

@@ -3,19 +3,6 @@
 # Main script to manage the execution of the twm.sh script based on the provided run mode
 (
   RUN=$1  # Get the run mode from the first argument
-  echo "$RUN" > "$HOME/twm/runmode_file"  # Save the run mode to a file
-  LANGUAGE_FILE="$HOME/twm/language_file"  # Caminho para o arquivo de idioma
-  
-  # Verifica se o arquivo existe e se contém um idioma válido
-  if [ -f "$LANGUAGE_FILE" ] && [ -s "$LANGUAGE_FILE" ]; then
-      LANGUAGE=$(cat "$LANGUAGE_FILE")
-  else
-      LANGUAGE="en"  # Define o idioma para o padrão
-      echo "$LANGUAGE" > "$LANGUAGE_FILE"  # Salva o idioma padrão no arquivo
-  fi
-
-  # Exporta a variável para torná-la disponível globalmente
-  export LANGUAGE LANGUAGE_FILE
 
   while true; do
     # Get the PID of the running twm.sh script
