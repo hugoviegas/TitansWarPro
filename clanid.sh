@@ -93,7 +93,8 @@ check_leader() {
 clan_statue() {
     check_leader
     if [ -n "$CLD" ] && [ "$is_leader" == true ]; then  # Proceed only if CLD is set (indicating a valid clan)
-        echo -e "${GOLD_BLACK}Clan Statue Check 🗿${COLOR_RESET}"
+        echo_t "Clan statue check" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "🗿"
+        echo -e "${GOLD_BLACK} ${COLOR_RESET}"
 
         # Fetch the code from the arena/quit page
         (
@@ -120,15 +121,14 @@ clan_statue() {
         ) &
         time_exit 17  # Wait for the process to finish
         echo_t " Silver Statue Upgrade..."
-
-        echo -e "${GREEN_BLACK}Clan Statue ✅${COLOR_RESET}\n"
+        echo_t "Clan Statue" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "🗿✅\n"
     fi
 }
 
 clanDungeon() {
   #clan_id
   if [ -n "$CLD" ]; then
-  echo -e "${GOLD_BLACK}Checking clan dungeon 👹${COLOR_RESET}"
+  echo_t "Checking clan dungeon" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "👹"
     fetch_page "/clandungeon/?close"
     local CLANDUNGEON
     CLANDUNGEON=$(grep -o -E '/clandungeon/(attack/[?][r][=][0-9]+|[?]close)' "$TMP"/SRC | head -n 1)
@@ -137,11 +137,11 @@ clanDungeon() {
       fetch_page "${CLANDUNGEON}"
       local count 
       count=$((count + 1))
-      echo " ⚔ Atack $count"
+      echo_t " Atack $count" "" "\n" "before" "⚔️"
       local CLANDUNGEON
       CLANDUNGEON=$(grep -o -E '/clandungeon/(attack/[?][r][=][0-9]+|[?]close)' "$TMP"/SRC | head -n 1)
     done
-    echo -e "${GREEN_BLACK}Clan Dungeon ✅${COLOR_RESET}\n"
+    echo_t "Clan Dungeon" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "😈✅\n"
   fi
 }
 

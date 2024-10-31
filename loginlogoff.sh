@@ -31,8 +31,8 @@ login_logoff () {
   until [ "$check" -lt 1 ]; do
    clear
    echo_t "Please wait..."
-   echo -e -n "[Login using: $ACC...] (${check}s) - "
-   echo_t "press [ENTER] to change your user account"
+   echo -ne "[Login using: $ACC...] (${check}s) - "
+   echo_t "press ENTER to change your user account"
 
    local check=$((check - 1))
    if read -t 1; then

@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.8.39 (Beta)" # To change the version number every time has an update!!!!!!!!!!
+    versionNum="3.8.40 (Beta)" # To change the version number every time has an update!
 for i in $colors; do
 clear
 printf "\033[1;38;5;${i}m
@@ -106,7 +106,7 @@ echo_t() {
 
   # Adiciona o emoji conforme a posição especificada
   if [[ "$emoji_position" == "before" ]]; then
-    echo -e "${color_start}${emoji} ${translated_text}${color_end}"
+    echo -ne "${color_start}${emoji} ${translated_text}${color_end}"
   else
     echo -e "${color_start}${translated_text} ${emoji}${color_end}"
   fi

@@ -98,7 +98,7 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
     num=6  # Number of seconds to wait before reconfiguration prompt
 
     # Countdown loop for reconfiguration prompt
-    for i in $(seq 3 -1 1); do
+    for i in $(seq 4 -1 1); do
         i=$((i - 1))
         if read -t 1; then
             # Clear relevant files if Enter is pressed
@@ -109,7 +109,7 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
             break &>/dev/null  # Exit the loop quietly if Enter is pressed
         fi
         
-        echo_t "\033[FTo reconfigure please press the button [Enter] ${i}s" "${GOLD_BLACK}" "${COLOR_RESET}" 
+        echo_t "To reconfigure please press the button [Enter] ${i}s" "\033[F${GOLD_BLACK}" "${COLOR_RESET}" 
 
     done
 fi
