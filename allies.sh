@@ -19,10 +19,10 @@ members_allies() {
         sort -u allies.txt -o allies.txt
     fi
 
-    echo -e "${BLACK_CYAN}$(translate_and_cache "$LANGUAGE" "Allies for Coliseum and King of the Immortals:")${COLOR_RESET}"
+    echo -e "${BLACK_CYAN}$(translate_and_cache "$LANGUAGE" "Allies for Coliseum and King of the Immortals:") 🧱 👑${COLOR_RESET}"
     cat allies.txt
 
-    echo -e "${BLACK_CYAN}$(translate_and_cache "$LANGUAGE" "Wait to continue. 👈")${COLOR_RESET}"
+    echo -e "${BLACK_CYAN}$(translate_and_cache "$LANGUAGE" "Wait to continue. ") 👈${COLOR_RESET}"
     sleep 2
 }
 
@@ -111,11 +111,12 @@ clan_allies() {
 conf_allies() {
     cd "$TMP" || exit  # Change to the temporary directory
     clear
-  printf "${BLACK_CYAN}\n$(translate_and_cache "$LANGUAGE" "The script will consider users on your friends list and \nClan as allies.\nLeader/Deputy on friend list will add \nClan allies.")${COLOR_RESET}\n"
-    printf "$(translate_and_cache "$LANGUAGE" "1) Add/Update alliances(All Battles)🏳️👨‍🏴‍👩‍🏳️👧‍🏴‍👦🏳️")\n\n"
-    printf "$(translate_and_cache "$LANGUAGE" "2) 👫 Add/Update just Herois alliances(Coliseum/King of immortals)")\n\n"
-    printf "$(translate_and_cache "$LANGUAGE" "3) 🏴🏳️ Add/Update just Clan alliances(Altars,Clan Coliseum and Clan Fight)")\n\n"
-    printf "$(translate_and_cache "$LANGUAGE" "4) 🚶Do nothing")\n"
+  printf "${BLACK_CYAN}\n%s${COLOR_RESET}\n" "$(translate_and_cache "$LANGUAGE" "The script will consider users on your friends list and Clan as allies.\nLeader on friend list will add Clan allies.")\n"
+  printf "%s🔵👨 🔴🧑‍🦰\n" "$(translate_and_cache "$LANGUAGE" "1) Add/Update alliances (All Battles)")"
+  printf "2) 👫 %s\n" "$(translate_and_cache "$LANGUAGE" "Add/Update just Herois alliances (Coliseum/King of immortals)")"
+  printf "3) 🔴 🔵 %s\n" "$(translate_and_cache "$LANGUAGE" "Add/Update just Clan alliances (Altars, Clan Coliseum and Clan Fight)")"
+  printf "4) 🚶 %s\n" "$(translate_and_cache "$LANGUAGE" "Do nothing")"
+
   if [ -f "$HOME/twm/al_file" ] && [ -s "$HOME/twm/al_file" ]; then
     AL=$(cat "$HOME"/twm/al_file)
   else
@@ -131,7 +132,7 @@ conf_allies() {
         members_allies
         ALD=1
         echo "1" >"$HOME"/twm/al_file
-        printf "$(translate_and_cache "$LANGUAGE" "🏳️👨‍🏴‍👩‍🏳️👧‍🏴‍👦🏳️Alliances on all battles active")\n"
+        printf "%s🔵👨 🔴🧑‍🦰\n" "$(translate_and_cache "$LANGUAGE" "Alliances on all battles active")\n"
       ;;
       #/Opção 2: Ativa alianças apenas em Herois (chama as funções AlliesID e Members, verifica se o arquivo callies.txt existe e, se existir, o esvazia, define a variável ALD como 1, armazena o valor "2" no arquivo al_file e exibe uma mensagem de confirmação)
       2)
@@ -142,7 +143,7 @@ conf_allies() {
         fi
         ALD=1
         echo "2" >"$HOME"/twm/al_file
-        printf "$(translate_and_cache "$LANGUAGE" "👫 Just Herois alliances now.")\n"
+        printf "👫 %s\n" "$(translate_and_cache "$LANGUAGE" "Just Herois alliances now.")\n"
       ;;
       #/Opção 3: Ativa alianças apenas no Clan (chama as funções AlliesID, ClanAlliesID e verifica se o arquivo allies.txt existe e, se existir, o esvazia, desfaz a definição da variável ALD, armazena o valor "3" no arquivo al_file e exibe uma mensagem de confirmação)
       3)
@@ -153,11 +154,11 @@ conf_allies() {
         fi
         unset ALD
         echo "3" >"$HOME"/twm/al_file
-        printf "$(translate_and_cache "$LANGUAGE" "🏴🏳️ Just Clan alliances now.")\n"
+        printf "🔴 🔵 %s\n""$(translate_and_cache "$LANGUAGE" "Just Clan alliances now.")\n"
       ;;
       #/Opção 4: Não faz nada (exibe uma mensagem de confirmação e adiciona linhas vazias nos arquivos allies.txt e callies.txt, caso existam)
       4)
-        printf "$(translate_and_cache "$LANGUAGE" "🚶Nothing changed.")\n"
+        printf "🚶 %s\n" "$(translate_and_cache "$LANGUAGE" "Nothing changed.")\n"
         # shellcheck disable=SC2034
         ALD=1
         echo "4" >"$HOME"/twm/al_file
