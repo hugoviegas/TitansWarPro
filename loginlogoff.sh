@@ -52,7 +52,7 @@ login_logoff () {
     w3m -cookie -o http_proxy=$PROXY -dump "$URL/?exit" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" &>/dev/null
    ) </dev/null &>/dev/null &
    time_exit 17
-   echo -e "$(translate_and_cache "pt" "${BLACK_YELLOW}In case of error will repeat${COLOR_RESET}")"
+   echo -e "${BLACK_YELLOW}$(translate_and_cache "pt" "In case of error will repeat")${COLOR_RESET}"
    echo -e "$(translate_and_cache "pt" "Username: ")"
    read username
    local prompt="$(translate_and_cache "pt" "Password: ")"

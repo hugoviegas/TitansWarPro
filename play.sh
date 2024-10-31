@@ -4,6 +4,17 @@
 (
   RUN=$1  # Get the run mode from the first argument
   echo "$RUN" > "$HOME/twm/runmode_file"  # Save the run mode to a file
+  LANGUAGE_FILE="$HOME/twm/language_file"  # Caminho para o arquivo de idioma
+  DEFAULT_LANGUAGE="en"  # Define o idioma padrão
+
+  # Verifica se o arquivo existe e se contém um idioma válido
+  if [ -f "$LANGUAGE_FILE" ] && [ -s "$LANGUAGE_FILE" ]; then
+      LANGUAGE=$(cat "$LANGUAGE_FILE")
+  else
+      LANGUAGE="$DEFAULT_LANGUAGE"  # Define o idioma para o padrão
+      echo "$LANGUAGE" > "$LANGUAGE_FILE"  # Salva o idioma padrão no arquivo
+  fi
+
 
   while true; do
     # Get the PID of the running twm.sh script

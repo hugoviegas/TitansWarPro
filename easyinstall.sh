@@ -57,6 +57,12 @@ if [ -d /data/data/com.termux/files/usr/share/doc ]; then
     pkg install w3m -y
   fi
 
+  if whereis -b jq >/dev/null 2>&1; then
+    :
+  else
+    pkg install jq -y
+  fi
+
   if whereis -b coreutils >/dev/null 2>&1; then
     :
   else

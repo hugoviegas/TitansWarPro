@@ -2,6 +2,17 @@
 
 # Nome do arquivo de traduções
 TRANSLATIONS_FILE="$HOME/twm/translations.po"
+# Defina um idioma padrão, se necessário
+DEFAULT_LANGUAGE="en"
+echo "$DEFAULT_LANGUAGE" > "$LANGUAGE_FILE"
+
+# Declarando os idiomas disponíveis para referência
+# shellcheck disable=SC2034
+declare -A LANGUAGES=(
+    [de]="Deutsch" [en]="English" [es]="Español" [fr]="Français"
+    [hi]="Hindi" [id]="Indonesian" [it]="Italiano" [pl]="Polski"
+    [pt]="Português" [ro]="Română" [ru]="Русский" [sr]="Srpski" [zh]="中文"
+)
 
 # Função para traduzir usando a API
 get_translation() {
@@ -32,6 +43,12 @@ translate_and_cache() {
 
     # Remover espaços extras no texto original
     text=$(echo "$text" | xargs)
+
+    # Se o idioma for inglês, não traduzir e retornar o texto original
+    if [[ "$target_lang" == "en" ]]; then
+        echo "$text"
+        return
+    fi
 
     # Verificar se já existe a tradução usando o texto original
     if [[ -n "${translations["$text"]}" ]]; then
