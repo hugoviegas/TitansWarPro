@@ -63,7 +63,7 @@ func_sleep() {
     # Check if it's the first day of the month
     if [ "$(date +%d)" -eq 01 ]; then
         # Check if the current hour is between 0 and 8 (inclusive)
-        if [ "$(date +%H)" -lt 9 ]; then  # This covers hours 00 to 08
+        if [ "$HOUR" -lt 9 ]; then  # This covers hours 00 to 08
             arena_duel  # Start arena duel
             coliseum_start  # Start coliseum activities
             reset; clear  # Clear the terminal screen
@@ -73,7 +73,7 @@ func_sleep() {
     fi
 
     # Check if the current minute is between 25 and 29 inclusive
-    if [ "$(date +%M)" -ge 25 ] && [ "$(date +%M)" -le 29 ]; then
+    if [ "$MIN" -ge 25 ] && [ "$MIN" -le 29 ]; then
         reset; clear  # Clear the terminal screen
         i=10  # Set wait time to 10 seconds
         func_cat  # Call func_cat to display information
@@ -94,7 +94,7 @@ start() {
     clan_statue      # Check the clan statue
     check_missions   # Check for missions 
     specialEvent     # Check the current Event
-    clanQuests       # Check the clan missions opened
+    #clanQuests       # Check the clan missions opened
     messages_info    # Display messages information 
     func_crono       # Display current time again 
     func_sleep       # Call sleep function to manage timing 

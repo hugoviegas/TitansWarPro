@@ -42,14 +42,16 @@ translate_and_cache() {
     text=$(echo "$text" | xargs)
 
     # Se o idioma for inglês, não traduzir e retornar o texto original
-    if [[ "$target_lang" == "en" ]]; then
+    if [ "$target_lang" = "en" ]; then
         echo "$text"
         return
     fi
 
     # Verificar se já existe a tradução usando o texto original
-    if [[ -n "${translations["$text"]}" ]]; then
-        echo "${translations["$text"]}"
+    if grep -q "^$text|" "$TRANSLATIONS_FILE"; then
+        # Se a tradução existir, obtê-la do arquivo
+        translated_text=$(grep "^$text|" "$TRANSLATIONS_FILE" | cut -d'|' -f2-)
+        echo "$translated_text"
     else
         # Se não existe, traduzir
         translated_text=$(get_translation "$target_lang" "$text")
