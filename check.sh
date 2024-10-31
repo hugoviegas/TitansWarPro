@@ -1,5 +1,5 @@
 check_missions() {
-    echo -e "${GOLD_BLACK}Checking Missions 📜${COLOR_RESET}"
+    echo_t "Checking Missions" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "📜"
     # Open chests for the first two chests
     fetch_page "/quest/"
     for i in {1..2}; do
@@ -17,7 +17,7 @@ check_missions() {
     click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p')
         if [ -n "$click" ]; then
             fetch_page "$click"  # Fetch the mission completion URL
-            echo -e "${GREEN_BLACK} Mission [$i] Completed ✅${COLOR_RESET}"
+            echo_t " Mission (${i}) Completed" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
         fi
     done
 
@@ -25,16 +25,16 @@ check_missions() {
     fetch_page "/collector/"
     if click=$(grep -o -E "/collector/reward/element/[?]r=[0-9]+" "$TMP/SRC"); then
         fetch_page "$click"  # Fetch the collection reward URL
-        echo -e "${GREEN_BLACK}Collection collected ✅${COLOR_RESET}\n"
+        echo_t "Collection collected" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
     fi
+    echo_t "Missions" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
 
-    echo -e "${GREEN_BLACK}Missions ✅${COLOR_RESET}\n"
-
-    clanElixirQuest
-    clanMerchantQuest
 }
 
 check_rewards(){
+    if [ "$FUNC_rewards" = "n" ]; then
+        return
+    fi
     # Collect rewards from relics
     fetch_page "/relic/reward/"
     for i in {0..11}; do
@@ -42,7 +42,7 @@ check_rewards(){
     click=$(grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP/SRC")
         if [ -n "$click" ]; then
             fetch_page "$click"  # Fetch the relic reward URL
-            echo -e " ${GREEN_BLACK}Relic [$i] collected ✅${COLOR_RESET}"
+            echo_t "Relic (${i}) collected" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
         fi
     done
 }
@@ -54,11 +54,14 @@ apply_event() {
   if grep -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC; then
     APPLY=$(grep -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC)
     fetch_page "$APPLY"
-    echo -e "${BLACK_YELLOW}Applied for battle ✅${COLOR_RESET}\n"
+    echo_t "Applied for battle" "${BLACK_YELLOW}" "${COLOR_RESET}" "after" "✅\n"
   fi
 }
 
 use_elixir() {
+    if [ "$FUNC_elixir" = "n" ]; then
+        return
+    fi
     # Initial fetch to get the starting URLs
     fetch_page "/inv/chest/"
 
@@ -69,7 +72,7 @@ use_elixir() {
 
         # Break the loop if no more clicks are found
         if [[ -z "$click" ]]; then
-            echo "No more URLs to process."
+            echo_t "No more URLs to process."
             break
         fi
 
@@ -77,5 +80,5 @@ use_elixir() {
         fetch_page "$click"
     done
 
-    echo -e "${BLACK_YELLOW}Applied all elixir 💊${COLOR_RESET}\n"
+    echo_t "Applied all elixir" "${BLACK_YELLOW}" "${COLOR_RESET}" "after" "💊\n"
 }

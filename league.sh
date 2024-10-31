@@ -1,22 +1,29 @@
+# shellcheck disable=SC2034
 fetch_available_fights() {
-    fetch_page "/league/" "LEAGUE_DEBUG_SRC"
+    fetch_page "/league/" "LEAGUE_SRC"
     
-    if [ -f "$TMP/LEAGUE_DEBUG_SRC" ]; then
-        echo "Looking for available fights..."
-        # Remover tudo antes e depois do número de lutas disponíveis
-        AVAILABLE_FIGHTS=$(grep -o -E '<b>[0-5]</b>' "$TMP/LEAGUE_DEBUG_SRC" | head -n 1 | sed -n 's/.*<b>\([0-5]\)<\/b>.*/\1/p')
-        echo "Fights left: $AVAILABLE_FIGHTS"
+    if [ -f "$TMP/LEAGUE_SRC" ]; then
+        echo_t "Looking for available fights..."
+        # Extract the number of available fights
+        AVAILABLE_FIGHTS=$(grep -o -E '<b>[0-5]</b>' "$TMP/LEAGUE_SRC" | head -n 1 | sed -n 's/.*<b>\([0-5]\)<\/b>.*/\1/p')
         
-        if [ -z "$AVAILABLE_FIGHTS" ]; then
-            echo "Erro: Nenhuma luta disponível encontrada."
-            return 1  # Retorna um código de erro
+        # Check if AVAILABLE_FIGHTS is a number
+        if [[ "$AVAILABLE_FIGHTS" =~ ^[0-5]$ ]]; then
+            echo_t "Fights left:" "" "$AVAILABLE_FIGHTS"
+        else
+            echo "Error: No available fights or not found." >> "$TMP/ERROR_DEBUG"
+            AVAILABLE_FIGHTS=0
         fi
     else
-        echo "O arquivo LEAGUE_DEBUG_SRC não foi encontrado."
-        AVAILABLE_FIGHTS=0  # Define como 0 se o arquivo não for encontrado
-        return 1  # Retorna um código de erro
+        echo "The LEAGUE_SRC file was not found." >> "$TMP/ERROR_DEBUG"
+        AVAILABLE_FIGHTS=0
     fi
     
+    # Ensure AVAILABLE_FIGHTS is an integer
+    AVAILABLE_FIGHTS=${AVAILABLE_FIGHTS:-0}
+    
+    # Return 0 if fights are available, 1 otherwise
+    [ "$AVAILABLE_FIGHTS" -gt 0 ]
 }
 
 # Função para extrair estatísticas dos inimigos
@@ -38,15 +45,15 @@ get_enemy_stat() {
         ((attempts++))
     done
 
-    echo "Stat not found after $max_attempts attempts."  # Mensagem de erro se não encontrar
+    echo "Error: Stat not found after $max_attempts attempts." >> "$TMP/ERROR_DEBUG"  # Mensagem de erro se não encontrar
     return 1  # Retorna um código de erro
 }
 
 # Função principal para jogar na liga
 league_play() {
     echo -e "${GOLD_BLACK}League ⚔️${COLOR_RESET}"
-    checkQuest 2
-    checkQuest 1
+    checkQuest 2 apply
+    checkQuest 1 apply
 
     PLAYER_STRENGTH=$(player_stats)  # Obtendo a força do jogador
     fetch_available_fights  # Buscando lutas disponíveis
@@ -57,7 +64,7 @@ league_play() {
     j=1  # Index for fight buttons (skipping every 2 links)
     enemy_index=1  # Separate index for enemy stats
 
-    while [ "$fights_done" -lt "$AVAILABLE_FIGHTS" ] || [ "$AVAILABLE_FIGHTS" -gt 0 ]; do
+    while [ "$fights_done" -lt "$AVAILABLE_FIGHTS" ] && [ "$AVAILABLE_FIGHTS" -gt 0 ]; do
         case "$action" in
             check_fights)
                 #echo "DEBUG: Player Stats = $PLAYER_STRENGTH"
@@ -69,7 +76,7 @@ league_play() {
                 click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight button
                 #echo "${URL}$click"
                 if [[ "$click" == *"/league/refreshFights/"* ]]; then
-                    echo "Limite de ataques finalizado. Encerrando..."
+                    echo_t "Fights limit reached, finishing..."
                     action="exit_loops"
                 elif [ -n "$click" ]; then
                     ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]+' | head -n 1)
@@ -82,33 +89,51 @@ league_play() {
                     E_AGILITY=$(get_enemy_stat "$INDEX" 3)
                     E_PROTECTION=$(get_enemy_stat "$INDEX" 4)
 
-                    echo -e "Enemy Number: $ENEMY_NUMBER"
-                    echo -e "Enemy Stats: Strength: ${E_STRENGTH:-0}"
+                    echo_t "Enemy Number:" "" "$ENEMY_NUMBER"
+                    #echo -e "Enemy Stats: Strength: ${E_STRENGTH:-0}"
                     action="fight_or_skip"
                 else
-                    echo "No fight buttons found for button $j ❌"
+                    echo "No fight buttons found for button $j ❌" >> "$TMP/ERROR_DEBUG"
                     action="exit_loops"
                 fi
                 ;;
             
             fight_or_skip)
                 if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
-                    echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
-                    echo -e "Fight $((fights_done + 1)) initiated with enemy number $ENEMY_NUMBER ✅ .\n"
-                    fetch_page "$click"
-                    action="check_fights"
+                    echo_t "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
+                    fetch_page "$click" # click
                     fights_done=$((fights_done + 1))  # Count the fight
+                    echo_t "Fight the enemy number $ENEMY_NUMBER ✅ ." "" "\n"
                     enemy_index=1  # Reset enemy index after a fight
                     j=1  # Reset button index after a fight
                     fetch_available_fights  # Recheck available fights
+                    action="check_fights" # back to check fights
                 else
-                    echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
+                    echo_t "Your strength ($PLAYER_STRENGTH) < enemy's strength ($E_STRENGTH). Skipping enemy. >>"
                     enemy_index=$((enemy_index + 1))  # Move to the next enemy
+                    #echo "$enemy_index"
                     j=$((j + 2))  # Move to the next button (skip every 2 links)
-
-                    if [ "$enemy_index" -gt 4 ]; then  # Limite de inimigos (assuming 4 enemies)
-                        enemy_index=1  # Reset enemy index after checking all enemies
-                        action="exit_loops"  # Exit if no viable enemies
+                    last_click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight
+                    #echo "$last_click" 
+                    fetch_available_fights  # Recheck available fights
+                    if [ -z "$last_click" ] && [ "$AVAILABLE_FIGHTS" -gt 1 ]; then  # If there are more than 4 enemies
+                        echo_t " Reached the last enemy. Attacking the last one and using a potion..."
+                        j=$((j - 2))  # Move to the previous button (skip every 2 links)
+                        
+                        # Attack the last enemy
+                        click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")
+                        fetch_page "$click"
+                        fights_done=$((fights_done + 1))  # Count the fight
+                        fetch_available_fights  # Recheck available fights
+                        
+                        # Use potion
+                            potion_click=$(grep -o -E "/league/potion/\?r=[0-9]+" "$TMP/SRC" | sed -n 1p)
+                            fetch_page "$potion_click"
+                            E_STRENGTH=50 # set a fake strength to the first enemy
+                            # Reset the index to attack the first enemy
+                            enemy_index=1
+                            j=1
+                            action="fight_or_skip"
                     else
                         action="check_fights"
                     fi
@@ -119,15 +144,23 @@ league_play() {
                 break
                 ;;
         esac
-       # Recompensa
-        click=$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
-        fetch_page "$click" 
+        # Recompensa
+        if [[ "$AVAILABLE_FIGHTS" =~ ^[0-9]+$ ]]; then
+            if [ "$AVAILABLE_FIGHTS" -eq 0 ]; then
+                clickReward=$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
+                fetch_page "$clickReward" 
+            fi
+        else
+            echo "Error: AVAILABLE_FIGHTS is not a valid number." >> "$TMP/ERROR_DEBUG"
+            # Handle the error condition
+            AVAILABLE_FIGHTS=0  # Set to 0 to prevent further errors
+        fi
     done
 
     unset click ENEMY_NUMBER PLAYER_STRENGTH E_STRENGTH AVAILABLE_FIGHTS fights_done enemy_index j
 
-    checkQuest 2
-    checkQuest 1
+    checkQuest 2 end
+    checkQuest 1 end
 
     echo -e "${GREEN_BLACK}League Routine Completed ✅${COLOR_RESET}\n"
 }

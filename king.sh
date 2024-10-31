@@ -1,14 +1,14 @@
 # shellcheck disable=SC2148
 king_fight () {
 
- #/enterFight
- cd "$TMP" || exit
- local LA=4 # interval attack
- local HPER="38" # % to heal
- local RPER=5 # % to random
- cl_access () {
-#  sed -n 's/.*\(\/[a-z]\{3,12\}\/[A-Za-z]\{3,12\}\/[^[:alnum:]][a-z]\{1,3\}[^[:alnum:]][0-9]\+\).*/\1/p'
-#  sed -n 's/.*\(\/king\/attack\/[^A-Za-z0-9_]r[^A-Za-z0-9_][0-9]\+\).*/\1/p' $TMP/SRC|sed -n 1p >ATK 2> /dev/null
+  #/enterFight
+  cd "$TMP" || exit
+  local LA=4 # interval attack
+  local HPER="38" # % to heal
+  local RPER=5 # % to random
+  cl_access () {
+  #  sed -n 's/.*\(\/[a-z]\{3,12\}\/[A-Za-z]\{3,12\}\/[^[:alnum:]][a-z]\{1,3\}[^[:alnum:]][0-9]\+\).*/\1/p'
+  #  sed -n 's/.*\(\/king\/attack\/[^A-Za-z0-9_]r[^A-Za-z0-9_][0-9]\+\).*/\1/p' $TMP/SRC|sed -n 1p >ATK 2> /dev/null
   grep -o -E '(/king/attack/[?]r[=][0-9]+)' "$TMP"/SRC|sed -n 1p >ATK 2> /dev/null
   grep -o -E '(/king/kingatk/[?]r[=][0-9]+)' "$TMP"/SRC|sed -n 1p >KINGATK 2> /dev/null
   grep -o -E '(/king/at[a-z]{0,3}k[a-z]{3,6}/[?]r[=][0-9]+)' "$TMP"/SRC >ATKRND 2> /dev/null
@@ -48,12 +48,12 @@ king_fight () {
  cat HP >old_HP
  echo $(( $(date +%s) - 20 )) >last_dodge
  echo $(( $(date +%s) - 90 )) >last_heal
- echo $(( $(date +%s) - $LA )) >last_atk
- >BREAK_LOOP
+ echo $(( $(date +%s) - LA )) >last_atk
+ : >BREAK_LOOP
  until [ -s "BREAK_LOOP" ] ; do
-  >BREAK_LOOP
+ : >BREAK_LOOP
   #/dodge
-  if ! grep -q -o 'txt smpl grey' "$TMP"/SRC && [ "$(( $(date +%s) - $(cat last_dodge) ))" -gt 20 -a "$(( $(date +%s) - $(cat last_dodge) ))" -lt 300 ] && awk -v ush="$(cat HP)" -v oldhp="$(cat old_HP)" 'BEGIN { exit !(ush < oldhp) }' ; then
+  if ! grep -q -o 'txt smpl grey' "$TMP"/SRC && [ "$(( $(date +%s) - $(cat last_dodge) ))" -gt 20 ] && [ "$(( $(date +%s) - $(cat last_dodge) ))" -lt 300 ] && awk -v ush="$(cat HP)" -v oldhp="$(cat old_HP)" 'BEGIN { exit !(ush < oldhp) }' ; then
    (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat DODGE)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
    ) </dev/null &>/dev/null &
@@ -61,7 +61,7 @@ king_fight () {
    cl_access
    cat HP >old_HP ; date +%s >last_dodge
   #/heal
-  elif awk -v ush="$(cat HP)" -v hlhp="$HLHP" 'BEGIN { exit !(ush < hlhp) }' && [ "$(( $(date +%s) - $(cat last_heal) ))" -gt 90 -a "$(( $(date +%s) - $(cat last_heal) ))" -lt 300 ] ; then
+  elif awk -v ush="$(cat HP)" -v hlhp="$HLHP" 'BEGIN { exit !(ush < hlhp) }' && [ "$(( $(date +%s) - $(cat last_heal) ))" -gt 90 ] && [ "$(( $(date +%s) - $(cat last_heal) ))" -lt 300 ] ; then
    (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat HEAL)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
    ) </dev/null &>/dev/null &
@@ -131,7 +131,7 @@ king_start () {
   ) </dev/null &>/dev/null &
   time_exit 17
   echo -e "${GOLD_BLACK}👑King of the Immortals will be started...${COLOR_RESET}"
-  until $(case $(date +%M) in (2[5-9]) exit 1 ;; esac) ; do
+  until (case $(date +%M) in (2[5-9]) exit 1 ;; esac) ; do
    sleep 3
   done
   (
@@ -144,16 +144,16 @@ king_start () {
   printf " 👣 Entering...\n$(cat ACCESS)\n"
   #/wait
   printf " 😴 Waiting...\n"
-  cat "$TMP"/SRC|grep -o 'king/kingatk/' >EXIT 2> /dev/null
+  cat < "$TMP"/SRC|grep -o 'king/kingatk/' >EXIT 2> /dev/null
   local BREAK=$(( $(date +%s) + 30 ))
-  until [ -s "EXIT" ] || [ $(date +%s) -gt "$BREAK" ] ; do
+  until [ -s "EXIT" ] || [ "$(date +%s)" -gt "$BREAK" ] ; do
    printf " 💤	...\n$(cat ACCESS)\n"
    (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat ACCESS)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
    ) </dev/null &>/dev/null &
    time_exit 17
-   cat "$TMP"/SRC|sed 's/href=/\n/g'|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
-   cat "$TMP"/SRC|grep -o 'king/kingatk/' >EXIT 2> /dev/null
+   cat < "$TMP"/SRC | sed 's/href=/\n/g'|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
+   cat < "$TMP"/SRC | grep -o 'king/kingatk/' >EXIT 2> /dev/null
    sleep 2
   done
   king_fight

@@ -28,7 +28,8 @@ script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.8" # to change the version number every time has an update    
+    versionNum="3.9" # to change the version number every time has an update    
+
 for i in $colors; do
 clear
 printf "\033[1;38;5;${i}m
@@ -58,6 +59,60 @@ printf "\033[1;38;5;${i}m${author}\n\033[02m${versionNum}${COLOR_RESET}\n"
 sleep 0.2s
 done
 }
+language_setup() {
+    LANGUAGE_FILE="$HOME/twm/language_file"  # Caminho para o arquivo de idioma
+    
+    # Verifica se o arquivo existe e se contém um idioma válido
+    if [ -f "$LANGUAGE_FILE" ] && [ -s "$LANGUAGE_FILE" ]; then
+        LANGUAGE=$(cat "$LANGUAGE_FILE")
+    else
+        LANGUAGE="en"  # Define o idioma para o padrão
+        echo "$LANGUAGE" > "$LANGUAGE_FILE"  # Salva o idioma padrão no arquivo
+    fi
+
+    # Exporta a variável para torná-la disponível globalmente
+    export LANGUAGE
+}
+language_setup
+
+# Função para imprimir com printf, usando tradução e cores
+printf_t() {
+  local text="$1"
+  local color_start="$2"
+  local color_end="$3"
+  local emoji_position="$4"  # "before" ou "after"
+  local emoji="$5"
+
+  # Traduz o texto
+  local translated_text="$(translate_and_cache "$LANGUAGE" "$text")"
+
+  # Adiciona o emoji conforme a posição especificada
+  if [[ "$emoji_position" == "before" ]]; then
+    printf "${color_start}%s %s${color_end}\n" "$emoji" "$translated_text"
+  else
+    printf "${color_start}%s %s${color_end}\n" "$translated_text" "$emoji"
+  fi
+}
+
+# Função para imprimir com echo, usando tradução e cores
+echo_t() {
+  local text="$1"
+  local color_start="$2"
+  local color_end="$3"
+  local emoji_position="$4"  # "before" ou "after"
+  local emoji="$5"
+
+  # Traduz o texto
+  local translated_text="$(translate_and_cache "$LANGUAGE" "$text")"
+
+  # Adiciona o emoji conforme a posição especificada
+  if [[ "$emoji_position" == "before" ]]; then
+    echo -ne "${color_start}${emoji} ${translated_text}${color_end}"
+  else
+    echo -e "${color_start}${translated_text} ${emoji}${color_end}"
+  fi
+}
+
 
 time_exit() {
     # Function to monitor a background process and terminate it if it exceeds a specified timeout.
@@ -82,7 +137,9 @@ time_exit() {
         kill -15 "$TEFPID" &>/dev/null
         
         # Notify the user that the command execution was interrupted
-        printf "${WHITEb_BLACK}Command execution was interrupted!${COLOR_RESET}\n"
+        #printf "${WHITEb_BLACK}%s${COLOR_RESET}\n" "$(translate_and_cache "$LANGUAGE" "Command execution was interrupted!")"
+        printf_t "Command execution was interrupted!" "$WHITEb_BLACK" "$COLOR_RESET" "before" "⚠️"
+
     )
 }
 
@@ -112,29 +169,29 @@ hpmp() {
 }
 
 messages_info() {
-     echo " ⚔️ - Titans War Macro - ⚔️ V: $versionNum " >"$TMP"/msg_file
+     echo " ⚔️ - Titans War Macro - ⚔️ V: $versionNum " > "$TMP"/msg_file
      printf " --------- 📩 MAIL 📩 ---------------\n" >> "$TMP"/msg_file
     (
-          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/mail" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tee "$TMP"/info_file | sed -n '/[|]\ mp/,/\[arrow\]/p' | sed '1,1d;$d;6q' >>"$TMP"/msg_file
+          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/mail" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tee "$TMP"/info_file | sed -n '/[|]\ mp/,/\[arrow\]/p' | sed '1,1d;$d;6q' >> "$TMP"/msg_file
     ) </dev/null &>/dev/null &
     time_exit 17
-     printf " --------- 💬 CHAT TITANS 🔱 ---------\n" >>"$TMP"/msg_file
+     printf " --------- 💬 CHAT TITANS 🔱 ---------\n" >> "$TMP"/msg_file
     (
-          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/titans/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -n '/\(\»\)/,/\[chat\]/p' | sed '$d;6q' >>"$TMP"/msg_file
+          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/titans/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -n '/\(\»\)/,/\[chat\]/p' | sed '$d;6q' >> "$TMP"/msg_file
     ) </dev/null &>/dev/null &
     time_exit 17
-     printf " --------- 💬 CHAT CLAN 🛡️ -----------\n" >>"$TMP"/msg_file
+     printf " --------- 💬 CHAT CLAN 🛡️ -----------\n" >> "$TMP"/msg_file
     (
-          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/clan/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[chat\]/p' | sed '$d;8q' >>"$TMP"/msg_file
+          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/clan/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -n '/\[[^a-z]\]/,/\[chat\]/p' | sed '$d;8q' >> "$TMP"/msg_file
     ) </dev/null &>/dev/null &
     time_exit 17
      sed -i 's/\[0\]/🔴/g;s/\[0-off\]/⭕/g;s/\[1\]/🔵/g;s/\[1-off\]/🔘/g;s/\[premium\]/👑/g;s/\[level\]/🔼/g;s/\[mail\]/📩/g;s/\[bot\]/⚫/g' msg_file >>"$TMP"/msg_file
-     printf " --------------------------------------\n" >>"$TMP"/msg_file
+     printf " --------------------------------------\n" >> "$TMP"/msg_file
     local TRAIN="$HOME.${UR}/TRAIN"
-     if [ ! -e "$HOME.${UR}/TRAIN" ] || find "$TRAIN" -mmin +30 >/dev/null 2>&1; then
+     if [ ! -e "$TRAIN" ] || find "$TRAIN" -mmin +30 >/dev/null 2>&1; then
         hpmp -fix
     fi
-     echo -e "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}" >>"$TMP"/msg_file
+     echo -e "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}" >> "$TMP"/msg_file
      # sed :a;N;s/\n//g;ta |
      echo -e "${GREENb_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' "$TMP"/info_file | sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}" >>"$TMP"/msg_file
 }

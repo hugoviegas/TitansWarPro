@@ -13,7 +13,7 @@ undying_fight () {
    w3m -dump -T text/html "$TMP/SRC"|head -n 18|sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{1,6\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\],\🔴,g;s,\[1\]\ ,\🔵,g;s,\[stone\],\ 💪,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[hit\],🗡️,;s,\[2hit\],⚔️,;s,\[rage\],⚰️,;s,\[bot\],🧟‍,;s,\[vs\]\ ,🆚\ 👹,;s,\[rip\],💀,g'
   else
    echo 1 >BREAK_LOOP
-   echo -e "${RED_BLACK}Battle's over.${COLOR_RESET}\n"
+   echo_t "Battle's over!" "${RED_BLACK}" "${COLOR_RESET}" "after" "⚔️\n"
    sleep 2s
   fi
  }
@@ -46,7 +46,7 @@ undying_fight () {
 
  #/end
  unset cf_access
- printf "Undying ✅\n"
+ echo_t "Undying" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
  sleep 15s
  apply_event undying
 
@@ -63,8 +63,7 @@ undying_start () {
    use_elixir
 
    apply_event undying
-
-   echo -e "${GOLD_BLACK}Valley of the Immortals will be started 🧟...${COLOR_RESET}\n$(date +%Hh:%Mm)"
+    echo_t "Valley of the Immortals will be started... " "${GOLD_BLACK}" "${COLOR_RESET}\n$(date +%Hh:%Mm)" "after" "🧟"
    until $(case $(date +%M) in (5[5-9]) exit 1 ;; esac) ;
     do
      sleep 2

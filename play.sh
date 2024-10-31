@@ -3,7 +3,6 @@
 # Main script to manage the execution of the twm.sh script based on the provided run mode
 (
   RUN=$1  # Get the run mode from the first argument
-  echo "$RUN" > "$HOME/twm/runmode_file"  # Save the run mode to a file
 
   while true; do
     # Get the PID of the running twm.sh script

@@ -23,7 +23,7 @@ clancoliseum_fight() {
       w3m -dump -T text/html "$src_ram" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{1,6\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\],\🔴,g;s,\[1\],\🔵,g;s,\[stone\],\ 💪,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\]\ ,\ 💀,g'
     else
       echo 1 >BREAK_LOOP
-      echo -e "${RED_BLACK}Battle's over.${COLOR_RESET}"
+      echo_t "Battle's over!" "${RED_BLACK}" "${COLOR_RESET}" "after" "⚔️\n"
       sleep 2s
     fi
   }
@@ -84,7 +84,7 @@ clancoliseum_fight() {
   rm "$src_ram" "$full_ram"
   unset dir_ram tmp_ram src_ram full_ram ACCESS cf_access
   #/end
-  echo -e "${GREEN_BLACK}ClanColiseum ✅${COLOR_RESET}\n"
+  echo_t "Clancoliseum" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
   sleep 10s
   clear
 }
@@ -126,7 +126,7 @@ clancoliseum_start() {
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/clancoliseum/enterFight" -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
     ) </dev/null &>/dev/null &
     time_exit 17
-    printf "Clan coliseum will be started...\n"
+    echo_t "Clan coliseum will be started..." "${GOLD_BLACK}" "${COLOR_RESET}"
 
     case $(date +%H:%M) in
     10:2[5-9])
@@ -146,11 +146,11 @@ clancoliseum_start() {
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/clancoliseum/" -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
     ) </dev/null &>/dev/null &
     time_exit 17
-    printf "\nClanColiseum\n$URL\n"
+    #printf "\nClanColiseum\n$URL\n"
     ACCESS=$(grep -o -E '(/clancoliseum(/[a-z]+/[?]r[=][0-9]+|/))' "$src_ram" | grep -v 'dodge' | sed -n '1p')
-    printf " 👣 Entering...\n${ACCESS}\n"
+    echo_t " Entering..." "" "\n" "before" " 👣"
     #/wait
-    printf " 😴 Waiting...\n"
+    echo_t " Waiting..." "" "\n" "before" " 😴"
 
     local BREAK=$(($(date +%s) + 11))
 

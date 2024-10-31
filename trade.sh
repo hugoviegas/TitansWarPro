@@ -1,11 +1,8 @@
 func_trade() {
-    echo -e "${GOLD_BLACK}Trade ⚖️${COLOR_RESET}"
+  echo_t "Trade" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "⚖️"
 
     # Fetch the trade exchange page
-    (
-      w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/trade/exchange" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
-    ) &
-    time_exit 17  # Wait for the process to finish
+    fetch_page "/trade/exchange"
 
     # Extract the first access link for silver exchange
     local ACCESS=$(grep -o -E '/trade/exchange/silver/[0-9]+[?]r[=][0-9]+' "$TMP/SRC" | head -n 1)
@@ -17,19 +14,15 @@ func_trade() {
     until [ -z "$ACCESS" ] || [ "$(date +%s)" -gt "$BREAK" ]; do
         SILVER_NUMBER=$(echo "$ACCESS" | cut -d'/' -f5 | cut -d'?' -f1)  # Extract silver amount
 
-        echo -e " Exchange ${GOLD_BLACK}$SILVER_NUMBER🪙${COLOR_RESET}"
+        echo_t "Exchange " "" "" "before" "" && echo -e "${GOLD_BLACK}$SILVER_NUMBER🪙${COLOR_RESET}"
 
         # Fetch the specific silver exchange details
-        (
-          w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$ACCESS" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" >$TMP/SRC
-        ) </dev/null &>/dev/null &
-        time_exit 17  # Wait for the process to finish
+        fetch_page "$ACCESS"
 
         # Update ACCESS with the next available silver exchange link
         ACCESS=$(grep -o -E '/trade/exchange/silver/[0-9]+[?]r[=][0-9]+' "$TMP/SRC" | head -n 1)
     done
-
-    echo -e "${GREEN_BLACK}Trade ✅${COLOR_RESET}\n"
+    echo_t "Trade " "${GREEN_BLACK}" "${COLOR_RESET}" "after" "⚖️✅\n"
 }
 
 clan_money() {

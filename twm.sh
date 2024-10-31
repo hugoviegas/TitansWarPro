@@ -17,7 +17,9 @@ script_ads() {
 }
 script_ads
 
-printf "${BLACK_CYAN}\n Starting...\n👉 Please wait...☕👴${COLOR_RESET}\n"
+#printf "${BLACK_CYAN}\n Starting...\n👉 Please wait...☕👴${COLOR_RESET}\n"
+print_t "Starting the macro wait a few seconds..." "$BLACK_CYAN" "$COLOR_RESET" "after" "☕👴"
+
 script_slogan
 sleep 1s
 #/termux
@@ -32,7 +34,7 @@ fi
 cd ~/twm || exit
 #/twm.sh before sources <<
 #. clandmgfight.sh
-
+. language.sh
 . requeriments.sh
 . loginlogoff.sh
 . flagfight.sh
@@ -54,12 +56,14 @@ cd ~/twm || exit
 . svproxy.sh
 . check.sh
 . league.sh
+. specialevent.sh
+. function.sh
 #/twm.sh after sources >>
 #/functions
 twm_start() {
     # Determine which action to start based on the RUN variable
     if echo "$RUN" | grep -q -E '[-]cv'; then
-        cave_start  # Start the cave function if in cave mode
+        cave_process start  # Start the cave function if in cave mode
     elif echo "$RUN" | grep -q -E '[-]cl'; then
         twm_play  # Start the main game loop if in clan mode
     elif echo "$RUN" | grep -q -E '[-]boot'; then
@@ -89,12 +93,12 @@ fetch_page() {
 
 # Check if the user settings file exists and is not empty
 if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
-    printf "${GREEN_BLACK} Starting with last settings used.${COLOR_RESET}\n"
+    echo_t "Starting with last settings used." "${GREEN_BLACK}" "${COLOR_RESET}\n"
     
     num=6  # Number of seconds to wait before reconfiguration prompt
 
     # Countdown loop for reconfiguration prompt
-    for i in $(seq 3 -1 1); do
+    for i in $(seq 4 -1 1); do
         i=$((i - 1))
         if read -t 1; then
             # Clear relevant files if Enter is pressed
@@ -105,7 +109,8 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
             break &>/dev/null  # Exit the loop quietly if Enter is pressed
         fi
         
-        printf " Hit${GOLD_BLACK} [Enter]${COLOR_RESET} to${GOLD_BLACK} reconfigure${GREEN_BLACK} ${i}s${COLOR_RESET}\n"
+        echo_t "To reconfigure please press the button [Enter] ${i}s ..." "\033[F${GOLD_BLACK}" "${COLOR_RESET}" 
+
     done
 fi
 
