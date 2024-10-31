@@ -47,13 +47,13 @@ Lista do que este macro faz:
 - Para múltiplas opções (Y/I/N/O/D/Z) apenas pressione ENTER para prosseguir.
 
 ```bash
-pkg update -y ; pkg upgrade
+pkg update ; pkg upgrade -y
 ```
 
 Também:
 
 ```bash
-pkg install w3m termux-api procps coreutils ncurses-utils
+pkg install w3m termux-api procps coreutils ncurses-utils jq -y
 ```
 
 > 2 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando):
@@ -132,13 +132,13 @@ apk update
 > Android(UserLAnd):
 
 ```bash
-sudo apk add curl ; apk add w3m ; apk add procps ; apk add coreutils ; apk add --no-cache tzdata
+sudo apk add curl ; apk add w3m ; apk add procps ; apk add coreutils ; apk add jq ; apk add --no-cache tzdata
 ```
 
 > Iphone(iSH):
 
 ```bash
-apk add curl ; apk add w3m ; apk add procps ; apk add coreutils ; apk add --no-cache tzdata
+apk add curl ; apk add w3m ; apk add procps ; apk add coreutils ; apk add jq ; apk add --no-cache tzdata
 ```
 
 > 3 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando)
