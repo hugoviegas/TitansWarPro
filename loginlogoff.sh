@@ -7,12 +7,12 @@ login_logoff () {
    w3m -cookie -o http_proxy=$PROXY -post $TMP/cookie_file -dump "$URL/?sign_in=1" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" &>/dev/null
   ) </dev/null &>/dev/null &
   time_exit 17
-  echo -e "$(translate_and_cache "pt" "Setting session cookie...")"
+  echo -e "$(translate_and_cache "$LANGUAGE" "Setting session cookie...")"
   (
    w3m -cookie -o http_proxy=$PROXY -post $TMP/cookie_file -dump "$URL/?sign_in=1" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" &>/dev/null
   ) </dev/null &>/dev/null &
   time_exit 17
-  echo -e "$(translate_and_cache "pt" "Session configured.")"
+  echo -e "$(translate_and_cache "$LANGUAGE" "Session configured.")"
   rm $TMP/cookie_file &>/dev/null
  fi
 
@@ -21,7 +21,7 @@ login_logoff () {
  ) </dev/null &>/dev/null &
  time_exit 17
 
- echo -e "$(translate_and_cache "pt" "Checking if user matches...")"
+ echo -e "$(translate_and_cache "$LANGUAGE" "Checking if user matches...")"
  sed -i 's/^[ \t]*//;s/[ \t]*$//' $TMP/acc_file
  ACC=$(cat $TMP/acc_file)
 
@@ -30,8 +30,8 @@ login_logoff () {
 
   until [ "$check" -lt 1 ]; do
    clear
-   echo -e "$(translate_and_cache "pt" "Please wait...")"
-   echo -e "$(translate_and_cache "pt" "[Wait to $ACC... (${check}s) - press ENTER to change account]")"
+   echo -e "$(translate_and_cache "$LANGUAGE" "Please wait...")"
+   echo -e "$(translate_and_cache "$LANGUAGE" "[Wait to *$ACC*... (${check}s) - press ENTER to change account]")"
    local check=$((check - 1))
    if read -t 1; then
     ACC=""
@@ -42,7 +42,7 @@ login_logoff () {
  fi
 
  clear
- echo -e "$(translate_and_cache "pt" "Please wait...")"
+ echo -e "$(translate_and_cache "$LANGUAGE" "Please wait...")"
 
  while [ -z "$ACC" ] && [ -n "$URL" ]; do
 
@@ -52,10 +52,10 @@ login_logoff () {
     w3m -cookie -o http_proxy=$PROXY -dump "$URL/?exit" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" &>/dev/null
    ) </dev/null &>/dev/null &
    time_exit 17
-   echo -e "${BLACK_YELLOW}$(translate_and_cache "pt" "In case of error will repeat")${COLOR_RESET}"
-   echo -e "$(translate_and_cache "pt" "Username: ")"
+   echo -e "${BLACK_YELLOW}$(translate_and_cache "$LANGUAGE" "In case of error will repeat")${COLOR_RESET}"
+   echo -e "$(translate_and_cache "$LANGUAGE" "Username: ")"
    read username
-   local prompt="$(translate_and_cache "pt" "Password: ")"
+   local prom$LANGUAGE="$(translate_and_cache "$LANGUAGE" "Password: ")"
    local charcount=0
 
    while read -p "$prompt" -r -s -n 1 char; do
@@ -84,7 +84,7 @@ login_logoff () {
 
    done
 
-   echo -e "$(translate_and_cache "pt" "Please wait...")"
+   echo -e "$(translate_and_cache "$LANGUAGE" "Please wait...")"
 
    #/cryptography
    if [ -z "$ACC" ]; then
@@ -104,23 +104,23 @@ login_logoff () {
     w3m -cookie -o http_proxy=$PROXY -post $TMP/cookie_file -dump "$URL/?sign_in=1" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" &>/dev/null
    ) </dev/null &>/dev/null &
    time_exit 17
-   echo -e "$(translate_and_cache "pt" "Setting session cookie...")"
+   echo -e "$(translate_and_cache "$LANGUAGE" "Setting session cookie...")"
    (
     w3m -cookie -o http_proxy=$PROXY -post $TMP/cookie_file -dump "$URL/?sign_in=1" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" &>/dev/null
    ) </dev/null &>/dev/null &
    time_exit 17
-   echo -e "$(translate_and_cache "pt" "Session configured.")"
+   echo -e "$(translate_and_cache "$LANGUAGE" "Session configured.")"
    rm $TMP/cookie_file &>/dev/null
   }
   log_in
 
   clear
-  echo -e "$(translate_and_cache "pt" "Please wait...")"
+  echo -e "$(translate_and_cache "$LANGUAGE" "Please wait...")"
   (
    w3m -cookie -o http_proxy=$PROXY -debug "$URL/user" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | grep "\[level" | grep -o -E "[[:space:]][[:upper:]][[:lower:]]{0,15}[[:space:]]{0,1}[[:upper:]]{0,1}[[:lower:]]{0,14}[[:space:]]" > $TMP/acc_file
   ) </dev/null &>/dev/null &
   time_exit 17
-  echo -e "$(translate_and_cache "pt" "Checking if user matches...")"
+  echo -e "$(translate_and_cache "$LANGUAGE" "Checking if user matches...")"
   ACC=$(cat $TMP/acc_file)
 
   if [ -n "$ACC" ]; then
