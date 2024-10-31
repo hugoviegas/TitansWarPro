@@ -34,7 +34,7 @@ cave_process() {
         local RESULT=$(echo "$CAVE" | cut -d'/' -f3)
 
         # Verificar limites de speedUp
-        if [[ "$RESULT" == "speedUp" && (( "$mode" == "start" && count >= 20 )) || (( "$mode" == "routine" && count >= 8 )) ]]; then
+        if [[ "$RESULT" == "speedUp" && (( "$mode" == "start" && count -ge 20 )) || (( "$mode" == "routine" && count -ge 8 )) ]]; then
             echo_t "Cave limit reached" "" "" "after" " ⛏️"
             break
         fi
