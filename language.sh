@@ -33,7 +33,6 @@ load_translations() {
     fi
 }
 
-# Função para traduzir e armazenar em cache
 translate_and_cache() {
     local target_lang="$1"
     local text="$2"
@@ -48,9 +47,8 @@ translate_and_cache() {
     fi
 
     # Verificar se já existe a tradução usando o texto original
-    if grep -q "^$text|" "$TRANSLATIONS_FILE"; then
+    if translated_text=$(grep "^$text|" "$TRANSLATIONS_FILE" | tail -n 1 | cut -d'|' -f2-); then
         # Se a tradução existir, obtê-la do arquivo
-        translated_text=$(grep "^$text|" "$TRANSLATIONS_FILE" | tail -n 1 | cut -d'|' -f2-)
         echo "$translated_text"
     else
         # Se não existe, traduzir
@@ -58,8 +56,8 @@ translate_and_cache() {
 
         # Verificar se a tradução foi bem-sucedida
         if [ -n "$translated_text" ]; then
+            # Adicionar ao array de traduções em cache e ao arquivo apenas se não existir
             translations["$text"]="$translated_text"
-            # Salvar no arquivo, removendo espaços
             echo "$text|$translated_text" >> "$TRANSLATIONS_FILE"
             echo "$translated_text"
         else
