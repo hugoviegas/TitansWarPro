@@ -2,9 +2,6 @@
 
 # Nome do arquivo de traduções
 TRANSLATIONS_FILE="$HOME/twm/translations.po"
-# Defina um idioma padrão, se necessário
-DEFAULT_LANGUAGE="en"
-echo "$DEFAULT_LANGUAGE" > "$LANGUAGE_FILE"
 
 # Declarando os idiomas disponíveis para referência
 # shellcheck disable=SC2034
