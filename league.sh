@@ -3,13 +3,13 @@ fetch_available_fights() {
     fetch_page "/league/" "LEAGUE_SRC"
     
     if [ -f "$TMP/LEAGUE_SRC" ]; then
-        echo "Looking for available fights..."
+        echo_t "Looking for available fights..."
         # Extract the number of available fights
         AVAILABLE_FIGHTS=$(grep -o -E '<b>[0-5]</b>' "$TMP/LEAGUE_SRC" | head -n 1 | sed -n 's/.*<b>\([0-5]\)<\/b>.*/\1/p')
         
         # Check if AVAILABLE_FIGHTS is a number
         if [[ "$AVAILABLE_FIGHTS" =~ ^[0-5]$ ]]; then
-            echo "Fights left: $AVAILABLE_FIGHTS"
+            echo_t "Fights left:" "" "$AVAILABLE_FIGHTS"
         else
             echo "Error: No available fights or not found." >> "$TMP/ERROR_DEBUG"
             AVAILABLE_FIGHTS=0
@@ -76,7 +76,7 @@ league_play() {
                 click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight button
                 #echo "${URL}$click"
                 if [[ "$click" == *"/league/refreshFights/"* ]]; then
-                    echo "Limite de ataques finalizado. Encerrando..."
+                    echo_t "Fights limit reached, finishing..."
                     action="exit_loops"
                 elif [ -n "$click" ]; then
                     ENEMY_NUMBER=$(echo "$click" | grep -o -E '[0-9]+' | head -n 1)
@@ -89,7 +89,7 @@ league_play() {
                     E_AGILITY=$(get_enemy_stat "$INDEX" 3)
                     E_PROTECTION=$(get_enemy_stat "$INDEX" 4)
 
-                    echo -e "Enemy Number: $ENEMY_NUMBER"
+                    echo_t "Enemy Number:" "" "$ENEMY_NUMBER"
                     #echo -e "Enemy Stats: Strength: ${E_STRENGTH:-0}"
                     action="fight_or_skip"
                 else
@@ -100,16 +100,16 @@ league_play() {
             
             fight_or_skip)
                 if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
-                    echo "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
+                    echo_t "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
                     fetch_page "$click" # click
                     fights_done=$((fights_done + 1))  # Count the fight
-                    echo -e "Fight $fights_done initiated with enemy number $ENEMY_NUMBER ✅ .\n"
+                    echo_t "Fight the enemy number $ENEMY_NUMBER ✅ ." "" "\n"
                     enemy_index=1  # Reset enemy index after a fight
                     j=1  # Reset button index after a fight
                     fetch_available_fights  # Recheck available fights
                     action="check_fights" # back to check fights
                 else
-                    echo "Player's strength ($PLAYER_STRENGTH) is not sufficient to attack enemy's strength ($E_STRENGTH). Skipping to next enemy."
+                    echo_t "Your strength ($PLAYER_STRENGTH) < enemy's strength ($E_STRENGTH). Skipping enemy. >>"
                     enemy_index=$((enemy_index + 1))  # Move to the next enemy
                     #echo "$enemy_index"
                     j=$((j + 2))  # Move to the next button (skip every 2 links)
@@ -117,7 +117,7 @@ league_play() {
                     #echo "$last_click" 
                     fetch_available_fights  # Recheck available fights
                     if [ -z "$last_click" ] && [ "$AVAILABLE_FIGHTS" -gt 1 ]; then  # If there are more than 4 enemies
-                        echo " Reached the last enemy. Attacking the last one and using a potion..."
+                        echo_t " Reached the last enemy. Attacking the last one and using a potion..."
                         j=$((j - 2))  # Move to the previous button (skip every 2 links)
                         
                         # Attack the last enemy
@@ -149,9 +149,6 @@ league_play() {
             if [ "$AVAILABLE_FIGHTS" -eq 0 ]; then
                 clickReward=$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
                 fetch_page "$clickReward" 
-            else
-                # Use AVAILABLE_FIGHTS here for other cases
-                echo "Fights available: $AVAILABLE_FIGHTS"
             fi
         else
             echo "Error: AVAILABLE_FIGHTS is not a valid number." >> "$TMP/ERROR_DEBUG"

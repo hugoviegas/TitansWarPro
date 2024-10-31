@@ -17,7 +17,9 @@ script_ads() {
 }
 script_ads
 
-printf "${BLACK_CYAN}\n Starting...\n👉 Please wait...☕👴${COLOR_RESET}\n"
+#printf "${BLACK_CYAN}\n Starting...\n👉 Please wait...☕👴${COLOR_RESET}\n"
+print_t "Starting the macro wait a few seconds..." "$BLACK_CYAN" "$COLOR_RESET" "after" "☕👴"
+
 script_slogan
 sleep 1s
 #/termux
@@ -107,11 +109,7 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
             break &>/dev/null  # Exit the loop quietly if Enter is pressed
         fi
         
-        print_t " Hit " "$COLOR_RESET" "" "before" ""
-        print_t "[Enter]" "$GOLD_BLACK" "$COLOR_RESET" "after" ""
-        print_t " to " "$COLOR_RESET" "" "before" ""
-        print_t " reconfigure " "$GOLD_BLACK" "" "before" ""
-        print_t "${GREEN_BLACK} ${i}s${COLOR_RESET}" "$COLOR_RESET" "" "after" "\n"
+        print_t " Press " "$COLOR_RESET" && echo -e "${GOLD_BLACK}[Enter]${COLOR_RESET}" && printf_t " to reconfigure " && echo -e "${GREEN_BLACK} ${i}s${COLOR_RESET}"
 
     done
 fi

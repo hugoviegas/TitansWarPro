@@ -39,15 +39,15 @@ checkQuest() {
     # Verificar se encontrou o botão correto
     if [ -n "$click" ]; then
         fetch_page "/clan/${CLD}$click"
-        echo_t "$(translate_and_cache "$LANGUAGE" "Clan quest") $quest_id $(translate_and_cache "$LANGUAGE" "Check") ($action) ... 🔎" "$COLOR_RESET"
+        echo_t "Clan mission $quest_id Check $($action) ..." "" "" "after" "🔎"
         return 0 # Sucesso se o botão foi encontrado
     else
-        echo_t "$(translate_and_cache "$LANGUAGE" "Clan quest") $quest_id ($action) $(translate_and_cache "$LANGUAGE" "is not ready.") 🔎" "$COLOR_RESET"
+        echo_t "Clan mission $quest_id Check $($action) is not ready" "" "" "after" "🔎"
         return 1 # Não encontrou o botão
     fi
     else
         fetch_page "/clanrating/wantedToClan"
-        echo_t "$(translate_and_cache "$LANGUAGE" "Clan quest") $quest_id $(translate_and_cache "$LANGUAGE" "was not found.") 🔎" "$COLOR_RESET"
+        echo_t "Clan mission $quest_id Check $($action) was not found" "$COLOR_RESET" "" "after" "❌🔎"
         return 1 # Falha se CLD estiver vazio
     fi
 }
