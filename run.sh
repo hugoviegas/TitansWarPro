@@ -1,4 +1,5 @@
 twm_play() {
+    echo "$RUN" > "$HOME/twm/runmode_file"  # Save the run mode to a file
     # Function to restart the twm script if it is running
     restart_script() {
         # shellcheck disable=SC2317

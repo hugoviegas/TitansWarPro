@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.8.31 (Beta)" # To change the version number every time has an update!
+    versionNum="3.8.32 (Beta)" # To change the version number every time has an update!!!!
 for i in $colors; do
 clear
 printf "\033[1;38;5;${i}m
@@ -59,7 +59,6 @@ sleep 0.2s
 done
 }
 language_setup() {
-    echo "$RUN" > "$HOME/twm/runmode_file"  # Save the run mode to a file
     LANGUAGE_FILE="$HOME/twm/language_file"  # Caminho para o arquivo de idioma
     
     # Verifica se o arquivo existe e se contém um idioma válido
