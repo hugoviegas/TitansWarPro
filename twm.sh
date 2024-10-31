@@ -35,6 +35,7 @@ cd ~/twm || exit
 
 . requeriments.sh
 . loginlogoff.sh
+. language.sh
 . flagfight.sh
 . clanid.sh
 . crono.sh
