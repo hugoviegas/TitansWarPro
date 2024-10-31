@@ -47,22 +47,23 @@ translate_and_cache() {
         return
     fi
 
-    # Verificar se já existe a tradução usando o texto original
-    if translated_text=$(grep "^$text|" "$TRANSLATIONS_FILE" | tail -n 1 | cut -d'|' -f2-); then
-        # Se a tradução existir, obtê-la do arquivo
+    # Verificar se já existe a tradução no arquivo de cache
+    translated_text=$(grep "^$text|" "$TRANSLATIONS_FILE" | tail -n 1 | cut -d'|' -f2-)
+    
+    if [ -n "$translated_text" ]; then
+        # Se a tradução existir, retornar a tradução armazenada
         echo "$translated_text"
     else
-        # Se não existe, traduzir
+        # Se a tradução não existe, chamar a função para traduzir
         translated_text=$(get_translation "$target_lang" "$text")
 
-        # Verificar se a tradução foi bem-sucedida
+        # Verificar se a tradução foi bem-sucedida e salvar no cache
         if [ -n "$translated_text" ]; then
-            # Adicionar ao array de traduções em cache e ao arquivo apenas se não existir
-            translations["$text"]="$translated_text"
             echo "$text|$translated_text" >> "$TRANSLATIONS_FILE"
             echo "$translated_text"
         else
-            echo "$text"  # Retornar o texto original se a tradução falhar
+            # Se falhar, retornar o texto original
+            echo "$text"
         fi
     fi
 }
