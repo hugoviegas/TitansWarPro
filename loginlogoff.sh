@@ -31,7 +31,8 @@ login_logoff () {
   until [ "$check" -lt 1 ]; do
    clear
    echo -e "$(translate_and_cache "$LANGUAGE" "Please wait...")"
-   echo -e "$(translate_and_cache "$LANGUAGE" "[Wait to *$ACC*... (${check}s) - press ENTER to change account]")"
+   echo -e "[Login using: $ACC... (${check}s) - $(translate_and_cache "$LANGUAGE" "press ENTER to change account")]"
+
    local check=$((check - 1))
    if read -t 1; then
     ACC=""
