@@ -79,7 +79,7 @@ cave_process() {
         fi
     done
 
-    echo_t "Cave" "${GREEN_BLACK}" "${COLOR_RESET}" "✅\n"
+    echo_t "Cave" "${GREEN_BLACK}" "${COLOR_RESET}" "✅\n\n"
     
     # Se for o modo start, mudar o modo de execução e reiniciar o script
     if [ "$mode" == "start" ]; then

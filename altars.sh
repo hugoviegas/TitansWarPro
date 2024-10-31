@@ -23,7 +23,7 @@ altars_fight () {
    w3m -dump -T text/html "$TMP/src.html" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{1,6\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\]\ ,\🔴,g;s,\[1\]\ ,\🔵,g;s,\[stone\],\ 💪,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\]\ ,\ 💀,g'
   else
    echo 1 >BREAK_LOOP
-   echo -e "${RED_BLACK}Battle's over.${COLOR_RESET}"
+   echo_t "Battle's over!" "${RED_BLACK}" "${COLOR_RESET}" "after" "⚔️\n"
    sleep 2s
   fi
  }
@@ -87,7 +87,7 @@ altars_fight () {
  #/end
  func_unset
  apply_event
- printf "Altars (✔)\n"
+ echo_t "Altars" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
  sleep 10s
  clear
 }
@@ -109,11 +109,11 @@ altars_start () {
    sleep 2
   done
   fetch_page "/altars/enterFight" "$TMP"/src.html
-  echo -e "${GOLD_BLACK}Altars will be started...${COLOR_RESET}"
+  echo_t "Altars will be started..." "${GOLD_BLACK}" "${COLOR_RESET}"
   grep -o -E '(/altars(/[A-Za-z]+/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+|/))' "$TMP"/src.html | sed -n 1p >ACCESS 2> /dev/null
-  echo -e " 👣 Entering..."
+  echo_t " Entering..." "" "\n" "before" " 👣"
   #/wait
-  echo -e " 😴 Waiting..."
+  echo_t " Waiting..." "" "\n" "before" " 😴"
   local BREAK=$(( $(date +%s) + 30 ))
   until grep -q -o 'altars/dodge/' ACCESS || [ "$(date +%s)" -gt "$BREAK" ] ; do
    printf "$URL\n 💤	...\n$(cat ACCESS)\n"

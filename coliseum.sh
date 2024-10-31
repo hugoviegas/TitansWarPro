@@ -19,7 +19,7 @@ coliseum_fight() {
     local LA=4    #2.Interval attack
     local HPER=38 #3.HPER % to heal
     local RPER=5  #4.RPER % to random
-    echo -e "${GOLD_BLACK}Coliseum🧱${COLOR_RESET}\n"
+    echo_t "Coliseum" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "🧱"
     (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL"/settings/graphics/0 -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
     ) </dev/null &>/dev/null &
@@ -44,15 +44,14 @@ coliseum_fight() {
     local access_link=$(grep -o -E '/coliseum(/[A-Za-z]+/[?]r[=][0-9]+|/)' "$src_ram" | sed -n '1p' | cat -)
     local go_stop=$(grep -o -E '/coliseum/enterFight/[?]r[=][0-9]+' "$src_ram" | cat -)
     if [ -n "$go_stop" ]; then
-        echo -e " 🤺 Entering...\n"
+        echo_t "  Entering..." "" "\n" "before" "🤺"
         (
             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${go_stop}" -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
         ) </dev/null &>/dev/null &
         time_exit 17
         local access_link=$(grep -o -E '/coliseum(/[A-Za-z]+/[?]r[=][0-9]+|/)' "$src_ram" | grep -v 'dodge' | sed -n 1p | cat -)
         #/wait
-        # printf " 😠 %s\n" "$(translate_and_cache "$LANGUAGE" "Preparing for Battle, waiting for other players...")\n"
-        echo_t " Preparing for Battle, waiting for other players..." "" "" "before" "😠"
+        echo_t " Preparing for Battle, waiting for other players..." "" "\n" "before" "😠"
 
 
         local first_time=$(date +%s) #6
@@ -62,7 +61,7 @@ coliseum_fight() {
             ) </dev/null &>/dev/null &
             time_exit 17
             local access_link=$(grep -o -E '/(coliseum/[A-Za-z]+/[?]r[=][0-9]+|coliseum)' "$src_ram" | grep -v 'dodge' | sed -n 1p) #5
-            echo_t " 	Preparing..." "" "" "before" "😡"
+            echo_t " 	Preparing..." "" "\n" "before" "😡"
             sleep 3s
         done
         cl_access() {
@@ -167,7 +166,7 @@ done
         #/end
         func_unset
         if awk -v smodplay="$RUN" -v rmodplay="-cl" 'BEGIN { exit !(smodplay != rmodplay) }'; then printf "\nYou can run ./twm/play.sh -cl\n"; fi
-        echo -e "${RED_BLACK} Coliseum ⚔️${COLOR_RESET}\n"
+        echo_t "Battle's over!" "${RED_BLACK}" "${COLOR_RESET}" "after" "⚔️\n"
     else
         # shellcheck disable=SC2154
         echo_t "It was not possible to start the battle at this time." "${WHITEb_BLACK}" "${COLOR_RESET}"
