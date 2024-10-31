@@ -63,7 +63,7 @@ invalid_two () {
 # Function for the second menu of options
 	menu_two () {
 		options_two
-		echo -e "$(translate_and_cache "pt" "Select number Server [1 to 11]: 1")"  # Default selection shown to user
+		echo -e "$(translate_and_cache "pt" "Select number Server [1 to 11]: ")"  # Default selection shown to user
 		read -r -n 1 UR # Read user input without waiting for Enter
 
 # Process user input for server selection

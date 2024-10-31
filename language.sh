@@ -73,7 +73,8 @@ load_translations
 
 # Exemplo de uso
 SOURCE="en"
-#echo -e "$(translate_and_cache "pt" "Hello world!")"
-#echo -e "$(translate_and_cache "pt" "Enter a command or type 'list'")"
-#echo -e "$(translate_and_cache "pt" "No battles now, waiting 0s")"
-#echo -e "$(translate_and_cache "pt" "No battles now, waiting 45s")"
+#echo -e "$(translate_and_cache "$LANGUAGE" "Hello world!")"
+#echo -e "$(translate_and_cache "$LANGUAGE" "Enter a command or type \*list\*:")"
+#echo -e "$(translate_and_cache "$LANGUAGE" "No battles now, waiting 0s")"
+#echo -e "$(translate_and_cache "$LANGUAGE" "No battles now, waiting 45s")"
+#echo -e "${BLACK_YELLOW}$(translate_and_cache "$LANGUAGE" "[Wait to *$ACC*... (${check}s) - press ENTER to change account]")${COLOR_RESET}" //this is case we have variable and colour
