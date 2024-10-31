@@ -118,13 +118,12 @@ if uname | grep -q -i "cygwin"; then
   else
     apt-cyg install procps -y &
   fi
-fi
-
-if [ -e "${LS}/jq" ]; then
-    :
+  if [ -e "${LS}/jq" ]; then
+      :> /dev/null
   else
-    apt-cyg install jq -y &
-    : > /dev/null
+      apt-cyg install jq -y &
+  fi
+  
   fi
 
 #/ish Iphone
