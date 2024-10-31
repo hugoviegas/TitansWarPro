@@ -109,7 +109,8 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
             break &>/dev/null  # Exit the loop quietly if Enter is pressed
         fi
        
-        print_t " Press " "$COLOR_RESET" && echo -e "${GOLD_BLACK}[Enter]${COLOR_RESET}" && printf_t " to reconfigure " && echo -e "${GREEN_BLACK} ${i}s${COLOR_RESET}"
+        printf_t " Press " "$COLOR_RESET" && printf_t "${GOLD_BLACK}[Enter]${COLOR_RESET} " && printf_t "to reconfigure " && printf_t "${GREEN_BLACK}${i}s${COLOR_RESET}\n"
+
 
     done
 fi
