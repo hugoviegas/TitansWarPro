@@ -87,7 +87,7 @@ func_sleep() {
 start() {
     arena_duel       # Start arena duel function
     career_func      # Call career-related function
-    cave_routine     # Execute cave routine function 
+    cave_process routine     # Execute cave routine function 
     func_trade       # Call trading function 
     campaign_func    # Start campaign function 
     clanDungeon      # Execute clan dungeon function 

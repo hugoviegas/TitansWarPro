@@ -115,7 +115,7 @@ conf_allies() {
     clear
     
     # Exibe o cabeçalho da seção de configuração de aliados
-    printf_t "The script will consider users on your friends list and Clan as allies.\nLeader on friend list will add Clan allies." "$BLACK_CYAN" "$COLOR_RESET" "before" ""
+    printf_t "The script will consider users on your friends list and Clan as allies. Leader on friend list will add Clan allies." "$BLACK_CYAN" "$COLOR_RESET" "before" ""
 
     # Opções de configuração com emojis para cada item do menu
     printf_t "1) Add/Update alliances (All Battles)" "" "" "before" "🔵👨 🔴🧑‍🦰"
