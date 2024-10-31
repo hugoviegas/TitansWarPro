@@ -109,7 +109,7 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
             break &>/dev/null  # Exit the loop quietly if Enter is pressed
         fi
         
-        echo_t "To reconfigure please press the button [Enter] ${i}s" "\033[F${GOLD_BLACK}" "${COLOR_RESET}" 
+        echo_t "To reconfigure please press the button [Enter] ${i}s ..." "\033[F${GOLD_BLACK}" "${COLOR_RESET}" 
 
     done
 fi
