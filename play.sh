@@ -14,6 +14,8 @@
       echo "$LANGUAGE" > "$LANGUAGE_FILE"  # Salva o idioma padrão no arquivo
   fi
 
+  # Exporta a variável para torná-la disponível globalmente
+  export LANGUAGE
 
   while true; do
     # Get the PID of the running twm.sh script
