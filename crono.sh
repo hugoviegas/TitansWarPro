@@ -93,7 +93,7 @@ start() {
     clanDungeon      # Execute clan dungeon function 
     clan_statue      # Check the clan statue
     check_missions   # Check for missions 
-    specialEvent     # Check the current Event
+    #specialEvent     # Check the current Event
     #clanQuests       # Check the clan missions opened
     messages_info    # Display messages information 
     func_crono       # Display current time again 
