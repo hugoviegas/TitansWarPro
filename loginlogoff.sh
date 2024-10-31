@@ -1,27 +1,27 @@
 # shellcheck disable=SC2148
 login_logoff () {
  if [ -f "$TMP/cript_file" ]; then
-  cat $TMP/cript_file|base64 -d >$TMP/cookie_file
+  cat $TMP/cript_file | base64 -d > $TMP/cookie_file
   chmod 600 $TMP/cookie_file
   (
    w3m -cookie -o http_proxy=$PROXY -post $TMP/cookie_file -dump "$URL/?sign_in=1" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" &>/dev/null
   ) </dev/null &>/dev/null &
   time_exit 17
-  printf 'Setting session cookie...\n'
+  echo -e "$(translate_and_cache "pt" "Setting session cookie...")"
   (
    w3m -cookie -o http_proxy=$PROXY -post $TMP/cookie_file -dump "$URL/?sign_in=1" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" &>/dev/null
   ) </dev/null &>/dev/null &
   time_exit 17
-  printf 'Session configured.\n'
+  echo -e "$(translate_and_cache "pt" "Session configured.")"
   rm $TMP/cookie_file &>/dev/null
  fi
 
  (
-  w3m -cookie -o http_proxy=$PROXY -dump "$URL/user" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)"|grep "\[level"|grep -o -E "[[:space:]][[:upper:]][[:lower:]]{0,15}[[:space:]]{0,1}[[:upper:]]{0,1}[[:lower:]]{0,14}[[:space:]]" >$TMP/acc_file
+  w3m -cookie -o http_proxy=$PROXY -dump "$URL/user" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | grep "\[level" | grep -o -E "[[:space:]][[:upper:]][[:lower:]]{0,15}[[:space:]]{0,1}[[:upper:]]{0,1}[[:lower:]]{0,14}[[:space:]]" > $TMP/acc_file
  ) </dev/null &>/dev/null &
  time_exit 17
 
- printf "Checking if user matches...\n"
+ echo -e "$(translate_and_cache "pt" "Checking if user matches...")"
  sed -i 's/^[ \t]*//;s/[ \t]*$//' $TMP/acc_file
  ACC=$(cat $TMP/acc_file)
 
@@ -30,8 +30,8 @@ login_logoff () {
 
   until [ "$check" -lt 1 ]; do
    clear
-   printf "Please wait...\n"
-   printf "[Wait to $ACC... (${check}s) - press ENTER to change account] \n"
+   echo -e "$(translate_and_cache "pt" "Please wait...")"
+   echo -e "$(translate_and_cache "pt" "[Wait to $ACC... (${check}s) - press ENTER to change account]")"
    local check=$((check - 1))
    if read -t 1; then
     ACC=""
@@ -39,11 +39,10 @@ login_logoff () {
     break
    fi
   done
-
  fi
 
  clear
- printf "Please wait...\n"
+ echo -e "$(translate_and_cache "pt" "Please wait...")"
 
  while [ -z "$ACC" ] && [ -n "$URL" ]; do
 
@@ -53,10 +52,10 @@ login_logoff () {
     w3m -cookie -o http_proxy=$PROXY -dump "$URL/?exit" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" &>/dev/null
    ) </dev/null &>/dev/null &
    time_exit 17
-   printf "${BLACK_YELLOW}In case of error will repeat${COLOR_RESET}\n"
-   printf "Username: "
+   echo -e "$(translate_and_cache "pt" "${BLACK_YELLOW}In case of error will repeat${COLOR_RESET}")"
+   echo -e "$(translate_and_cache "pt" "Username: ")"
    read username
-   local prompt="Password: "
+   local prompt="$(translate_and_cache "pt" "Password: ")"
    local charcount=0
 
    while read -p "$prompt" -r -s -n 1 char; do
@@ -67,12 +66,12 @@ login_logoff () {
     fi
 
     #/ESC - DEL
-    if [ "$char" = $'\177' ] || [ "char" = $'\577' ]; then
+    if [ "$char" = $'\177' ] || [ "$char" = $'\577' ]; then
 
      if [ "$charcount" -gt 0 ]; then
       local charcount=$((charcount - 1))
       local prompt=$(echo -n $'\b \b')
-      local password=$(echo "$password"|sed 's/.$//')
+      local password=$(echo "$password" | sed 's/.$//')
      else
       local prompt=$(echo -n '')
      fi
@@ -85,20 +84,17 @@ login_logoff () {
 
    done
 
-   printf "\n	Please wait...\n"
+   echo -e "$(translate_and_cache "pt" "Please wait...")"
 
    #/cryptography
    if [ -z "$ACC" ]; then
-#    echo "login=$username&pass=$password"|openssl enc -aes-256-cbc -md sha512 -a -pbkdf2 -iter 100000 -salt -pass pass:"　 　$username" > $TMP/cript_file
-    echo "login=$username&pass=$password"|base64 -w 0 > $TMP/cript_file
+    echo "login=$username&pass=$password" | base64 -w 0 > $TMP/cript_file
     chmod 600 $TMP/cript_file
     #/decryption
-#    cat $TMP/cript_file|openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:"　 　$username" >$TMP/cookie_file
-    cat $TMP/cript_file|base64 -d >$TMP/cookie_file
+    cat $TMP/cript_file | base64 -d > $TMP/cookie_file
     chmod 600 $TMP/cookie_file
    else
-#    cat $TMP/cript_file|openssl enc -aes-256-cbc -md sha512 -a -d -pbkdf2 -iter 100000 -salt -pass pass:"　 　$ACC" >$TMP/cookie_file
-    cat $TMP/cript_file|base64 -d >$TMP/cookie_file
+    cat $TMP/cript_file | base64 -d > $TMP/cookie_file
     chmod 600 $TMP/cookie_file
    fi
 
@@ -108,23 +104,23 @@ login_logoff () {
     w3m -cookie -o http_proxy=$PROXY -post $TMP/cookie_file -dump "$URL/?sign_in=1" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" &>/dev/null
    ) </dev/null &>/dev/null &
    time_exit 17
-   printf "Setting session cookie...\n"
+   echo -e "$(translate_and_cache "pt" "Setting session cookie...")"
    (
     w3m -cookie -o http_proxy=$PROXY -post $TMP/cookie_file -dump "$URL/?sign_in=1" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" &>/dev/null
    ) </dev/null &>/dev/null &
    time_exit 17
-   printf "Session configured.\n"
+   echo -e "$(translate_and_cache "pt" "Session configured.")"
    rm $TMP/cookie_file &>/dev/null
   }
   log_in
 
   clear
-  printf "Please wait...\n"
+  echo -e "$(translate_and_cache "pt" "Please wait...")"
   (
-   w3m -cookie -o http_proxy=$PROXY -debug "$URL/user" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)"|grep "\[level"|grep -o -E "[[:space:]][[:upper:]][[:lower:]]{0,15}[[:space:]]{0,1}[[:upper:]]{0,1}[[:lower:]]{0,14}[[:space:]]" >$TMP/acc_file
+   w3m -cookie -o http_proxy=$PROXY -debug "$URL/user" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | grep "\[level" | grep -o -E "[[:space:]][[:upper:]][[:lower:]]{0,15}[[:space:]]{0,1}[[:upper:]]{0,1}[[:lower:]]{0,14}[[:space:]]" > $TMP/acc_file
   ) </dev/null &>/dev/null &
   time_exit 17
-  printf "Checking if user matches...\n"
+  echo -e "$(translate_and_cache "pt" "Checking if user matches...")"
   ACC=$(cat $TMP/acc_file)
 
   if [ -n "$ACC" ]; then
