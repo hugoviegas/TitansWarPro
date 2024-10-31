@@ -51,7 +51,8 @@ coliseum_fight() {
         time_exit 17
         local access_link=$(grep -o -E '/coliseum(/[A-Za-z]+/[?]r[=][0-9]+|/)' "$src_ram" | grep -v 'dodge' | sed -n 1p | cat -)
         #/wait
-        printf " 😠 Preparing for Battle, waiting for others players...\n"
+        printf " 😠 %s\n" "$(translate_and_cache "$LANGUAGE" "Preparing for Battle, waiting for other players...\n")"
+
         local first_time=$(date +%s) #6
         until grep -q -o 'coliseum/dodge/' "$src_ram" || awk -v ltime="(($(date +%s) - $first_time))" 'BEGIN { exit !(ltime > 30) }'; do
             (
@@ -167,7 +168,7 @@ done
         echo -e "${RED_BLACK} Coliseum ⚔️${COLOR_RESET}\n"
     else
         # shellcheck disable=SC2154
-        printf "${WHITEb_BLACK}It was not possible to start the battle at this time.${COLOR_RESET}\n"
+        echo -e "${WHITEb_BLACK}It was not possible to start the battle at this time.${COLOR_RESET}"
     fi
 }
 coliseum_start() {
@@ -175,7 +176,7 @@ coliseum_start() {
         return
     fi
     if case $(date +%H:%M ) in
-    09:2[4-9] | 9:5[4-9] | 10:1[0-4] | 10:2[4-9] | 10:5[4-9] | 12:2[4-9] | 13:5[4-9] | 14:5[4-9] | 15:5[4-9] | 16:1[0-4] | 16:2[4-9] | 18:5[4-9] | 20:5[4-9] | 21:2[4-9] | 21:5[4-9] | 22:2[4-9])
+    (09:2[4-9] | 9:5[4-9] | 10:1[0-4] | 10:2[4-9] | 10:5[4-9] | 12:2[4-9] | 13:5[4-9] | 14:5[4-9] | 15:5[4-9] | 16:1[0-4] | 16:2[4-9] | 18:5[4-9] | 20:5[4-9] | 21:2[4-9] | 21:5[4-9] | 22:2[4-9])
         exit 1
         ;;
     esac  then
