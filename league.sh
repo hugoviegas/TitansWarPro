@@ -1,23 +1,29 @@
 # shellcheck disable=SC2034
 fetch_available_fights() {
-    fetch_page "/league/" "LEAGUE_DEBUG_SRC"
+    fetch_page "/league/" "LEAGUE_SRC"
     
-    if [ -f "$TMP/LEAGUE_DEBUG_SRC" ]; then
+    if [ -f "$TMP/LEAGUE_SRC" ]; then
         echo "Looking for available fights..."
-        # Remover tudo antes e depois do número de lutas disponíveis
-        AVAILABLE_FIGHTS=$(grep -o -E '<b>[0-5]</b>' "$TMP/LEAGUE_DEBUG_SRC" | head -n 1 | sed -n 's/.*<b>\([0-5]\)<\/b>.*/\1/p')
-        echo "Fights left: $AVAILABLE_FIGHTS"
+        # Extract the number of available fights
+        AVAILABLE_FIGHTS=$(grep -o -E '<b>[0-5]</b>' "$TMP/LEAGUE_SRC" | head -n 1 | sed -n 's/.*<b>\([0-5]\)<\/b>.*/\1/p')
         
-        if [ -z "$AVAILABLE_FIGHTS" ]; then
-            echo "Erro: Nenhuma luta disponível encontrada."
-            return 1  # Retorna um código de erro
+        # Check if AVAILABLE_FIGHTS is a number
+        if [[ "$AVAILABLE_FIGHTS" =~ ^[0-5]$ ]]; then
+            echo "Fights left: $AVAILABLE_FIGHTS"
+        else
+            echo "Error: No available fights or not found." >> "$TMP/ERROR_DEBUG"
+            AVAILABLE_FIGHTS=0
         fi
     else
-        echo "O arquivo LEAGUE_DEBUG_SRC não foi encontrado."
-        AVAILABLE_FIGHTS=0  # Define como 0 se o arquivo não for encontrado
-        return 1  # Retorna um código de erro
+        echo "The LEAGUE_SRC file was not found." >> "$TMP/ERROR_DEBUG"
+        AVAILABLE_FIGHTS=0
     fi
     
+    # Ensure AVAILABLE_FIGHTS is an integer
+    AVAILABLE_FIGHTS=${AVAILABLE_FIGHTS:-0}
+    
+    # Return 0 if fights are available, 1 otherwise
+    [ "$AVAILABLE_FIGHTS" -gt 0 ]
 }
 
 # Função para extrair estatísticas dos inimigos
@@ -39,7 +45,7 @@ get_enemy_stat() {
         ((attempts++))
     done
 
-    echo "Stat not found after $max_attempts attempts."  # Mensagem de erro se não encontrar
+    echo "Error: Stat not found after $max_attempts attempts." >> "$TMP/ERROR_DEBUG"  # Mensagem de erro se não encontrar
     return 1  # Retorna um código de erro
 }
 
@@ -58,7 +64,7 @@ league_play() {
     j=1  # Index for fight buttons (skipping every 2 links)
     enemy_index=1  # Separate index for enemy stats
 
-    while [ "$fights_done" -lt "$AVAILABLE_FIGHTS" ] || [ "$AVAILABLE_FIGHTS" -gt 0 ]; do
+    while [ "$fights_done" -lt "$AVAILABLE_FIGHTS" ] && [ "$AVAILABLE_FIGHTS" -gt 0 ]; do
         case "$action" in
             check_fights)
                 #echo "DEBUG: Player Stats = $PLAYER_STRENGTH"
@@ -87,7 +93,7 @@ league_play() {
                     #echo -e "Enemy Stats: Strength: ${E_STRENGTH:-0}"
                     action="fight_or_skip"
                 else
-                    echo "No fight buttons found for button $j ❌"
+                    echo "No fight buttons found for button $j ❌" >> "$TMP/ERROR_DEBUG"
                     action="exit_loops"
                 fi
                 ;;
@@ -139,9 +145,18 @@ league_play() {
                 ;;
         esac
         # Recompensa
-        if [ "$AVAILABLE_FIGHTS" -eq 0 ]; then
-            clickReward=$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
-            fetch_page "$clickReward" 
+        if [[ "$AVAILABLE_FIGHTS" =~ ^[0-9]+$ ]]; then
+            if [ "$AVAILABLE_FIGHTS" -eq 0 ]; then
+                clickReward=$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
+                fetch_page "$clickReward" 
+            else
+                # Use AVAILABLE_FIGHTS here for other cases
+                echo "Fights available: $AVAILABLE_FIGHTS"
+            fi
+        else
+            echo "Error: AVAILABLE_FIGHTS is not a valid number." >> "$TMP/ERROR_DEBUG"
+            # Handle the error condition
+            AVAILABLE_FIGHTS=0  # Set to 0 to prevent further errors
         fi
     done
 

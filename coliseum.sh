@@ -52,7 +52,7 @@ coliseum_fight() {
         local access_link=$(grep -o -E '/coliseum(/[A-Za-z]+/[?]r[=][0-9]+|/)' "$src_ram" | grep -v 'dodge' | sed -n 1p | cat -)
         #/wait
         # printf " 😠 %s\n" "$(translate_and_cache "$LANGUAGE" "Preparing for Battle, waiting for other players...")\n"
-        echo -e "$(translate_and_cache "$LANGUAGE" "😠 Preparing for Battle, waiting for other players...")"
+        echo -e "😠 $(translate_and_cache "$LANGUAGE" " Preparing for Battle, waiting for other players...")"
 
 
         local first_time=$(date +%s) #6
