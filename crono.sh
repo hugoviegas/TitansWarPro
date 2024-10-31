@@ -13,11 +13,11 @@ func_cat() {
     func_crono  # Call func_crono to display the current time
 
     # Set color based on the time of day
-    if [ "$HOUR" -lt 6 ] || [ "$HOUR" -ge 18 ]; then
+    # if [ "$HOUR" -lt 6 ] || [ "$HOUR" -ge 18 ]; then
         printf "${BLUE_BLACK}"  # Night mode
-    else
-        printf "${GOLD_BLACK}"   # Day mode
-    fi
+    #else
+    #    printf "${GOLD_BLACK}"   # Day mode
+    #fi
 
     cat "$TMP/msg_file"  # Display the contents of msg_file
     printf "${WHITE_BLACK}"
@@ -32,7 +32,7 @@ func_cat() {
     while true; do
        
         echo -e "\033[02m$(translate_and_cache "pt" "No battles now, waiting ${i}s")${COLOR_RESET}"
-        echo -e "${WHITEb_BLACK}$(translate_and_cache "pt" "Enter a command or type 'list':")${COLOR_RESET}"
+        echo -e "${WHITEb_BLACK}$(translate_and_cache "pt" "Enter a command or type \"*list*\" :")${COLOR_RESET}"
 
         read -t "$i" cmd  # Read user command with a timeout
 

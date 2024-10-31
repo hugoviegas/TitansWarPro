@@ -64,7 +64,8 @@ cave_routine() {
   # Checking for available quests
   if checkQuest 5 apply; then
     count=0
-    echo "Quests available speeding up mine to complete!"
+    echo -e "$(translate_and_cache "$LANGUAGE" "Quests available speeding up mine to complete!")"
+
   else
     count=8
   fi
@@ -88,28 +89,29 @@ cave_routine() {
 
       # Process the current cave action
       case $RESULT in
-        gather|down|runaway|speedUp)
-          # Fetch page and process action
-          fetch_page "$CAVE"
+    gather|down|runaway|speedUp)
+      # Fetch page and process action
+      fetch_page "$CAVE"
 
-          # Feedback based on the current action
-          case $RESULT in
-            down*)
-              tput cuu1; tput el; echo " New search 🔍"
-              ((count++))  # Increment count by 1
-              ;;
-            gather*)
-              tput cuu1; tput el; echo " Start mining ⛏️"
-              ;;
-            runaway*)
-              tput cuu1; tput el; echo " Run away 💨"
-              ;;
-            speedUp*)
-              tput cuu1; tput el; echo " Speed up mining ⚡"
-              ;;
-          esac
+      # Feedback based on the current action
+      case $RESULT in
+        down*)
+          tput cuu1; tput el; echo -e "$(translate_and_cache "$LANGUAGE" "New search 🔍")"
+          ((count++))  # Increment count by 1
+          ;;
+        gather*)
+          tput cuu1; tput el; echo -e "$(translate_and_cache "$LANGUAGE" "Start mining ⛏️")"
+          ;;
+        runaway*)
+          tput cuu1; tput el; echo -e "$(translate_and_cache "$LANGUAGE" "Run away 💨")"
+          ;;
+        speedUp*)
+          tput cuu1; tput el; echo -e "$(translate_and_cache "$LANGUAGE" "Speed up mining ⚡")"
           ;;
       esac
+      ;;
+esac
+
 
       # Fetch new cave data
       fetch_page "/cave/"

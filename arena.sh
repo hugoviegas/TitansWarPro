@@ -40,7 +40,7 @@ arena_collFight() {
 }
 
 arena_duel() {
-    echo -e "${GOLD_BLACK}$(translate_and_cache "$LANGUAGE" "Arena ⚔️")${COLOR_RESET}"
+    echo -e "${GOLD_BLACK}Arena ⚔️${COLOR_RESET}"
     checkQuest 3 apply
     checkQuest 4 apply
 
@@ -59,7 +59,7 @@ arena_duel() {
         fetch_page "$ACCESS"
         
         count=$((count + 1))
-        echo "$(translate_and_cache "$LANGUAGE" "⚔ Attack $count")"
+        echo " ⚔ Attack $count"
         
         sleep 0.6s
     done
@@ -74,26 +74,27 @@ arena_duel() {
     checkQuest 3 end
     checkQuest 4 end
     
-    echo "$(translate_and_cache "$LANGUAGE" "Sell all items ✅")"
-    echo -e "${GREEN_BLACK}$(translate_and_cache "$LANGUAGE" "Arena ✅")${COLOR_RESET}\n"
+    echo -e "$(translate_and_cache "$LANGUAGE" "Sell all items ✅")"
+    echo -e "${GREEN_BLACK}Arena ✅${COLOR_RESET}\n"
+    
 }
 
 arena_fullmana() {
-  echo "$(translate_and_cache "$LANGUAGE" "energy arena ...")\n"
+  echo "energy arena ...\n"
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}"/arena/quit -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed "s/href='/\n/g" | grep 'attack/1' | head -n1 | awk -F\/ '{ print $5 }' | tr -cd "[[:digit:]]" >ARENA
   ) </dev/null &>/dev/null &
     time_exit 17
-  echo "$(translate_and_cache "$LANGUAGE" "⚔ - 1 Attack...")"
+  echo " ⚔ - 1 Attack..."
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/arena/attack/1/?r=$(cat ARENA)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed "s/href='/\n/g" | grep 'arena/lastPlayer' | head -n1 | awk -F\' '{ print $1 }' | tr -cd "[[:digit:]]" >ATK1
   ) </dev/null &>/dev/null &
     time_exit 17
-    echo "$(translate_and_cache "$LANGUAGE" "⚔ - Full Attack...")"
+    echo " ⚔ - Full Attack..."
   (
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump "${URL}/arena/lastPlayer/?r=$(cat ATK1)&fullmana=true" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | head -n5 | tail -n4
   ) </dev/null &>/dev/null &
     time_exit 17
     
-  echo -e "${GREEN_BLACK}$(translate_and_cache "$LANGUAGE" "Energy arena ✅")${COLOR_RESET}\n"
+  echo -e "${GREEN_BLACK}Energy arena ✅${COLOR_RESET}\n"
 }
