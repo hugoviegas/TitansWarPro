@@ -50,7 +50,7 @@ translate_and_cache() {
     # Verificar se já existe a tradução usando o texto original
     if grep -q "^$text|" "$TRANSLATIONS_FILE"; then
         # Se a tradução existir, obtê-la do arquivo
-        translated_text=$(grep "^$text|" "$TRANSLATIONS_FILE" | cut -d'|' -f2-)
+        translated_text=$(grep "^$text|" "$TRANSLATIONS_FILE" | tail -n 1 | cut -d'|' -f2-)
         echo "$translated_text"
     else
         # Se não existe, traduzir
