@@ -22,7 +22,7 @@ func_trade() {
         # Update ACCESS with the next available silver exchange link
         ACCESS=$(grep -o -E '/trade/exchange/silver/[0-9]+[?]r[=][0-9]+' "$TMP/SRC" | head -n 1)
     done
-    echo_t "Trade" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "⚖️✅\n"
+    echo_t "Trade " "${GREEN_BLACK}" "${COLOR_RESET}" "after" "⚖️✅\n"
 }
 
 clan_money() {
