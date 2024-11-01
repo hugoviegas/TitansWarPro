@@ -6,10 +6,10 @@ members_allies() {
     echo "" > callies.txt
 
     if [ -n "$CLD" ]; then
-        echo_t "Updating clan members into allies" "$BLACK_CYAN" "$COLOR_RESET" "before" ""
+        echo_t "Updating clan members into allies" "$BLACK_CYAN" "$COLOR_RESET"
         
         for num in $(seq 5 -1 1); do
-            echo_t "/clan/${CLD}/${num}" "$PURPLEis_BLACK" "$COLOR_RESET" "before" ""
+            echo_t "/clan/${CLD}/${num}" "$PURPLEis_BLACK" "$COLOR_RESET"
             (
                 w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan/${CLD}/${num}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | grep -o -E "[/]>([[:upper:]][[:lower:]]{0,15}[[:space:]]{0,1}[[:upper:]]{0,1}[[:lower:]]{0,14},[[:space:]])<s" | awk -F"[>]" '{print $2}' | awk -F"[,]" '{print $1}' | sed 's,\ ,_,' >> allies.txt
             ) </dev/null &>/dev/null &
@@ -29,7 +29,7 @@ members_allies() {
 id_allies() {
     printf_t "Looking for allies on friends list" "$BLACK_CYAN" "$COLOR_RESET" "after" "🔎"
     cd "$TMP" || exit
-    printf_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET" "before" ""
+    printf_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET"
 
     (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/mail/friends" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$TMP"/SRC
@@ -39,7 +39,7 @@ id_allies() {
     NPG=$(cat "$TMP"/SRC | grep -o -E '/mail/friends/([0-9]{0,4})[^[:alnum:]]{4}62[^[:alnum:]]{3}62[^[:alnum:]]' | sed 's/\/mail\/friends\/\([0-9]\{0,4\}\).*/\1/') > tmp.txt
     
     if [ -z "$NPG" ]; then
-        printf_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET" "before" ""
+        printf_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET"
         (
             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/mail/friends" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed 's,/user/,\n/user/,g' | grep '/user/' | grep '/mail/' | cut -d\< -f1 >> tmp.txt
         ) </dev/null &>/dev/null &
@@ -49,14 +49,14 @@ id_allies() {
     NPG=$(cat "$TMP"/SRC | grep -o -E '/mail/friends/([0-9]{0,4})[^[:alnum:]]{4}62[^[:alnum:]]{3}62[^[:alnum:]]' | sed 's/\/mail\/friends\/\([0-9]\{0,4\}\).*/\1/') > tmp.txt
 
     if [ -z "$NPG" ]; then
-        echo_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET" "before" ""
+        echo_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET"
         (
             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/mail/friends" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed 's,/user/,\n/user/,g' | grep '/user/' | grep '/mail/' | cut -d\< -f1 >> tmp.txt
         ) </dev/null &>/dev/null &
         time_exit 17
     else
         for num in $(seq "$NPG" -1 1); do
-            echo_t "Friends list page ${num}" "$BLACK_CYAN" "$COLOR_RESET" "before" ""
+            echo_t "Friends list page ${num}" "$BLACK_CYAN" "$COLOR_RESET"
             (
                 w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/mail/friends/${num}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed 's,/user/,\n/user/,g' | grep '/user/' | grep '/mail/' | cut -d\< -f1 >> tmp.txt
             ) </dev/null &>/dev/null &
@@ -76,14 +76,14 @@ clan_allies() {
         echo "" > callies.txt
         cut -d/ -f3 tmp.txt > ids.txt  # Extrai IDs diretamente para ids.txt
 
-        printf_t "Clan allies by Leader/Deputy on friends list" "$BLACK_CYAN" "$COLOR_RESET" "before" ""
+        printf_t "Clan allies by Leader/Deputy on friends list" "$BLACK_CYAN" "$COLOR_RESET"
         Lnl=$(wc -l < ids.txt)  # Contar linhas em ids.txt
         ts=0
         
         for num in $(seq "$Lnl" -1 1); do
             IDN=$(sed -n "${num}p" ids.txt)  # Pega a ID correspondente
             if [ -n "$IDN" ]; then
-                echo_t "/user/${IDN}" "$PURPLEis_BLACK" "$COLOR_RESET" "before" ""
+                echo_t "/user/${IDN}" "$PURPLEis_BLACK" "$COLOR_RESET"
 
                 (
                     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/user/${IDN}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$TMP"/SRC
@@ -93,13 +93,13 @@ clan_allies() {
                 LEADPU=$(sed 's,/clan/,\n/clan/,g' "$TMP"/SRC | grep -E "</a>, <span class='blue'|</a>, <span class='green'" | cut -d\< -f1 | cut -d\> -f2)
                 alCLAN=$(grep -E -o '/clan/[0-9]{1,3}' "$TMP"/SRC | tail -n1)
                 
-                printf_t "${LEADPU} - ${alCLAN}" "$PURPLEis_BLACK" "$COLOR_RESET" "before" ""
+                printf_t "${LEADPU} - ${alCLAN}" "$PURPLEis_BLACK" "$COLOR_RESET"
                 
                 if [ -n "$LEADPU" ]; then
                     ts=$((ts + 1))  # Increment ally count
                     echo -e "$LEADPU" | sed 's,\ ,_,' >> callies.txt  # Save ally name formatted with underscores
 
-                    echo_t "${ts}. Ally ${LEADPU} ${alCLAN} added." "$BLACK_CYAN" "$COLOR_RESET" "before" ""
+                    echo_t "${ts}. Ally ${LEADPU} ${alCLAN} added." "$BLACK_CYAN" "$COLOR_RESET"
                     sort -u callies.txt -o callies.txt  # Sort and remove duplicates in callies.txt
                 fi
                 
@@ -115,7 +115,7 @@ conf_allies() {
     clear
     
     # Exibe o cabeçalho da seção de configuração de aliados
-    printf_t "The script will consider users on your friends list and Clan as allies. Leader on friend list will add Clan allies." "$BLACK_CYAN" "$COLOR_RESET" "before" ""
+    printf_t "The script will consider users on your friends list and Clan as allies. Leader on friend list will add Clan allies." "$BLACK_CYAN" "$COLOR_RESET"
 
     # Opções de configuração com emojis para cada item do menu
     printf_t "1) Add/Update alliances (All Battles)" "" "" "after" "🔵👨 🔴🧑‍🦰"
@@ -127,7 +127,7 @@ conf_allies() {
     if [ -f "$HOME/twm/al_file" ] && [ -s "$HOME/twm/al_file" ]; then
         AL=$(cat "$HOME"/twm/al_file)
     else
-        printf_t "Set up alliances [1 to 4]:" "" "" "after" ""
+        printf_t "Set up alliances :" "" " [1 to 4]" "after" ""
         read -r -n 1 AL
     fi
 
@@ -175,10 +175,10 @@ conf_allies() {
         *) 
             clear
             if [ -n "$AL" ]; then
-                echo_t "Invalid option: $AL" "" "" "before" ""
+                echo_t "Invalid option: " "" "$AL"
                 kill -9 $$
             else
-                echo_t "Time exceeded!" "" "" "before" ""
+                echo_t "Time exceeded!"
             fi
         ;;
     esac

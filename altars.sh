@@ -102,7 +102,7 @@ altars_start () {
 
   fetch_page "/altars/?close=reward" "$TMP"/src.html
   fetch_page "/altars/enterFight" "$TMP"/src.html
-  printf "Ancient Altars will be started...\n"
+  printf_t "Ancient Altars will be started..."
 
   until (case $(date +%M) in (55|56|57|58|59) exit 1 ;; esac) ;
   do
