@@ -23,7 +23,7 @@ clancoliseum_fight() {
       w3m -dump -T text/html "$src_ram" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{1,6\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\],\🔴,g;s,\[1\],\🔵,g;s,\[stone\],\ 💪,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\]\ ,\ 💀,g'
     else
       echo 1 >BREAK_LOOP
-      echo_t "Battle's over!" "${RED_BLACK}" "${COLOR_RESET}" "after" "⚔️\n"
+      echo_t "Battle over!" "${RED_BLACK}" "${COLOR_RESET}" "after" "⚔️\n"
       sleep 2s
     fi
   }
@@ -89,7 +89,7 @@ clancoliseum_fight() {
   clear
 }
 
-clancoliseum_start() {
+ clancoliseum_start() {
   if [ -d "/dev/shm" ]; then
     dir_ram="/dev/shm/"
   else
@@ -104,13 +104,8 @@ clancoliseum_start() {
 
   case $(date +%H:%M) in
   10:2[5-9] | 14:5[5-9])
-    : ' #apply to fight
-   ${TMP}=$tmp_ram
-   cp $src_ram SRC
-   apply_event clancoliseum
-   cp SRC $src_ram
-   cd $tmp_ram
-'
+    :  
+    # apply to fight ${TMP}=$tmp_ram cp $src_ram SRC  apply_event clancoliseum cp SRC $src_ram cd $tmp_ram 
     #/FULL hp
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 userAgent.txt)" | grep -o -E '\(([0-9]+)\)' | sed 's/[()]//g' >"$full_ram"
@@ -130,7 +125,7 @@ clancoliseum_start() {
 
     case $(date +%H:%M) in
     10:2[5-9])
-      while [ $(date +%M) -gt "24" ] && [ $(date +%M) -lt "30" ]; do
+      while  $(date +%M) -gt "24" && [ $(date +%M) -lt "30" ]; do
         sleep 3s
       done
       ;;
