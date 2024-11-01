@@ -16,7 +16,7 @@ func_cat() {
     if (( HOUR < 6 || HOUR >= 18 )); then
         printf "${BLUE_BLACK}"
     else
-        printf "${GOLD_BLACK}"
+        printf "${GOLD_BLACK} "
     fi
 
     cat "$TMP/msg_file"

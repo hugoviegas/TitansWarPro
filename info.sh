@@ -14,7 +14,7 @@ colors() {
     CYAN_CYAN='\033[01;36m\033[08;07m'     # Bright cyan text on dark background
     BLUE_BLACK='\033[0;34m'                # Blue text on default background
     COLOR_RESET='\033[00m'                 # Reset to default color
-    GOLD_BLACK='\033[33m'                   # Gold text on default background
+    GOLD_BLACK='\033[0;33m'                   # Gold text on default background
     GREEN_BLACK='\033[32m'                  # Green text on default background
     GREENb_BLACK='\033[1;32m'               # Bold green text on default background
     RED_BLACK='\033[0;31m'                  # Red text on default background
