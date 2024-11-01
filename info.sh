@@ -75,7 +75,7 @@ language_setup() {
     export LANGUAGE
 }
 language_setup
-. twm/language.sh
+
 # Função para imprimir com printf, usando tradução e cores
 printf_t() {
   local text="$1"
