@@ -18,8 +18,6 @@ fi
 
 # shellcheck disable=SC1090
 . ~/twm/info.sh
-# shellcheck disable=SC1090
-. ~/twm/language.sh
 colors
 script_slogan
 
