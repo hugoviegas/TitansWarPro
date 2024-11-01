@@ -63,7 +63,7 @@ cd ~/twm || exit
 twm_start() {
     # Determine which action to start based on the RUN variable
     if echo "$RUN" | grep -q -E '[-]cv'; then
-        cave_process start  # Start the cave function if in cave mode
+        cave_start  # Start the cave function if in cave mode
     elif echo "$RUN" | grep -q -E '[-]cl'; then
         twm_play  # Start the main game loop if in clan mode
     elif echo "$RUN" | grep -q -E '[-]boot'; then
