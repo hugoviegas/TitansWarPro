@@ -94,7 +94,7 @@ coliseum_fight() {
                     fi #...passou 300s
                 else   #...cessa espera || finaliza...
                     BREAK_LOOP=1
-                    echo_t "Battle's over." "${RED_BLACK}" "${COLOR_RESET}"
+                    echo_t "Battle over." "${RED_BLACK}" "${COLOR_RESET}"
                     sleep 2s
                 fi #...finalizou a batalha
             fi     #...cessou procura por esquiva

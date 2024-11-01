@@ -46,8 +46,8 @@ requer_func () {
 # Function to handle invalid input for the first menu
 invalid_one () {
     options_one
-    #echo "Select number Server [1 to 11]: $UR◄ invalid option"
-		echo_t "Select number Server: $UR◄ invalid option" "" " [1 to 11]"
+    #echo "Select server number [1 to 11]: $UR◄ invalid option"
+		echo_t "Select server number: $UR◄ invalid option" "" " [1 to 11]"
     sleep 0.2s
     menu_one
 }
@@ -56,7 +56,7 @@ invalid_one () {
 invalid_two () {
     clear
     options_two
-    echo_t "Select number Server: $UR◄ invalid option" "" " [1 to 11]"
+    echo_t "Select server number: $UR◄ invalid option" "" " [1 to 11]"
     sleep 0.2s
     menu_two
 }
@@ -64,7 +64,7 @@ invalid_two () {
 # Function for the second menu of options
 	menu_two () {
 		options_two
-		echo_t "Select number Server: " "" " [1 to 11]"  # Default selection shown to user
+		echo_t "Select server number: " "" " [1 to 11]"  # Default selection shown to user
 		read -r -n 1 UR # Read user input without waiting for Enter
 
 # Process user input for server selection
@@ -97,7 +97,7 @@ invalid_two () {
 # Function for the first menu of options
 	menu_one () {
 		options_one
-		echo_t "Select number Server: " "" " [1 to 11]" # Default selection shown to user
+		echo_t "Select server number: " "" " [1 to 11]" # Default selection shown to user
 		read -r -n 1 UR
 
 # Process user input for server selection in the first menu
@@ -227,10 +227,10 @@ case $UR in
         clear
         LANGUAGE=$(cat "$LANGUAGE_FILE" 2>/dev/null || echo "pt")
         if [ -n "$UR" ]; then
-            echo -e "$(translate_and_cache "$LANGUAGE" "\n Invalid option: $(echo "$UR")")"
+            echo_t "\n Invalid option: ${UR}"
             kill -9 $$
         else
-            echo -e "$(translate_and_cache "$LANGUAGE" "\n Time exceeded!")"
+            echo_t "\n Time exceeded!"
         fi
         ;;
 esac

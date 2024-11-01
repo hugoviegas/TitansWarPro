@@ -76,7 +76,7 @@ clan_allies() {
         echo "" > callies.txt
         cut -d/ -f3 tmp.txt > ids.txt  # Extrai IDs diretamente para ids.txt
 
-        printf_t "Clan allies by Leader/Deputy on friends list" "$BLACK_CYAN" "$COLOR_RESET"
+        printf_t "Clan allies by Leader on friends list" "$BLACK_CYAN" "$COLOR_RESET"
         Lnl=$(wc -l < ids.txt)  # Contar linhas em ids.txt
         ts=0
         
@@ -178,7 +178,7 @@ conf_allies() {
                 echo_t "Invalid option: " "" "$AL"
                 kill -9 $$
             else
-                echo_t "Time exceeded!"
+                echo_t "Time exceeded!" >> "$TMP/ERROR_DEBUG"
             fi
         ;;
     esac

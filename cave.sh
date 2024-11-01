@@ -20,7 +20,7 @@ cave_process() {
     # Verificar se existem quests disponíveis
     if [ "$mode" == "routine" ] && checkQuest 5 apply; then
         count=0
-        echo_t "Quests available speeding up mine to complete!" "" "" "after" " "
+        echo_t "Quests available speeding up mine to complete!"
     else
         count=8
     fi
@@ -32,6 +32,7 @@ cave_process() {
         # Obter a primeira ação da caverna
         local CAVE=$(grep -o -E '/cave/(gather|down|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
         local RESULT=$(echo "$CAVE" | cut -d'/' -f3)
+        echo -e "$RESULT"
 
         # Verificar limites de speedUp
         if [[ "$RESULT" == "speedUp" && (( "$mode" == "start" && count -ge 20 )) || (( "$mode" == "routine" && count -ge 8 )) ]]; then
