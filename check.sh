@@ -7,7 +7,7 @@ check_missions() {
     click=$(grep -o -E "/quest/openChest/$i/[?]r=[0-9]+" "$TMP/SRC" | head -n1)
         if [ -n "$click" ]; then
             fetch_page "$click"  # Fetch the chest opening URL
-            echo -e "${GREEN_BLACK}Chest $i opened ✅${COLOR_RESET}"
+            echo -e "${GREEN_BLACK}Chest ${i} opened ✅${COLOR_RESET}"
         fi
     done
 
@@ -17,7 +17,7 @@ check_missions() {
     click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p')
         if [ -n "$click" ]; then
             fetch_page "$click"  # Fetch the mission completion URL
-            echo_t " Mission (${i}) Completed" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
+            echo_t " Mission ${i} Completed" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
         fi
     done
 
@@ -42,7 +42,7 @@ check_rewards(){
     click=$(grep -o -E "/relic/reward/${i}/[?]r=[0-9]+" "$TMP/SRC")
         if [ -n "$click" ]; then
             fetch_page "$click"  # Fetch the relic reward URL
-            echo_t "Relic (${i}) collected" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
+            echo_t "Relic ${i} collected" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
         fi
     done
 }
@@ -52,7 +52,7 @@ apply_event() {
   event=("$@")  # Store arguments as an array
   fetch_page "/$event/"
   if grep -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC; then
-    APPLY=$(grep -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC)
+    APPLY=$(grep -o -E "/${event}/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC)
     fetch_page "$APPLY"
     echo_t "Applied for battle" "${BLACK_YELLOW}" "${COLOR_RESET}" "after" "✅\n"
   fi
@@ -80,5 +80,5 @@ use_elixir() {
         fetch_page "$click"
     done
 
-    echo_t "Applied all elixir" "${BLACK_YELLOW}" "${COLOR_RESET}" "after" "💊\n"
+    echo_t "Applied all elixir" "${BLACK_YELLOW}" "${COLOR_RESET}" "after" "💊"
 }
