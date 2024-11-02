@@ -136,7 +136,7 @@ clanDungeon() {
       fetch_page "${CLANDUNGEON}"
       local count 
       count=$((count + 1))
-      echo_t "  Atack " "" " ${count} " "after" "⚔️"
+      echo_t "  Attacking monster " "" " ${count} " "after" "⚔️"
       local CLANDUNGEON
       CLANDUNGEON=$(grep -o -E '/clandungeon/(attack/[?][r][=][0-9]+|[?]close)' "$TMP"/SRC | head -n 1)
     done
