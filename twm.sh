@@ -1,7 +1,8 @@
 #!/bin/bash
 # shellcheck disable=SC1091
 SHARE_DIR="/usr/share/twm-library"
-. "${SHARE_DIR}"/info.sh
+INSTALL_DIR="/usr/games"
+. "${INSTALL_DIR}"/info.sh
 colors
 RUN=$(cat "${SHARE_DIR}"/runmode_file)
 cd "${SHARE_DIR}" || exit

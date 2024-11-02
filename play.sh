@@ -1,5 +1,6 @@
 #!/bin/sh
 SHARE_DIR="/usr/share/twm-library"
+INSTALL_DIR="/usr/games"
 # Main script to manage the execution of the twm.sh script based on the provided run mode
 (
   RUN=$1  # Get the run mode from the first argument
