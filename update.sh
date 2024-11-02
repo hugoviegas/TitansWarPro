@@ -47,7 +47,7 @@ else
             VERSION="Beta"
             ;;
         3)
-            VERSION="Main"
+            VERSION="Master"
             SOURCE_CODE="sharesourcecode/TitansWarMacro"
             rm -rf ~/twm
             ;;
