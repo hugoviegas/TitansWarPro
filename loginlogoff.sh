@@ -57,7 +57,7 @@ login_logoff () {
    echo_t "In case of error will repeat" "${BLACK_YELLOW}" "${COLOR_RESET}"
    echo_t "Username: "
    read -r username
-   local prompt=echo_t "Password: "
+   local prompt="$(translate_and_cache "$LANGUAGE" "Password: ")"
    local charcount=0
 
    while read -p "$prompt" -r -s -n 1 char; do
@@ -86,7 +86,7 @@ login_logoff () {
 
    done
 
-   echo_t "\nPlease wait..."
+   echo_t "Please wait..." "\n"
 
    #/cryptography
    if [ -z "$ACC" ]; then
