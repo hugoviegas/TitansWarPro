@@ -58,6 +58,7 @@ cd ~/twm || exit
 . league.sh
 . specialevent.sh
 . function.sh
+. update_check.sh
 #/twm.sh after sources >>
 #/functions
 twm_start() {

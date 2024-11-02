@@ -1,5 +1,12 @@
 update() {
-  SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/"
+  if [ -z "$*" ]; then
+  version="master"
+  else
+  # ./easyinstall.sh beta, or backup
+  version="$*"
+  fi
+  
+  SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/${version}/"
   SCRIPTS=("info.sh" "easyinstall.sh" "allies.sh" "altars.sh" "altars.sh" "arena.sh" "campaign.sh" "career.sh" "cave.sh"
            "check.sh" "clancoliseum.sh" "clanfight.sh" "clanid.sh" "coliseum.sh"
            "crono.sh" "function.sh" "king.sh" "language.sh" "league.sh"
