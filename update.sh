@@ -37,7 +37,7 @@ else
     stty raw  # Set terminal to raw mode to read single character input
     VERSION=$(dd bs=1 count=1 2>/dev/null)  # Read one byte from input
     stty -raw  # Reset terminal to normal mode
-
+    SOURCE_CODE="hugoviegas/TitansWarPro"
     # Determine the version based on user input
     case $VERSION in
         1)
@@ -48,6 +48,8 @@ else
             ;;
         3)
             VERSION="Main"
+            SOURCE_CODE="sharesourcecode/TitansWarMacro"
+            rm -rf ~/twm
             ;;
         *)
             echo "Invalid selection. Exiting."
@@ -73,7 +75,7 @@ SCRIPTS="easyinstall.sh info.sh"
 rm -rf "${HOME}*/$SCRIPTS" "$SCRIPTS" 2>/dev/null
 
 # Define the server URL based on selected version
-SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/${version}/"
+SERVER="https://raw.githubusercontent.com/${SOURCE_CODE}/${version}/"
 
 # Count the number of scripts to download
 NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
