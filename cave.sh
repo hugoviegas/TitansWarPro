@@ -87,30 +87,29 @@ cave_routine() {
       fi
 
       # Process the current cave action
-      case $RESULT in
-    gather|down|runaway|speedUp)
-      # Fetch page and process action
-      fetch_page "$CAVE"
+    case $RESULT in
+        gather|down|runaway|speedUp)
+        # Fetch page and process action
+        fetch_page "$CAVE"
 
-      # Feedback based on the current action
-      case $RESULT in
-        down*)
-            echo_t "New search" "" "" "after" "🔍"
-            ((count++))  # Incrementar contador
-          ;;
-        gather*)
-            echo_t "Start mining" "" "" "after" "⛏️"
-          ;;
-        runaway*)
-            echo_t "Run away" "" "" "after" "💨"
-          ;;
-        speedUp*)
-            echo_t "Speed up mining" "" "" "after" "⚡"
-          ;;
-      esac
-      ;;
-esac
-
+        # Feedback based on the current action
+        case $RESULT in
+            down*)
+                echo_t "New search" "" "" "after" "🔍"
+                ((count++))  # Incrementar contador
+            ;;
+            gather*)
+                echo_t "Start mining" "" "" "after" "⛏️"
+            ;;
+            runaway*)
+                echo_t "Running away" "" "" "after" "💨"
+            ;;
+            speedUp*)
+                echo_t "Speed up mining" "" "" "after" "⚡"
+            ;;
+        esac
+        ;;
+    esac
 
       # Fetch new cave data
       fetch_page "/cave/"
@@ -118,5 +117,5 @@ esac
 
     checkQuest 5 end
 
-    echo_t "Cave" "${GREEN_BLACK}" "${COLOR_RESET}" "✅\n\n"  
+    echo_t "Cave" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n\n"  
 }

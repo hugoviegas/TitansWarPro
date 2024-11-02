@@ -74,10 +74,7 @@ flagfight_fight() {
       cf_access
       date +%s >last_atk
     else
-      (
-        w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/flagfight" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
-      ) </dev/null &>/dev/null &
-      time_exit 17
+      fetch_page "/flagfight" "$src_ram"
       cf_access
       sleep 1s
     fi
@@ -93,11 +90,11 @@ flagfight_fight() {
   sleep 10s
 
   #apply to fight
-  cd $TMP
-  cp $src_ram SRC
+  cd "$TMP" || exit
+  cp "$src_ram" SRC
   apply_event flagfight
-  cp SRC $src_ram
-  cd $tmp_ram
+  cp SRC "$src_ram"
+  cd "$tmp_ram" || exit
   clear
 }
 
@@ -108,11 +105,11 @@ flagfight_start() {
     dir_ram="$PREFIX/tmp/"
   fi
 
-  src_ram=$(mktemp -p $dir_ram data.XXXXXX)
-  full_ram=$(mktemp -p $dir_ram data.XXXXXX)
+  src_ram=$(mktemp -p "$dir_ram" data.XXXXXX)
+  full_ram=$(mktemp -p "$dir_ram" data.XXXXXX)
   tmp_ram=$(mktemp -d -t twmdir.XXXXXX)
-  cp -r $TMP/* $tmp_ram
-  cd $tmp_ram
+  cp -r "$TMP"/* "$tmp_ram"
+  cd "$tmp_ram" || exit
 
   case $(date +%H:%M) in
   (10:1[0-4] | 16:1[0-4])
@@ -120,15 +117,9 @@ flagfight_start() {
       w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 userAgent.txt)" | grep -o -E '\(([0-9]+)\)' | sed 's/[()]//g' >$full_ram
     ) </dev/null &>/dev/null &
     time_exit 17
-    (
-      w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "$URL/flagfight/?close=reward" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
-    ) </dev/null &>/dev/null &
-    time_exit 17
-    (
-      w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/flagfight/enterFight" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
-    ) </dev/null &>/dev/null &
-    time_exit 17
-    echo_t "Flag fight  will be started..." "${GOLD_BLACK}" "${COLOR_RESET}"
+    fetch_page "/flagfight/?close=reward" "$src_ram"
+    fetch_page "/flagfight/enterFight" "$src_ram"
+    echo_t "Flagfight will be started..." "${GOLD_BLACK}" "${COLOR_RESET}"
 
     while $(case $(date +%M:%S) in (14:[3-5][0-9]) exit 1 ;; esac); do
       sleep 3s
@@ -148,11 +139,8 @@ flagfight_start() {
 
     until grep -q -o 'flagfight/dodge/' ACCESS || [ "$(date +%s)" -gt "$BREAK" ]; do
       printf " 💤	...\n$(cat ACCESS)\n"
-      (
-        w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}/flagfight/" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
-      ) </dev/null &>/dev/null &
-      time_exit 17
-      grep -o -E '(/flagfight/[a-z]+/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+)' $src_ram | sed -n '1p' >ACCESS 2>/dev/null
+      fetch_page "/flagfight/" "$src_ram"
+      grep -o -E '(/flagfight/[a-z]+/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+)' "$src_ram" | sed -n '1p' >ACCESS 2>/dev/null
       sleep 3
     done
 

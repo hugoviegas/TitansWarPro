@@ -125,12 +125,12 @@ clancoliseum_fight() {
 
     case $(date +%H:%M) in
     10:2[5-9])
-      while  $(date +%M) -gt "24" && [ $(date +%M) -lt "30" ]; do
+      while  "$(date +%M)" -gt "24" && [ "$(date +%M)" -lt "30" ]; do
         sleep 3s
       done
       ;;
     14:5[5-9])
-      while awk -v minute="$(date +%M)" 'BEGIN { exit !(minute != 00) }' && [ $(date +%M) -gt "54" ]; do
+      while awk -v minute="$(date +%M)" 'BEGIN { exit !(minute != 00) }' && [ "$(date +%M)" -gt "54" ]; do
         sleep 3s
       done
       ;;

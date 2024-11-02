@@ -17,7 +17,7 @@ career_func() {
                     (*attack*|*take*)
                         fetch_page "$CAREER"
                         RESULT=$(echo "$CAREER" | cut -d'/' -f3)
-                        echo_t "Career -> $RESULT !" "$COLOR_RESET" "" "before" ""
+                        echo_t "Career -> $RESULT !" "$COLOR_RESET"
                         
                         sleep 0.5s
                         CAREER=$(grep -o -E '/career/(attack|take)/[?]r[=][0-9]+' "$TMP/SRC" | sed -n '1p')
