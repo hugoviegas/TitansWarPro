@@ -60,7 +60,7 @@ check_update_easyinstall
 printf "\n${BLACK_GREEN}✅ Repository source updated successfully${COLOR_RESET}\n\n"
 printf "${BLACK_CYAN}Starting $INSTALL_DIR/easyinstall.sh with version $version...${COLOR_RESET}\n"
 sleep 2s  # Brief pause before starting the installation script
-"$INSTALL_DIR/easyinstall.sh" "$version"
+#"$INSTALL_DIR/easyinstall.sh" "$version"
 
 # Function to install Termux packages
 install_termux_packages() {
