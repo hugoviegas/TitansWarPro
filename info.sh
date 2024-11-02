@@ -26,9 +26,9 @@ colors() {
 
 script_slogan() {
     colors="10 8 2 1 3 6 7"
-    author="author: Hugo Viegas"
+    author="Mod author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.9.2" # to change the version number every time has an update !
+    versionNum="3.9.3 (beta)" # to change the version number every time has an update !
 
 for i in $colors; do
 clear
@@ -61,7 +61,7 @@ done
 }
 
 language_setup() {
-    LANGUAGE_FILE="$HOME/twm/language_file"  # Caminho para o arquivo de idioma
+    LANGUAGE_FILE="/usr/share/twm-library/language_file"  # Caminho para o arquivo de idioma
     
     # Verifica se o arquivo existe e se contém um idioma válido
     if [ -f "$LANGUAGE_FILE" ] && [ -s "$LANGUAGE_FILE" ]; then

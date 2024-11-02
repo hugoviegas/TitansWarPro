@@ -1,5 +1,5 @@
 #!/bin/sh
-
+SHARE_DIR="/usr/share/twm-library"
 # Main script to manage the execution of the twm.sh script based on the provided run mode
 (
   RUN=$1  # Get the run mode from the first argument
@@ -17,18 +17,18 @@
 
     # Function to determine which mode to run based on the RUN variable
     run_mode() {
-      chmod +x "$HOME/twm/twm.sh"  # Ensure twm.sh is executable
+      chmod +x "${SHARE_DIR}/twm.sh"  # Ensure twm.sh is executable
 
       if echo "$RUN" | grep -q -E '[-]cl'; then
-        $HOME/twm/twm.sh  # Run in clan mode
+        "${SHARE_DIR}"/twm.sh  # Run in clan mode
       elif echo "$RUN" | grep -q -E '[-]cv'; then
-        $HOME/twm/twm.sh -cv  # Run in cave mode
+        "${SHARE_DIR}"/twm.sh -cv  # Run in cave mode
       elif echo "$RUN" | grep -q -E '[-]boot'; then
-        echo '-boot' > "$HOME/twm/runmode_file"  # Update run mode to boot
-        $HOME/twm/twm.sh -boot  # Run in boot mode
+        echo '-boot' > "${SHARE_DIR}/runmode_file"  # Update run mode to boot
+        "${SHARE_DIR}"/twm.sh -boot  # Run in boot mode
       else
-        echo '-boot' > "$HOME/twm/runmode_file"  # Default to boot mode if no specific mode is set
-        $HOME/twm/twm.sh -boot  # Run in boot mode
+        echo '-boot' > "${SHARE_DIR}/runmode_file"  # Default to boot mode if no specific mode is set
+        "${SHARE_DIR}"/twm.sh -boot  # Run in boot mode
       fi
     }
 

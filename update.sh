@@ -2,6 +2,8 @@
 
 # Clear the terminal screen
 clear
+# Defina o diretório de instalação para /usr/games (onde os scripts vão agora)
+INSTALL_DIR="/usr/games"
 
 # Define color codes for output formatting
 BLACK_CYAN='\033[01;36m\033[01;07m'
@@ -71,46 +73,52 @@ cd ~/twm || exit
 # Define scripts to download
 SCRIPTS="easyinstall.sh info.sh"
 
+# Verifique se as variáveis estão definidas para evitar comportamento inesperado
+INSTALL_DIR="${INSTALL_DIR:?Diretório de instalação não definido}"
+SCRIPTS="${SCRIPTS:?Lista de scripts não definida}"
+
 # Remove any existing scripts in both home and current directories
-rm -rf "${HOME}*/$SCRIPTS" "$SCRIPTS" 2>/dev/null
+#rm -rf "${HOME}*/$SCRIPTS" "$SCRIPTS" 2>/dev/null
+rm -rf "${INSTALL_DIR:?}/${SCRIPTS}" "${SCRIPTS}" 2>/dev/null
 
 # Define the server URL based on selected version
 SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/${version}/"
 
-# Count the number of scripts to download
+# Get the total number of scripts
 NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
-LEN=0
+CURRENT_INDEX=0
 
-# Loop through each script and handle downloading/updating
+# Loop through each script to check, download, or update
 for script in $SCRIPTS; do
-    LEN=$((LEN + 1))
-    printf "Checking $LEN/$NUM_SCRIPTS $script\n"
+    CURRENT_INDEX=$((CURRENT_INDEX + 1))
+    printf "Checking %d/%d: %s\n" "$CURRENT_INDEX" "$NUM_SCRIPTS" "$script"
 
     # Get the size of the remote script
-    remote_count=$(curl "${SERVER}${script}" -s -L | wc -c)
+    remote_size=$(curl -s -L "${SERVER}${script}" | wc -c)
 
-    # Get the size of the local script if it exists, otherwise set to 1 (to indicate it does not exist)
-    if [ -e ~/twm/"$script" ]; then
-        local_count=$(wc -c <"$script")
+    # Check if the local script exists, otherwise set size to 1 (indicating it doesn't exist)
+    if [ -e "$INSTALL_DIR/$script" ]; then
+        local_size=$(wc -c <"$script")
     else
-        local_count=1
+        local_size=1
     fi
 
-    # Compare remote and local script sizes to determine action
-    if [ -e ~/twm/"$script" ] && [ "$remote_count" -eq "$local_count" ]; then
-        printf "✅ ${BLACK_CYAN}Updated $script${COLOR_RESET}\n"
-    elif [ -e ~/twm/"$script" ] && [ "$remote_count" -ne "$local_count" ]; then
-        printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
-        curl "${SERVER}${script}" -s -L >"$script"  # Update existing script with new content
+    # Determine if an update or download is needed
+    if [ -e "$INSTALL_DIR/$script" ] && [ "$remote_size" -eq "$local_size" ]; then
+        printf "✅ ${BLACK_CYAN}Already up to date: $script${COLOR_RESET}\n"
+    elif [ -e "$INSTALL_DIR/$script" ] && [ "$remote_size" -ne "$local_size" ]; then
+        printf "🔁 ${BLACK_GREEN}Updating: $script${COLOR_RESET}\n"
+        curl -s -L "${SERVER}${script}" > "$script"  # Download updated content
     else
-        printf "🔽 ${BLACK_YELLOW}Downloading $script${COLOR_RESET}\n"
-        curl "${SERVER}${script}" -s -L -O  # Download new script if it doesn't exist locally
+        printf "🔽 ${BLACK_YELLOW}Downloading: $script${COLOR_RESET}\n"
+        curl -s -L -O "${SERVER}${script}"  # Download if not present locally
     fi
 
-    chmod +x "$script"  # Make the script executable
-    cp "$script" "$HOME/$script" 2>/dev/null  # Copy script to user's home directory (if applicable)
+    # Make the script executable and copy it to the installation directory
+    chmod +x "$script"
+    sudo cp "$script" "$INSTALL_DIR/" 2>/dev/null
     
-    sleep 0.1s  # Brief pause between downloads for stability
+    sleep 0.1s  # Brief pause for download stability
 done
 
 # Inform user that repository source has been updated and start easyinstall.sh with selected version

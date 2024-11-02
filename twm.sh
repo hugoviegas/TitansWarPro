@@ -1,18 +1,19 @@
 #!/bin/bash
 # shellcheck disable=SC1091
-. "$HOME"/twm/info.sh
+SHARE_DIR="/usr/share/twm-library"
+. "${SHARE_DIR}"/info.sh
 colors
-RUN=$(cat "$HOME"/twm/runmode_file)
-cd "$HOME"/twm || exit
+RUN=$(cat "${SHARE_DIR}"/runmode_file)
+cd "${SHARE_DIR}" || exit
 
 script_ads() {
-  if [ "$RUN" != '-boot' ] && [ -f "$HOME/twm/ads_file" ] && [ -s "$HOME/twm/ads_file" ] && [ "$(cat "$HOME"/twm/ads_file)" != "$(date +%d)" ]; then
-    if [ "$(cat "$HOME"/twm/ads_file 2>/dev/null)" != "$(date +%d)" ]; then
+  if [ "$RUN" != '-boot' ] && [ -f "$HOME/twm/ads_file" ] && [ -s "$HOME/twm/ads_file" ] && [ "$(cat "${SHARE_DIR}"/ads_file)" != "$(date +%d)" ]; then
+    if [ "$(cat "${SHARE_DIR}"/ads_file 2>/dev/null)" != "$(date +%d)" ]; then
       xdg-open "https://apps.disroot.org/search?q=Shell+Script&category_general=on&language=pt-BR&time_range=&safesearch=1&theme=beetroot"
-      date +%d >"$HOME"/twm/ads_file
+      date +%d >"${SHARE_DIR}"/ads_file
     fi
   else
-    date +%d >"$HOME"/twm/ads_file
+    date +%d >"${SHARE_DIR}"/ads_file
   fi
 }
 script_ads
@@ -31,9 +32,8 @@ else
 fi
 
 #/sources
-cd ~/twm || exit
+cd "${SHARE_DIR}" || exit
 #/twm.sh before sources <<
-#. clandmgfight.sh
 . language.sh
 . requeriments.sh
 . loginlogoff.sh

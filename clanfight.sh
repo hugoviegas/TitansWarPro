@@ -1,12 +1,5 @@
-#/clanfight/dodge/?r=0
-#/clanfight/attack/?r=0
-#/clanfight/attackrandom/?r=0
-#/clanfight/heal/?r=0
-#/clanfight/stone/?r=0
-#/clanfight/grass/?r=0
-#/clanfight/?out_gate
 clanfight_fight() {
-  cd $TMP || exit
+  cd "$TMP" || exit
   #/enterFight
   local LA=4    # interval attack
   local HPER=48 # % to heal

@@ -1,16 +1,16 @@
 twm_play() {
-    echo "$RUN" > "$HOME/twm/runmode_file"  # Save the run mode to a file
+    echo "$RUN" > "${SHARE_DIR}/runmode_file"  # Save the run mode to a file
+
     # Function to restart the twm script if it is running
     restart_script() {
         # shellcheck disable=SC2317
         if [ "$RUN" != '-boot' ]; then
-            # Get the PID of the running twm script
-            pidf=$(ps ax -o pid=,args= | grep "sh.*twm/twm.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
+            # Get the PIDs of all running twm scripts
+            pids=$(pgrep -f "sh.*twm/twm.sh")  # Use pgrep for simplicity and efficiency
             
             # Loop until there are no more PIDs found
-            until [ -z "$pidf" ]; do
-                kill -9 $pidf 2> /dev/null  # Forcefully kill the process
-                pidf=$(ps ax -o pid=,args= | grep "sh.*twm/twm.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
+            for pid in $pids; do
+                kill -9 "$pid" 2>/dev/null  # Forcefully kill the process
                 sleep 1s  # Wait for a second before checking again
             done
         fi
