@@ -21,16 +21,16 @@ if [ $# -eq 1 ]; then
             VERSION="Beta"
             ;;
         3)
-            VERSION="Old"
+            VERSION="Main"
             ;;
         *)
-            echo "Invalid selection. Please use 1 for Master, 2 for Beta, or 3 for Old."
+            echo "Invalid selection. Please use 1 for Master, 2 for Beta, or 3 for Other Macro ."
             exit 1  # Exit if an invalid option is selected
             ;;
     esac
 else
     # Display version options to the user
-    printf "Versions\n 1- Master\n 2- Beta\n 3- Old\n"
+    printf "Versions\n 1- Master\n 2- Beta\n 3- Other Macro (delete all)\n"
     printf "${CYAN_BLACK}Select the version:${COLOR_RESET} \n"
 
     # User input handling
@@ -47,7 +47,7 @@ else
             VERSION="Beta"
             ;;
         3)
-            VERSION="Old"
+            VERSION="Main"
             ;;
         *)
             echo "Invalid selection. Exiting."
