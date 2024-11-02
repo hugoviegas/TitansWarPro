@@ -29,7 +29,7 @@ clanfight_fight() {
       w3m -dump -T text/html "$TMP/SRC" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{1,6\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\]\ ,\🔴,g;s,\[1\]\ ,\🔵,g;s,\[stone\],\ 💪,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\]\ ,\ 💀,g'
     else
       echo 1 >BREAK_LOOP
-      echo_t "Battle's over!" "${RED_BLACK}" "${COLOR_RESET}" "after" "⚔️\n"
+      echo_t "Battle is over!" "${RED_BLACK}" "${COLOR_RESET}" "after" "⚔️\n"
       sleep 2s
     fi
   }
@@ -114,7 +114,7 @@ clanfight_start() {
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/clanfight/enterFight" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
     ) </dev/null &>/dev/null &
     time_exit 17
-    echo_t "Clan tournament will be started..." "${GOLD_BLACK}" "${COLOR_RESET}"
+    echo_t "The clan tournament will be started..." "${GOLD_BLACK}" "${COLOR_RESET}"
     while $(case $(date +%M:%S) in (59:[3-5][0-9]) exit 1 ;; esac) ; do
       sleep 3
     done

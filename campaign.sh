@@ -13,7 +13,7 @@ campaign_func() {
                     fetch_page "$CAMPAIGN"
                     
                     RESULT=$(echo "$CAMPAIGN" | cut -d'/' -f3)
-                    echo_t "Campaign -> $RESULT !" "$COLOR_RESET" "" "before" ""
+                    echo_t "Campaign -> $RESULT !"  #  a
                     
                     CAMPAIGN=$(grep -o -E '/campaign/(go|fight|attack|end)/[?]r[=][0-9]+' "$TMP/SRC" | head -n 1)
                     ;;

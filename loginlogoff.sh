@@ -31,8 +31,8 @@ login_logoff () {
   until [ "$check" -lt 1 ]; do
    clear
    echo_t "Please wait..."
-   echo -ne "[Login using: $ACC...] (${check}s) - "
-   echo_t "press ENTER to change your user account"
+   echo -ne "${GOLD_BLACK}> [$ACC] ${COLOR_RESET}- "
+   echo_t "to change your user account press" "" "${GOLD_BLACK} [ENTER] ${check}s ...${COLOR_RESET}"
 
    local check=$((check - 1))
    if read -t 1; then
@@ -56,7 +56,7 @@ login_logoff () {
    time_exit 17
    echo_t "In case of error will repeat" "${BLACK_YELLOW}" "${COLOR_RESET}"
    echo_t "Username: "
-   read username
+   read -r username
    local prompt="$(translate_and_cache "$LANGUAGE" "Password: ")"
    local charcount=0
 
@@ -86,7 +86,7 @@ login_logoff () {
 
    done
 
-   echo -e "$(translate_and_cache "$LANGUAGE" "Please wait...")"
+   echo_t "Please wait..." "\n"
 
    #/cryptography
    if [ -z "$ACC" ]; then

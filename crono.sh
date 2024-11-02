@@ -6,7 +6,7 @@ func_crono() {
     MIN=$(date +%M | sed 's/^0//')
 
     # Format and print the time
-    echo -e " \033[02m$URL ⏰ $HOUR:$MIN${COLOR_RESET}"
+    echo -e " \033[02m$URL ⏰ $(date +%H):$(date +%M)${COLOR_RESET}"
 }
 
 func_cat() {
@@ -16,13 +16,13 @@ func_cat() {
     if (( HOUR < 6 || HOUR >= 18 )); then
         printf "${BLUE_BLACK}"
     else
-        printf "${GOLD_BLACK}"
+        printf "${GOLD_BLACK} "
     fi
 
     cat "$TMP/msg_file"
     printf "${WHITE_BLACK}"
  
-    list() {
+    info() {
         printf "\n"
         # List functions defined in scripts
         grep -o -E '[[:alpha:]]+?[_]?[[:alpha:]]+?[ ]?\() \{' ~/twm/*.sh | awk -F\: '{ print $2 }' | awk -F \( '{ print $1 }'
@@ -31,10 +31,10 @@ func_cat() {
     
     while true; do
        
-        echo -e "\033[02m$(translate_and_cache "$LANGUAGE" "No battles now, waiting ${i}s")${COLOR_RESET}"
-        echo -e "${WHITEb_BLACK}$(translate_and_cache "$LANGUAGE" "Enter a command or for more info enter:") list${COLOR_RESET}"
+        echo_t "No battles now, waiting ${i}s" "\033[02m" "${COLOR_RESET}"
+        echo_t "Enter a command or for more info enter:" "${WHITEb_BLACK}" "info${COLOR_RESET}"
 
-        read -t "$i" cmd  # Read user command with a timeout
+        read -r -t "$i" cmd  # Read user command with a timeout
 
         if [ "$cmd" = " " ]; then
             break  # Exit loop if only space is entered
@@ -64,7 +64,7 @@ func_sleep() {
     if [ "$(date +%d)" -eq 01 ]; then
         # Check if the current hour is between 0 and 8 (inclusive)
         if [ "$HOUR" -lt 9 ]; then  # This covers hours 00 to 08
-            arena_duel  # Start arena duel
+            #arena_duel  # Start arena duel
             coliseum_start  # Start coliseum activities
             reset; clear  # Clear the terminal screen
             i=60  # Set wait time to 60 seconds
@@ -87,13 +87,13 @@ func_sleep() {
 start() {
     arena_duel       # Start arena duel function
     career_func      # Call career-related function
-    cave_process routine     # Execute cave routine function 
+    cave_routine     # Execute cave routine function 
     func_trade       # Call trading function 
     campaign_func    # Start campaign function 
     clanDungeon      # Execute clan dungeon function 
     clan_statue      # Check the clan statue
     check_missions   # Check for missions 
-    specialEvent     # Check the current Event
+    #specialEvent     # Check the current Event
     #clanQuests       # Check the clan missions opened
     messages_info    # Display messages information 
     func_crono       # Display current time again 

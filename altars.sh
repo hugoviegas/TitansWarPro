@@ -23,7 +23,7 @@ altars_fight () {
    w3m -dump -T text/html "$TMP/src.html" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{1,6\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\]\ ,\🔴,g;s,\[1\]\ ,\🔵,g;s,\[stone\],\ 💪,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\]\ ,\ 💀,g'
   else
    echo 1 >BREAK_LOOP
-   echo_t "Battle's over!" "${RED_BLACK}" "${COLOR_RESET}" "after" "⚔️\n"
+   echo_t "Battle over!" "${RED_BLACK}" "${COLOR_RESET}" "after" "⚔️\n"
    sleep 2s
   fi
  }
@@ -102,7 +102,7 @@ altars_start () {
 
   fetch_page "/altars/?close=reward" "$TMP"/src.html
   fetch_page "/altars/enterFight" "$TMP"/src.html
-  printf "Ancient Altars will be started...\n"
+  printf_t "Ancient Altars will be started..."
 
   until (case $(date +%M) in (55|56|57|58|59) exit 1 ;; esac) ;
   do

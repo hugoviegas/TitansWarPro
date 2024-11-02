@@ -14,7 +14,7 @@ colors() {
     CYAN_CYAN='\033[01;36m\033[08;07m'     # Bright cyan text on dark background
     BLUE_BLACK='\033[0;34m'                # Blue text on default background
     COLOR_RESET='\033[00m'                 # Reset to default color
-    GOLD_BLACK='\033[33m'                   # Gold text on default background
+    GOLD_BLACK='\033[0;33m'                   # Gold text on default background
     GREEN_BLACK='\033[32m'                  # Green text on default background
     GREENb_BLACK='\033[1;32m'               # Bold green text on default background
     RED_BLACK='\033[0;31m'                  # Red text on default background
@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.9" # to change the version number every time has an update    
+    versionNum="3.9.2" # to change the version number every time has an update !
 
 for i in $colors; do
 clear
@@ -59,6 +59,7 @@ printf "\033[1;38;5;${i}m${author}\n\033[02m${versionNum}${COLOR_RESET}\n"
 sleep 0.2s
 done
 }
+
 language_setup() {
     LANGUAGE_FILE="$HOME/twm/language_file"  # Caminho para o arquivo de idioma
     
@@ -113,7 +114,6 @@ echo_t() {
   fi
 }
 
-
 time_exit() {
     # Function to monitor a background process and terminate it if it exceeds a specified timeout.
     (
@@ -138,9 +138,21 @@ time_exit() {
         
         # Notify the user that the command execution was interrupted
         #printf "${WHITEb_BLACK}%s${COLOR_RESET}\n" "$(translate_and_cache "$LANGUAGE" "Command execution was interrupted!")"
-        printf_t "Command execution was interrupted!" "$WHITEb_BLACK" "$COLOR_RESET" "before" "⚠️"
+        printf_t "Command execution was interrupted!" "$WHITEb_BLACK" "$COLOR_RESET" "before" "⚠️" >> "$TMP/ERROR_DEBUG"
 
     )
+}
+
+#Access any page link
+fetch_page() {
+    local relative_url="$1"  # The specific part of the URL you want to fetch (e.g., "/quest/")
+    local output_file="${2:-$TMP/SRC}"  # Use the second argument if provided, otherwise default to $TMP/SRC
+
+    (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${relative_url}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$output_file"
+    ) </dev/null &>/dev/null  # Run in background and suppress output
+
+    time_exit 17  # Wait for the process to finish
 }
 
 hpmp() {
@@ -215,4 +227,3 @@ player_stats() {
 
     echo "$PLAYER_STRENGTH"
 }
-

@@ -17,8 +17,8 @@ script_ads() {
 }
 script_ads
 
-#printf "${BLACK_CYAN}\n Starting...\n👉 Please wait...☕👴${COLOR_RESET}\n"
-print_t "Starting the macro wait a few seconds..." "$BLACK_CYAN" "$COLOR_RESET" "after" "☕👴"
+#printf_t "Starting the macro wait a few seconds..." "$BLACK_CYAN" "$COLOR_RESET" "after" "☕"
+#sleep 3s
 
 script_slogan
 sleep 1s
@@ -58,12 +58,13 @@ cd ~/twm || exit
 . league.sh
 . specialevent.sh
 . function.sh
+. update_check.sh
 #/twm.sh after sources >>
 #/functions
 twm_start() {
     # Determine which action to start based on the RUN variable
     if echo "$RUN" | grep -q -E '[-]cv'; then
-        cave_process start  # Start the cave function if in cave mode
+        cave_start  # Start the cave function if in cave mode
     elif echo "$RUN" | grep -q -E '[-]cl'; then
         twm_play  # Start the main game loop if in clan mode
     elif echo "$RUN" | grep -q -E '[-]boot'; then
@@ -76,19 +77,6 @@ twm_start() {
 func_unset() {
     # Unset various game-related variables to clear state
     unset HP1 HP2 YOU USER CLAN ENTER ENTER ATK ATKRND DODGE HEAL GRASS STONE BEXIT OUTGATE LEAVEFIGHT WDRED CAVE BREAK NEWCAVE
-}
-
-#Access any page link
-
-fetch_page() {
-    local relative_url="$1"  # The specific part of the URL you want to fetch (e.g., "/quest/")
-    local output_file="${2:-$TMP/SRC}"  # Use the second argument if provided, otherwise default to $TMP/SRC
-
-    (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${relative_url}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$output_file"
-    ) </dev/null &>/dev/null  # Run in background and suppress output
-
-    time_exit 17  # Wait for the process to finish
 }
 
 # Check if the user settings file exists and is not empty
@@ -109,7 +97,7 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
             break &>/dev/null  # Exit the loop quietly if Enter is pressed
         fi
         
-        echo_t "To reconfigure please press the button [Enter] ${i}s ..." "\033[F${GOLD_BLACK}" "${COLOR_RESET}" 
+        echo_t "To reconfigure please press the button" "\033[F" "${GOLD_BLACK} ENTER ${i}s ...${COLOR_RESET}"
 
     done
 fi

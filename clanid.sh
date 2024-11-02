@@ -39,15 +39,15 @@ checkQuest() {
     # Verificar se encontrou o botão correto
     if [ -n "$click" ]; then
         fetch_page "/clan/${CLD}$click"
-        echo_t "Clan mission (${quest_id}) Check (${action}) ..." "" "" "after" "🔎"
+        echo_t " Starting clan mission: " "" " ${quest_id}" "after" "🔎"
         return 0 # Sucesso se o botão foi encontrado
     else
-        echo_t "Clan mission (${quest_id}) Check (${action}) is not ready" "" "" "after" "🔎"
+        echo_t " Can not start the clan mission:" "" " ${quest_id}" "after" "🔎"
         return 1 # Não encontrou o botão
     fi
     else
         fetch_page "/clanrating/wantedToClan"
-        echo_t "Clan mission $($quest_id) Check (${action}) was not found" "$COLOR_RESET" "" "after" "❌🔎"
+        echo_t " Can not find the clan mission: " "" " ${quest_id}" "after" "❌🔎"
         return 1 # Falha se CLD estiver vazio
     fi
 }
@@ -136,11 +136,11 @@ clanDungeon() {
       fetch_page "${CLANDUNGEON}"
       local count 
       count=$((count + 1))
-      echo_t "  Atack ${count}" "" "" "after" "⚔️"
+      echo_t "  Attacking monster " "" " ${count} " "after" "⚔️"
       local CLANDUNGEON
       CLANDUNGEON=$(grep -o -E '/clandungeon/(attack/[?][r][=][0-9]+|[?]close)' "$TMP"/SRC | head -n 1)
     done
-    echo_t "Clan dungeon" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "😈✅\n"
+    echo_t "The clan dungeon" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "😈✅\n"
   fi
 }
 
