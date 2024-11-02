@@ -56,9 +56,11 @@ while true; do
         printf_t "Update canceled."
         break
       fi
-    
-  else
     printf_t "All files are updated, press CTRL + C to stop and run the code to apply."
+    sleep 1
+  else
+    printf_t "All files are updated."
+    sleep 1
     break
   fi
 done
