@@ -3,8 +3,7 @@ king_fight () {
 
   #/enterFight
   cd "$TMP" || exit
-  local LA
-  LA=$(shuf -i 4-5 -n 1) #4 interval attack
+  local LA=4 # interval attack
   local HPER="38" # % to heal
   local RPER=5 # % to random
   cl_access () {
