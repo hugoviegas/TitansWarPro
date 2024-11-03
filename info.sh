@@ -26,7 +26,7 @@ colors() {
 
 script_slogan() {
     colors="10 8 2 1 3 6 7"
-    author="Mod author: Hugo Viegas"
+    author="Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
     versionNum="3.9" # to change the version number every time has an update !
 
@@ -55,7 +55,8 @@ printf "\033[1;38;5;${i}m
 ██║     ██║  ██║╚██████╔╝
 ╚═╝     ╚═╝  ╚═╝ ╚═════╝ 
 "
-printf "\033[1;38;5;${i}m${author}\n\033[02m${versionNum}${COLOR_RESET}\n"
+printf_t "Mod author: " "\033[1;38;5;${i}m" "${author}\n\033[02m"
+printf_t "Verion: " "" "${versionNum}${COLOR_RESET}\n"
 sleep 0.2s
 done
 }
