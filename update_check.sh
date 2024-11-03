@@ -45,19 +45,20 @@ while true; do
       for file in "${files_to_update[@]}"; do
         printf " - $file\n"
       done
-      echo_t "Do you want to update this files? (y/n/s)"
+      echo_t "Do you want to update this files? (y/n)"
       read -r choice
       if [[ "$choice" == "s" || "$choice" == "S" || "$choice" == "y" || "$choice" == "Y" ]]; then
         for file in "${files_to_update[@]}"; do
           curl -s -L "${SERVER}${file}" -o "$HOME/twm/$file"
-          printf_t " Atualizado" "" "" "after" " ${file} ✅"
+          printf_t " Up-to-date" "" "" "after" " ${file} ✅"
         done
       else
         printf_t "Update canceled."
         break
       fi
-    printf_t "All files are updated, press CTRL + C to stop and run the code to apply."
-    sleep 1
+    printf_t "All files are updated, press CTRL + C to stop and run the code to apply." 
+    sleep 3
+    break
   else
     printf_t "All files are updated."
     sleep 1

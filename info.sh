@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="Mod author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.9.4" # to change the version number every time has an update !
+    versionNum="3.9.5" # to change the version number every time has an update !
 
 for i in $colors; do
 clear
@@ -118,8 +118,8 @@ time_exit() {
     # Function to monitor a background process and terminate it if it exceeds a specified timeout.
     (
         # Get the PID of the last background command
-        TEFPID
-        TELOOP
+        local TEFPID
+        local TELOOP
         TEFPID=$(echo "$!" | grep -o -E '([0-9]{2,6})')
         # Loop for the specified number of seconds, counting down
         # shellcheck disable=SC2034
