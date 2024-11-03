@@ -279,7 +279,12 @@ if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = '-ish' ]; then
 fi
 
 script_slogan
-printf "✅ ${BLACK_CYAN}Updated scripts!${COLOR_RESET}\n To execute run command: ${GOLD_BLACK}./twm/play.sh${COLOR_RESET}\n       For coliseum run: ${GOLD_BLACK}./twm/play.sh -cl${COLOR_RESET}\n           For cave run: ${GOLD_BLACK}./twm/play.sh -cv${COLOR_RESET}\n"
+printf "✅ ${BLACK_CYAN}Updated scripts!${COLOR_RESET}\n\
+To execute, you can use the shortcut command: ${GOLD_BLACK}play-twm${COLOR_RESET}\n\
+Or, alternatively, run: ${GOLD_BLACK}./twm/play.sh${COLOR_RESET}\n\
+       For coliseum, use: ${GOLD_BLACK}play-twm -cl${COLOR_RESET} or ${GOLD_BLACK}./twm/play.sh -cl${COLOR_RESET}\n\
+           For cave, use: ${GOLD_BLACK}play-twm -cv${COLOR_RESET} or ${GOLD_BLACK}./twm/play.sh -cv${COLOR_RESET}\n"
+
 # shellcheck disable=SC2009
 tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/play.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
 until [ -z "$tipidf" ]; do
