@@ -214,13 +214,13 @@ else
 fi
 
 check_if_exists() {
-  local config_file="$1"
-  grep -q 'play-twm' "$config_file" 2>/dev/null
+  local_config_file="$1"
+  grep -q 'play-twm' "$local_config_file" 2>/dev/null
 }
 
 shortcut_set(){
   # Define a função play-twm e o comando a ser adicionado
-  function_definition='play-twm() { /usr/games/play.sh "$@"; }'
+  function_definition='play-twm() { $HOME/twm/play.sh "$@"; }'
  # Função para verificar se o atalho já está configurado
 
 # Detecta o sistema operacional e adiciona o comando no arquivo correto
