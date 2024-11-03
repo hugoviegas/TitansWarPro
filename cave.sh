@@ -129,5 +129,5 @@ cave_routine() {
 
     checkQuest 5 end
 
-    echo_t "Cave" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n\n"  
+    echo_t "Cave" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"  
 }
