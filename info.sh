@@ -55,8 +55,8 @@ printf "\033[1;38;5;${i}m
 ██║     ██║  ██║╚██████╔╝
 ╚═╝     ╚═╝  ╚═╝ ╚═════╝ 
 "
-printf_t "Mod author: " "\033[1;38;5;${i}m" "${author}\n\033[02m"
-printf_t "Verion: " "" "${versionNum}${COLOR_RESET}\n"
+printf "\033[1;38;5;${i}mMod author: ${author}\n\033[02m"
+printf "Verion: ${versionNum}${COLOR_RESET}\n"
 sleep 0.2s
 done
 }
