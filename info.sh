@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.9" # to change the version number every time has an update !
+    versionNum="3.9" # to change the version number every time has an update !!!!!!!!!!!!
 
 for i in $colors; do
 clear
@@ -56,7 +56,7 @@ printf "\033[1;38;5;${i}m
 ╚═╝     ╚═╝  ╚═╝ ╚═════╝ 
 "
 printf "\033[1;38;5;${i}mMod author: ${author}\n\033[02m"
-printf "Verion: ${versionNum}${COLOR_RESET}\n"
+printf "Version: ${versionNum}${COLOR_RESET}\n"
 sleep 0.2s
 done
 }
@@ -204,9 +204,9 @@ messages_info() {
      if [ ! -e "$local_TRAIN" ] || find "$local_TRAIN" -mmin +30 >/dev/null 2>&1; then
         hpmp -fix
     fi
-     printf "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}\n" >> "$TMP"/msg_file
+     echo -e "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}" >> "$TMP"/msg_file
      # sed :a;N;s/\n//g;ta |
-     printf "${GREENb_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' "$TMP"/info_file | sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}\n" >>"$TMP"/msg_file
+     echo -e "${GREENb_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' "$TMP"/info_file | sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}" >>"$TMP"/msg_file
 }
 
 player_stats() {
@@ -224,8 +224,7 @@ player_stats() {
 
     # Trim whitespace and ensure that STRENGTH only contains numbers
     PLAYER_STRENGTH=$(echo "$STRENGTH" | xargs)
-    PLAYER_STRENGTH=$(echo "$PLAYER_STRENGTH" | sed 's/[^0-9]//g')
-
+    PLAYER_STRENGTH=${PLAYER_STRENGTH//[^0-9]/}
 
     echo "$PLAYER_STRENGTH"
 }

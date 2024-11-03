@@ -136,7 +136,7 @@ clanDungeon() {
       fetch_page "${CLANDUNGEON}"
       local count 
       count=$((count + 1))
-      echo_t "  Attacking monster " "" " ${count} " "after" "⚔️"
+      echo_t "  Attacking monster " "" "" "after" "${count} ⚔️"
       local CLANDUNGEON
       CLANDUNGEON=$(grep -o -E '/clandungeon/(attack/[?][r][=][0-9]+|[?]close)' "$TMP"/SRC | head -n 1)
     done
@@ -170,6 +170,7 @@ clanElixirQuest() {
     sleep 1s
     click=$(grep -o -E "/lab/alchemy/$i/makePotion[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p')
     fetch_page "$click"
+    sleep 2s
     # Finalize the quest
     checkQuest 7 end
   fi
@@ -197,18 +198,20 @@ clanMerchantQuest() {
         echo_t " Buying Grass" "" "" "after" "🍃"
     esac
     fetch_page "$click"
+    sleep 3s
     click=$(grep -o -E "/coliseum/merchant/$i/startMaking[?]r=[0-9]+&ref=lab" "$TMP"/SRC | sed -n '1p')
     fetch_page "$click"
+    sleep 3s
     click=$(grep -o -E "/coliseum/merchant/$i/startMaking[?]r=[0-9]+&ref=lab" "$TMP"/SRC | sed -n '1p')
     fetch_page "$click"
-    sleep 1s
+    sleep 3s
     checkQuest 8 end
   fi
 }
 
 clanQuests() {
   #echo -e "${GOLD_BLACK}Clan Missions ${COLOR_RESET}"
-  printf "${GOLD_BLACK}" && printf_t "Clan missions " && echo -e "🔱🎯${COLOR_RESET}\n"
+  echo_t "Clan missions" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "🔱🎯"
     if checkQuest 7 apply; then
     clanElixirQuest
     fi
@@ -221,5 +224,5 @@ clanQuests() {
     if checkQuest 1 apply || checkQuest 2 apply; then
     league_play
     fi
-    printf "${GREEN_BLACK}" && printf_t "Clan missions done " && echo -e "✅${COLOR_RESET}\n"
+  echo_t "Clan missions done" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅"
 }
