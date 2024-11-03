@@ -183,9 +183,6 @@ sync_func() {
   chmod +x "${SHARE_DIR}"/*.sh  # Make all scripts executable
 }
 
-# Start the sync process
-sync_func
-
 # Merge function handling
 sync_func_other() {
   SCRIPTS="requeriments.sh svproxy.sh loginlogoff.sh crono.sh check.sh run.sh clanid.sh allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh clancoliseum.sh clandungeon.sh clanfight.sh coliseum.sh flagfight.sh function.sh king.sh language.sh league.sh specialevent.sh trade.sh undying.sh update_check.sh"
@@ -213,11 +210,73 @@ sync_func_other() {
   sync_func
 #fi
 
-echo 'play-twm() { /usr/share/twm-library/play.sh "$@" ; }' >> ~/.bashrc
-echo 'export -f play-twm' >> ~/.bashrc  # Para garantir que a função esteja disponível em subshells
+shortcut_set(){
+  # Define a função play-twm e o comando a ser adicionado
+  function_definition='play-twm() { /usr/games/play.sh "$@"; }'
 
-# Carrega as novas configurações
-source ~/.bashrc
+  # Detecta o sistema operacional e adiciona o comando no arquivo correto
+  case "$(uname)" in
+      "Linux")
+          # Verifica a distribuição e o shell em uso
+          if grep -qiE 'debian|ubuntu|mint' /etc/os-release; then
+              echo "$function_definition" >> ~/.bashrc
+              echo 'export -f play-twm' >> ~/.bashrc
+              source ~/.bashrc
+              config_file="~/.bashrc"
+          
+          elif grep -qiE 'arch|manjaro' /etc/os-release; then
+              echo "$function_definition" >> ~/.bashrc
+              echo 'export -f play-twm' >> ~/.bashrc
+              source ~/.bashrc
+              config_file="~/.bashrc"
+
+          elif grep -qi 'fedora' /etc/os-release; then
+              echo "$function_definition" >> ~/.bashrc
+              echo 'export -f play-twm' >> ~/.bashrc
+              source ~/.bashrc
+              config_file="~/.bashrc"
+
+          elif grep -qi 'termux' /etc/os-release; then
+              # Adiciona no .bashrc do Termux
+              echo "$function_definition" >> ~/.bashrc
+              echo 'export -f play-twm' >> ~/.bashrc
+              source ~/.bashrc
+              config_file="~/.bashrc"
+              
+          elif [ "$SHELL" = "/bin/ash" ]; then
+              # Configuração para sistemas que usam 'sh'
+              echo "$function_definition" >> ~/.profile
+              echo 'export -f play-twm' >> ~/.profile
+              source ~/.profile
+              config_file="~/.profile"
+
+          else
+              # Se o shell for diferente (zsh, etc.), tenta adicionar no .zshrc
+              if [ -n "$ZSH_VERSION" ]; then
+                  echo "$function_definition" >> ~/.zshrc
+                  echo 'export -f play-twm' >> ~/.zshrc
+                  source ~/.zshrc
+                  config_file="~/.zshrc"
+              else
+                  echo "Sistema não identificado, usando ~/.bashrc por padrão."
+                  echo "$function_definition" >> ~/.bashrc
+                  echo 'export -f play-twm' >> ~/.bashrc
+                  source ~/.bashrc
+                  config_file="~/.bashrc"
+              fi
+          fi
+          ;;
+      *)
+          echo "Sistema operacional não suportado ou desconhecido."
+          exit 1
+          ;;
+  esac
+
+  # Mensagem final com o arquivo de configuração usado
+echo "Atalho 'play-twm' configurado com sucesso em $config_file!"
+
+}
+shortcut_set
 
 # Check if running in iSH environment and modify script shebang accordingly
 APPISH=$(uname -a | grep -o "\-ish")
