@@ -20,15 +20,17 @@
       chmod +x "$HOME/twm/twm.sh"  # Ensure twm.sh is executable
 
       if echo "$RUN" | grep -q -E '[-]cl'; then
-        $HOME/twm/twm.sh  # Run in clan mode
+      echo '-cl' > "$HOME/twm/runmode_file"  # Update run mode to coliseum
+        "$HOME"/twm/twm.sh -cl  # Run in clan mode
       elif echo "$RUN" | grep -q -E '[-]cv'; then
-        $HOME/twm/twm.sh -cv  # Run in cave mode
+      echo '-cv' > "$HOME/twm/runmode_file"  # Update run mode to cave
+        "$HOME"/twm/twm.sh -cv  # Run in cave mode
       elif echo "$RUN" | grep -q -E '[-]boot'; then
         echo '-boot' > "$HOME/twm/runmode_file"  # Update run mode to boot
-        $HOME/twm/twm.sh -boot  # Run in boot mode
+        "$HOME"/twm/twm.sh -boot  # Run in boot mode
       else
         echo '-boot' > "$HOME/twm/runmode_file"  # Default to boot mode if no specific mode is set
-        $HOME/twm/twm.sh -boot  # Run in boot mode
+        "$HOME"/twm/twm.sh -boot  # Run in boot mode
       fi
     }
 

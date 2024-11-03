@@ -79,19 +79,7 @@ coliseum_fight() {
             HLHP=$(awk -v ush="$(cat "$full_ram")" -v hper="$HPER" 'BEGIN { printf "%.0f", ush * hper / 100 }')
             if grep -q -o '/dodge/' "$src_ram"; then # Exibe batalha se houver link de esquiva...
                 printf "\n     🤺‍ "
-                w3m -dump -T text/html "$src_ram" | 
-                head -n 18 |
-                sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{2,5\}\)\([0-9]\{2\}\):\([0-9]\{2\)/s//\♥️\2 ⏰\3:\4/;
-                    s,\[0\]\ ,\🔴,g;
-                    s,\[1\]\ ,\🔵,g;
-                    s,\[stone\],\ \n🪨,;
-                    s,\[herb\],\ 🌿,;
-                    s,\[grass\],\ 🌿,g;
-                    s,\[potio\],\ 💊,;
-                    s,\ \[health\]\ ,\ 🧡,;
-                    s,\ \[icon\]\ ,\ 🐾,g;
-                    s,\[rip\],\ 💀,g'
-
+                w3m -dump -T text/html "$src_ram" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{2,5\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\]\ ,\🔴,g;s,\[1\]\ ,\🔵,g;s,\[stone\],\ \n🪨,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\],\ 💀,g'
                 #    time_exit 17
             else #...exibiu || aguarda ou finaliza...
                 if grep -q -o '?end_fight=true' "$src_ram"; then # aguarda como expectador...
@@ -101,19 +89,7 @@ coliseum_fight() {
                         ) </dev/null &>/dev/null &
                         time_exit 17
                         printf "\n     🤺‍ "
-                        w3m -dump -T text/html "$src_ram" | 
-                        head -n 18 |
-                        sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{2,5\}\)\([0-9]\{2\}\):\([0-9]\{2\)/s//\♥️\2 ⏰\3:\4/;
-                            s,\[0\]\ ,\🔴,g;
-                            s,\[1\]\ ,\🔵,g;
-                            s,\[stone\],\ \n🪨,;
-                            s,\[herb\],\ 🌿,;
-                            s,\[grass\],\ 🌿,g;
-                            s,\[potio\],\ 💊,;
-                            s,\ \[health\]\ ,\ 🧡,;
-                            s,\ \[icon\]\ ,\ 🐾,g;
-                            s,\[rip\],\ 💀,g'
-
+                        w3m -dump -T text/html "$src_ram" | head -n 18 | sed '0,/^\([a-z]\{2\}\)[[:space:]]\([0-9]\{2,5\}\)\([0-9]\{2\}\):\([0-9]\{2\}\)/s//\♥️\2 ⏰\3:\4/;s,\[0\]\ ,\🔴,g;s,\[1\]\ ,\🔵,g;s,\[stone\],\ \n🪨,;s,\[herb\],\ 🌿,;s,\[grass\],\ 🌿,g;s,\[potio\],\ 💊,;s,\ \[health\]\ ,\ 🧡,;s,\ \[icon\]\ ,\ 🐾,g;s,\[rip\],\ 💀,g'
                         #      time_exit 17
                     fi #...passou 300s
                 else   #...cessa espera || finaliza...
@@ -157,14 +133,7 @@ coliseum_fight() {
         last_atk=$now    # Atualizar o tempo do último ataque
 
     # Verificar se pode atacar aleatoriamente
-    elif 
-        awk -v latk="$time_since_last_atk" -v atktime="$LA" 'BEGIN { exit !(latk != atktime) }' &&
-        ! grep -q -o 'txt smpl grey' "$src_ram" &&
-        awk -v rhp="$RHP" -v enh="$ENH" 'BEGIN { exit !(rhp < enh) }' ||
-        awk -v latk="$time_since_last_atk" -v atktime="$LA" 'BEGIN { exit !(latk != atktime) }' &&
-        ! grep -q -o 'txt smpl grey' "$src_ram" &&
-        grep -q -o "$USER" allies.txt;
-    then
+    elif awk -v latk="$time_since_last_atk" -v atktime="$LA" 'BEGIN { exit !(latk != atktime) }' && ! grep -q -o 'txt smpl grey' "$src_ram" && awk -v rhp="$RHP" -v enh="$ENH" 'BEGIN { exit !(rhp < enh) }' || awk -v latk="$time_since_last_atk" -v atktime="$LA" 'BEGIN { exit !(latk != atktime) }' && ! grep -q -o 'txt smpl grey' "$src_ram" && grep -q -o "$USER" allies.txt; then
         (
             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$ATKRND" -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
         ) </dev/null &>/dev/null &
@@ -197,7 +166,7 @@ done
         #/end
         func_unset
         if awk -v smodplay="$RUN" -v rmodplay="-cl" 'BEGIN { exit !(smodplay != rmodplay) }'; then printf "\nYou can run ./twm/play.sh -cl\n"; fi
-        echo_t "Battle's over!" "${RED_BLACK}" "${COLOR_RESET}" "after" "⚔️\n"
+        echo_t "The battle is over!" "${RED_BLACK}" "${COLOR_RESET}" "after" "⚔️\n"
     else
         # shellcheck disable=SC2154
         echo_t "It was not possible to start the battle at this time." "${WHITEb_BLACK}" "${COLOR_RESET}"
