@@ -250,12 +250,12 @@ case "$(uname)" in
 
         # Verifica se a função já está presente no arquivo de configuração
         if check_if_exists "$config_file"; then
-            echo "O atalho 'play-twm' já está configurado em $config_file. Pulando a configuração."
+            #echo "O atalho 'play-twm' já está configurado em $config_file. Pulando a configuração."
         else
             # Adiciona a função e exporta
             echo "$function_definition" >> "$config_file"
             echo 'export -f play-twm' >> "$config_file"
-            echo "Atalho 'play-twm' configurado com sucesso em $config_file!"
+            #echo "Atalho 'play-twm' configurado com sucesso em $config_file!"
             # Recarrega o arquivo de configuração para que a função fique disponível imediatamente
             source "$config_file"
         fi
