@@ -214,8 +214,8 @@ else
 fi
 
 check_if_exists() {
-  local_config_file="$1"
-  grep -q 'play-twm' "$local_config_file" 2>/dev/null
+  config_file="$1"
+  grep -q 'play-twm' "$config_file" 2>/dev/null
 }
 
 shortcut_set(){
@@ -258,10 +258,11 @@ case "$(uname)" in
             # Adiciona a função e exporta
             echo "$function_definition" >> "$config_file"
             echo 'export -f play-twm' >> "$config_file"
-            #echo "Atalho 'play-twm' configurado com sucesso em $config_file!"
+            echo "Atalho 'play-twm' configurado com sucesso em $config_file!"
             # Recarrega o arquivo de configuração para que a função fique disponível imediatamente
             # shellcheck disable=SC1090
             . "$config_file"
+            source "${config_file}"
         fi
         ;;
     *)
