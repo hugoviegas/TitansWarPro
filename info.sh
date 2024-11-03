@@ -26,9 +26,9 @@ colors() {
 
 script_slogan() {
     colors="10 8 2 1 3 6 7"
-    author="author: Hugo Viegas"
+    author="Mod author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.9.3" # to change the version number every time has an update !
+    versionNum="3.9.4" # to change the version number every time has an update !
 
 for i in $colors; do
 clear
@@ -78,39 +78,39 @@ language_setup
 
 # Função para imprimir com printf, usando tradução e cores
 printf_t() {
-  local text="$1"
-  local color_start="$2"
-  local color_end="$3"
-  local emoji_position="$4"  # "before" ou "after"
-  local emoji="$5"
+  local_text="$1"
+  local_color_start="$2"
+  local_color_end="$3"
+  local_emoji_position="$4"  # "before" ou "after"
+  local_emoji="$5"
 
   # Traduz o texto
-  local translated_text="$(translate_and_cache "$LANGUAGE" "$text")"
+  local_translated_text="$(translate_and_cache "$LANGUAGE" "$local_text")"
 
   # Adiciona o emoji conforme a posição especificada
-  if [[ "$emoji_position" == "before" ]]; then
-    printf "${color_start}%s %s${color_end}\n" "$emoji" "$translated_text"
+  if [ "$local_emoji_position" = "before" ]; then
+    printf "${local_color_start}%s %s${local_color_end}\n" "$local_emoji" "$local_translated_text"
   else
-    printf "${color_start}%s %s${color_end}\n" "$translated_text" "$emoji"
+    printf "${local_color_start}%s %s${local_color_end}\n" "$local_translated_text" "$local_emoji"
   fi
 }
 
 # Função para imprimir com echo, usando tradução e cores
 echo_t() {
-  local text="$1"
-  local color_start="$2"
-  local color_end="$3"
-  local emoji_position="$4"  # "before" ou "after"
-  local emoji="$5"
+  local_text="$1"
+  local_color_start="$2"
+  local_color_end="$3"
+  local_emoji_position="$4"  # "before" ou "after"
+  local_emoji="$5"
 
   # Traduz o texto
-  local translated_text="$(translate_and_cache "$LANGUAGE" "$text")"
+  local_translated_text="$(translate_and_cache "$LANGUAGE" "$local_text")"
 
   # Adiciona o emoji conforme a posição especificada
-  if [[ "$emoji_position" == "before" ]]; then
-    echo -ne "${color_start}${emoji} ${translated_text}${color_end}"
+  if [ "$local_emoji_position" = "before" ]; then
+    echo -ne "${local_color_start}${local_emoji} ${local_translated_text}${local_color_end}"
   else
-    echo -e "${color_start}${translated_text} ${emoji}${color_end}"
+    echo -e "${local_color_start}${local_translated_text} ${local_emoji}${local_color_end}"
   fi
 }
 
@@ -118,8 +118,8 @@ time_exit() {
     # Function to monitor a background process and terminate it if it exceeds a specified timeout.
     (
         # Get the PID of the last background command
-        local TEFPID
-        local TELOOP
+        TEFPID
+        TELOOP
         TEFPID=$(echo "$!" | grep -o -E '([0-9]{2,6})')
         # Loop for the specified number of seconds, counting down
         # shellcheck disable=SC2034
@@ -133,8 +133,8 @@ time_exit() {
         done
 
         # If we reach this point, the timeout has been exceeded
-        kill -s PIPE "$TEFPID" &>/dev/null
-        kill -15 "$TEFPID" &>/dev/null
+        kill -s PIPE "$TEFPID" > /dev/null 2>&1
+        kill -15 "$TEFPID" > /dev/null 2>&1
         
         # Notify the user that the command execution was interrupted
         #printf "${WHITEb_BLACK}%s${COLOR_RESET}\n" "$(translate_and_cache "$LANGUAGE" "Command execution was interrupted!")"
@@ -150,7 +150,7 @@ fetch_page() {
 
     (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${relative_url}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$output_file"
-    ) </dev/null &>/dev/null  # Run in background and suppress output
+    ) </dev/null > /dev/null 2>&1  # Run in background and suppress output
 
     time_exit 17  # Wait for the process to finish
 }
@@ -163,7 +163,7 @@ hpmp() {
         # Fetch the train page to get HP and MP values
         (
             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 userAgent.txt)" >"$TMP"/TRAIN
-        ) </dev/null &>/dev/null &
+        ) </dev/null > /dev/null 2>&1 &
         time_exit 20
         #/Fixed HP and MP.
         #/Needs to run -fix at least once before
@@ -185,27 +185,27 @@ messages_info() {
      printf " --------- 📩 MAIL 📩 ---------------\n" >> "$TMP"/msg_file
     (
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/mail" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tee "$TMP"/info_file | sed -n '/[|]\ mp/,/\[arrow\]/p' | sed '1,1d;$d;6q' >> "$TMP"/msg_file
-    ) </dev/null &>/dev/null &
+    ) </dev/null > /dev/null 2>&1 &
     time_exit 17
      printf " --------- 💬 CHAT TITANS 🔱 ---------\n" >> "$TMP"/msg_file
     (
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/titans/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -n '/\(\»\)/,/\[chat\]/p' | sed '$d;6q' >> "$TMP"/msg_file
-    ) </dev/null &>/dev/null &
+    ) </dev/null > /dev/null 2>&1 &
     time_exit 17
      printf " --------- 💬 CHAT CLAN 🛡️ -----------\n" >> "$TMP"/msg_file
     (
           w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/clan/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -n '/\[[^a-z]\]/,/\[chat\]/p' | sed '$d;8q' >> "$TMP"/msg_file
-    ) </dev/null &>/dev/null &
+    ) </dev/null > /dev/null 2>&1 &
     time_exit 17
      sed -i 's/\[0\]/🔴/g;s/\[0-off\]/⭕/g;s/\[1\]/🔵/g;s/\[1-off\]/🔘/g;s/\[premium\]/👑/g;s/\[level\]/🔼/g;s/\[mail\]/📩/g;s/\[bot\]/⚫/g' "$TMP"/msg_file
      printf " --------------------------------------\n" >> "$TMP"/msg_file
-    local TRAIN="$HOME.${UR}/TRAIN"
-     if [ ! -e "$TRAIN" ] || find "$TRAIN" -mmin +30 >/dev/null 2>&1; then
+    local_TRAIN="$HOME.${UR}/TRAIN"
+     if [ ! -e "$local_TRAIN" ] || find "$local_TRAIN" -mmin +30 >/dev/null 2>&1; then
         hpmp -fix
     fi
-     echo -e "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}" >> "$TMP"/msg_file
+     printf "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}" >> "$TMP"/msg_file
      # sed :a;N;s/\n//g;ta |
-     echo -e "${GREENb_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' "$TMP"/info_file | sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}" >>"$TMP"/msg_file
+     printf "${GREENb_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' "$TMP"/info_file | sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}" >>"$TMP"/msg_file
 }
 
 player_stats() {
@@ -223,7 +223,8 @@ player_stats() {
 
     # Trim whitespace and ensure that STRENGTH only contains numbers
     PLAYER_STRENGTH=$(echo "$STRENGTH" | xargs)
-    PLAYER_STRENGTH=${PLAYER_STRENGTH//[^0-9]/}
+    PLAYER_STRENGTH=$(echo "$PLAYER_STRENGTH" | sed 's/[^0-9]//g')
+
 
     echo "$PLAYER_STRENGTH"
 }

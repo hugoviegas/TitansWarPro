@@ -1,5 +1,12 @@
 # shellcheck disable=SC2155
 # shellcheck disable=SC2154
+
+bottom_info(){
+    printf "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}" >> "$TMP"/bottom_file
+    # sed :a;N;s/\n//g;ta |
+    printf "${GREENb_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' "$TMP"/info_file | sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}" >>"$TMP"/bottom_file
+    cat "$TMP/bottom_file"
+}
 cave_start() {
   clan_id
 
@@ -17,6 +24,7 @@ cave_start() {
       # Break the loop if speedUp is found and count is less than 8
       if [[ "$RESULT" == "speedUp" && "$count" -ge 20 ]]; then
         echo " Cave limit reached ⚡"
+        "$HOME"/twm/twm.sh -boot  # Run in boot mode
         return 1
       fi
 
@@ -31,15 +39,19 @@ cave_start() {
             down*)
                 echo_t "New search" "" "" "after" "🔍"
                 ((count++))  # Incrementar contador
+                bottom_info
             ;;
             gather*)
                 echo_t "Start mining" "" "" "after" "⛏️"
+                bottom_info
             ;;
             runaway*)
                 echo_t "Run away" "" "" "after" "💨"
+                bottom_info
             ;;
             speedUp*)
                 echo_t "Speed up mining" "" "" "after" "⚡"
+                bottom_info
             ;;
          esac
           ;;
@@ -47,12 +59,12 @@ cave_start() {
 
       # Fetch new cave data
       fetch_page "/cave/"
-
-    if awk -v smodplay="$RUN" -v rmodplay="-cv" 'BEGIN { exit !(smodplay != rmodplay) }'; then
-      echo -e "\nYou can run ./twm/play.sh -cv"
-    fi
-    unset ACCESS1 ACCESS2 ACTION DOWN MEGA
-  done
+    
+        if awk -v smodplay="$RUN" -v rmodplay="-cv" 'BEGIN { exit !(smodplay != rmodplay) }'; then
+        echo -e "\nYou can run ./twm/play.sh -cv"
+        fi
+        unset ACCESS1 ACCESS2 ACTION DOWN MEGA
+    done
   echo -e "${GREEN_BLACK}Cave Done ✅${COLOR_RESET}\n"
   echo "-boot" > "$HOME/twm/runmode_file"  # Change the run mode and save to a file
   restart_script
@@ -96,7 +108,7 @@ cave_routine() {
         case $RESULT in
             down*)
                 echo_t "New search" "" "" "after" "🔍"
-                ((count++))  # Incrementar contador
+                count=$((count+1))  # Incrementar contador
             ;;
             gather*)
                 echo_t "Start mining" "" "" "after" "⛏️"

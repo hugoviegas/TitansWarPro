@@ -1,3 +1,4 @@
+#
 #/clanfight/dodge/?r=0
 #/clanfight/attack/?r=0
 #/clanfight/attackrandom/?r=0

@@ -73,13 +73,13 @@ func_sleep() {
     fi
 
     # Check if the current minute is between 25 and 29 inclusive
-    if [ "$MIN" -ge 25 ] && [ "$MIN" -le 29 ]; then
+    if [ "$MIN" -ge 29 ] && [ "$MIN" -le 30 ]; then
         reset; clear  # Clear the terminal screen
-        i=10  # Set wait time to 10 seconds
+        i=15  # Set wait time to 15 seconds
         func_cat  # Call func_cat to display information
     else
         reset; clear  # Clear the terminal screen for any other minute value
-        i=45  # Set wait time to 45 seconds
+        i=60  # Set wait time to 60 seconds
         func_cat  # Call func_cat to display information
     fi
 }
@@ -93,8 +93,8 @@ start() {
     clanDungeon      # Execute clan dungeon function 
     clan_statue      # Check the clan statue
     check_missions   # Check for missions 
-    #specialEvent     # Check the current Event
-    #clanQuests       # Check the clan missions opened
+    specialEvent     # Check the current Event
+    clanQuests       # Check the clan missions opened
     messages_info    # Display messages information 
     func_crono       # Display current time again 
     func_sleep       # Call sleep function to manage timing 

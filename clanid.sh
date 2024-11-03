@@ -24,7 +24,7 @@ checkQuest() {
 
   if [ -n "${CLD}" ]; then
     fetch_page "/clan/${CLD}/quest/"
-    fetch_page "/clan/${CLD}/quest/" "$TMP/debug_output.txt"
+    #fetch_page "/clan/${CLD}/quest/" "$TMP/debug_output.txt"
     
     # Dependendo do valor de $action, alterar os padrões de busca do grep
     if [ "$action" == "apply" ]; then
@@ -39,15 +39,15 @@ checkQuest() {
     # Verificar se encontrou o botão correto
     if [ -n "$click" ]; then
         fetch_page "/clan/${CLD}$click"
-        echo_t " Starting clan mission: " "" " ${quest_id}" "after" "🔎"
+        echo_t " Starting clan mission: " "" "" "after" " ${quest_id} 🔎"
         return 0 # Sucesso se o botão foi encontrado
     else
-        echo_t " Can not start the clan mission:" "" " ${quest_id}" "after" "🔎"
+        echo_t " Can not start the clan mission:" "" "" "after" " ${quest_id} 🔎"
         return 1 # Não encontrou o botão
     fi
     else
         fetch_page "/clanrating/wantedToClan"
-        echo_t " Can not find the clan mission: " "" " ${quest_id}" "after" "❌🔎"
+        echo_t " Can not find the clan mission: " "" "" "after" " ${quest_id} ❌🔎"
         return 1 # Falha se CLD estiver vazio
     fi
 }
