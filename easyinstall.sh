@@ -212,6 +212,66 @@ if echo "$@" | grep -q 'merge'; then
 else
   sync_func
 fi
+
+check_if_exists() {
+  local config_file="$1"
+  grep -q 'play-twm' "$config_file" 2>/dev/null
+}
+
+shortcut_set(){
+  # Define a função play-twm e o comando a ser adicionado
+  function_definition='play-twm() { /usr/games/play.sh "$@"; }'
+ # Função para verificar se o atalho já está configurado
+
+# Detecta o sistema operacional e adiciona o comando no arquivo correto
+case "$(uname)" in
+    "Linux")
+        # Verifica a distribuição e o shell em uso
+        if grep -qiE 'debian|ubuntu|mint' /etc/os-release; then
+            config_file="$HOME/.bashrc"
+        
+        elif grep -qiE 'arch|manjaro' /etc/os-release; then
+            config_file="$HOME/.bashrc"
+
+        elif grep -qi 'fedora' /etc/os-release; then
+            config_file="$HOME/.bashrc"
+
+        elif grep -qi 'termux' /etc/os-release; then
+            config_file="$HOME/.bashrc"
+            
+        elif [ "$SHELL" = "/bin/ash" ]; then
+            config_file="$HOME/.profile"
+
+        else
+            # Se o shell for diferente (zsh, etc.), tenta adicionar no .zshrc
+            if [ -n "$ZSH_VERSION" ]; then
+                config_file="$HOME/.zshrc"
+            else
+                config_file="$HOME/.bashrc"
+            fi
+        fi
+
+        # Verifica se a função já está presente no arquivo de configuração
+        if check_if_exists "$config_file"; then
+            echo "O atalho 'play-twm' já está configurado em $config_file. Pulando a configuração."
+        else
+            # Adiciona a função e exporta
+            echo "$function_definition" >> "$config_file"
+            echo 'export -f play-twm' >> "$config_file"
+            #echo "Atalho 'play-twm' configurado com sucesso em $config_file!"
+            # Recarrega o arquivo de configuração para que a função fique disponível imediatamente
+            # shellcheck disable=SC1090
+            . "$config_file"
+        fi
+        ;;
+    *)
+        echo "Sistema operacional não suportado ou desconhecido."
+        exit 1
+        ;;
+esac
+}
+shortcut_set
+
 APPISH=$(uname -a | grep -o "\-ish")
 if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = '-ish' ]; then
   sed -i 's,#!/bin/bash,#!/bin/sh,g' "$HOME"/twm/*.sh
