@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="Mod author: Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.9.5" # to change the version number every time has an update !!!!!!!!!!!!!!!
+    versionNum="3.9" # to change the version number every time has an update !
 
 for i in $colors; do
 clear
@@ -203,9 +203,9 @@ messages_info() {
      if [ ! -e "$local_TRAIN" ] || find "$local_TRAIN" -mmin +30 >/dev/null 2>&1; then
         hpmp -fix
     fi
-     printf "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}" >> "$TMP"/msg_file
+     printf "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}\n" >> "$TMP"/msg_file
      # sed :a;N;s/\n//g;ta |
-     printf "${GREENb_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' "$TMP"/info_file | sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}" >>"$TMP"/msg_file
+     printf "${GREENb_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' "$TMP"/info_file | sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}\n" >>"$TMP"/msg_file
 }
 
 player_stats() {
