@@ -12,10 +12,10 @@ specialEvent() {
     # Check if a link was found
     if [ -n "$event_link" ]; then
         EVENT=$(echo "$event_link" | cut -d'/' -f2)
-        #echo "🎯 Current Event Link: $event_link, Name: $EVENT"
+        echo "🎯 Current Event Link: $event_link, Name: $EVENT"
     fi
   fi
-
+	echo "${EVENT}"
   case $EVENT in
     (questrnd)
       fetch_page "$event_link"
@@ -29,6 +29,27 @@ specialEvent() {
       echo " "
       return 1  # Not found
       fi
+      ;;
+    (fault)
+        fetch_page "${event_link}"
+        echo_t "Fault event fault" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "😈"
+        #click=$(grep -o -E "/fault/?group=2/\?r=[0-9]+" "$TMP"/SRC | sed -n '1p')
+        click=$(grep -o -E "/fault/attack/\?r=[0-9]+" "$TMP"/SRC | sed -n '1p')
+		    #echo "${click}"
+        fetch_page "${click}"
+        sleep 1s
+        click=$(grep -o -E "/fault/attack/\?r=[0-9]+" "$TMP"/SRC | sed -n '1p')
+        while true; do
+          if [ -n "${click}" ]; then
+            fetch_page "${click}"
+            # Atualiza o valor de click após a nova página ser carregada
+            click=$(grep -o -E "/fault/attack/\?r=[0-9]+" "$TMP"/SRC | sed -n '1p')
+            echo_t " Attacking monster" "" "" "after" "⚔️"
+          else
+            echo_t "Event fault" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "😈✅"
+            break
+          fi
+        done
       ;;
       *)
         echo " "

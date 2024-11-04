@@ -1,4 +1,5 @@
 #!/bin/sh
+
 #create fold twm if does not exist
 mkdir -p ~/twm
 
