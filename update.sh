@@ -11,6 +11,9 @@ GOLD_BLACK='\033[33m'
 CYAN_BLACK='\033[36m'
 COLOR_RESET='\033[00m'
 
+version=""
+# Define the server URL based on selected version
+SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/${version}/"
 # Check if a version number is provided as an argument
 if [ $# -eq 1 ]; then
     case $1 in
@@ -48,7 +51,8 @@ else
             ;;
         3)
             VERSION="Main"
-            #SOURCE_CODE="sharesourcecode/TitansWarMacro"
+            # Define the server URL based on selected version
+            SERVER="https://codeberg.org/ueliton/TitansWarMacro/src/branch/master/"
             rm -rf ~/twm
             ;;
         *)
@@ -73,9 +77,6 @@ SCRIPTS="easyinstall.sh info.sh"
 
 # Remove any existing scripts in both home and current directories
 rm -rf "${HOME}*/$SCRIPTS" "$SCRIPTS" 2>/dev/null
-
-# Define the server URL based on selected version
-SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/${version}/"
 
 # Count the number of scripts to download
 NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
