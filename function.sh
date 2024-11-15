@@ -67,8 +67,8 @@ load_config() {
         echo "Arquivo de configuração não encontrado. Criando config.cfg com valores padrão."
         
         # Define valores padrão
-        FUNC_rewards="s"
-        FUNC_elixir="s"
+        FUNC_check_rewards="s"
+        FUNC_use_elixir="s"
         FUNC_coliseum="n"
         SCRIPT_PAUSED="n"
 

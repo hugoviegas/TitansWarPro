@@ -49,10 +49,10 @@ check_rewards(){
 
 apply_event() {
   # Apply to fight
-  event=("$@")  # Store arguments as an array
-  fetch_page "/$event/"
-  if grep -o -E "/$event/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC; then
-    APPLY=$(grep -o -E "/${event}/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC)
+  local event_path="${1}"  # Use primeiro argumento diretamente
+  fetch_page "/${event_path}/"
+  if grep -o -E "/${event_path}/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC; then
+    APPLY=$(grep -o -E "/${event_path}/enter(Game|Fight)/[?]r=[0-9]+" "$TMP"/SRC)
     fetch_page "$APPLY"
     echo_t "Applied for battle" "${BLACK_YELLOW}" "${COLOR_RESET}" "after" "✅\n"
   fi
