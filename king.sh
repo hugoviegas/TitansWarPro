@@ -39,7 +39,7 @@ king_fight () {
     time_exit 17
    else
     echo 1 >BREAK_LOOP
-    echo -e "${RED_BLACK}Battle over.${COLOR_RESET}\n"
+    echo_t "Battle over!" "${RED_BLACK}" "${COLOR_RESET}" "after" "⚔️\n"
     sleep 3s
    fi
   fi
@@ -115,7 +115,7 @@ king_fight () {
  unset cl_access
  func_unset
  apply_event
- echo -e "${RED_BLACK}👑King ✅${COLOR_RESET}"
+ echo_t "King of imortals" "${RED_BLACK} 👑" "${COLOR_RESET}" "after" "✅\n"
  sleep 10s
  clear
 }
@@ -130,7 +130,7 @@ king_start () {
    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/king/enterGame" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
   time_exit 17
-  echo -e "${GOLD_BLACK}👑King of the Immortals will be started...${COLOR_RESET}"
+  echo_t "King of the Immortals will be started..." "${GOLD_BLACK}" "${COLOR_RESET}" "before" "👑"
   until (case $(date +%M) in (2[5-9]) exit 1 ;; esac) ; do
    sleep 3
   done
@@ -143,7 +143,7 @@ king_start () {
   #cat "$TMP"/SRC|sed 's/href=/\n/g'|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
   printf " 👣 Entering...\n$(cat ACCESS)\n"
   #/wait
-  printf " 😴 Waiting...\n"
+  printf_t " 😴 Waiting...\n"
   cat < "$TMP"/SRC|grep -o 'king/kingatk/' >EXIT 2> /dev/null
   local BREAK=$(( $(date +%s) + 30 ))
   until [ -s "EXIT" ] || [ "$(date +%s)" -gt "$BREAK" ] ; do

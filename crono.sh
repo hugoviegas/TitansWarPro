@@ -20,19 +20,12 @@ func_cat() {
     fi
 
     cat "$TMP/msg_file"
-    printf "${WHITE_BLACK}"
- 
-    info() {
-        printf "\n"
-        # List functions defined in scripts
-        grep -o -E '[[:alpha:]]+?[_]?[[:alpha:]]+?[ ]?\() \{' ~/twm/*.sh | awk -F\: '{ print $2 }' | awk -F \( '{ print $1 }'
-        read -r -t 30  # Wait for user input for 5 seconds
-    }
-    
-    while true; do
+printf "${WHITE_BLACK}"
+
+while true; do
        
         echo_t "No battles now, waiting ${i}s" "\033[02m" "${COLOR_RESET}"
-        echo_t "Enter a command or for more info enter:" "${WHITEb_BLACK}" "info${COLOR_RESET}"
+        awk '/[[:alpha:]]+?[_]?[[:alpha:]]+?[ ]?\(\) \{/{gsub(/.*:| \(.*/, "", $0); print}' ~/twm/*.sh
 
         read -r -t "$i" cmd  # Read user command with a timeout
 
@@ -49,13 +42,16 @@ func_cat() {
         $cmd
 
         # Checa se o comando está na lista de comandos que não requerem break
-        if [[ " ${commands_no_break[@]} " =~ " ${cmd} " ]]; then
+        for no_break_cmd in "${commands_no_break[@]}"; do
+            if [[ "$cmd" =~ $no_break_cmd ]]; then
+                # Pausa breve antes de continuar o loop
+                sleep 0.5s
+                continue 2
+            fi
+        done
             # Pausa breve antes de continuar o loop
             sleep 0.5s
             continue
-        else
-            break  # Sai do loop para comandos que não estão na lista
-        fi
     done
 }
 
@@ -84,6 +80,13 @@ func_sleep() {
     fi
 }
 
+info() {
+    printf "\n"
+    # List functions defined in scripts
+    grep -o -E '[[:alpha:]]+?[_]?[[:alpha:]]+?[ ]?\(\) \{' ~/twm/*.sh | awk -F: '{ print $2 }' | awk -F \( '{ print $1 }'
+    read -r -t 30  # Wait for user input for 30 seconds
+}
+
 start() {
     arena_duel       # Start arena duel function
     career_func      # Call career-related function
@@ -93,6 +96,7 @@ start() {
     clanDungeon      # Execute clan dungeon function 
     clan_statue      # Check the clan statue
     check_missions   # Check for missions 
+    check_rewards    # Check for rewards
     specialEvent     # Check the current Event
     clanQuests       # Check the clan missions opened
     messages_info    # Display messages information 

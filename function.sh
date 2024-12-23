@@ -1,78 +1,78 @@
-# Variável global para controlar a saída dos loops
+# Global variable to control loop exits
 EXIT_CONFIG="n"
 
 update_config() {
-    local key="$1"      # Nome da configuração a ser alterada
-    local value="$2"    # Novo valor para a configuração
+    local key="$1"      # Name of the configuration to be changed
+    local value="$2"    # New value for the configuration
 
-    # Verifica se a chave existe no arquivo config.cfg
+    # Check if the key exists in the config.cfg file
     if grep -q "^${key}=" "$CONFIG_FILE"; then
-        # Atualiza o valor no config.cfg usando sed para substituição
+        # Update the value in config.cfg using sed for substitution
         sed -i "s/^${key}=.*/${key}=${value}/" "$CONFIG_FILE"
-        echo "Configuração $key atualizada para $value."
+        echo_t "Configuration $key updated to $value." "" "" "" ""
     else
-        echo "Configuração $key não encontrada no arquivo config.cfg."
-        return 1  # Retorna um erro para indicar falha
+        echo_t "Configuration $key not found in the config.cfg file." "" "" "" ""
+        return 1  # Return an error to indicate failure
     fi
 }
 
-# Função para solicitar chave e valor, e chamar update_config com validação
+# Function to request key and value, and call update_config with validation
 request_update() {
-    local key value success=1  # Inicializa success com 1 (falha)
+    local key value success=1  # Initialize success with 1 (failure)
 
     while [ "$success" -ne 0 ]; do
-        # Instruções para o usuário
-        echo -e "  Configurações do macro, lista de alterações para modificar\n Digite o comando exatamente como escrito\n 1- reliquias\n 2- elixir\n sair"
-        echo "Digite o nome da configuração que deseja alterar (ou digite ' ' ou 'sair' para sair): "
+        # Instructions for the user
+        echo_t "  Macro settings, list of changes to modify\n Type the command exactly as written\n 1- relics\n 2- elixir\n exit" "" "" "" ""
+        echo_t "Enter the name of the configuration you want to change (or type ' ' or 'exit' to exit): " "" "" "" ""
         read -r key
 
         case $key in
-            (reliquias)
-            echo "Deseja recolher as reliquias (s ou n):"
+            (1|relics)
+            echo_t "Do you want to collect the relics (y or n):" "" "" "" ""
             read -r value
             key="FUNC_rewards"
             ;;
-            (elixir)
-            echo "Deseja usar elixir antes de todos os vales? (s ou n):"
+            (2|elixir)
+            echo_t "Do you want to use elixir before all valleys? (y or n):" "" "" "" ""
             read -r value
             key="FUNC_elixir"
             ;;
-            (sair|*)
-            echo "Saindo do modo de atualização de configurações."
-            EXIT_CONFIG="s"  # Sinaliza para sair de ambos os loops
+            (3|exit|*)
+            echo_t "Exiting configuration update mode." "" "" "" ""
+            EXIT_CONFIG="s"  # Signal to exit both loops
             break
             ;;
         esac
 
-        # Chama a função de atualização de configuração e captura o status
+        # Call the configuration update function and capture the status
         update_config "$key" "$value"
         success=$?
 
-        # Verifica se houve falha e notifica o usuário
+        # Check if there was a failure and notify the user
         if [ "$success" -ne 0 ]; then
-            echo "Chave inválida. Tente novamente."
+            echo_t "Invalid key. Try again." "" "" "" ""
         else
-            echo "Configuração atualizada com sucesso!"
+            echo_t "Configuration updated successfully!" "" "" "" ""
             config
             break
         fi
     done
 }
 
-# Função para carregar as configurações do arquivo config.cfg
+# Function to load configurations from the config.cfg file
 load_config() {
     if [ -f "$CONFIG_FILE" ]; then
-        . "$CONFIG_FILE"  # Carrega o arquivo de configuração
+        . "$CONFIG_FILE"  # Load the configuration file
     else
-        echo "Arquivo de configuração não encontrado. Criando config.cfg com valores padrão."
+        echo_t "Configuration file not found. Creating config.cfg with default values." "" "" "" ""
         
-        # Define valores padrão
-        FUNC_check_rewards="s"
-        FUNC_use_elixir="s"
+        # Define default values
+        FUNC_check_rewards="y"
+        FUNC_use_elixir="y"
         FUNC_coliseum="n"
         SCRIPT_PAUSED="n"
 
-        # Escreve o arquivo config.cfg com os valores padrão
+        # Write the config.cfg file with default values
         {
             echo "FUNC_check_rewards=$FUNC_check_rewards"
             echo "FUNC_use_elixir=$FUNC_use_elixir"
@@ -83,50 +83,50 @@ load_config() {
 }
 
 config() {
-    # Carrega a configuração inicial
+    # Load the initial configuration
     CONFIG_FILE="$TMP/config.txt"
     load_config
     SCRIPT_PAUSED="s"
 
-    # Loop principal do script
+    # Main script loop
     while true; do
-        # Verifica se o script está pausado ou se foi sinalizado para sair
+        # Check if the script is paused or signaled to exit
         if [ "$SCRIPT_PAUSED" = "s" ] || [ "$EXIT_CONFIG" = "s" ]; then
-            echo "Script pausado. Aguardando reativação..."
+            echo_t "Script paused. Waiting for reactivation..." "" "" "" ""
             sleep 2
-            load_config  # Recarrega a configuração após o intervalo
+            load_config  # Reload the configuration after the interval
 
-            # Se EXIT_CONFIG estiver em "s", sai do loop principal
+            # If EXIT_CONFIG is "s", exit the main loop
             if [ "$EXIT_CONFIG" = "s" ]; then
-                echo "Saindo do modo de configuração..."
-                EXIT_CONFIG="n"  # Reseta o sinal de saída para o próximo uso
+                echo_t "Exiting configuration mode..." "" "" "" ""
+                EXIT_CONFIG="n"  # Reset the exit signal for next use
                 break
             fi
 
-            # Prompt para alterar configurações durante a execução
-            echo -e "\nDeseja alterar alguma configuração? (s/n)"
-            read -r alterar
+            # Prompt to change configurations during execution
+            echo_t "\nDo you want to change any configuration? (y/n)" "" "" "" ""
+            read -r change
         fi
 
-        if [ "$alterar" = "s" ]; then
-            # Chama a função para solicitar atualização com verificação de chave
+        if [ "$change" = "y" ]; then
+            # Call the function to request update with key verification
             request_update
 
-            # Se EXIT_CONFIG estiver em "s", sai do loop principal
+            # If EXIT_CONFIG is "s", exit the main loop
             if [ "$EXIT_CONFIG" = "s" ]; then
-                echo "Saindo do modo de configuração..."
-                EXIT_CONFIG="n"  # Reseta o sinal de saída para o próximo uso
+                echo_t "Exiting configuration mode..." "" "" "" ""
+                EXIT_CONFIG="n"  # Reset the exit signal for next use
                 break
             fi
 
-            # Recarrega as configurações após a atualização
+            # Reload the configurations after the update
             load_config
         else
             SCRIPT_PAUSED="n"
             break
         fi
 
-        # Intervalo antes de reiniciar o loop
+        # Interval before restarting the loop
         sleep 30
     done
 }
