@@ -11,7 +11,7 @@ update() {
            "check.sh" "clancoliseum.sh" "clanfight.sh" "clanid.sh" "coliseum.sh"
            "crono.sh" "function.sh" "king.sh" "language.sh" "league.sh"
            "loginlogoff.sh" "play.sh" "requeriments.sh" "run.sh" "svproxy.sh"
-           "specialevent.sh" "trade.sh" "twm.sh" "undying.sh update.sh")
+           "specialevent.sh" "trade.sh" "twm.sh" "undying.sh update.sh update_check.sh")
   NUM_SCRIPTS=${#SCRIPTS[@]}
   files_to_update=()
   cd ~/twm || exit
