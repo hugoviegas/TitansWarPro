@@ -46,7 +46,7 @@ while true; do
         printf " - $file\n"
       done
       echo_t "Do you want to update this files? (y/n)"
-      read -r choice
+      read -r -n 1 choice
       if [[ "$choice" == "s" || "$choice" == "S" || "$choice" == "y" || "$choice" == "Y" ]]; then
         for file in "${files_to_update[@]}"; do
           curl -s -L "${SERVER}${file}" -o "$HOME/twm/$file"
