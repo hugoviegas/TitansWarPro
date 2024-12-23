@@ -65,7 +65,9 @@ invalid_two () {
 	menu_two () {
 		options_two
 		echo_t "Select server number: " "" " [1 to 11]"  # Default selection shown to user
-		read -r -n 1 UR # Read user input without waiting for Enter
+		stty -echo -icanon time 0 min 1
+		read -r UR
+		stty sane
 
 # Process user input for server selection
 		if [ "$UR" = $'\0' ]; then

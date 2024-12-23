@@ -1,5 +1,6 @@
 
 # shellcheck disable=SC2154
+# shellcheck disable=SC2317
 func_crono() {
     # Get current hour and minute, removing leading zeros
     HOUR=$(date +%H | sed 's/^0//')
@@ -25,8 +26,9 @@ func_cat() {
     info() {
         printf "\n"
         # List functions defined in scripts
+        
         grep -o -E '[[:alpha:]]+?[_]?[[:alpha:]]+?[ ]?\() \{' ~/twm/*.sh | awk -F\: '{ print $2 }' | awk -F \( '{ print $1 }'
-        read -r -t 30  # Wait for user input for 5 seconds
+        read -r -t 30  # Wait for user input for 30 seconds
     }
     
     while true; do
@@ -49,13 +51,16 @@ func_cat() {
         $cmd
 
         # Checa se o comando está na lista de comandos que não requerem break
-        if [[ " ${commands_no_break[@]} " =~ " ${cmd} " ]]; then
+        for command in "${commands_no_break[@]}"; do
+            if [[ "$command" == "$cmd" ]]; then
+                # Pausa breve antes de continuar o loop
+                sleep 0.5s
+                continue 2
+            fi
+        done
             # Pausa breve antes de continuar o loop
             sleep 0.5s
             continue
-        else
-            break  # Sai do loop para comandos que não estão na lista
-        fi
     done
 }
 

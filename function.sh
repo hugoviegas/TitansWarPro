@@ -22,11 +22,11 @@ request_update() {
 
     while [ "$success" -ne 0 ]; do
         # Instructions for the user
-        echo_t "  Macro settings, list of changes to modify\n Type the command exactly as written"
+        echo_t "  Macro settings, list of changes to modify type the command number"
         echo_t "1- relics"
         echo_t "2- elixir"
-        echo_t "Enter the name of the configuration you want to change (or type ' ' or 'exit' to exit): "
-        read -r key
+        echo_t "Enter ' ' or *'EXIT'* to exit configuration update mode."
+        read -r -n 1 key
 
         case $key in
             (1|relics)
@@ -64,6 +64,8 @@ request_update() {
 # Function to load configurations from the config.cfg file
 load_config() {
     if [ -f "$CONFIG_FILE" ]; then
+        # shellcheck source=/path/to/config.cfg
+        # shellcheck disable=SC1091
         . "$CONFIG_FILE"  # Load the configuration file
     else
         echo_t "Configuration file not found. Creating config.cfg with default values."
@@ -106,8 +108,8 @@ config() {
             fi
 
             # Prompt to change configurations during execution
-            echo_t "\nDo you want to change any configuration? (y/n)"
-            read -r change
+            echo_t "Do you want to change any configuration? (y/n)"
+            read -r -n 1 change
         fi
 
         if [ "$change" = "y" ]; then
