@@ -12,7 +12,7 @@ specialEvent() {
     # Check if a link was found
     if [ -n "$event_link" ]; then
         EVENT=$(echo "$event_link" | cut -d'/' -f2)
-        echo "🎯 Current Event Link: $event_link, Name: $EVENT"
+        echo "🎯 Current event name: $EVENT"
     fi
   fi
 	echo "${EVENT}"
