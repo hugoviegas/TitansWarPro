@@ -9,9 +9,9 @@ update_config() {
     if grep -q "^${key}=" "$CONFIG_FILE"; then
         # Update the value in config.cfg using sed for substitution
         sed -i "s/^${key}=.*/${key}=${value}/" "$CONFIG_FILE"
-        echo_t "Configuration $key updated to $value." "" "" "" ""
+        echo_t "Configuration $key updated to $value."
     else
-        echo_t "Configuration $key not found in the config.cfg file." "" "" "" ""
+        echo_t "Configuration $key not found in the config.cfg file."
         return 1  # Return an error to indicate failure
     fi
 }
@@ -22,23 +22,25 @@ request_update() {
 
     while [ "$success" -ne 0 ]; do
         # Instructions for the user
-        echo_t "  Macro settings, list of changes to modify\n Type the command exactly as written\n 1- relics\n 2- elixir\n exit" "" "" "" ""
-        echo_t "Enter the name of the configuration you want to change (or type ' ' or 'exit' to exit): " "" "" "" ""
+        echo_t "  Macro settings, list of changes to modify\n Type the command exactly as written"
+        echo_t "1- relics"
+        echo_t "2- elixir"
+        echo_t "Enter the name of the configuration you want to change (or type ' ' or 'exit' to exit): "
         read -r key
 
         case $key in
             (1|relics)
-            echo_t "Do you want to collect the relics (y or n):" "" "" "" ""
+            echo_t "Do you want to collect the relics (y or n):"
             read -r value
-            key="FUNC_rewards"
+            key="FUNC_check_rewards"
             ;;
             (2|elixir)
-            echo_t "Do you want to use elixir before all valleys? (y or n):" "" "" "" ""
+            echo_t "Do you want to use elixir before all valleys? (y or n):"
             read -r value
             key="FUNC_elixir"
             ;;
             (3|exit|*)
-            echo_t "Exiting configuration update mode." "" "" "" ""
+            echo_t "Exiting configuration update mode."
             EXIT_CONFIG="s"  # Signal to exit both loops
             break
             ;;
@@ -50,9 +52,9 @@ request_update() {
 
         # Check if there was a failure and notify the user
         if [ "$success" -ne 0 ]; then
-            echo_t "Invalid key. Try again." "" "" "" ""
+            echo_t "Invalid key. Try again."
         else
-            echo_t "Configuration updated successfully!" "" "" "" ""
+            echo_t "Configuration updated successfully!"
             config
             break
         fi
@@ -64,11 +66,11 @@ load_config() {
     if [ -f "$CONFIG_FILE" ]; then
         . "$CONFIG_FILE"  # Load the configuration file
     else
-        echo_t "Configuration file not found. Creating config.cfg with default values." "" "" "" ""
+        echo_t "Configuration file not found. Creating config.cfg with default values."
         
         # Define default values
-        FUNC_check_rewards="y"
-        FUNC_use_elixir="y"
+        FUNC_check_rewards="n"
+        FUNC_use_elixir="n"
         FUNC_coliseum="n"
         SCRIPT_PAUSED="n"
 
@@ -84,7 +86,7 @@ load_config() {
 
 config() {
     # Load the initial configuration
-    CONFIG_FILE="$TMP/config.txt"
+    CONFIG_FILE="$TMP/config.cfg"
     load_config
     SCRIPT_PAUSED="s"
 
@@ -92,19 +94,19 @@ config() {
     while true; do
         # Check if the script is paused or signaled to exit
         if [ "$SCRIPT_PAUSED" = "s" ] || [ "$EXIT_CONFIG" = "s" ]; then
-            echo_t "Script paused. Waiting for reactivation..." "" "" "" ""
+            echo_t "Script paused. Waiting for reactivation..."
             sleep 2
             load_config  # Reload the configuration after the interval
 
             # If EXIT_CONFIG is "s", exit the main loop
             if [ "$EXIT_CONFIG" = "s" ]; then
-                echo_t "Exiting configuration mode..." "" "" "" ""
+                echo_t "Exiting configuration mode..."
                 EXIT_CONFIG="n"  # Reset the exit signal for next use
                 break
             fi
 
             # Prompt to change configurations during execution
-            echo_t "\nDo you want to change any configuration? (y/n)" "" "" "" ""
+            echo_t "\nDo you want to change any configuration? (y/n)"
             read -r change
         fi
 
@@ -114,7 +116,7 @@ config() {
 
             # If EXIT_CONFIG is "s", exit the main loop
             if [ "$EXIT_CONFIG" = "s" ]; then
-                echo_t "Exiting configuration mode..." "" "" "" ""
+                echo_t "Exiting configuration mode..."
                 EXIT_CONFIG="n"  # Reset the exit signal for next use
                 break
             fi
