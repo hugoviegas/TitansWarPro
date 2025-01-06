@@ -41,7 +41,7 @@ arena_collFight() {
 
 arena_duel() {
     # Exibe o título da Arena com emoji de espada e cor
-    echo_t "Arena " "$GOLD_BLACK" "$COLOR_RESET" "after" "⚔️"
+    echo_t "Arena" "$GOLD_BLACK" "$COLOR_RESET" "after" "⚔️"
 
     checkQuest 3 apply
     checkQuest 4 apply
@@ -72,7 +72,7 @@ arena_duel() {
     fetch_page "/inv/bag/"
 
     # Extrai e executa a ação de vender todos os itens
-    local SELL=$(grep -o -E '(/inv/bag/sellAll/1/[?]r[=][0-9]+)' "$TMP"/SRC | sed -n '1p')
+    SELL=$(grep -o -E '(/inv/bag/sellAll/1/[?]r[=][0-9]+)' "$TMP"/SRC | sed -n '1p')
     fetch_page "$SELL"
     
     checkQuest 3 end

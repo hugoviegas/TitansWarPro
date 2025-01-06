@@ -32,7 +32,7 @@ check_missions() {
 }
 
 check_rewards(){
-    if [ "$FUNC_rewards" = "n" ]; then
+    if [ "$FUNC_check_rewards" = "n" ]; then
         return
     fi
     # Collect rewards from relics
@@ -59,7 +59,7 @@ apply_event() {
 }
 
 use_elixir() {
-    if [ "$FUNC_elixir" = "n" ]; then
+    if [ "$FUNC_use_elixir" = "n" ]; then
         return
     fi
     # Initial fetch to get the starting URLs
