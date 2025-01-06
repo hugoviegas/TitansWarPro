@@ -83,7 +83,7 @@ twm_play() {
 
 # Function to restart the twm script if it is running
 restart_script() {
-    if [ "$RUN" != "-boot" ]; then
+    if [ "$RUN" = "-boot" ]; then
         # Mata todas as instâncias do script
         pidf=$(pgrep -f "sh.*twm/twm.sh")
         while [ -n "$pidf" ]; do

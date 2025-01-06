@@ -32,7 +32,7 @@ func_cat() {
     while true; do
        
         echo_t "No battles now, waiting ${i}s" "\033[02m" "${COLOR_RESET}"
-        echo_t "Enter a command or for more info enter:" "${WHITEb_BLACK}" "info${COLOR_RESET}"
+        echo_t "Enter a command or for more info enter:" "${WHITEb_BLACK}" "info or config${COLOR_RESET}"
 
         read -r -t "$i" cmd  # Read user command with a timeout
 

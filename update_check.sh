@@ -45,8 +45,14 @@ while true; do
       for file in "${files_to_update[@]}"; do
         printf " - $file\n"
       done
-      echo_t "Do you want to update this files? (y/n)"
-      read -r -n 1 choice
+      if [ "$FUNC_AUTO_UPDATE" = "y" ]; then
+        choice="y"
+        return
+      else
+        echo_t "Do you want to update this files? (y/n) [The script will be restarted]"
+        read -r -n 1 choice
+      fi
+      
       if [[ "$choice" == "s" || "$choice" == "S" || "$choice" == "y" || "$choice" == "Y" ]]; then
         for file in "${files_to_update[@]}"; do
           curl -s -L "${SERVER}${file}" -o "$HOME/twm/$file"
@@ -56,8 +62,10 @@ while true; do
         printf_t "Update canceled."
         break
       fi
-    printf_t "All files are updated, press CTRL + C to stop and run the code to apply." 
+
+    printf_t "All files are updated, the script will be restarted in 3 seconds." 
     sleep 3
+    restart_script
     break
   else
     printf_t "All files are updated."
