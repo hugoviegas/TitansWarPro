@@ -13,7 +13,7 @@ twm_play() {
             coliseum_fight
             ;;
         # Scheduled events every half hour during the day
-        (00:00|00:30|01:00|01:30|02:00|02:30|03:00|03:30|04:00|04:30|05:00|05:30|06:00|06:30|07:00|07:30|08:00|08:30|09:00|09:30|11:30|12:00|13:00|13:30|14:30|15:30|17:00|17:30|18:00|18:30|19:30|20:00|20:30|23:00|23:30)
+        (00:00|00:30|01:00|01:30|02:00|02:30|03:00|03:30|04:00|04:30|05:00|05:30|06:00|06:30|07:00|07:30|08:00|08:30|09:00|11:30|12:00|13:00|13:30|14:30|15:30|17:00|17:30|18:00|18:30|19:30|20:00|20:30|23:00|23:30)
             start
             ;;
         
@@ -57,13 +57,12 @@ twm_play() {
             fi
             start
             ;;
-        
-        # Clan damage event at 21:30; additional logic can be added here if needed.
-        (21:30)
-            # _clandmgfight  # Uncomment if needed for clan damage fight logic.
+
+        # Clan damage event at 09:30 and 21:30; additional logic can be added here if needed.
+        (09:2[5-9]|21:2[5-9])
+            specialEvent
             start
             ;;
-        
         (*)
             # If running in coliseum mode, execute relevant functions.
             if echo "$RUN" | grep -q -E '[-]cl'; then

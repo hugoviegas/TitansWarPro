@@ -52,15 +52,16 @@ specialEvent() {
         done
       ;;
       (clandmgfight)
-        current_time=$(date +%H:%M)
-        if [[ "$current_time" == "09:30" || "$current_time" == "21:30" ]]; then
-          fetch_page "${event_link}"
-          clandmgfight_start
-        else
-          echo " "
-          return 1
-        fi
-      ;;
+        case $(date +%H:%M) in
+          (09:2[5-9]|21:2[5-9])
+            clandmgfight_start
+            ;;
+          (*)
+            echo " "
+            return 1
+            ;;
+        esac
+        ;;
       *)
         echo " "
         return 1

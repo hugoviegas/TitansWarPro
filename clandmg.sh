@@ -7,7 +7,7 @@
 #/clandmgfight/grass/?r=0
 #/clandmgfight/?out_gate
 clandmgfight_fight() {
-  cd $TMP || exit
+  cd "$TMP" || exit
   #/enterFight
   local LA=4    # interval attack
   local HPER=48 # % to heal
@@ -35,7 +35,7 @@ clandmgfight_fight() {
     fi
   }
   cf_access
-  >BREAK_LOOP
+  : > BREAK_LOOP
   cat HP >old_HP
   echo $(($(date +%s) - 20)) >last_dodge
   echo $(($(date +%s) - 90)) >last_heal
@@ -102,7 +102,7 @@ clandmgfight_fight() {
 clandmgfight_start() {
   cd $TMP || exit
   case $(date +%H:%M) in
-  10:5[5-9] | 18:5[5-9])
+  09:2[5-9] | 21:2[5-9])
     (
       w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | grep -o -E '\(([0-9]+)\)' | sed 's/[()]//g' >"$TMP"/FULL
     ) </dev/null &>/dev/null &
@@ -116,7 +116,7 @@ clandmgfight_start() {
     ) </dev/null &>/dev/null &
     time_exit 17
     echo_t "The clan duel will be started..." "${GOLD_BLACK}" "${COLOR_RESET}"
-    while $(case $(date +%M:%S) in (59:[3-5][0-9]) exit 1 ;; esac) ; do
+    while (case $(date +%M:%S) in (29:[3-5][0-9]) exit 1 ;; esac) ; do
       sleep 3
     done
     (

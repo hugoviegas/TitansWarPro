@@ -27,7 +27,7 @@ request_update() {
         echo_t "2- elixir"
         echo_t "3- auto-update"
         echo_t "Enter ' ' or *'EXIT'* to exit configuration update mode."
-        read -r -n 1 key
+        read -r key
 
         case $key in
             (1|relics)
@@ -117,7 +117,7 @@ config() {
 
             # Prompt to change configurations during execution
             echo_t "Do you want to change any configuration? (y/n)"
-            read -r -n 1 change
+            read -r change
         fi
 
         if [ "$change" = "y" ]; then
