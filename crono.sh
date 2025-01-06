@@ -1,5 +1,5 @@
-
 # shellcheck disable=SC2154
+# shellcheck disable=SC2317
 func_crono() {
     # Get current hour and minute, removing leading zeros
     HOUR=$(date +%H | sed 's/^0//')

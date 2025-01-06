@@ -3,7 +3,7 @@ king_fight () {
 
   #/enterFight
   cd "$TMP" || exit
-  local LA=4 # interval attack
+  local LA=4.1 # interval attack
   local HPER="38" # % to heal
   local RPER=5 # % to random
   cl_access () {
@@ -139,12 +139,14 @@ king_start () {
   ) </dev/null &>/dev/null &
   time_exit 17
   printf "\nKing\n$URL\n"
-  grep -o -E '(/[a-z]+(/[a-z]+/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+|/))' "$TMP"/SRC | sed -n '1p' >ACCESS 2>/dev/null
+  sed 's/href=/\n/g' "$TMP/SRC"|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
+  # grep -o -E '(/[a-z]+(/[a-z]+/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+|/))' "$TMP"/SRC | sed -n '1p' >ACCESS 2>/dev/null
   #cat "$TMP"/SRC|sed 's/href=/\n/g'|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
   printf " 👣 Entering...\n$(cat ACCESS)\n"
   #/wait
   printf_t " 😴 Waiting...\n"
-  cat < "$TMP"/SRC|grep -o 'king/kingatk/' >EXIT 2> /dev/null
+  grep -o 'king/kingatk/' "$TMP/SRC" >EXIT 2> /dev/null
+  #cat < "$TMP"/SRC|grep -o 'king/kingatk/' >EXIT 2> /dev/null
   local BREAK=$(( $(date +%s) + 30 ))
   until [ -s "EXIT" ] || [ "$(date +%s)" -gt "$BREAK" ] ; do
    printf " 💤	...\n$(cat ACCESS)\n"
@@ -152,8 +154,16 @@ king_start () {
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat ACCESS)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
    ) </dev/null &>/dev/null &
    time_exit 17
-   cat < "$TMP"/SRC | sed 's/href=/\n/g'|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
-   cat < "$TMP"/SRC | grep -o 'king/kingatk/' >EXIT 2> /dev/null
+   sed 's/href=/\n/g' "$TMP/SRC"|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
+   #cat < "$TMP"/SRC | sed 's/href=/\n/g'|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
+     # Ensure the file exists
+  if [ ! -f "$TMP/SRC" ]; then
+      touch "$TMP/SRC"
+  fi
+  
+  # Read from the file and process it
+  grep -o 'king/kingatk/' "$TMP/SRC" >EXIT 2> /dev/null
+  #cat < "$TMP/SRC" | grep -o 'king/kingatk/' > EXIT 2> /dev/null
    sleep 2
   done
   king_fight

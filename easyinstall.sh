@@ -152,7 +152,7 @@ cd ~/twm || exit
 printf "${BLACK_CYAN}\n ⌛ Wait downloading scripts...${COLOR_RESET}\n"
 
 sync_func() {
-  SCRIPTS="allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh check.sh clancoliseum.sh clanfight.sh clanid.sh coliseum.sh crono.sh flagfight.sh function.sh king.sh language.sh league.sh loginlogoff.sh play.sh requeriments.sh run.sh svproxy.sh specialevent.sh trade.sh twm.sh undying.sh update_check.sh"
+  SCRIPTS="allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh check.sh clancoliseum.sh clandmg.sh clanfight.sh clanid.sh coliseum.sh crono.sh flagfight.sh function.sh king.sh language.sh league.sh loginlogoff.sh play.sh requeriments.sh run.sh svproxy.sh specialevent.sh trade.sh twm.sh undying.sh update_check.sh"
   NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
   LEN=0
   for script in $SCRIPTS; do
@@ -184,7 +184,7 @@ sync_func() {
 }
 
 sync_func_other() {
-  SCRIPTS="requeriments.sh svproxy.sh loginlogoff.sh crono.sh check.sh run.sh clanid.sh allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh clancoliseum.sh clandungeon.sh clanfight.sh coliseum.sh flagfight.sh function.sh king.sh language.sh league.sh specialevent.sh trade.sh undying.sh update_check.sh"
+  SCRIPTS="requeriments.sh svproxy.sh loginlogoff.sh crono.sh check.sh run.sh clanid.sh allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh clancoliseum.sh clandungeon.sh clandmg.sh clanfight.sh coliseum.sh flagfight.sh function.sh king.sh language.sh league.sh specialevent.sh trade.sh undying.sh update_check.sh"
   curl "${SERVER}"play.sh -s -L -O
   curl "${SERVER}"info.sh -s -L >twm.sh
   curl "${SERVER}"twm.sh -s -L | sed -n '3,33p' >>twm.sh
@@ -263,7 +263,6 @@ case "$(uname)" in
             # Recarrega o arquivo de configuração para que a função fique disponível imediatamente
             # shellcheck disable=SC1090
             . "$config_file"
-            source "${config_file}"
         fi
         ;;
     *)

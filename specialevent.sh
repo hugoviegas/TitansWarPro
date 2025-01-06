@@ -15,7 +15,7 @@ specialEvent() {
         echo "🎯 Current event name: $EVENT"
     fi
   fi
-	echo "${EVENT}"
+
   case $EVENT in
     (questrnd)
       fetch_page "$event_link"
@@ -50,6 +50,16 @@ specialEvent() {
             break
           fi
         done
+      ;;
+      (clandmgfight)
+        current_time=$(date +%H:%M)
+        if [[ "$current_time" == "09:30" || "$current_time" == "21:30" ]]; then
+          fetch_page "${event_link}"
+          clandmgfight_start
+        else
+          echo " "
+          return 1
+        fi
       ;;
       *)
         echo " "

@@ -45,6 +45,7 @@ cd ~/twm || exit
 . campaign.sh
 . run.sh
 . altars.sh
+. clandmg.sh
 . clanfight.sh
 . clancoliseum.sh
 . king.sh
