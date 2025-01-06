@@ -22,35 +22,47 @@ request_update() {
 
     while [ "$success" -ne 0 ]; do
         # Instructions for the user
-        echo_t "  Macro settings, list of changes to modify type the command number"
-        echo_t "1- relics current value: " "" "$FUNC_check_rewards"
-        echo_t "2- elixir current value: " "" "$FUNC_use_elixir"
-        echo_t "3- auto update current value: " "" "$FUNC_AUTO_UPDATE"
-        echo_t "Press *'ENTER'* to exit configuration update mode."
+        echo_t "  Macro settings, list of changes to modify type the command number" "${BLACK_GREEN}" "${COLOR_RESET}" "before" "⚙️"
+        echo_t "1- Collect relics. | Current value: " "" "$FUNC_check_rewards"
+        echo_t "2- Use elixir. | Current value: " "" "$FUNC_use_elixir"
+        echo_t "3- Auto update. | Current value: " "" "$FUNC_AUTO_UPDATE"
+        echo_t "Press *ENTER* to exit configuration update mode." "" "" "after" "↩️"
         read -r key
 
         case $key in
             (1|relics)
-            echo_t "Do you want to collect the relics (y or n):"
-            read -r -n 1 value
-            key="FUNC_check_rewards"
-            ;;
+                echo_t "Do you want to collect the relics (y or n):"
+                key="FUNC_check_rewards"
+                ;;
             (2|elixir)
-            echo_t "Do you want to use elixir before all valleys? (y or n):"
-            read -r -n 1 value
-            key="FUNC_elixir"
-            ;;
+                echo_t "Do you want to use elixir before all valleys? (y or n):"
+                key="FUNC_elixir"
+                ;;
             (3|auto-update)
-            echo_t "Do you want to update the script automatically? (y or n):"
-            read -r -n 1 value
-            key="FUNC_AUTO_UPDATE"
-            ;;
+                echo_t "Do you want to update the script automatically? (y or n):"
+                key="FUNC_AUTO_UPDATE"
+                ;;
             (exit|*)
-            echo_t "Exiting configuration update mode."
-            EXIT_CONFIG="y"  # Signal to exit both loops
-            break
-            ;;
+                echo_t "Exiting configuration update mode."
+                EXIT_CONFIG="y"  # Signal to exit both loops
+                break
+                ;;
         esac
+
+        # If a valid key was chosen, validate input for value
+        if [[ $key != "FUNC_check_rewards" && $key != "FUNC_elixir" && $key != "FUNC_AUTO_UPDATE" ]]; then
+            continue
+        fi
+
+        while true; do
+            read -r -n 1 value
+            echo  # To break the line after input
+            if [[ $value =~ ^[yYnN]$ ]]; then
+                break
+            else
+                echo_t "Invalid input. Please enter 'y' or 'n':"  "" "" "before" "❌"
+            fi
+        done
 
         # Call the configuration update function and capture the status
         update_config "$key" "$value"
@@ -58,11 +70,11 @@ request_update() {
 
         # Check if there was a failure and notify the user
         if [ "$success" -ne 0 ]; then
-            echo_t "Invalid key. Try again."
+            echo_t "Invalid key. Please try again." "" "" "before" "❌"
             rm -f "$CONFIG_FILE"  # Remove the config file to reset the configuration
             load_config  # Reload the configuration after the reset
         else
-            echo_t "Configuration updated successfully!"
+            echo_t "Configuration updated successfully!"   "" "" "before" "✅"
             config
             break
         fi
