@@ -23,10 +23,10 @@ request_update() {
     while [ "$success" -ne 0 ]; do
         # Instructions for the user
         echo_t "  Macro settings, list of changes to modify type the command number"
-        echo_t "1- relics"
-        echo_t "2- elixir"
-        echo_t "3- auto-update"
-        echo_t "Enter ' ' or *'EXIT'* to exit configuration update mode."
+        echo_t "1- relics current value: " "" "$FUNC_check_rewards"
+        echo_t "2- elixir current value: " "" "$FUNC_use_elixir"
+        echo_t "3- auto update current value: " "" "$FUNC_AUTO_UPDATE"
+        echo_t "Press *'ENTER'* to exit configuration update mode."
         read -r key
 
         case $key in
@@ -59,6 +59,8 @@ request_update() {
         # Check if there was a failure and notify the user
         if [ "$success" -ne 0 ]; then
             echo_t "Invalid key. Try again."
+            rm -f "$CONFIG_FILE"  # Remove the config file to reset the configuration
+            load_config  # Reload the configuration after the reset
         else
             echo_t "Configuration updated successfully!"
             config
