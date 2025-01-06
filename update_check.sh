@@ -17,6 +17,7 @@ update() {
   cd ~/twm || exit
   . language.sh
   . info.sh
+  load_config
   # Exibe a mensagem de loading
   printf_t "Looking for new updates, please wait..."
 
@@ -47,7 +48,6 @@ while true; do
       done
       if [ "$FUNC_AUTO_UPDATE" = "y" ]; then
         choice="y"
-        return
       else
         echo_t "Do you want to update this files? (y/n) [The script will be restarted]"
         read -r -n 1 choice
