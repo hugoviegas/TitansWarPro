@@ -56,7 +56,7 @@ while true; do
       if [[ "$choice" == "s" || "$choice" == "S" || "$choice" == "y" || "$choice" == "Y" ]]; then
         for file in "${files_to_update[@]}"; do
           curl -s -L "${SERVER}${file}" -o "$HOME/twm/$file"
-          printf_t " Up-to-date" "" "" "after" " ${file} ✅"
+          printf_t " Updated: " "" "" "after" " ${file} ✅"
         done
       else
         printf_t "Update canceled."

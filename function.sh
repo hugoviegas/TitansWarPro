@@ -23,6 +23,7 @@ request_update() {
     while [ "$success" -ne 0 ]; do
         # Instructions for the user
         echo_t "  Macro settings, list of changes to modify type the command number" "${BLACK_GREEN}" "${COLOR_RESET}" "before" "⚙️"
+        echo " "
         echo_t "1- Collect relics. | Current value: " "" "$FUNC_check_rewards"
         echo_t "2- Use elixir. | Current value: " "" "$FUNC_use_elixir"
         echo_t "3- Auto update. | Current value: " "" "$FUNC_AUTO_UPDATE"
