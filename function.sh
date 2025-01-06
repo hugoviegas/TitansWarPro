@@ -83,6 +83,8 @@ request_update() {
 
 # Function to load configurations from the config.cfg file
 load_config() {
+    # Load the initial configuration
+    CONFIG_FILE="$TMP/config.cfg"
     if [ -f "$CONFIG_FILE" ]; then
         # shellcheck source=/path/to/config.cfg
         # shellcheck disable=SC1091
@@ -109,8 +111,6 @@ load_config() {
 }
 
 config() {
-    # Load the initial configuration
-    CONFIG_FILE="$TMP/config.cfg"
     load_config
     SCRIPT_PAUSED="y"
 
