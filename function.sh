@@ -43,7 +43,7 @@ request_update() {
             (3|auto-update)
             echo_t "Do you want to update the script automatically? (y or n):"
             read -r -n 1 value
-            key="AUTO_UPDATE"
+            key="FUNC_AUTO_UPDATE"
             ;;
             (exit|*)
             echo_t "Exiting configuration update mode."
