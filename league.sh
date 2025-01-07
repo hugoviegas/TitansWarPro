@@ -65,7 +65,7 @@ league_play() {
     fights_done=0
     j=1  # Index for fight buttons (skipping every 2 links)
     enemy_index=1  # Separate index for enemy stats
-    FUNC_play_league=$(get_config "FUNC_play_league")
+    FUNC_play_league=$(get_config "FUNC_play_league") # get the league number from the config file
 
 #[ "$fights_done" -lt "$AVAILABLE_FIGHTS" ] && 
 
@@ -114,6 +114,8 @@ league_play() {
                     echo_t "Fight the enemy number $ENEMY_NUMBER ✅ ." "" "\n"
                     enemy_index=1  # Reset enemy index after a fight
                     j=1  # Reset button index after a fight
+                    last_click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight
+                    ENEMY_NUMBER=$(echo "$last_click" | grep -o -E '[0-9]+' | head -n 1)
                     fetch_available_fights  # Recheck available fights
                     action="check_fights" # back to check fights
                     # Delete the potion file if it exists
@@ -131,8 +133,9 @@ league_play() {
                     j=$((j + 2))  # Move to the next button (skip every 2 links)
                     last_click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight
                     #echo "$last_click" 
-                    fetch_available_fights  # Recheck available fights
                     ENEMY_NUMBER=$(echo "$last_click" | grep -o -E '[0-9]+' | head -n 1)
+                    fetch_available_fights  # Recheck available fights
+                    echo "Enemy number: $ENEMY_NUMBER"
                     if [ -z "$last_click" ] && [ "$AVAILABLE_FIGHTS" -gt 0 ]; then  # If there are more than 4 enemies
                         echo_t " Reached the last enemy. Attacking the last one and using a potion..."
                         j=$((j - 2))  # Move to the previous button (skip every 2 links)
