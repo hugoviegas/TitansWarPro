@@ -151,7 +151,7 @@ league_play() {
                         # Reset the index to attack the first enemy
                         enemy_index=1
                         j=1
-                    elif [ -z "$last_click" ] && [ "$AVAILABLE_FIGHTS" -eq 0 ] && [ "$FUNC_play_league" = "y" ] && [ "$ENEMY_NUMBER" -gt 50 ]; then
+                    elif [ "$AVAILABLE_FIGHTS" -eq 0 ] && [ "$FUNC_play_league" = "y" ] && [ "$ENEMY_NUMBER" -gt 50 ]; then
                         # /league/refreshFights/?r=56720053
                         click=$(grep -o -E "/league/refreshFights/\?r=[0-9]+" "$TMP/SRC" | sed -n 1p)
                         fetch_page "$click"
