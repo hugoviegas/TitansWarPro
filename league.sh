@@ -124,7 +124,7 @@ league_play() {
                     last_click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight
                     #echo "$last_click" 
                     fetch_available_fights  # Recheck available fights
-                    if [ -z "$last_click" ] && [ "$AVAILABLE_FIGHTS" -gt 1 ]; then  # If there are more than 4 enemies
+                    if [ -z "$last_click" ] && [ "$AVAILABLE_FIGHTS" -gt 0 ]; then  # If there are more than 4 enemies
                         echo_t " Reached the last enemy. Attacking the last one and using a potion..."
                         j=$((j - 2))  # Move to the previous button (skip every 2 links)
                         
@@ -133,15 +133,16 @@ league_play() {
                         fetch_page "$click"
                         fights_done=$((fights_done + 1))  # Count the fight
                         fetch_available_fights  # Recheck available fights
-                        
-                        # Use potion
-                            potion_click=$(grep -o -E "/league/potion/\?r=[0-9]+" "$TMP/SRC" | sed -n 1p)
-                            fetch_page "$potion_click"
-                            E_STRENGTH=50 # set a fake strength to the first enemy
-                            # Reset the index to attack the first enemy
-                            enemy_index=1
-                            j=1
-                            action="fight_or_skip"
+                        sleep 1s
+
+                        # Use potion /league/potion/?r=25771396
+                        potion_click=$(grep -o -E "/league/potion/\?r=[0-9]+" "$TMP/SRC" | sed -n 1p)
+                        fetch_page "$potion_click"
+                        E_STRENGTH=50 # set a fake strength to the first enemy
+                        # Reset the index to attack the first enemy
+                        enemy_index=1
+                        j=1
+                        action="fight_or_skip"
                     else
                         action="check_fights"
                     fi
