@@ -96,11 +96,11 @@ clandmgfight_fight() {
   #/end
   func_unset
   echo_t "Clan duel" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
-  sleep 10s
   clear
 }
 clandmgfight_start() {
-  cd $TMP || exit
+  cd "$TMP" || exit
+  apply_event clandmgfight
   case $(date +%H:%M) in
   09:2[5-9] | 21:2[5-9])
     (
@@ -116,7 +116,7 @@ clandmgfight_start() {
     ) </dev/null &>/dev/null &
     time_exit 17
     echo_t "The clan duel will be started..." "${GOLD_BLACK}" "${COLOR_RESET}"
-    while (case $(date +%M:%S) in (29:[3-5][0-9]) exit 1 ;; esac) ; do
+    while (case $(date +%M:%S) in (29:[3-5][0-9]) exit 1 ;; ([4-5][5-9]:[0-5][0-9]) return ;; esac) ; do
       sleep 3
     done
     (
@@ -139,6 +139,35 @@ clandmgfight_start() {
       sleep 3
     done
     clandmgfight_fight
+    sleep 10s
+    fetch_page /clandmgfight/enterFight
+    clandmgfight_start
+    ;;
+    09:[3-4][0-9] | 21:[3-4][0-9])
+    echo_t "The clan duel will be started..." "${GOLD_BLACK}" "${COLOR_RESET}"
+    (
+      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/clandmgfight/enterFight" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+    ) </dev/null &>/dev/null &
+    time_exit 17
+    #printf "\nClan fight\n$URL\n"
+    grep -o -E '(/[a-z]+(/[a-z]+/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+|/))' "$TMP"/SRC | sed -n '1p' >ACCESS 2>/dev/null
+    echo_t " Entering..." "" "\n" "before" " 👣"
+    #/wait
+    echo_t " Waiting..." "" "\n" "before" " 😴"
+    local BREAK=$(($(date +%s) + 60))
+    until grep -q -o 'clandmgfight/dodge/' ACCESS || [ "$(date +%s)" -gt "$BREAK" ]; do
+      printf " 💤	...\n$(cat ACCESS)\n"
+      (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clandmgfight/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+      ) </dev/null &>/dev/null &
+      time_exit 17
+      grep -o -E '(/clandmgfight(/[a-z]+/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+|/))' "$TMP"/SRC | sed -n '1p' >ACCESS 2>/dev/null
+      sleep 3
+    done
+    clandmgfight_fight
+    sleep 10s
+    fetch_page /clandmgfight/enterFight
+    clandmgfight_start
     ;;
   esac
 }
