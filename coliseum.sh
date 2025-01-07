@@ -204,6 +204,7 @@ coliseum_start() {
             coliseum_fight
         fi
     else
-        printf_t "Battle or event time...\n" && sleep 5s
+        echo_t "Battle or event time..."
+        sleep 5s
     fi
 }

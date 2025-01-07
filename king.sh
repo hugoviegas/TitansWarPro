@@ -144,7 +144,7 @@ king_start () {
   #cat "$TMP"/SRC|sed 's/href=/\n/g'|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
   printf " 👣 Entering...\n$(cat ACCESS)\n"
   #/wait
-  printf_t " 😴 Waiting...\n"
+  echo_t " 😴 Waiting..."
   grep -o 'king/kingatk/' "$TMP/SRC" >EXIT 2> /dev/null
   #cat < "$TMP"/SRC|grep -o 'king/kingatk/' >EXIT 2> /dev/null
   local BREAK=$(( $(date +%s) + 30 ))

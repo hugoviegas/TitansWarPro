@@ -17,7 +17,7 @@ script_ads() {
 }
 script_ads
 
-#printf_t "Starting the macro wait a few seconds..." "$BLACK_CYAN" "$COLOR_RESET" "after" "☕"
+#echo_t "Starting the macro wait a few seconds..." "$BLACK_CYAN" "$COLOR_RESET" "after" "☕"
 #sleep 3s
 
 script_slogan

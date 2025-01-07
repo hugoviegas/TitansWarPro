@@ -19,7 +19,7 @@ update() {
   . info.sh
   load_config
   # Exibe a mensagem de loading
-  printf_t "Looking for new updates, please wait..."
+  echo_t "Looking for new updates, please wait..."
 
   # Verifica cada script
   for script in "${SCRIPTS[@]}"; do
@@ -41,7 +41,7 @@ update() {
 while true; do
   # Pergunta ao usuário se deseja atualizar
   if [ ${#files_to_update[@]} -gt 0 ]; then
-    printf_t "New updates available for: "
+    echo_t "New updates available for: "
     
       for file in "${files_to_update[@]}"; do
         printf " - $file\n"
@@ -56,19 +56,19 @@ while true; do
       if [[ "$choice" == "s" || "$choice" == "S" || "$choice" == "y" || "$choice" == "Y" ]]; then
         for file in "${files_to_update[@]}"; do
           curl -s -L "${SERVER}${file}" -o "$HOME/twm/$file"
-          printf_t " Updated: " "" "" "after" " ${file} ✅"
+          echo_t " Updated: " "" "" "after" " ${file} ✅"
         done
       else
-        printf_t "Update canceled."
+        echo_t "Update canceled."
         break
       fi
 
-    printf_t "All files are updated, the script will be restarted in 3 seconds." 
+    echo_t "All files are updated, the script will be restarted in 3 seconds." 
     sleep 3
     restart_script
     break
   else
-    printf_t "All files are updated."
+    echo_t "All files are updated."
     sleep 1
     break
   fi
