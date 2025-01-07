@@ -85,6 +85,7 @@ func_sleep() {
 }
 
 start() {
+    load_config      # Load configuration file
     arena_duel       # Start arena duel function
     career_func      # Call career-related function
     cave_routine     # Execute cave routine function 
