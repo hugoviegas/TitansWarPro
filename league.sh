@@ -63,7 +63,7 @@ league_play() {
     fights_done=0
     j=1  # Index for fight buttons (skipping every 2 links)
     enemy_index=1  # Separate index for enemy stats
-    
+
 #[ "$fights_done" -lt "$AVAILABLE_FIGHTS" ] && 
     while [ "$AVAILABLE_FIGHTS" -gt 0 ]; do
         case "$action" in
@@ -117,7 +117,7 @@ league_play() {
                     printf "($PLAYER_STRENGTH) " 
                     printf_t "< enemys strength " 
                     printf "($E_STRENGTH)"
-                    printf_t ". Skipping enemy. >>" "" "\n" "after" "⏩"
+                    printf_t ". Skipping enemy. " "" "\n" "after" "⏩"
                     enemy_index=$((enemy_index + 1))  # Move to the next enemy
                     #echo "$enemy_index"
                     j=$((j + 2))  # Move to the next button (skip every 2 links)
@@ -157,6 +157,7 @@ league_play() {
             if [ "$AVAILABLE_FIGHTS" -eq 0 ]; then
                 clickReward=$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
                 fetch_page "$clickReward" 
+                echo_t "Claimed reward" "" "" "after" "🎁"
             fi
         else
             echo "Error: $AVAILABLE_FIGHTS is not a valid number." >> "$TMP/ERROR_DEBUG"

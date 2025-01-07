@@ -1,9 +1,23 @@
 # shellcheck disable=SC2148
 king_fight () {
-
+  if [ -d "/dev/shm" ]; then
+        local dir_ram="/dev/shm/"
+    else
+        local dir_ram="$PREFIX/tmp/"
+    fi
+    mkdir -p "$dir_ram"
+    src_ram=$(mktemp -p "$dir_ram" data.XXXXXX)
+    full_ram=$(mktemp -p "$dir_ram" data.XXXXXX)
+    tmp_ram=$(mktemp -d -t twmdir.XXXXXX)
+    cp -r "$TMP"/* "$tmp_ram"
+    cd "$tmp_ram" || exit
+    (
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 userAgent.txt)" | grep -o -E '\(([0-9]+)\)' | sed 's/[()]//g' >"$full_ram"
+    ) &
+    time_exit 20
   #/enterFight
   cd "$TMP" || exit
-  local LA=4.1 # interval attack
+  local LA=4 # interval attack
   local HPER="38" # % to heal
   local RPER=5 # % to random
   cl_access () {
@@ -68,7 +82,7 @@ king_fight () {
    time_exit 17
    cl_access
    cat HP >FULL ; date +%s >last_heal
-  sleep 0.3s
+  sleep 0.2s
   #/attack_all
   elif awk -v latk="$(( $(date +%s) - $(cat last_atk) ))" -v atktime="$LA" 'BEGIN { exit !(latk > atktime) }' ; then
    if grep -q -o -E '(king/kingatk/[^A-Za-z0-9_]r[^A-Za-z0-9_][0-9]+)' "$TMP"/SRC ; then  #kingatk...
@@ -115,7 +129,7 @@ king_fight () {
  unset cl_access
  func_unset
  apply_event
- echo_t "King of imortals" "${RED_BLACK} 👑" "${COLOR_RESET}" "after" "✅\n"
+ echo_t "King of imortals" "${RED_BLACK} 👑" "${COLOR_RESET}" "after" "✅"
  sleep 10s
  clear
 }
@@ -132,21 +146,19 @@ king_start () {
   time_exit 17
   echo_t "King of the Immortals will be started..." "${GOLD_BLACK}" "${COLOR_RESET}" "before" "👑"
   until (case $(date +%M) in (2[5-9]) exit 1 ;; esac) ; do
-   sleep 3
+   sleep 2
   done
   (
    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/king/enterGame" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
   ) </dev/null &>/dev/null &
   time_exit 17
   printf "\nKing\n$URL\n"
-  sed 's/href=/\n/g' "$TMP/SRC"|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
-  # grep -o -E '(/[a-z]+(/[a-z]+/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+|/))' "$TMP"/SRC | sed -n '1p' >ACCESS 2>/dev/null
+  grep -o -E '(/[a-z]+(/[a-z]+/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+|/))' "$TMP"/SRC | sed -n '1p' >ACCESS 2>/dev/null
   #cat "$TMP"/SRC|sed 's/href=/\n/g'|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
   printf " 👣 Entering...\n$(cat ACCESS)\n"
   #/wait
-  echo_t " 😴 Waiting..."
-  grep -o 'king/kingatk/' "$TMP/SRC" >EXIT 2> /dev/null
-  #cat < "$TMP"/SRC|grep -o 'king/kingatk/' >EXIT 2> /dev/null
+  echo_t " 😴 Waiting...\n"
+  cat < "$TMP"/SRC|grep -o 'king/kingatk/' >EXIT 2> /dev/null
   local BREAK=$(( $(date +%s) + 30 ))
   until [ -s "EXIT" ] || [ "$(date +%s)" -gt "$BREAK" ] ; do
    printf " 💤	...\n$(cat ACCESS)\n"
@@ -154,16 +166,8 @@ king_start () {
     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat ACCESS)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
    ) </dev/null &>/dev/null &
    time_exit 17
-   sed 's/href=/\n/g' "$TMP/SRC"|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
-   #cat < "$TMP"/SRC | sed 's/href=/\n/g'|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
-     # Ensure the file exists
-  if [ ! -f "$TMP/SRC" ]; then
-      touch "$TMP/SRC"
-  fi
-  
-  # Read from the file and process it
-  grep -o 'king/kingatk/' "$TMP/SRC" >EXIT 2> /dev/null
-  #cat < "$TMP/SRC" | grep -o 'king/kingatk/' > EXIT 2> /dev/null
+   cat < "$TMP"/SRC | sed 's/href=/\n/g'|grep '/king/'|head -n 1|awk -F"[']" '{ print $2 }' >ACCESS 2> /dev/null
+   cat < "$TMP"/SRC | grep -o 'king/kingatk/' >EXIT 2> /dev/null
    sleep 2
   done
   king_fight
