@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.9.11" # to change the version number every time has an update!
+    versionNum="3.9.12" # to change the version number every time has an update!!!!!!!
 
 for i in $colors; do
 clear
@@ -90,9 +90,9 @@ printf_t() {
 
   # Adiciona o emoji conforme a posição especificada
   if [ "$local_emoji_position" = "before" ]; then
-    printf "${local_color_start}%s %s${local_color_end}\n" "$local_emoji" "$local_translated_text"
+    printf "${local_color_start}%s %s${local_color_end}" "$local_emoji" "$local_translated_text"
   else
-    printf "${local_color_start}%s %s${local_color_end}\n" "$local_translated_text" "$local_emoji"
+    printf "${local_color_start}%s %s${local_color_end}" "$local_translated_text" "$local_emoji"
   fi
 }
 

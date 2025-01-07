@@ -9,7 +9,7 @@ fetch_available_fights() {
         
         # Check if AVAILABLE_FIGHTS is a number
         if [[ "$AVAILABLE_FIGHTS" =~ ^[0-5]$ ]]; then
-            echo_t "Fights left:" "" "$AVAILABLE_FIGHTS"
+            echo_t "Available fights:" "" "$AVAILABLE_FIGHTS"
         else
             echo "Error: No available fights or not found." >> "$TMP/ERROR_DEBUG"
             AVAILABLE_FIGHTS=0
@@ -63,8 +63,9 @@ league_play() {
     fights_done=0
     j=1  # Index for fight buttons (skipping every 2 links)
     enemy_index=1  # Separate index for enemy stats
-
-    while [ "$fights_done" -lt "$AVAILABLE_FIGHTS" ] && [ "$AVAILABLE_FIGHTS" -gt 0 ]; do
+    
+#[ "$fights_done" -lt "$AVAILABLE_FIGHTS" ] && 
+    while [ "$AVAILABLE_FIGHTS" -gt 0 ]; do
         case "$action" in
             check_fights)
                 #echo "DEBUG: Player Stats = $PLAYER_STRENGTH"
@@ -100,7 +101,10 @@ league_play() {
             
             fight_or_skip)
                 if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
-                    echo_t "Player's strength ($PLAYER_STRENGTH) is greater than enemy's strength ($E_STRENGTH)."
+                    printf_t "Your Player strength"
+                    printf " ($PLAYER_STRENGTH) " 
+                    printf_t "is greater than enemys strength"
+                    printf " ($E_STRENGTH)."
                     fetch_page "$click" # click
                     fights_done=$((fights_done + 1))  # Count the fight
                     echo_t "Fight the enemy number $ENEMY_NUMBER ✅ ." "" "\n"
@@ -109,7 +113,11 @@ league_play() {
                     fetch_available_fights  # Recheck available fights
                     action="check_fights" # back to check fights
                 else
-                    echo_t "Your strength ($PLAYER_STRENGTH) < enemy's strength ($E_STRENGTH). Skipping enemy. >>"
+                    printf_t "Your Player strength" 
+                    printf "($PLAYER_STRENGTH) " 
+                    printf_t "< enemys strength " 
+                    printf "($E_STRENGTH)"
+                    printf_t ". Skipping enemy. >>" "" "\n" "after" "⏩"
                     enemy_index=$((enemy_index + 1))  # Move to the next enemy
                     #echo "$enemy_index"
                     j=$((j + 2))  # Move to the next button (skip every 2 links)
@@ -151,7 +159,7 @@ league_play() {
                 fetch_page "$clickReward" 
             fi
         else
-            echo "Error: AVAILABLE_FIGHTS is not a valid number." >> "$TMP/ERROR_DEBUG"
+            echo "Error: $AVAILABLE_FIGHTS is not a valid number." >> "$TMP/ERROR_DEBUG"
             # Handle the error condition
             AVAILABLE_FIGHTS=0  # Set to 0 to prevent further errors
         fi
