@@ -52,6 +52,8 @@ get_enemy_stat() {
 # Função principal para jogar na liga
 league_play() {
     echo -e "${GOLD_BLACK}League ⚔️${COLOR_RESET}"
+    # FUNC_play_league=""  # Assign a value to FUNC_play_league
+    load_config  # Carregar as configurações do arquivo de configuração
     checkQuest 2 apply
     checkQuest 1 apply
 
@@ -65,6 +67,7 @@ league_play() {
     enemy_index=1  # Separate index for enemy stats
 
 #[ "$fights_done" -lt "$AVAILABLE_FIGHTS" ] && 
+
     while [ "$AVAILABLE_FIGHTS" -gt 0 ]; do
         case "$action" in
             check_fights)
@@ -100,11 +103,11 @@ league_play() {
                 ;;
             
             fight_or_skip)
-                if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ]; then
+                if [ "$PLAYER_STRENGTH" -gt "$E_STRENGTH" ] || [ -f "$TMP/POTION" ]; then
                     printf_t "Your Player strength"
                     printf " ($PLAYER_STRENGTH) " 
                     printf_t "is greater than enemys strength"
-                    printf " ($E_STRENGTH)."
+                    printf " ($E_STRENGTH).\n"
                     fetch_page "$click" # click
                     fights_done=$((fights_done + 1))  # Count the fight
                     echo_t "Fight the enemy number $ENEMY_NUMBER ✅ ." "" "\n"
@@ -112,6 +115,10 @@ league_play() {
                     j=1  # Reset button index after a fight
                     fetch_available_fights  # Recheck available fights
                     action="check_fights" # back to check fights
+                    # Delete the potion file if it exists
+                    if [ -f "$TMP/POTION" ]; then
+                        rm -rf "$TMP/POTION"
+                    fi
                 else
                     printf_t "Your Player strength" 
                     printf "($PLAYER_STRENGTH) " 
@@ -138,10 +145,19 @@ league_play() {
                         # Use potion /league/potion/?r=25771396
                         potion_click=$(grep -o -E "/league/potion/\?r=[0-9]+" "$TMP/SRC" | sed -n 1p)
                         fetch_page "$potion_click"
+                        echo_t "Used a potion" "" "" "after" "🧪" 
+                        echo "potion used" > "$TMP/POTION"
                         E_STRENGTH=50 # set a fake strength to the first enemy
                         # Reset the index to attack the first enemy
                         enemy_index=1
                         j=1
+                    elif [ -z "$last_click" ] && [ "$AVAILABLE_FIGHTS" -eq 0 ] && [ "$FUNC_play_league" = "y" ] && [ "$ENEMY_NUMBER" -gt 50 ]; then
+                        # /league/refreshFights/?r=56720053
+                        click=$(grep -o -E "/league/refreshFights/\?r=[0-9]+" "$TMP/SRC" | sed -n 1p)
+                        fetch_page "$click"
+                        enemy_index=1
+                        j=1
+                        echo_t "Refreshed fights" "" "" "after" "🔄"
                         action="fight_or_skip"
                     else
                         action="check_fights"

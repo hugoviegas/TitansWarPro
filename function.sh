@@ -27,6 +27,7 @@ request_update() {
         echo_t "1- Collect relics. Current value: " "" "$FUNC_check_rewards"
         echo_t "2- Use elixir. Current value: " "" "$FUNC_use_elixir"
         echo_t "3- Auto update. Current value: " "" "$FUNC_AUTO_UPDATE"
+        echo_t "4- Get to top 50 in league. Current value: " "" "$FUNC_play_league"
         echo_t "Press *ENTER* to exit configuration update mode." "" "" "after" "↩️"
         read -r key
 
@@ -43,6 +44,10 @@ request_update() {
                 echo_t "Do you want to update the script automatically? (y or n):"
                 key="FUNC_AUTO_UPDATE"
                 ;;
+            (4|league)
+                echo_t "Do you want to get to top 50 in league? (y or n):"
+                key="FUNC_play_league"
+                ;;
             (exit|*)
                 echo_t "Exiting configuration update mode."
                 EXIT_CONFIG="y"  # Signal to exit both loops
@@ -51,7 +56,7 @@ request_update() {
         esac
 
         # If a valid key was chosen, validate input for value
-        if [[ $key != "FUNC_check_rewards" && $key != "FUNC_use_elixir" && $key != "FUNC_AUTO_UPDATE" ]]; then
+        if [[ $key != "FUNC_check_rewards" && $key != "FUNC_use_elixir" && $key != "FUNC_AUTO_UPDATE" && $key != "FUNC_play_league" ]]; then
             continue
         fi
 
@@ -98,6 +103,7 @@ load_config() {
         FUNC_use_elixir="n"
         FUNC_coliseum="y"
         FUNC_AUTO_UPDATE="Y"
+        FUNC_play_league="n"
         SCRIPT_PAUSED="n"
 
         # Write the config.cfg file with default values
@@ -106,6 +112,7 @@ load_config() {
             echo "FUNC_use_elixir=$FUNC_use_elixir"
             echo "FUNC_coliseum=$FUNC_coliseum"
             echo "FUNC_AUTO_UPDATE=$FUNC_AUTO_UPDATE"
+            echo "FUNC_play_league=$FUNC_play_league"
             echo "SCRIPT_PAUSED=$SCRIPT_PAUSED"
         } > "$CONFIG_FILE"
     fi
