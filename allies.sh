@@ -1,8 +1,6 @@
 # shellcheck disable=SC2154
 members_allies() {
     cd "$TMP" || exit
-    # Load config file
-    AL=$(set_config "ALLIES" "")
 
     echo "" >> allies.txt
     clan_id
@@ -128,6 +126,7 @@ conf_allies() {
 
     # Verifica se o valor de ALLIES já está configurado
     AL=$(get_config "ALLIES")
+    echo_t "Current alliance configuration:" "" "$AL"
     if [ -z "$AL" ]; then
         echo_t "Set up alliances :" "" " [1 to 4]"
         while true; do
@@ -145,7 +144,7 @@ conf_allies() {
     fi
 
     # Executa ações com base no valor de AL
-    case $AL in
+    case "$AL" in
         1)
             id_allies
             clan_allies

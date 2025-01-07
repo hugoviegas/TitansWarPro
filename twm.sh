@@ -2,8 +2,7 @@
 # shellcheck disable=SC1091
 . "$HOME"/twm/info.sh
 . "$HOME"/twm/language.sh
-. "$TMP/config.cfg"
-load_config
+
 colors
 RUN=$(cat "$HOME"/twm/runmode_file)
 cd "$HOME"/twm || exit
@@ -36,7 +35,7 @@ fi
 #/sources
 cd ~/twm || exit
 #/twm.sh before sources <<
-. clandmgfight.sh
+#. clandmgfight.sh
 . language.sh
 . requeriments.sh
 . loginlogoff.sh
@@ -92,7 +91,7 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
     # Countdown loop for reconfiguration prompt
     for i in $(seq 4 -1 1); do
         i=$((i - 1))
-        if read -t 1; then
+        if read -r -t 1; then
             # Clear relevant files if Enter is pressed
             set_config "ALLIES" "" # Clear allies configuration
             : >"$HOME/twm/ur_file"
@@ -107,12 +106,13 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
 fi
 
 # Call necessary functions to set up the environment
+load_config
 requer_func
 func_proxy
 login_logoff
 
 # If allies are defined and not in cave mode, configure allies and clear screen
-if [ -n "$ALLIES" ] && [ "$RUN" != "-cv" ]; then
+if [ -n "$ALLIAS" ] && [ "$RUN" != "-cv" ]; then
     conf_allies  # Configure allies if applicable
     clear  # Clear the terminal screen for better visibility
 fi

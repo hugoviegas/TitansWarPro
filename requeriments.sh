@@ -1,228 +1,171 @@
 #!/bin/sh
 
-requer_func () {
-# Clear the terminal screen
-	clear
-
-# Function to display server options (in multiple languages)
-	options_one () {
-		clear
-		printf "1)${BLACK_CYAN} Brazil, Português: Furia de Titãs online \033[00m
-						2)${BLACK_CYAN} Deutsch: Krieg der Titanen online \033[00m
-						3)${BLACK_CYAN} Español: Guerra de Titanes online \033[00m
-						4)${BLACK_CYAN} Français: Combat des Titans online \033[00m
-						5)${BLACK_CYAN} Indian, English: Titan's War India \033[00m
-						6)${BLACK_CYAN} Indonesian: Titan's War Indonesia \033[00m
-						7)${BLACK_CYAN} Italiano: Guerra di Titani online \033[00m
-						8)${BLACK_CYAN} Polski: Wojna Tytanów online \033[00m
-						9)${BLACK_CYAN} Română: Războiul Titanilor online \033[00m
-						10)${BLACK_CYAN} Русский: Битва Титанов онлайн \033[00m
-						11)${BLACK_CYAN} Srpski: Rat Titana online \033[00m
-						12)${BLACK_CYAN} 中文, Chinese: 泰坦之战 \033[00m
-						13)${BLACK_CYAN} English, Global: Titan's War online \033[00m
-						C)${BLACK_YELLOW} ❌ Cancel \033[00m
-			" | sed 's/\t\t\t//g'
+requer_func() {
+	# Função para exibir o menu de seleção de servidores
+	display_menu() {
+			clear
+			printf_t "Select a server: " "${BLACK_CYAN}" "\n"
+			echo "1) Brazil, Português: Furia de Titãs"
+			echo "2) Deutsch: Krieg der Titanen"
+			echo "3) Español: Guerra de Titanes"
+			echo "4) Français: Combat des Titans"
+			echo "5) Indian, English: Titan's War India"
+			echo "6) Indonesian: Titan's War Indonesia"
+			echo "7) Italiano: Guerra di Titani"
+			echo "8) Polski: Wojna Tytanów"
+			echo "9) Română: Războiul Titanilor"
+			echo "10) Русский: Битва Титанов"
+			echo "11) Srpski: Rat Titana"
+			echo "12) 中文, Chinese: 泰坦之战"
+			echo "13) English, Global: Titan's War"
+			printf_t "C) Cancel" "${BLACK_YELLOW}" "${COLOR_RESET}" 
 	}
 
-	options_two () {
-		clear
-		printf "1)${BLACK_CYAN} Brazil, Português: Furia de Titãs ${BLACK_GREEN}[ENTER]\033[00m
-						2)${CYAN_CYAN} Deutsch: Krieg der Titanen online \033[00m
-						3)${CYAN_CYAN} Español: Guerra de Titanes online \033[00m
-						4)${CYAN_CYAN} Français: Combat des Titans online \033[00m
-						5)${CYAN_CYAN} Indian, English: Titan's War India \033[00m
-						6)${CYAN_CYAN} Indonesian: Titan's War Indonesia \033[00m
-						7)${CYAN_CYAN} Italiano: Guerra di Titani online \033[00m
-						8)${CYAN_CYAN} Polski: Wojna Tytanów online \033[00m
-						9)${CYAN_CYAN} Română: Războiul Titanilor online \033[00m
-						${BLACK_RED}1\033[00m${BLACK_GREEN}0\033[00m)${BLACK_CYAN} Русский: Битва Титанов онлайн \033[00m
-						${BLACK_RED}1\033[00m${BLACK_GREEN}1\033[00m)${BLACK_CYAN} Srpski: Rat Titana online \033[00m
-						${BLACK_RED}1\033[00m${BLACK_GREEN}2\033[00m)${BLACK_CYAN} 中文, Chinese: 泰坦之战 \033[00m
-						${BLACK_RED}1\033[00m${BLACK_GREEN}3\033[00m)${BLACK_CYAN} English, Global: Titan's War online \033[00m
-						C)${BLACK_YELLOW} ❌ Cancel \033[00m
-			" | sed 's/\t\t\t//g'
+	# Função para processar a entrada do usuário
+	process_input() {
+			local input="$1"
+
+			case "$input" in
+					[1-9]|10|11|12|13)
+							echo "$input" > "$HOME/twm/ur_file"
+							echo_t "Selected server: $input"
+							return 0  # Saída para parar o loop
+							;;
+					'c'|'C')
+							terminate_script
+							;;
+					*)
+							echo_t "Invalid option: $input"
+							sleep 0.5
+							return 1  # Continua o loop
+							;;
+			esac
 	}
 
-# Function to handle invalid input for the first menu
-invalid_one () {
-    options_one
-    #echo "Select server number [1 to 11]: $UR◄ invalid option"
-		echo_t "Select server number: $UR◄ invalid option" "" " [1 to 11]"
-    sleep 0.2s
-    menu_one
-}
-
-# Function to handle invalid input for the second menu
-invalid_two () {
-    clear
-    options_two
-    echo_t "Select server number: $UR◄ invalid option" "" " [1 to 11]"
-    sleep 0.2s
-    menu_two
-}
-
-# Function for the second menu of options
-	menu_two () {
-		options_two
-		echo_t "Select server number: " "" " [1 to 11]"  # Default selection shown to user
-		stty -echo -icanon time 0 min 1
-		read -r UR
-		stty sane
-
-# Process user input for server selection
-		if [ "$UR" = $'\0' ]; then
-			echo "1" >"$HOME/twm/ur_file"  # Defaults to server 1(Brazilian) if Enter is pressed
-		elif [ "$UR" = '0' ]; then
-			echo "10" >"$HOME/twm/ur_file"  # Select Russian server if '(1)0' is pressed
-		elif [ "$UR" = '1' ]; then
-				echo "11" >"$HOME/twm/ur_file"  # Select Croatian server if '(1)1' is pressed
-		elif [ "$UR" = '2' ]; then
-			echo "12" >"$HOME/twm/ur_file"  # Select Chinese server if '(1)2' is pressed
-		elif [ "$UR" = '3' ]; then
-			echo "13" >"$HOME/twm/ur_file"  # Select English server if '(1)3' is pressed
-		elif [ "$UR" = $'\177' ]; then
-			menu_one # Go back to the first menu if Backspace is pressed
-		elif [ "$UR" = 'c' ] || [ "$UR" = 'C' ]; then
-# Kill any running play.sh script if 'c' is pressed and exit the script
-			pidf=$(ps ax -o pid=,args= | grep "sh.*twm/play.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
-			until [ -z "$pidf" ]; do
-				kill -9 "$pidf" 2> /dev/null
-				pidf=$(ps ax -o pid=,args= | grep "sh.*twm/play.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
-				sleep 1s
+	# Função para encerrar o script
+	terminate_script() {
+			echo_t "Terminating script..."
+			local pidf
+			pidf=$(pgrep -f "sh.*twm/play.sh")
+			while [ -n "$pidf" ]; do
+					kill -9 "$pidf" 2>/dev/null
+					pidf=$(pgrep -f "sh.*twm/play.sh")
+					sleep 1
 			done
-			kill -9 $$ 2> /dev/null # Terminate the current script process
-		else
-			invalid_two # Handle invalid input by calling the invalid function for menu two
-		fi
+			kill -9 $$ 2>/dev/null
 	}
 
-# Function for the first menu of options
-	menu_one () {
-		options_one
-		echo_t "Select server number: " "" " [1 to 11]" # Default selection shown to user
-		read -r -n 1 UR
-
-# Process user input for server selection in the first menu
-		case "$UR" in
-		'1') menu_two ;; # Go to second menu if '1' is selected
-		'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9')
-			echo "$UR" >"$HOME/twm/ur_file"
-			;;
-		$'\177') menu_one ;; # Go back if Backspace is pressed
-		# If ‘c’ or ‘C’ is pressed, terminate play.sh and exit
-		'c'|'C') 
-			pidf=$(ps ax -o pid=,args= | grep "sh.*twm/play.sh"|grep -v 'grep'|head -n 1|grep -o -E '([0-9]{3,5})')
-			until [ -z "$pidf" ]; do
-				kill -9 "$pidf" 2> /dev/null
-				pidf=$(ps ax -o pid=,args=|grep "sh.*twm/play.sh"|grep -v 'grep'|head -n 1|grep -o -E '([0-9]{3,5})')
-				sleep 1s
+	# Função principal do menu
+	menu_loop() {
+			while true; do
+					display_menu
+					printf "Select server number (1-13) or C to cancel: "
+					read -r input
+					process_input "$input" && break  # Sai do loop se a entrada for válida
 			done
-			kill -9 $$ 2> /dev/null
-			;;
-		*) invalid_one ;; # Handle invalid input by calling the invalid function for menu one
-		esac
 	}
 
-# Check if ur_file exists and is not empty; if so, read from it; otherwise, show the first menu.
+	# Verifica se o arquivo ur_file existe e é válido
 	if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
-		UR="$(cat "$HOME/twm/ur_file")"
+			UR=$(cat "$HOME/twm/ur_file")
+			echo_t "Using existing selection: $UR"
 	else
-		menu_one
+			menu_loop
+			UR=$(cat "$HOME/twm/ur_file")  # Atualiza UR após o menu
 	fi
 
-	UR="$(cat "$HOME/twm/ur_file")"
-
-# Estrutura case para associar a seleção do usuário com os idiomas e configurações
-case $UR in
+	# Estrutura case para associar a seleção do usuário com os idiomas e configurações
+	echo "You have selectet $UR"
+	case $UR in
     (1|bra|pt)
         URL=$(echo "ZnVyaWFkZXRpdGFzLm5ldA==" | base64 -d)
         echo "1" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.1"
-        export TZ="America/Bahia"; ALLIES="_WORK"
+        export TZ="America/Bahia"; ALLIAS="_WORK"
         set_config "LANGUAGE" "pt"
         ;;
     (2|ger|de)
         URL=$(echo "dGl0YW5lbi5tb2Jp" | base64 -d)
         echo "2" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.2"
-        export TZ="Europe/Berlin"; ALLIES="_WORK"
+        export TZ="Europe/Berlin"; ALLIAS="_WORK"
         set_config "LANGUAGE" "de"
         ;;
     (3|esp|es)
         URL=$(echo "Z3VlcnJhZGV0aXRhbmVzLm5ldA==" | base64 -d)
         echo "3" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.3"
-        export TZ="America/Cancun"; ALLIES="_WORK"
+        export TZ="America/Cancun"; ALLIAS="_WORK"
         set_config "LANGUAGE" "es"
         ;;
     (4|fran|fr)
         URL=$(echo "dGl3YXIuZnI=" | base64 -d)
         echo "4" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.4"
-        export TZ="Europe/Paris"; ALLIES="_WORK"
+        export TZ="Europe/Paris"; ALLIAS="_WORK"
         set_config "LANGUAGE" "fr"
         ;;
     (5|indi|hi)
         URL=$(echo "aW4udGl3YXIubmV0" | base64 -d)
         echo "5" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.5"
-        export TZ="Asia/Kolkata"; ALLIES="_WORK"
+        export TZ="Asia/Kolkata"; ALLIAS="_WORK"
         set_config "LANGUAGE" "hi"
         ;;
     (6|indo|id)
         URL=$(echo "dGl3YXItaWQubmV0" | base64 -d)
         echo "6" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.6"
-        export TZ="Asia/Jakarta"; ALLIES="_WORK"
+        export TZ="Asia/Jakarta"; ALLIAS="_WORK"
         set_config "LANGUAGE" "id"
         ;;
     (7|ital|it)
         URL=$(echo "Z3VlcnJhZGl0aXRhbmkubmV0" | base64 -d)
         echo "7" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.7"
-        export TZ="Europe/Rome"; ALLIES="_WORK"
+        export TZ="Europe/Rome"; ALLIAS="_WORK"
         set_config "LANGUAGE" "it"
         ;;
     (8|pol|pl)
         URL=$(echo "dGl3YXIucGw=" | base64 -d)
         echo "8" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.8"
-        export TZ="Europe/Warsaw"; ALLIES="_WORK"
+        export TZ="Europe/Warsaw"; ALLIAS="_WORK"
         set_config "LANGUAGE" "pl"
         ;;
     (9|rom|ro)
         URL=$(echo "dGl3YXIucm8=" | base64 -d)
         echo "9" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.9"
-        export TZ="Europe/Bucharest"; ALLIES="_WORK"
+        export TZ="Europe/Bucharest"; ALLIAS="_WORK"
         set_config "LANGUAGE" "ro"
         ;;
     (10|rus|ru)
         URL=$(echo "dGl3YXIucnU=" | base64 -d)
         echo "10" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.10"
-        export TZ="Europe/Moscow"; ALLIES="_WORK"
+        export TZ="Europe/Moscow"; ALLIAS="_WORK"
         set_config "LANGUAGE" "ru"
         ;;
     (11|ser|sr)
         URL=$(echo "cnMudGl3YXIubmV0" | base64 -d)
         echo "11" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.11"
-        export TZ="Europe/Belgrade"; ALLIES="_WORK"
+        export TZ="Europe/Belgrade"; ALLIAS="_WORK"
         set_config "LANGUAGE" "sr"
         ;;
     (12|chi|zh)
         URL=$(echo "Y24udGl3YXIubmV0" | base64 -d)
         echo "12" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.12"
-        export TZ="Asia/Shanghai"; ALLIES="_WORK"
+        export TZ="Asia/Shanghai"; ALLIAS="_WORK"
         set_config "LANGUAGE" "zh"
         ;;
     (13|eng|en)
         URL=$(echo "dGl3YXIubmV0" | base64 -d)
         echo "13" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.13"
-        export TZ="Europe/London"; ALLIES="_WORK"
+        export TZ="Europe/London"; ALLIAS="_WORK"
         set_config "LANGUAGE" "en"
         ;;
     (*)
@@ -232,29 +175,29 @@ case $UR in
             echo_t "\n Invalid option: ${UR}"
             kill -9 $$
         else
-            echo_t "\n Time exceeded!"
+            echo_t " Time exceeded!"
         fi
         ;;
-esac
+	esac
 
 	clear
 
-# Check if URL is set; if not, exit the script
+	# Check if URL is set; if not, exit the script
 	if [ -z "$URL" ]; then
 		exit 1
 	fi
 
-# Create the temporary directory if it doesn't exist
+	# Create the temporary directory if it doesn't exist
 	mkdir -p "$TMP"
 
-# Change to the temporary directory
+	# Change to the temporary directory
 	cd "$TMP" || exit 1
 
-# Reset and clear the terminal screen
+	# Reset and clear the terminal screen
 	reset
 	clear
 
-# Function to handle user agent selection and setup
+	# Function to handle user agent selection and setup
 	user_agent () {
 		cd "$TMP" || exit 1
 		clear
@@ -269,7 +212,7 @@ if [ -f "$HOME/twm/fileAgent.txt" ] && [ -s "$HOME/twm/fileAgent.txt" ]; then
     UA=$(cat "$HOME/twm/fileAgent.txt") # Read existing user agent
 else
     echo_t "Set up User-Agent: " "$COLOR_RESET" " [1 to 2]"
-    read -r -n 1 UA # Read user input for user agent selection
+    read -r 1 UA # Read user input for user agent selection
 fi
 
 
