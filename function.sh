@@ -63,7 +63,8 @@ request_update() {
                 echo_t "Do you want to change the language? (y or n):"
                 menu_loop
                 menu_language
-                break
+                key="LANGUAGE"
+                continue
                 ;;
             (exit|*)
                 echo_t "Exiting configuration update mode."
@@ -89,7 +90,7 @@ request_update() {
 
         # Call the configuration update function and capture the status
         set_config "$key" "$value"
-        success=$?
+        #success=$?
 
         # Check if there was a failure and notify the user
         if [ "$success" -ne 0 ]; then
