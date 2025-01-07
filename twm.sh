@@ -2,6 +2,7 @@
 # shellcheck disable=SC1091
 . "$HOME"/twm/info.sh
 colors
+language_setup
 RUN=$(cat "$HOME"/twm/runmode_file)
 cd "$HOME"/twm || exit
 
@@ -81,7 +82,6 @@ func_unset() {
 }
 
 # Check if the user settings file exists and is not empty
-language_setup
 if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
     echo_t "Starting with last settings used." "${GREEN_BLACK}" "${COLOR_RESET}\n"
     
