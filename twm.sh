@@ -1,8 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC1091
 . "$HOME"/twm/info.sh
-. "$HOME"/twm/language.sh
-
 colors
 RUN=$(cat "$HOME"/twm/runmode_file)
 cd "$HOME"/twm || exit
