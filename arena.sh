@@ -63,7 +63,7 @@ arena_duel() {
         count=$((count + 1))
         
         # Mostra o número do ataque
-        echo_t "  Attack " "" "${count}" "before" "⚔️"
+        echo_t "  Attack " "" "${count}\n" "before" "⚔️"
         
         sleep 0.6s
     done
