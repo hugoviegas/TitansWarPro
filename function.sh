@@ -24,9 +24,9 @@ request_update() {
         # Instructions for the user
         echo_t "  Macro settings, list of changes to modify type the command number" "${BLACK_GREEN}" "${COLOR_RESET}" "before" "⚙️"
         echo " "
-        echo_t "1- Collect relics. | Current value: " "" "$FUNC_check_rewards"
-        echo_t "2- Use elixir. | Current value: " "" "$FUNC_use_elixir"
-        echo_t "3- Auto update. | Current value: " "" "$FUNC_AUTO_UPDATE"
+        echo_t "1- Collect relics. Current value: " "" "$FUNC_check_rewards"
+        echo_t "2- Use elixir. Current value: " "" "$FUNC_use_elixir"
+        echo_t "3- Auto update. Current value: " "" "$FUNC_AUTO_UPDATE"
         echo_t "Press *ENTER* to exit configuration update mode." "" "" "after" "↩️"
         read -r key
 
@@ -51,7 +51,7 @@ request_update() {
         esac
 
         # If a valid key was chosen, validate input for value
-        if [[ $key != "FUNC_check_rewards" && $key != "FUNC_elixir" && $key != "FUNC_AUTO_UPDATE" ]]; then
+        if [[ $key != "FUNC_check_rewards" && $key != "FUNC_use_elixir" && $key != "FUNC_AUTO_UPDATE" ]]; then
             continue
         fi
 
@@ -94,10 +94,10 @@ load_config() {
         echo_t "Configuration file not found. Creating config.cfg with default values."
         
         # Define default values
-        FUNC_check_rewards="n"
+        FUNC_check_rewards="Y"
         FUNC_use_elixir="n"
         FUNC_coliseum="y"
-        FUNC_AUTO_UPDATE="n"
+        FUNC_AUTO_UPDATE="Y"
         SCRIPT_PAUSED="n"
 
         # Write the config.cfg file with default values
@@ -120,7 +120,7 @@ config() {
         # Check if the script is paused or signaled to exit
         if [ "$SCRIPT_PAUSED" = "y" ] || [ "$EXIT_CONFIG" = "y" ]; then
             echo_t "Script paused. Waiting for reactivation..."
-            sleep 2
+            sleep 1
             load_config  # Reload the configuration after the interval
 
             # If EXIT_CONFIG is "s", exit the main loop
@@ -158,11 +158,12 @@ config() {
             load_config
         else
             SCRIPT_PAUSED="n"
+            EXIT_CONFIG="Y"
             break
         fi
 
         # Interval before restarting the loop
-        sleep 5
+        sleep 3
     done
 }
 
