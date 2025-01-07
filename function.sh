@@ -29,7 +29,7 @@ request_update() {
         echo_t "3- Auto update. Current value: " "" "$FUNC_AUTO_UPDATE"
         echo_t "4- Get to top in league. Current value: " "" "$FUNC_play_league"
         echo_t "5- Change language. Current value: " "" "$LANGUAGE"
-        echo_t "Press *ENTER* to exit configuration update mode." "" "" "after" "↩️"
+        echo_t "Press *'ENTER'* to exit configuration update mode." "" "" "after" "↩️"
         read -r -n 1 key
 
         case $key in

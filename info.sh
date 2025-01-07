@@ -91,7 +91,7 @@ printf_t() {
 
   # Adiciona o emoji conforme a posição especificada
   if [ "$local_emoji_position" = "before" ]; then
-    printf "${local_color_start}%s %s${local_color_end}" "$local_emoji" "$local_translated_text"
+    printf "${local_color_start}%s %s${local_color_end}\n" "$local_emoji" "$local_translated_text"
   else
     printf "${local_color_start}%s %s${local_color_end}" "$local_translated_text" "$local_emoji"
   fi
