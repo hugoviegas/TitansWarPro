@@ -1,6 +1,9 @@
 # shellcheck disable=SC2154
 members_allies() {
     cd "$TMP" || exit
+    # Load config file
+    AL=$(set_config "ALLIES" "")
+
     echo "" >> allies.txt
     clan_id
     echo "" > callies.txt
@@ -36,7 +39,7 @@ id_allies() {
     ) </dev/null &>/dev/null &
     time_exit 17
 
-    NPG=$(cat "$TMP"/SRC | grep -o -E '/mail/friends/([0-9]{0,4})[^[:alnum:]]{4}62[^[:alnum:]]{3}62[^[:alnum:]]' | sed 's/\/mail\/friends\/\([0-9]\{0,4\}\).*/\1/') > tmp.txt
+    NPG=$(cat "$TMP/SRC" | grep -o -E '/mail/friends/([0-9]{0,4})[^[:alnum:]]{4}62[^[:alnum:]]{3}62[^[:alnum:]]' | sed 's/\/mail\/friends\/\([0-9]\{0,4\}\).*/\1/') > tmp.txt
     
     if [ -z "$NPG" ]; then
         echo_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET"
@@ -113,7 +116,7 @@ clan_allies() {
 conf_allies() {
     cd "$TMP" || exit  # Change to the temporary directory
     clear
-    
+
     # Exibe o cabeçalho da seção de configuração de aliados
     echo_t "The script will consider users on your friends list and Clan as allies. Leader on friend list will add Clan allies." "$BLACK_CYAN" "$COLOR_RESET"
 
@@ -123,56 +126,54 @@ conf_allies() {
     echo_t "3) Add/Update just Clan alliances (Altars, Clan Coliseum and Clan Fight)" "" "" "after" "🔴 🔵"
     echo_t "4) Do nothing" "" "" "after" "🚶"
 
-    # Verifica se o arquivo de alianças existe e possui conteúdo; caso contrário, pede ao usuário para configurar
-    if [ -f "$HOME/twm/al_file" ] && [ -s "$HOME/twm/al_file" ]; then
-        AL=$(cat "$HOME"/twm/al_file)
+    # Verifica se o valor de ALLIES já está configurado
+    AL=$(get_config "ALLIES")
+    if [ -z "$AL" ]; then
+        echo_t "Set up alliances :" "" " [1 to 4]"
+        while true; do
+            read -r -n 1 AL
+            echo  # Quebra de linha após o input
+            if [[ $AL =~ ^[1-4]$ ]]; then
+                set_config "ALLIES" "$AL"
+                break
+            else
+                echo_t "Invalid input. Please enter a value between 1 and 4:"
+            fi
+        done
     else
-        echo_t "Set up alliances :" "" " [1 to 4]" "after" ""
-        read -r -n 1 AL
+        echo_t "Using existing alliance configuration:" "" "$AL"
     fi
 
+    # Executa ações com base no valor de AL
     case $AL in
-         #/Opção 1: Ativa alianças em todas as batalhas (chama as funções AlliesID, ClanAlliesID e Members, define a variável ALD como 1, armazena o valor "1" no arquivo al_file e exibe uma mensagem de confirmação)
-      1)
+        1)
             id_allies
             clan_allies
             members_allies
-            ALD=1
-            echo "1" > "$HOME/twm/al_file"
             echo_t "Alliances on all battles active" "" "" "after" "🔵👨 🔴🧑‍🦰"
-        ;;
-        # Opção 2: Ativa alianças apenas em Herois
-        2) 
+            ;;
+        2)
             id_allies
             members_allies
             if [ -e "$TMP/callies.txt" ]; then
-                : > "$TMP"/callies.txt
+                : > "$TMP/callies.txt"
             fi
-            ALD=1
-            echo "2" > "$HOME/twm/al_file"
             echo_t "Just Herois alliances now." "" "" "after" "👫"
-        ;;
-        # Opção 3: Ativa alianças apenas no Clan
-        3) 
+            ;;
+        3)
             id_allies
             clan_allies
             if [ -e "$TMP/allies.txt" ]; then
-                : > "$TMP"/allies.txt
+                : > "$TMP/allies.txt"
             fi
-            unset ALD
-            echo "3" > "$HOME/twm/al_file"
             echo_t "Just Clan alliances now." "" "" "after" "🔴 🔵"
-        ;;
-        # Opção 4: Não faz nada
-        4) 
+            ;;
+        4)
             echo_t "Nothing changed." "" "" "after" "🚶"
-            ALD=1
-            echo "4" > "$HOME/twm/al_file"
-            : >> "$TMP"/allies.txt
-            : >> "$TMP"/callies.txt
-        ;;
-        # Opção inválida ou tempo excedido
-        *) 
+            : >> "$TMP/allies.txt"
+            : >> "$TMP/callies.txt"
+            ;;
+        *)
             clear
             if [ -n "$AL" ]; then
                 echo_t "Invalid option: " "" "$AL"
@@ -180,6 +181,6 @@ conf_allies() {
             else
                 echo_t "Time exceeded!" >> "$TMP/ERROR_DEBUG"
             fi
-        ;;
+            ;;
     esac
 }

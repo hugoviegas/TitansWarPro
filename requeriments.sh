@@ -135,99 +135,99 @@ invalid_two () {
 # Estrutura case para associar a seleção do usuário com os idiomas e configurações
 case $UR in
     (1|bra|pt)
-        URL=$(echo "ZnVyaWFkZXRpdGFzLm5ldA=="|base64 -d)
-        echo "1" >"$HOME/twm/ur_file"
+        URL=$(echo "ZnVyaWFkZXRpdGFzLm5ldA==" | base64 -d)
+        echo "1" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.1"
         export TZ="America/Bahia"; ALLIES="_WORK"
-        echo "pt" > "$LANGUAGE_FILE"
+        set_config "LANGUAGE" "pt"
         ;;
     (2|ger|de)
-        URL=$(echo "dGl0YW5lbi5tb2Jp"|base64 -d)
-        echo "2" >"$HOME/twm/ur_file"
+        URL=$(echo "dGl0YW5lbi5tb2Jp" | base64 -d)
+        echo "2" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.2"
         export TZ="Europe/Berlin"; ALLIES="_WORK"
-        echo "de" > "$LANGUAGE_FILE"
+        set_config "LANGUAGE" "de"
         ;;
     (3|esp|es)
-        URL=$(echo "Z3VlcnJhZGV0aXRhbmVzLm5ldA=="|base64 -d)
-        echo "3" >"$HOME/twm/ur_file"
+        URL=$(echo "Z3VlcnJhZGV0aXRhbmVzLm5ldA==" | base64 -d)
+        echo "3" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.3"
         export TZ="America/Cancun"; ALLIES="_WORK"
-        echo "es" > "$LANGUAGE_FILE"
+        set_config "LANGUAGE" "es"
         ;;
     (4|fran|fr)
-        URL=$(echo "dGl3YXIuZnI="|base64 -d)
-        echo "4" >"$HOME/twm/ur_file"
+        URL=$(echo "dGl3YXIuZnI=" | base64 -d)
+        echo "4" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.4"
         export TZ="Europe/Paris"; ALLIES="_WORK"
-        echo "fr" > "$LANGUAGE_FILE"
+        set_config "LANGUAGE" "fr"
         ;;
     (5|indi|hi)
-        URL=$(echo "aW4udGl3YXIubmV0"|base64 -d)
-        echo "5" >"$HOME/twm/ur_file"
+        URL=$(echo "aW4udGl3YXIubmV0" | base64 -d)
+        echo "5" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.5"
         export TZ="Asia/Kolkata"; ALLIES="_WORK"
-        echo "hi" > "$LANGUAGE_FILE"
+        set_config "LANGUAGE" "hi"
         ;;
     (6|indo|id)
-        URL=$(echo "dGl3YXItaWQubmV0"|base64 -d)
-        echo "6" >"$HOME/twm/ur_file"
+        URL=$(echo "dGl3YXItaWQubmV0" | base64 -d)
+        echo "6" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.6"
         export TZ="Asia/Jakarta"; ALLIES="_WORK"
-        echo "id" > "$LANGUAGE_FILE"
+        set_config "LANGUAGE" "id"
         ;;
     (7|ital|it)
-        URL=$(echo "Z3VlcnJhZGl0aXRhbmkubmV0"|base64 -d)
-        echo "7" >"$HOME/twm/ur_file"
+        URL=$(echo "Z3VlcnJhZGl0aXRhbmkubmV0" | base64 -d)
+        echo "7" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.7"
         export TZ="Europe/Rome"; ALLIES="_WORK"
-        echo "it" > "$LANGUAGE_FILE"
+        set_config "LANGUAGE" "it"
         ;;
     (8|pol|pl)
-        URL=$(echo "dGl3YXIucGw="|base64 -d)
-        echo "8" >"$HOME/twm/ur_file"
+        URL=$(echo "dGl3YXIucGw=" | base64 -d)
+        echo "8" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.8"
         export TZ="Europe/Warsaw"; ALLIES="_WORK"
-        echo "pl" > "$LANGUAGE_FILE"
+        set_config "LANGUAGE" "pl"
         ;;
     (9|rom|ro)
-        URL=$(echo "dGl3YXIucm8="|base64 -d)
-        echo "9" >"$HOME/twm/ur_file"
+        URL=$(echo "dGl3YXIucm8=" | base64 -d)
+        echo "9" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.9"
         export TZ="Europe/Bucharest"; ALLIES="_WORK"
-        echo "ro" > "$LANGUAGE_FILE"
+        set_config "LANGUAGE" "ro"
         ;;
     (10|rus|ru)
-        URL=$(echo "dGl3YXIucnU="|base64 -d)
-        echo "10" >"$HOME/twm/ur_file"
+        URL=$(echo "dGl3YXIucnU=" | base64 -d)
+        echo "10" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.10"
         export TZ="Europe/Moscow"; ALLIES="_WORK"
-        echo "ru" > "$LANGUAGE_FILE"
+        set_config "LANGUAGE" "ru"
         ;;
     (11|ser|sr)
-        URL=$(echo "cnMudGl3YXIubmV0"|base64 -d)
-        echo "11" >"$HOME/twm/ur_file"
+        URL=$(echo "cnMudGl3YXIubmV0" | base64 -d)
+        echo "11" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.11"
         export TZ="Europe/Belgrade"; ALLIES="_WORK"
-        echo "sr" > "$LANGUAGE_FILE"
+        set_config "LANGUAGE" "sr"
         ;;
     (12|chi|zh)
-        URL=$(echo "Y24udGl3YXIubmV0"|base64 -d)
-        echo "12" >"$HOME/twm/ur_file"
+        URL=$(echo "Y24udGl3YXIubmV0" | base64 -d)
+        echo "12" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.12"
         export TZ="Asia/Shanghai"; ALLIES="_WORK"
-        echo "zh" > "$LANGUAGE_FILE"
+        set_config "LANGUAGE" "zh"
         ;;
     (13|eng|en)
-        URL=$(echo "dGl3YXIubmV0"|base64 -d)
-        echo "13" >"$HOME/twm/ur_file"
+        URL=$(echo "dGl3YXIubmV0" | base64 -d)
+        echo "13" > "$HOME/twm/ur_file"
         TMP="$HOME/twm/.13"
         export TZ="Europe/London"; ALLIES="_WORK"
-        echo "en" > "$LANGUAGE_FILE"
+        set_config "LANGUAGE" "en"
         ;;
     (*)
         clear
-        LANGUAGE=$(cat "$LANGUAGE_FILE" 2>/dev/null || echo "pt")
+        LANGUAGE=$(get_config "LANGUAGE")
         if [ -n "$UR" ]; then
             echo_t "\n Invalid option: ${UR}"
             kill -9 $$

@@ -66,9 +66,8 @@ league_play() {
     j=1  # Index for fight buttons (skipping every 2 links)
     enemy_index=1  # Separate index for enemy stats
     FUNC_play_league=$(get_config "FUNC_play_league") # get the league number from the config file
-
-#[ "$fights_done" -lt "$AVAILABLE_FIGHTS" ] && 
-
+ 
+    #[ "$fights_done" -lt "$AVAILABLE_FIGHTS" ] && 
     while [ "$AVAILABLE_FIGHTS" -gt 0 ]; do
         case "$action" in
             check_fights)
@@ -80,7 +79,7 @@ league_play() {
                 
                 click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight button
                 #echo "${URL}$click"
-                if [[ "$click" == *"/league/refreshFights/"* ]]; then
+                if [[ "$click" == *"/league/refreshFights/"* ]] && [ "$ENEMY_NUMBER" -lt "$FUNC_play_league" ]; then
                     echo_t "Fights limit reached, finishing..."
                     action="exit_loops"
                 elif [ -n "$click" ]; then
@@ -96,6 +95,15 @@ league_play() {
 
                     echo_t "Enemy Number:" "" "$ENEMY_NUMBER"
                     #echo -e "Enemy Stats: Strength: ${E_STRENGTH:-0}"
+                    # loopt until finsh all battles
+                    if [ "$AVAILABLE_FIGHTS" -eq 0 ] && [ "$ENEMY_NUMBER" -gt "$FUNC_play_league" ]; then
+                        # /league/refreshFights/?r=56720053
+                        echo_t "Refreshed fights" "" "" "after" "🔄"
+                        click=$(grep -o -E "/league/refreshFights/\?r=[0-9]+" "$TMP/SRC" | sed -n 1p)
+                        fetch_page "$click"
+                        enemy_index=1
+                        j=1
+                    fi
                     action="fight_or_skip"
                 else
                     echo "No fight buttons found for button $j ❌" >> "$TMP/ERROR_DEBUG"
@@ -114,6 +122,7 @@ league_play() {
                     echo_t "Fight the enemy number $ENEMY_NUMBER ✅ ." "" "\n"
                     enemy_index=1  # Reset enemy index after a fight
                     j=1  # Reset button index after a fight
+                    # get the new ENEMY_NUMBER
                     last_click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight
                     ENEMY_NUMBER=$(echo "$last_click" | grep -o -E '[0-9]+' | head -n 1)
                     fetch_available_fights  # Recheck available fights
@@ -156,17 +165,11 @@ league_play() {
                         # Reset the index to attack the first enemy
                         enemy_index=1
                         j=1
-                    elif [ "$AVAILABLE_FIGHTS" -eq 0 ] && [ "$ENEMY_NUMBER" -gt "$FUNC_play_league" ]; then
-                        # /league/refreshFights/?r=56720053
-                        echo_t "Refreshed fights" "" "" "after" "🔄"
-                        click=$(grep -o -E "/league/refreshFights/\?r=[0-9]+" "$TMP/SRC" | sed -n 1p)
-                        fetch_page "$click"
-                        enemy_index=1
-                        j=1
-                        action="fight_or_skip"
+                        action="check_fights"
                     else
                         action="check_fights"
                     fi
+                    
                 fi
                 ;;
             

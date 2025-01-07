@@ -1,6 +1,9 @@
 #!/bin/bash
 # shellcheck disable=SC1091
 . "$HOME"/twm/info.sh
+. "$HOME"/twm/language.sh
+. "$TMP/config.cfg"
+load_config
 colors
 RUN=$(cat "$HOME"/twm/runmode_file)
 cd "$HOME"/twm || exit
@@ -33,7 +36,7 @@ fi
 #/sources
 cd ~/twm || exit
 #/twm.sh before sources <<
-#. clandmgfight.sh
+. clandmgfight.sh
 . language.sh
 . requeriments.sh
 . loginlogoff.sh
@@ -91,7 +94,7 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
         i=$((i - 1))
         if read -t 1; then
             # Clear relevant files if Enter is pressed
-            : >"$HOME/twm/al_file"
+            set_config "ALLIES" "" # Clear allies configuration
             : >"$HOME/twm/ur_file"
             : >"$HOME/twm/fileAgent.txt"
             unset UR UA AL  # Unset user-related variables

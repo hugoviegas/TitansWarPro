@@ -29,7 +29,7 @@ request_update() {
         echo_t "3- Auto update. Current value: " "" "$FUNC_AUTO_UPDATE"
         echo_t "4- Get to top in league. Current value: " "" "$FUNC_play_league"
         echo_t "Press *ENTER* to exit configuration update mode." "" "" "after" "↩️"
-        read -r key
+        read -r -n 1 key
 
         case $key in
             (1|relics)
@@ -81,7 +81,7 @@ request_update() {
         done
 
         # Call the configuration update function and capture the status
-        update_config "$key" "$value"
+        set_config "$key" "$value"
         success=$?
 
         # Check if there was a failure and notify the user
@@ -114,6 +114,7 @@ load_config() {
         FUNC_coliseum="y"
         FUNC_AUTO_UPDATE="y"
         FUNC_play_league=999
+        LANGUAGE="en"
         SCRIPT_PAUSED="n"
 
         # Write the config.cfg file with default values
@@ -124,6 +125,9 @@ load_config() {
             echo "FUNC_AUTO_UPDATE=$FUNC_AUTO_UPDATE"
             echo "FUNC_play_league=$FUNC_play_league"
             echo "SCRIPT_PAUSED=$SCRIPT_PAUSED"
+            echo "LANGUAGE=$LANGUAGE"
+            echo "ALLIES="
+
         } > "$CONFIG_FILE"
     fi
 }
@@ -133,6 +137,23 @@ get_config() {
     local key="$1"  # Name of the configuration to get
     load_config  # Load the configuration file
     echo "${!key}"  # Return the value of the configuration
+}
+
+# Function to change or create the configuration from file and return the value
+set_config() {
+    local key="$1"    # Name of the configuration to set
+    local value="$2"  # New value for the configuration
+    load_config  # Load the configuration file
+
+    # Remove any existing entry for the key
+    grep -v "^${key}=" "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" 2>/dev/null || true
+    mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
+
+    # Add the new configuration
+    echo "${key}=${value}" >> "$CONFIG_FILE"
+
+    # Return the value (optional)
+    return "$value"
 }
 
 config() {

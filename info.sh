@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.9.14" # to change the version number every time has an update!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    versionNum="3.9.15" # to change the version number every time has an update!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 for i in $colors; do
 clear
@@ -62,14 +62,15 @@ done
 }
 
 language_setup() {
-    LANGUAGE_FILE="$HOME/twm/language_file"  # Caminho para o arquivo de idioma
-    
-    # Verifica se o arquivo existe e se contém um idioma válido
-    if [ -f "$LANGUAGE_FILE" ] && [ -s "$LANGUAGE_FILE" ]; then
-        LANGUAGE=$(cat "$LANGUAGE_FILE")
-    else
-        LANGUAGE="en"  # Define o idioma para o padrão
-        echo "$LANGUAGE" > "$LANGUAGE_FILE"  # Salva o idioma padrão no arquivo
+    CONFIG_FILE="$TMP/config.cfg"  # Caminho para o arquivo de configuração
+
+    # Verifica se o idioma está configurado no arquivo de configuração
+    LANGUAGE=$(grep -E "^LANGUAGE=" "$CONFIG_FILE" 2>/dev/null | cut -d '=' -f2)
+
+    # Se o idioma não estiver definido, define o padrão como "en"
+    if [ -z "$LANGUAGE" ]; then
+        LANGUAGE="en"  # Idioma padrão
+        echo "LANGUAGE=$LANGUAGE" >> "$CONFIG_FILE"  # Salva no arquivo de configuração
     fi
 
     # Exporta a variável para torná-la disponível globalmente
