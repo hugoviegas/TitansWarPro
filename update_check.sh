@@ -19,7 +19,7 @@ update() {
   . info.sh
   load_config
   # Exibe a mensagem de loading
-  echo_t "Looking for new updates, please wait..."
+  echo_t "Looking for new updates, please wait..." "" "" "after" "🔍"
 
   # Verifica cada script
   for script in "${SCRIPTS[@]}"; do
