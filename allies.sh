@@ -27,9 +27,9 @@ members_allies() {
 }
 
 id_allies() {
-    printf_t "Looking for allies on friends list" "$BLACK_CYAN" "$COLOR_RESET" "after" "🔎"
+    echo_t "Looking for allies on friends list" "$BLACK_CYAN" "$COLOR_RESET" "after" "🔎"
     cd "$TMP" || exit
-    printf_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET"
+    echo_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET"
 
     (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/mail/friends" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$TMP"/SRC
@@ -39,7 +39,7 @@ id_allies() {
     NPG=$(cat "$TMP"/SRC | grep -o -E '/mail/friends/([0-9]{0,4})[^[:alnum:]]{4}62[^[:alnum:]]{3}62[^[:alnum:]]' | sed 's/\/mail\/friends\/\([0-9]\{0,4\}\).*/\1/') > tmp.txt
     
     if [ -z "$NPG" ]; then
-        printf_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET"
+        echo_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET"
         (
             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/mail/friends" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed 's,/user/,\n/user/,g' | grep '/user/' | grep '/mail/' | cut -d\< -f1 >> tmp.txt
         ) </dev/null &>/dev/null &
@@ -76,7 +76,7 @@ clan_allies() {
         echo "" > callies.txt
         cut -d/ -f3 tmp.txt > ids.txt  # Extrai IDs diretamente para ids.txt
 
-        printf_t "Clan allies by Leader on friends list" "$BLACK_CYAN" "$COLOR_RESET"
+        echo_t "Clan allies by Leader on friends list" "$BLACK_CYAN" "$COLOR_RESET"
         Lnl=$(wc -l < ids.txt)  # Contar linhas em ids.txt
         ts=0
         
@@ -93,7 +93,7 @@ clan_allies() {
                 LEADPU=$(sed 's,/clan/,\n/clan/,g' "$TMP"/SRC | grep -E "</a>, <span class='blue'|</a>, <span class='green'" | cut -d\< -f1 | cut -d\> -f2)
                 alCLAN=$(grep -E -o '/clan/[0-9]{1,3}' "$TMP"/SRC | tail -n1)
                 
-                printf_t "${LEADPU} - ${alCLAN}" "$PURPLEis_BLACK" "$COLOR_RESET"
+                echo_t "${LEADPU} - ${alCLAN}" "$PURPLEis_BLACK" "$COLOR_RESET"
                 
                 if [ -n "$LEADPU" ]; then
                     ts=$((ts + 1))  # Increment ally count
@@ -115,19 +115,19 @@ conf_allies() {
     clear
     
     # Exibe o cabeçalho da seção de configuração de aliados
-    printf_t "The script will consider users on your friends list and Clan as allies. Leader on friend list will add Clan allies." "$BLACK_CYAN" "$COLOR_RESET"
+    echo_t "The script will consider users on your friends list and Clan as allies. Leader on friend list will add Clan allies." "$BLACK_CYAN" "$COLOR_RESET"
 
     # Opções de configuração com emojis para cada item do menu
-    printf_t "1) Add/Update alliances (All Battles)" "" "" "after" "🔵👨 🔴🧑‍🦰"
-    printf_t "2) Add/Update just Herois alliances (Coliseum/King of immortals)" "" "" "after" "👫"
-    printf_t "3) Add/Update just Clan alliances (Altars, Clan Coliseum and Clan Fight)" "" "" "after" "🔴 🔵"
-    printf_t "4) Do nothing" "" "" "after" "🚶"
+    echo_t "1) Add/Update alliances (All Battles)" "" "" "after" "🔵👨 🔴🧑‍🦰"
+    echo_t "2) Add/Update just Herois alliances (Coliseum/King of immortals)" "" "" "after" "👫"
+    echo_t "3) Add/Update just Clan alliances (Altars, Clan Coliseum and Clan Fight)" "" "" "after" "🔴 🔵"
+    echo_t "4) Do nothing" "" "" "after" "🚶"
 
     # Verifica se o arquivo de alianças existe e possui conteúdo; caso contrário, pede ao usuário para configurar
     if [ -f "$HOME/twm/al_file" ] && [ -s "$HOME/twm/al_file" ]; then
         AL=$(cat "$HOME"/twm/al_file)
     else
-        printf_t "Set up alliances :" "" " [1 to 4]" "after" ""
+        echo_t "Set up alliances :" "" " [1 to 4]" "after" ""
         read -r -n 1 AL
     fi
 
@@ -139,7 +139,7 @@ conf_allies() {
             members_allies
             ALD=1
             echo "1" > "$HOME/twm/al_file"
-            printf_t "Alliances on all battles active" "" "" "after" "🔵👨 🔴🧑‍🦰"
+            echo_t "Alliances on all battles active" "" "" "after" "🔵👨 🔴🧑‍🦰"
         ;;
         # Opção 2: Ativa alianças apenas em Herois
         2) 
@@ -150,7 +150,7 @@ conf_allies() {
             fi
             ALD=1
             echo "2" > "$HOME/twm/al_file"
-            printf_t "Just Herois alliances now." "" "" "after" "👫"
+            echo_t "Just Herois alliances now." "" "" "after" "👫"
         ;;
         # Opção 3: Ativa alianças apenas no Clan
         3) 
@@ -161,11 +161,11 @@ conf_allies() {
             fi
             unset ALD
             echo "3" > "$HOME/twm/al_file"
-            printf_t "Just Clan alliances now." "" "" "after" "🔴 🔵"
+            echo_t "Just Clan alliances now." "" "" "after" "🔴 🔵"
         ;;
         # Opção 4: Não faz nada
         4) 
-            printf_t "Nothing changed." "" "" "after" "🚶"
+            echo_t "Nothing changed." "" "" "after" "🚶"
             ALD=1
             echo "4" > "$HOME/twm/al_file"
             : >> "$TMP"/allies.txt
