@@ -51,6 +51,7 @@ while true; do
       else
         echo_t "Do you want to update this files? (y/n) [The script will be restarted]"
         read -r -n 1 choice
+        echo
       fi
       
       if [[ "$choice" == "s" || "$choice" == "S" || "$choice" == "y" || "$choice" == "Y" ]]; then
