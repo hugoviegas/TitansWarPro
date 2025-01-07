@@ -37,7 +37,7 @@ request_update() {
                 ;;
             (2|elixir)
                 echo_t "Do you want to use elixir before all valleys? (y or n):"
-                key="FUNC_elixir"
+                key="FUNC_use_elixir"
                 ;;
             (3|auto-update)
                 echo_t "Do you want to update the script automatically? (y or n):"
@@ -132,7 +132,15 @@ config() {
 
             # Prompt to change configurations during execution
             echo_t "Do you want to change any configuration? (y/n)"
-            read -r change
+            while true; do
+                read -r -n 1 change
+                echo  # To break the line after input
+                if [[ $change =~ ^[yYnN]$ ]]; then
+                    break
+                else
+                    echo_t "Invalid input. Please enter 'y' or 'n':"  "" "" "before" "❌"
+                fi
+            done
         fi
 
         if [ "$change" = "y" ]; then
@@ -154,7 +162,7 @@ config() {
         fi
 
         # Interval before restarting the loop
-        sleep 30
+        sleep 5
     done
 }
 
