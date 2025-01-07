@@ -89,13 +89,13 @@ request_update() {
         done
 
         # Call the configuration update function and capture the status
-        set_config "$key" "$value"
-        #success=$?
+        update_config "$key" "$value"
+        success=$?
 
         # Check if there was a failure and notify the user
         if [ "$success" -ne 0 ]; then
             echo_t "Invalid key. Please try again." "" "" "before" "❌"
-            rm -f "$CONFIG_FILE"  # Remove the config file to reset the configuration
+            #rm -f "$CONFIG_FILE"  # Remove the config file to reset the configuration
             load_config  # Reload the configuration after the reset
         else
             echo_t "Configuration updated successfully!"   "" "" "before" "✅"
