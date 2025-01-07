@@ -10,7 +10,7 @@ members_allies() {
         echo_t "Updating clan members into allies" "$BLACK_CYAN" "$COLOR_RESET"
         
         for num in $(seq 5 -1 1); do
-            echo_t "/clan/${CLD}/${num}" "$PURPLEis_BLACK" "$COLOR_RESET"
+            echo "${PURPLEis_BLACK}/clan/${CLD}/${num}${COLOR_RESET}"
             (
                 w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clan/${CLD}/${num}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | grep -o -E "[/]>([[:upper:]][[:lower:]]{0,15}[[:space:]]{0,1}[[:upper:]]{0,1}[[:lower:]]{0,14},[[:space:]])<s" | awk -F"[>]" '{print $2}' | awk -F"[,]" '{print $1}' | sed 's,\ ,_,' >> allies.txt
             ) </dev/null &>/dev/null &
@@ -57,7 +57,7 @@ id_allies() {
         time_exit 17
     else
         for num in $(seq "$NPG" -1 1); do
-            echo_t "Friends list page ${num}" "$BLACK_CYAN" "$COLOR_RESET"
+            printf "Friends list page ${num}"
             (
                 w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/mail/friends/${num}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed 's,/user/,\n/user/,g' | grep '/user/' | grep '/mail/' | cut -d\< -f1 >> tmp.txt
             ) </dev/null &>/dev/null &
@@ -84,7 +84,7 @@ clan_allies() {
         for num in $(seq "$Lnl" -1 1); do
             IDN=$(sed -n "${num}p" ids.txt)  # Pega a ID correspondente
             if [ -n "$IDN" ]; then
-                echo_t "/user/${IDN}" "$PURPLEis_BLACK" "$COLOR_RESET"
+                echo_t "/user/" "$PURPLEis_BLACK" "${IDN}$COLOR_RESET"
 
                 (
                     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/user/${IDN}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$TMP"/SRC
@@ -100,7 +100,7 @@ clan_allies() {
                     ts=$((ts + 1))  # Increment ally count
                     echo -e "$LEADPU" | sed 's,\ ,_,' >> callies.txt  # Save ally name formatted with underscores
 
-                    echo_t "${ts}. Ally ${LEADPU} ${alCLAN} added." "$BLACK_CYAN" "$COLOR_RESET"
+                    echo "${ts}. Ally ${LEADPU} ${alCLAN} added."  # Print ally name and clan
                     sort -u callies.txt -o callies.txt  # Sort and remove duplicates in callies.txt
                 fi
                 

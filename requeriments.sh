@@ -205,68 +205,79 @@ export vUserAgent
 }
 
 user_agent() {
- cd "$TMP" || exit 1
- clear
+    cd "$TMP" || exit 1
+    clear
 
- printf "${BLACK_CYAN} $(G_T "Simulate your real or random device"). \033[00m
-	1)${BLACK_CYAN} $(G_T "Manual") \033[00m
-	2)${BLACK_CYAN} $(G_T "Automatic") \033[00m
-	" | sed 's/\t//g'
- twm_dir="twm"  # Define twm_dir variable
- if [ -f "$HOME/$twm_dir/fileAgent.txt" ] && [ -s "$HOME/$twm_dir/fileAgent.txt" ]; then
-   UA=$(cat "$HOME/$twm_dir/fileAgent.txt")
- else
-   printf "$(G_T "Set up User-Agent [1 to 2]"): \n"
-   read -r 1 UA
- fi
+    # Exibe opções de configuração de User-Agent
+    echo_t "Simulate your real or random device."
+    echo_t "1) Manual"
+    echo_t "2) Automatic"
 
- case $UA in (0) clear
-     echo "0" >"$HOME/$twm_dir/fileAgent.txt"
+    twm_dir="twm"  # Define twm_dir variable
 
-     if [ ! -e "$TMP/userAgent.txt" ] || [ -z "$UA" ]; then
-       cat "$HOME/$twm_dir/userAgent.txt" >"$TMP/userAgent.txt"
-     else
-       random_ua
-     fi 
-		 ;;
+    # Verifica se o arquivo de User-Agent já existe e tem conteúdo
+    if [ -f "$HOME/$twm_dir/fileAgent.txt" ] && [ -s "$HOME/$twm_dir/fileAgent.txt" ]; then
+        UA=$(cat "$HOME/$twm_dir/fileAgent.txt")
+    else
+        echo_t "Set up User-Agent [1 to 2]:"
+        read -r UA
+    fi
 
-     (1) clear 
-		 xdg-open "$(echo "aHR0cHM6Ly93d3cud2hhdHNteXVhLmluZm8=" | base64 -d)" >/dev/null 2>&1
-     echo "0" >"$HOME/$twm_dir/fileAgent.txt"
-     read -r UA
-     echo "$UA" >"$TMP/userAgent.txt"
+    case $UA in
+        0)
+            clear
+            echo "0" > "$HOME/$twm_dir/fileAgent.txt"
 
-     if [ ! -e "$TMP/userAgent.txt" ] || [ -z "$UA" ]; then
-       printf " ...\n"
-       cat "$HOME/$twm_dir/userAgent.txt" >"$TMP/userAgent.txt"
-     else
-       random_ua
-     fi ;;
+            if [ ! -e "$TMP/userAgent.txt" ] || [ -z "$UA" ]; then
+                cat "$HOME/$twm_dir/userAgent.txt" > "$TMP/userAgent.txt"
+            else
+                random_ua
+            fi
+            ;;
 
-   (2) printf " ...\n${BLACK_PINK}"
-     cat "$HOME/$twm_dir/userAgent.txt" >"$TMP/userAgent.txt"
-     echo "0" >"$HOME/$twm_dir/fileAgent.txt"
+        1)
+            clear
+            xdg-open "$(echo "aHR0cHM6Ly93d3cud2hhdHNteXVhLmluZm8=" | base64 -d)" >/dev/null 2>&1
+            echo "0" > "$HOME/$twm_dir/fileAgent.txt"
+            read -r UA
+            echo "$UA" > "$TMP/userAgent.txt"
 
-     if [ -e "$TMP/userAgent.txt" ]; then
-       random_ua
-     fi
+            if [ ! -e "$TMP/userAgent.txt" ] || [ -z "$UA" ]; then
+                echo_t " ..."
+                cat "$HOME/$twm_dir/userAgent.txt" > "$TMP/userAgent.txt"
+            else
+                random_ua
+            fi
+            ;;
 
-     printf "$(G_T "Automatic User Agent selected")\n${COLOR_RESET}"
-     sleep 2s ;;
+        2)
+            echo_t " ..."
+            cat "$HOME/$twm_dir/userAgent.txt" > "$TMP/userAgent.txt"
+            echo "0" > "$HOME/$twm_dir/fileAgent.txt"
 
-   (*) clear
-       printf "\n $(G_T "Invalid option"): $UA\n"
-     if [ -n "$UA" ]; then
-       printf "\n $(G_T "Invalid option"): $UA\n"
-       kill -9 $$
-     else
-       printf "\n $(G_T "Time exceeded")!\n"
-     fi
-   ;;
- esac
+            if [ -e "$TMP/userAgent.txt" ]; then
+                random_ua
+            fi
 
- unset UA
+            echo_t "Automatic User Agent selected."
+            sleep 2s
+            ;;
+
+        *)
+            clear
+            echo_t "Invalid option: $UA"
+            if [ -n "$UA" ]; then
+                echo_t "Invalid option: $UA"
+                kill -9 $$
+            else
+                echo_t "Time exceeded!"
+            fi
+            ;;
+    esac
+
+    unset UA
 }
+
   if [ ! -e "$TMP/userAgent.txt" ] || [ "$(wc -c < "$TMP/userAgent.txt")" -lt 10 ] || [ "$(wc -c < "$TMP/userAgent.txt")" -gt 65 ]; then
 	# Check if the user agent file is missing or has an invalid size; if so, prompt for a new one.
 		if [ ! -e "$TMP/userAgent.txt" ] || [ $(cat "$TMP/userAgent.txt" | wc -c) -lt 10 ] || [ $(cat "$TMP/userAgent.txt" | wc -c) -gt 65 ]; then
