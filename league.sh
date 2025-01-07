@@ -65,6 +65,7 @@ league_play() {
     fights_done=0
     j=1  # Index for fight buttons (skipping every 2 links)
     enemy_index=1  # Separate index for enemy stats
+    FUNC_play_league=$(get_config "FUNC_play_league")
 
 #[ "$fights_done" -lt "$AVAILABLE_FIGHTS" ] && 
 

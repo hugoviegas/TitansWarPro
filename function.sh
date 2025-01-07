@@ -109,10 +109,10 @@ load_config() {
         echo_t "Configuration file not found. Creating config.cfg with default values."
         
         # Define default values
-        FUNC_check_rewards="Y"
+        FUNC_check_rewards="y"
         FUNC_use_elixir="n"
         FUNC_coliseum="y"
-        FUNC_AUTO_UPDATE="Y"
+        FUNC_AUTO_UPDATE="y"
         FUNC_play_league=999
         SCRIPT_PAUSED="n"
 
@@ -126,6 +126,13 @@ load_config() {
             echo "SCRIPT_PAUSED=$SCRIPT_PAUSED"
         } > "$CONFIG_FILE"
     fi
+}
+
+# Function to get the configuration from file and return the value
+get_config() {
+    local key="$1"  # Name of the configuration to get
+    load_config  # Load the configuration file
+    echo "${!key}"  # Return the value of the configuration
 }
 
 config() {
