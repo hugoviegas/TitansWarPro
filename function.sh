@@ -50,8 +50,8 @@ request_update() {
                 echo_t "Type the number of the league you want to reach the top. Example: 1 or 50" "" "" "after" " 🏆"
                 # while loop to validate the input for only numbers between 1 and 999 (3 digits)
                 while true; do
-                    read -r FUNC_play_league
-                    if [[ $FUNC_play_league =~ ^[0-9]{1,3}$ ]]; then
+                    read -r value
+                    if [[ $value =~ ^[0-9]{1,3}$ ]]; then
                         break
                     else
                         echo_t "Invalid input. Please enter a number between 1 and 999: " "" "" "after" "❌"
