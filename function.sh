@@ -28,6 +28,7 @@ request_update() {
         echo_t "2- Use elixir. Current value: " "" "$FUNC_use_elixir"
         echo_t "3- Auto update. Current value: " "" "$FUNC_AUTO_UPDATE"
         echo_t "4- Get to top in league. Current value: " "" "$FUNC_play_league"
+        echo_t "5- Change language. Current value: " "" "$LANGUAGE"
         echo_t "Press *ENTER* to exit configuration update mode." "" "" "after" "↩️"
         read -r -n 1 key
 
@@ -57,6 +58,12 @@ request_update() {
                     fi
                 done
                 key="FUNC_play_league"
+                ;;
+            (5|language)
+                echo_t "Do you want to change the language? (y or n):"
+                menu_loop
+                menu_language
+                break
                 ;;
             (exit|*)
                 echo_t "Exiting configuration update mode."

@@ -75,7 +75,7 @@ requer_func() {
 	fi
 
 	# Estrutura case para associar a seleção do usuário com os idiomas e configurações
-	echo "You have selectet $UR"
+	menu_language(){
 	case $UR in
     (1|bra|pt)
         URL=$(echo "ZnVyaWFkZXRpdGFzLm5ldA==" | base64 -d)
@@ -181,7 +181,8 @@ requer_func() {
 	esac
 
 	clear
-
+	}
+	menu_language
 	# Check if URL is set; if not, exit the script
 	if [ -z "$URL" ]; then
 		exit 1
