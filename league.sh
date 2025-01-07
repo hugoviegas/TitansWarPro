@@ -154,7 +154,7 @@ league_play() {
         esac
         # Recompensa
         if [[ "$AVAILABLE_FIGHTS" =~ ^[0-9]+$ ]]; then
-            if [ "$AVAILABLE_FIGHTS" -eq 0 ]; then
+            if [ "$AVAILABLE_FIGHTS" -eq 0 ] && [ "$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)" ]; then
                 clickReward=$(grep -o -E "/league/takeReward/\?r=[0-9]+" "$TMP"/SRC | sed -n 1p)
                 fetch_page "$clickReward" 
                 echo_t "Claimed reward" "" "" "after" "🎁"
