@@ -131,6 +131,7 @@ league_play() {
                     last_click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight
                     #echo "$last_click" 
                     fetch_available_fights  # Recheck available fights
+                    ENEMY_NUMBER=$(echo "$last_click" | grep -o -E '[0-9]+' | head -n 1)
                     if [ -z "$last_click" ] && [ "$AVAILABLE_FIGHTS" -gt 0 ]; then  # If there are more than 4 enemies
                         echo_t " Reached the last enemy. Attacking the last one and using a potion..."
                         j=$((j - 2))  # Move to the previous button (skip every 2 links)
@@ -151,13 +152,13 @@ league_play() {
                         # Reset the index to attack the first enemy
                         enemy_index=1
                         j=1
-                    elif [ "$AVAILABLE_FIGHTS" -eq 0 ] && [ "$FUNC_play_league" = "y" ] && [ "$ENEMY_NUMBER" -gt 50 ]; then
+                    elif [ "$AVAILABLE_FIGHTS" -eq 0 ] && [ "$ENEMY_NUMBER" -gt "$FUNC_play_league" ]; then
                         # /league/refreshFights/?r=56720053
+                        echo_t "Refreshed fights" "" "" "after" "🔄"
                         click=$(grep -o -E "/league/refreshFights/\?r=[0-9]+" "$TMP/SRC" | sed -n 1p)
                         fetch_page "$click"
                         enemy_index=1
                         j=1
-                        echo_t "Refreshed fights" "" "" "after" "🔄"
                         action="fight_or_skip"
                     else
                         action="check_fights"

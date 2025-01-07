@@ -27,7 +27,7 @@ request_update() {
         echo_t "1- Collect relics. Current value: " "" "$FUNC_check_rewards"
         echo_t "2- Use elixir. Current value: " "" "$FUNC_use_elixir"
         echo_t "3- Auto update. Current value: " "" "$FUNC_AUTO_UPDATE"
-        echo_t "4- Get to top 50 in league. Current value: " "" "$FUNC_play_league"
+        echo_t "4- Get to top in league. Current value: " "" "$FUNC_play_league"
         echo_t "Press *ENTER* to exit configuration update mode." "" "" "after" "↩️"
         read -r key
 
@@ -45,7 +45,17 @@ request_update() {
                 key="FUNC_AUTO_UPDATE"
                 ;;
             (4|league)
-                echo_t "Do you want to get to top 50 in league? (y or n):"
+                echo_t "Do you want to get to top in league?:"
+                echo_t "Type the number of the league you want to reach the top. Example: 1 or 50" "" "" "after" " 🏆"
+                # while loop to validate the input for only numbers between 1 and 999 (3 digits)
+                while true; do
+                    read -r FUNC_play_league
+                    if [[ $FUNC_play_league =~ ^[0-9]{1,3}$ ]]; then
+                        break
+                    else
+                        echo_t "Invalid input. Please enter a number between 1 and 999: " "" "" "after" "❌"
+                    fi
+                done
                 key="FUNC_play_league"
                 ;;
             (exit|*)
@@ -56,7 +66,7 @@ request_update() {
         esac
 
         # If a valid key was chosen, validate input for value
-        if [[ $key != "FUNC_check_rewards" && $key != "FUNC_use_elixir" && $key != "FUNC_AUTO_UPDATE" && $key != "FUNC_play_league" ]]; then
+        if [[ $key != "FUNC_check_rewards" && $key != "FUNC_use_elixir" && $key != "FUNC_AUTO_UPDATE" ]]; then
             continue
         fi
 
@@ -103,7 +113,7 @@ load_config() {
         FUNC_use_elixir="n"
         FUNC_coliseum="y"
         FUNC_AUTO_UPDATE="Y"
-        FUNC_play_league="n"
+        FUNC_play_league=999
         SCRIPT_PAUSED="n"
 
         # Write the config.cfg file with default values
