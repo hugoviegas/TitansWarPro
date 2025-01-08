@@ -63,7 +63,7 @@ specialEvent() {
         esac
         ;;
       (marathon)
-          fetch_page "marathon/"
+          fetch_page "/marathon/"
           echo_t "Marathon event" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "🏆"
           click=$(grep -o -E "/marathon/take/\?r=[0-9]+" "$TMP"/SRC | sed -n '1p')
           if [ -n "$click" ]; then
