@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.9.17" # to change the version number every time has an update!!!!!!!!!!!!!!
+    versionNum="3.9.18" # to change the version number every time has an update!
 
 for i in $colors; do
 clear
