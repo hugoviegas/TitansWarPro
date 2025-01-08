@@ -1,0 +1,264 @@
+<body
+  style="-webkit-text-size-adjust: none"
+  data-new-gr-c-s-check-loaded="14.1092.0"
+  data-gr-ext-installed=""
+>
+  <div id="topdiv">
+    <div class="main" style="word-wrap: break-word">
+      <span style="text-shadow: none"></span>
+      <div class="head cntr" style="position: relative">
+        <span
+          ><img src="/images/icon/health.png" alt="hp" />
+          <span class="white">27821</span></span
+        ><span name="timer" style="position: absolute; right: 4px">00:00</span>
+        <div class="clr"></div>
+      </div>
+      <div class="exp_bar">
+        <div class="progress_life" style="width: 78, 131318804763%"></div>
+      </div>
+      <div class="center">
+        <div class="rght mlr5 mt5">
+          <div class="fl left w50">
+            <img src="/images/icon/race/1.png" alt="" /> Kimberlly Wanted
+            <span class="nwr"
+              ><img src="/images/icon/health.png" alt="hp" /> 27821</span
+            >
+          </div>
+          <img src="/images/icon/race/0.png" alt="" /> Furia X
+          <span class="nwr"
+            ><img src="/images/icon/health.png" alt="hp" />&nbsp;32704</span
+          >
+          <div class="clr"></div>
+        </div>
+        <div class="block_fight">
+          <div class="bf_left">
+            <div class="bf_right">
+              <div
+                class="unit_slot"
+                style="
+                  background-image: url('/manekenimage/0/0/f/562/507/508/565/470/511/440/289/2869985101.w?6&amp;png&amp;bg=alpha&amp;flip=left&amp;b=&amp;bc=949');
+                "
+              >
+                <div class="fprg">
+                  <div class="rate fl" style="width: 79%"></div>
+                </div>
+              </div>
+              <div
+                class="unit_slot s_enemy"
+                style="
+                  background-image: url('/manekenimage/0/0/m/570/571/572/565/566/463/576/577/1224187593.w?6&amp;bg=battle&amp;flip=right&amp;b=&amp;bc=832');
+                "
+              >
+                <div class="fprg">
+                  <div class="rate fl" style="width: 79%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="fight_buttons">
+          <a class="nbtn b_green" href="/king/dodge/?r=1736263959"
+            ><span class="lbl"><span class="txt smpl">Esquivar</span></span></a
+          ><a
+            class="nbtn b_red btn-attack-inst"
+            href="/king/attack/?r=1736263959"
+            ><span class="lbl"><span class="txt smpl">Atacar</span></span></a
+          ><a class="nbtn b_grey" href="/king/attackrandom/?r=1736263959"
+            ><span class="lbl"
+              ><span class="txt smpl">Troca o alvo</span></span
+            ></a
+          ><a class="nbtn b_green" href="/king/heal/?r=1736263959"
+            ><span class="lbl ico"
+              ><img
+                class="fl"
+                src="/images/battle/potion.png"
+                width="43"
+                height="38"
+                alt=""
+              /><span class="txt smpl">Esmalte heráldico</span></span
+            ></a
+          ><a class="nbtn b_green" href="/king/stone/?r=1736263959"
+            ><span class="lbl ico"
+              ><img
+                class="fl"
+                src="/images/battle/stone.png"
+                width="43"
+                height="38"
+                alt=""
+              /><span class="txt"
+                >Pedra<br /><span class="medium">+35% dano</span></span
+              ></span
+            ></a
+          ><a class="nbtn b_green" href="/king/grass/?r=1736263959"
+            ><span class="lbl ico"
+              ><img
+                class="fl"
+                src="/images/battle/herb.png"
+                width="43"
+                height="38"
+                alt=""
+              /><span class="txt"
+                >Erva<br /><span class="medium">-35% dano</span></span
+              ></span
+            ></a
+          >
+        </div>
+      </div>
+      <div class="dot-line"></div>
+      <div class="block_zero center">
+        <img src="/images/icon/race/0.png" alt="" /><img
+          src="/images/icon/race/1.png"
+          alt=""
+        />
+        Titãs: <b>8</b><br /><img src="/images/icon/rage.png" alt="" />
+        <span class="dred">Loucura Sangrenta: 53%</span>
+      </div>
+      <div class="mini-line"></div>
+      <div class="block_zero">
+        <img src="/images/icon/race/1.png" alt="" /> Avenger Balthier usou
+        esquivar<br />Você acertar
+        <img src="/images/icon/race/1.png" alt="" /> Avenger Balthier por
+        <span class="bold">1452</span><br /><img
+          src="/images/icon/race/1.png"
+          alt=""
+        />
+        Avenger Balthier usou <img src="/images/icon/grade/3.png" alt="" />
+        <span class="quality-3">Armadura mais forte</span><br /><span
+          class="dred"
+          ><img src="/images/icon/race/0.png" alt="" /> Levi Ackerman acertar
+          Você por <span class="bold">4411</span> crítico</span
+        ><br /><span class="dred"
+          ><img src="/images/icon/race/1.png" alt="" /> Heimdallr Oct acertar
+          Você por <span class="bold">3376</span> crítico</span
+        ><br />Você acertar <img src="/images/icon/race/1.png" alt="" /> Avenger
+        Balthier por <span class="bold">5916</span> crítico<br />Você usou
+        <img src="/images/icon/grade/4.png" alt="" />
+        <span class="quality-4">Turbilhão</span><br /><img
+          src="/images/icon/race/0.png"
+          alt=""
+        />
+        Furia X usou esquivar<br />Você acertar
+        <img src="/images/icon/race/0.png" alt="" /> Furia X por
+        <span class="bold">2539</span><br />Você acertar
+        <img src="/images/icon/race/0.png" alt="" /> Furia X por
+        <span class="bold">4754</span> crítico<br />Você usou
+        <img src="/images/icon/grade/4.png" alt="" />
+        <span class="quality-4">Turbilhão</span><br />Você acertar
+        <img src="/images/icon/race/0.png" alt="" /> Furia X por
+        <span class="bold">1587</span><br /><img
+          src="/images/icon/race/0.png"
+          alt=""
+        />
+        Furia X usou <img src="/images/icon/grade/3p.png" alt="" />
+        <span class="quality-3p">Armadura mais forte</span><br />Você usou
+        <img src="/images/icon/grade/4.png" alt="" />
+        <span class="quality-4">Fúria de Titã</span><br /><img
+          src="/images/icon/race/0.png"
+          alt=""
+        />
+        Juniorsieg usou esquivar<br />Você acertar
+        <img src="/images/icon/race/0.png" alt="" /> Juniorsieg por
+        <span class="bold">3580</span> crítico<br />Você usou
+        <img src="/images/icon/grade/4.png" alt="" />
+        <span class="quality-4">Turbilhão</span><br /><img
+          src="/images/icon/rip.png"
+          alt=""
+        />
+        Você assassinou
+        <img src="/images/icon/race/1.png" alt="" /> Inosuke<br />Você acertar
+        <img src="/images/icon/race/1.png" alt="" /> Inosuke por
+        <span class="bold">5012</span> crítico<br /><img
+          src="/images/icon/race/0.png"
+          alt=""
+        />
+        Furia X acertar <img src="/images/icon/race/1.png" alt="" /> Inosuke por
+        <span class="bold">3438</span> crítico<br /><img
+          src="/images/icon/race/0.png"
+          alt=""
+        />
+        Juniorsieg acertar <img src="/images/icon/race/1.png" alt="" /> Inosuke
+        por <span class="bold">5756</span> crítico<br /><img
+          src="/images/icon/race/0.png"
+          alt=""
+        />
+        Juniorsieg usou <img src="/images/icon/grade/4.png" alt="" />
+        <span class="quality-4">Turbilhão</span><br /><img
+          src="/images/icon/race/0.png"
+          alt=""
+        />
+        Furia X acertar <img src="/images/icon/race/1.png" alt="" /> Inosuke por
+        <span class="bold">3796</span> crítico<br />Você acertar
+        <img src="/images/icon/race/1.png" alt="" /> Inosuke por
+        <span class="bold">4940</span> crítico<br />Você usou
+        <img src="/images/icon/grade/4.png" alt="" />
+        <span class="quality-4">Turbilhão</span><br /><img
+          src="/images/icon/rip.png"
+          alt=""
+        />
+        Você assassinou
+        <img src="/images/icon/race/0.png" alt="" /> Gaucho<br />Você acertar
+        <img src="/images/icon/race/0.png" alt="" /> Gaucho por
+        <span class="bold">4291</span> crítico<br /><img
+          src="/images/icon/race/1.png"
+          alt=""
+        />
+        Dad acertar <img src="/images/icon/race/0.png" alt="" /> Gaucho por
+        <span class="bold">3516</span> crítico<br /><img
+          src="/images/icon/race/1.png"
+          alt=""
+        />
+        Daiapolon acertar <img src="/images/icon/race/0.png" alt="" /> Gaucho
+        por <span class="bold">4022</span> crítico<br /><img
+          src="/images/icon/race/0.png"
+          alt=""
+        />
+        Lucas Luan acertar <img src="/images/icon/race/0.png" alt="" /> Gaucho
+        por <span class="bold">2687</span> crítico<br />
+      </div>
+      <div class="mini-line"></div>
+      <div class="line"></div>
+      <div class="foot">
+        <div>
+          <img src="/images/icon/race/1.png" alt="Bóreas" /> Kimberlly Wanted
+        </div>
+        <div class="center">
+          <img src="/images/icon/level.png" alt="lvl" /> 86 |
+          <img src="/images/icon/gold.png" alt="g" /> 6'390 |
+          <img src="/images/icon/silver.png" alt="s" /> 152,4M
+        </div>
+      </div>
+    </div>
+    <script src="/js/t2.js?v=2" type="text/javascript"></script>
+    <br /><span id="footline" style="text-shadow: none"></span>
+    <div class="block_zero center">
+      <a class="grey" href="?out_gate">Fuja da batalha</a>
+    </div>
+    <script type="text/javascript">
+      document.onkeypress = function (event) {
+        var keyCode = event.which || event.keyCode;
+        if (
+          keyCode == 13 &&
+          event.target.tagName == "INPUT" &&
+          event.target.form &&
+          event.target.type != "submit"
+        ) {
+          var elements = event.target.form.elements;
+          var i = 0;
+          for (; i < elements.length; i++) {
+            if (elements[i] === event.target) {
+              break;
+            }
+          }
+          for (i++; i < elements.length; i++) {
+            if (elements[i].type != "hidden" && elements[i].type != "submit") {
+              elements[i].focus();
+              event.preventDefault();
+              return false;
+            }
+          }
+        }
+        return true;
+      };
+    </script>
+  </div>
+</body>

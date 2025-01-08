@@ -90,13 +90,13 @@ request_update() {
 
         # Call the configuration update function and capture the status
         update_config "$key" "$value"
-        success=$?
+        success=$? # Capture the status of the update
 
         # Check if there was a failure and notify the user
         if [ "$success" -ne 0 ]; then
             echo_t "Invalid key. Please try again." "" "" "before" "❌"
             #rm -f "$CONFIG_FILE"  # Remove the config file to reset the configuration
-            load_config  # Reload the configuration after the reset
+            #load_config  # Reload the configuration after the reset
         else
             echo_t "Configuration updated successfully!"   "" "" "before" "✅"
             config
@@ -116,27 +116,32 @@ load_config() {
     else
         echo_t "Configuration file not found. Creating config.cfg with default values."
         
-        # Define default values
-        FUNC_check_rewards="y"
-        FUNC_use_elixir="n"
-        FUNC_coliseum="y"
-        FUNC_AUTO_UPDATE="y"
-        FUNC_play_league=999
-        LANGUAGE="en"
-        SCRIPT_PAUSED="n"
-
         # Write the config.cfg file with default values
-        {
+        default_config() {
+            # Define default values
+            FUNC_check_rewards="y"
+            FUNC_use_elixir="n"
+            FUNC_coliseum="y"
+            FUNC_AUTO_UPDATE="y"
+            FUNC_play_league=999
+            FUNC_clan_figth="y"
+            LANGUAGE="en"
+            SCRIPT_PAUSED="n"
+
+            
+            {
             echo "FUNC_check_rewards=$FUNC_check_rewards"
             echo "FUNC_use_elixir=$FUNC_use_elixir"
             echo "FUNC_coliseum=$FUNC_coliseum"
             echo "FUNC_AUTO_UPDATE=$FUNC_AUTO_UPDATE"
             echo "FUNC_play_league=$FUNC_play_league"
+            echo "FUNC_clan_figth=$FUNC_clan_figth"
             echo "SCRIPT_PAUSED=$SCRIPT_PAUSED"
             echo "LANGUAGE=$LANGUAGE"
             echo "ALLIES="
-
-        } > "$CONFIG_FILE"
+            } > "$CONFIG_FILE"
+        } 
+        default_config 
     fi
 }
 
@@ -165,58 +170,25 @@ set_config() {
 }
 
 config() {
-    load_config
-    SCRIPT_PAUSED="y"
+    load_config # Load the configuration file
+    EXIT_CONFIG="n"
 
     # Main script loop
     while true; do
         # Check if the script is paused or signaled to exit
-        if [ "$SCRIPT_PAUSED" = "y" ] || [ "$EXIT_CONFIG" = "y" ]; then
-            echo_t "Script paused. Waiting for reactivation..."
-            sleep 1
-            load_config  # Reload the configuration after the interval
-
-            # If EXIT_CONFIG is "s", exit the main loop
-            if [ "$EXIT_CONFIG" = "y" ]; then
-                echo_t "Exiting configuration mode..."
-                EXIT_CONFIG="n"  # Reset the exit signal for next use
-                break
-            fi
-
-            # Prompt to change configurations during execution
-            echo_t "Do you want to change any configuration? (y/n)"
-            while true; do
-                read -r -n 1 change
-                echo  # To break the line after input
-                if [[ $change =~ ^[yYnN]$ ]]; then
-                    break
-                else
-                    echo_t "Invalid input. Please enter 'y' or 'n':"  "" "" "before" "❌"
-                fi
-            done
-        fi
-
-        if [ "$change" = "y" ]; then
+        if [ "$EXIT_CONFIG" = "n" ]; then
+            echo_t "Script paused. Waiting for reactivation..." "${BLACK_RED}" "${COLOR_RESET}" "before" "⏸️"
+            sleep 1s
             # Call the function to request update with key verification
             request_update
-
+    
             # If EXIT_CONFIG is "s", exit the main loop
-            if [ "$EXIT_CONFIG" = "y" ]; then
-                echo_t "Exiting configuration mode..."
-                EXIT_CONFIG="n"  # Reset the exit signal for next use
-                break
-            fi
-
-            # Reload the configurations after the update
-            load_config
         else
-            SCRIPT_PAUSED="n"
-            EXIT_CONFIG="Y"
+            echo_t "Exiting configuration mode..." "${BLACK_RED}" "${COLOR_RESET}" "before" "🛑"
+            EXIT_CONFIG="n"  # Reset the exit signal for next use
+            sleep 1s # Interval before restarting the loop
             break
-        fi
-
-        # Interval before restarting the loop
-        sleep 3
+        fi          
     done
 }
 
