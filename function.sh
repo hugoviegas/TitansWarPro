@@ -29,6 +29,7 @@ request_update() {
         echo_t "3- Auto update. Current value: " "" "$FUNC_AUTO_UPDATE"
         echo_t "4- Get to top in league. Current value: " "" "$FUNC_play_league"
         echo_t "5- Change language. Current value: " "" "$LANGUAGE"
+        echo_t "6- Change allies. Current value: " "" "$ALLIES"
         echo_t "Press *'ENTER'* to exit configuration update mode." "" "" "after" "↩️"
         read -r -n 1 key
 
@@ -77,9 +78,15 @@ request_update() {
                     echo_t "Invalid input. Please enter 'y' or 'n':"  "" "" "before" "❌"
                     fi
                 done
-                key="ALLIES"
-                : > "$TMP/allies.txt"
-                config_allies
+                if [ "$value" = "n" ]; then
+                    continue
+                else
+                    key="ALLIES"
+                    : > "$TMP/allies.txt"
+                    : > "$TMP/callies.txt"
+                    config_allies
+                fi
+                break
                 ;;
             (exit|*)
                 echo_t "Exiting configuration update mode."
@@ -141,6 +148,7 @@ load_config() {
             FUNC_play_league=999
             FUNC_clan_figth="y"
             LANGUAGE="en"
+            ALLIES=""
             SCRIPT_PAUSED="n"
 
             
