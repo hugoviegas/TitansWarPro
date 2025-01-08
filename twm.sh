@@ -115,8 +115,8 @@ requer_func
 func_proxy
 login_logoff
 
-# If allies are defined and not in cave mode, configure allies and clear screen
-if [ -n "$ALLIES" ] && [ "$RUN" != "-cv" ]; then
+# If allies are defined in config.cfg file and not in cave mode, configure allies and clear screen
+if [ "$(get_config "ALLIES")" = "" ] && [ "$RUN" != "-cv" ]; then
     conf_allies  # Configure allies if applicable
     clear  # Clear the terminal screen for better visibility
 fi
