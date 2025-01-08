@@ -7,7 +7,7 @@ members_allies() {
     echo "" > callies.txt
 
     if [ -n "$CLD" ]; then
-        echo_t "Updating clan members into allies" "$BLACK_CYAN" "$COLOR_RESET"
+        echo_t "Updating clan members into allies" "$BLACK_CYAN" "$COLOR_RESET" 
         
         for num in $(seq 5 -1 1); do
             echo "${PURPLEis_BLACK}/clan/${CLD}/${num}${COLOR_RESET}"
@@ -30,7 +30,7 @@ members_allies() {
 id_allies() {
     echo_t "Looking for allies on friends list" "$BLACK_CYAN" "$COLOR_RESET" "after" "🔎"
     cd "$TMP" || exit
-    echo_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET"
+    echo_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET" "after" "📄"
 
     (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/mail/friends" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$TMP"/SRC
@@ -40,7 +40,7 @@ id_allies() {
     NPG=$(cat "$TMP/SRC" | grep -o -E '/mail/friends/([0-9]{0,4})[^[:alnum:]]{4}62[^[:alnum:]]{3}62[^[:alnum:]]' | sed 's/\/mail\/friends\/\([0-9]\{0,4\}\).*/\1/') > tmp.txt
     
     if [ -z "$NPG" ]; then
-        echo_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET"
+        echo_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET" "after" "📄"
         (
             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/mail/friends" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed 's,/user/,\n/user/,g' | grep '/user/' | grep '/mail/' | cut -d\< -f1 >> tmp.txt
         ) </dev/null &>/dev/null &
@@ -50,14 +50,14 @@ id_allies() {
     NPG=$(cat "$TMP"/SRC | grep -o -E '/mail/friends/([0-9]{0,4})[^[:alnum:]]{4}62[^[:alnum:]]{3}62[^[:alnum:]]' | sed 's/\/mail\/friends\/\([0-9]\{0,4\}\).*/\1/') > tmp.txt
 
     if [ -z "$NPG" ]; then
-        echo_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET"
+        echo_t "/mail/friends" "$PURPLEis_BLACK" "$COLOR_RESET" "after" "📄"
         (
             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/mail/friends" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed 's,/user/,\n/user/,g' | grep '/user/' | grep '/mail/' | cut -d\< -f1 >> tmp.txt
         ) </dev/null &>/dev/null &
         time_exit 17
     else
         for num in $(seq "$NPG" -1 1); do
-            printf "Friends list page ${num}"
+            printf_t "Friends list page " "" "${num}\n" "after" "📄"
             (
                 w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/mail/friends/${num}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed 's,/user/,\n/user/,g' | grep '/user/' | grep '/mail/' | cut -d\< -f1 >> tmp.txt
             ) </dev/null &>/dev/null &
