@@ -19,11 +19,11 @@ specialEvent() {
   case $EVENT in
     (questrnd)
       fetch_page "$event_link"
-      echo -e "${GOLD_BLACK}Event Adventure 🎯${COLOR_RESET}"
+      echo_t "Event Adventure" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "🎯"
       click=$(grep -o -E "/questrnd/take/\?r=[0-9]{8}" "$TMP"/SRC | sed -n '1p')
       if [ -n "$click" ]; then
         fetch_page "$click"
-        echo -e " Claimed reward\n"
+        echo_t " Claiming reward" "" "" "after" "🎯"
         return 0  # Success if found
       else
       echo " "
@@ -66,10 +66,14 @@ specialEvent() {
           fetch_page "marathon/"
           echo_t "Marathon event" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "🏆"
           click=$(grep -o -E "/marathon/take/\?r=[0-9]+" "$TMP"/SRC | sed -n '1p')
-          fetch_page "${click}"
-          echo_t " Claimed reward" "" "" "after" "🏆"
-          # Show the page info using w3m -dump -T text/html "$TMP/SRC"
-          w3m -dump -T text/html "$TMP/SRC" | head -n 18 | tail -n 16 
+          if [ -n "$click" ]; then
+            fetch_page "$click"
+            echo_t " Claiming reward" "" "" "after" "🏆"
+            return 0  # Success if found
+          else
+            echo " "
+            return 1  # Not found
+          fi
 
         ;;
       *)
