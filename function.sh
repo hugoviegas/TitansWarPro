@@ -84,7 +84,7 @@ request_update() {
                     key="ALLIES"
                     : > "$TMP/allies.txt"
                     : > "$TMP/callies.txt"
-                    config_allies
+                    conf_allies
                 fi
                 break
                 ;;
