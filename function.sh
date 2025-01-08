@@ -66,6 +66,21 @@ request_update() {
                 key="LANGUAGE"
                 continue
                 ;;
+            (6|allies)
+                echo_t "Do you want to change the your allies for battle? (y or n):"
+                while true; do
+                    read -r -n 1 value
+                    echo  # To break the line after input
+                    if [[ $value =~ ^[yYnN]$ ]]; then
+                        break
+                    else
+                    echo_t "Invalid input. Please enter 'y' or 'n':"  "" "" "before" "❌"
+                    fi
+                done
+                key="ALLIES"
+                : > "$TMP/allies.txt"
+                config_allies
+                ;;
             (exit|*)
                 echo_t "Exiting configuration update mode."
                 EXIT_CONFIG="y"  # Signal to exit both loops
