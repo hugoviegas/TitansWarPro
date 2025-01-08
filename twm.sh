@@ -93,6 +93,7 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
         if read -r -t 1; then
             # Clear relevant files if Enter is pressed
             set_config "ALLIES" "" # Clear allies configuration
+            : >"$TMP/allies.txt"
             : >"$HOME/twm/ur_file"
             : >"$HOME/twm/fileAgent.txt"
             unset UR UA AL  # Unset user-related variables

@@ -148,12 +148,23 @@ conf_allies() {
         1)
             id_allies
             clan_allies
-            members_allies
+            # if allies.txt doesn't exists, create it using mebers_allies
+            if [ -e "$TMP/allies.txt" ]; then # Check if allies.txt exists
+                echo "" 
+            else
+                members_allies
+            fi
+            
             echo_t "Alliances on all battles active" "" "" "after" "🔵👨 🔴🧑‍🦰"
             ;;
         2)
             id_allies
-            members_allies
+            # if allies.txt is not empty, create it using members_allies
+            if [ -s "$TMP/allies.txt" ]; then # Check if allies.txt is not empty
+                echo "" 
+            else
+                members_allies
+            fi
             if [ -e "$TMP/callies.txt" ]; then
                 : > "$TMP/callies.txt"
             fi
