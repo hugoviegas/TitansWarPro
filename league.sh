@@ -129,7 +129,7 @@ league_play() {
                     action="check_fights" # back to check fights
                     # Delete the potion file if it exists
                     if [ -f "$TMP/POTION" ]; then
-                        rm -rf "$TMP/POTION"
+                        rm "$TMP/POTION"
                     fi
                 else
                     printf_t "Your Player strength" 
@@ -141,11 +141,10 @@ league_play() {
                     #echo "$enemy_index"
                     j=$((j + 2))  # Move to the next button (skip every 2 links)
                     last_click=$(grep -o -E "/league/fight/[0-9]{1,3}/\?r=[0-9]{1,8}" "$TMP/SRC" | sed -n "${j}p")  # Get the j-th fight
-                    #echo "$last_click" 
+                    echo "$last_click" 
                     ENEMY_NUMBER=$(echo "$last_click" | grep -o -E '[0-9]+' | head -n 1)
                     fetch_available_fights  # Recheck available fights
-                    echo "Enemy number: $ENEMY_NUMBER"
-                    if [ -z "$last_click" ] && [ "$AVAILABLE_FIGHTS" -gt 0 ]; then  # If there are more than 4 enemies
+                    if [ -z "$last_click" ] && [ "$AVAILABLE_FIGHTS" -gt 1 ]; then  # If there are more than 4 enemies
                         echo_t " Reached the last enemy. Attacking the last one and using a potion..."
                         j=$((j - 2))  # Move to the previous button (skip every 2 links)
                         
