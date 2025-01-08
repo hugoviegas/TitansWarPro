@@ -81,6 +81,7 @@ request_update() {
                 if [ "$value" = "n" ]; then
                     continue
                 else
+                    set_config "ALLIES" ""  # Clear allies configuration
                     key="ALLIES"
                     : > "$TMP/allies.txt"
                     : > "$TMP/callies.txt"
