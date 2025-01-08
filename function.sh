@@ -53,6 +53,7 @@ request_update() {
                 while true; do
                     read -r value
                     if [[ $value =~ ^[0-9]{1,3}$ ]]; then
+                        set_config "FUNC_play_league" "$value"
                         break
                     else
                         echo_t "Invalid input. Please enter a number between 1 and 999: " "" "" "after" "❌"
