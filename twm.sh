@@ -1,6 +1,10 @@
 #!/bin/bash
 # shellcheck disable=SC1091
 . "$HOME"/twm/info.sh
+# if config.cfg exist load it
+if [ -f "$HOME"/twm/config.cfg ]; then
+  . "$HOME"/twm/config.cfg
+fi
 colors
 language_setup
 RUN=$(cat "$HOME"/twm/runmode_file)

@@ -69,7 +69,7 @@ request_update() {
             (exit|*)
                 echo_t "Exiting configuration update mode."
                 EXIT_CONFIG="y"  # Signal to exit both loops
-                break
+                return
                 ;;
         esac
 
@@ -177,14 +177,14 @@ config() {
     while true; do
         # Check if the script is paused or signaled to exit
         if [ "$EXIT_CONFIG" = "n" ]; then
-            echo_t "Script paused. Waiting for reactivation..." "${BLACK_RED}" "${COLOR_RESET}" "before" "⏸️"
+            echo_t "Script paused. Waiting for reactivation..." "${BLACK_RED}" "${COLOR_RESET}\n" "before" "⏸️"
             sleep 1s
             # Call the function to request update with key verification
             request_update
     
             # If EXIT_CONFIG is "s", exit the main loop
         else
-            echo_t "Exiting configuration mode..." "${BLACK_RED}" "${COLOR_RESET}" "before" "🛑"
+            echo_t "Exiting configuration mode..." "${BLACK_RED}" "${COLOR_RESET}\n" "before" "🛑"
             EXIT_CONFIG="n"  # Reset the exit signal for next use
             sleep 1s # Interval before restarting the loop
             break
