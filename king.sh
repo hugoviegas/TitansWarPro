@@ -100,36 +100,15 @@ echo $(( $(date +%s) - LA )) >last_atk
 
 # Loop principal até que o arquivo "BREAK_LOOP" contenha dados
 until [ -s "BREAK_LOOP" ]; do
-  : >BREAK_LOOP  # Limpa o arquivo BREAK_LOOP a cada iteração
-
-    # Calcula o tempo restante para o próximo ataque e aguarda
-    current_time=$(date +%s)
-    last_attack_time=$(cat last_atk)
-    sleep_time=$(( LA - (current_time - last_attack_time) ))
-    if [ "$sleep_time" -gt 0 ]; then
-        sleep "$sleep_time"
-    fi
-
-    # Verifica se o HP2 é menor ou igual a 3 para controlar os ataques ao rei
-    if [ "${HP2:-0}" -le 3 ]; then
-        while [ "${HP2:-0}" -gt 2 ]; do
-            fetch_page "/king" "$TMP/SRC"
-            cl_access
-            sleep 1
-        done
-    fi
-
-    # Verifica se é possível executar uma esquiva
-    if ! grep -q -o 'txt smpl grey' "$TMP"/SRC && \
-       [ "$(( $(date +%s) - $(cat last_dodge) ))" -gt 20 ] && \
-       [ "$(( $(date +%s) - $(cat last_dodge) ))" -lt 300 ] && \
-       awk -v ush="$(cat HP)" -v oldhp="$(cat old_HP)" 'BEGIN { exit !(ush < oldhp) }'; then
-        # Realiza a esquiva
-        fetch_page "$(cat DODGE)" "$TMP/SRC"
-        cl_access
-        cat HP >old_HP  # Atualiza o HP antigo
-        date +%s >last_dodge  # Atualiza o tempo da última esquiva
-
+ : >BREAK_LOOP
+  #/dodge
+  if ! grep -q -o 'txt smpl grey' "$TMP"/SRC && [ "$(( $(date +%s) - $(cat last_dodge) ))" -gt 20 ] && [ "$(( $(date +%s) - $(cat last_dodge) ))" -lt 300 ] && awk -v ush="$(cat HP)" -v oldhp="$(cat old_HP)" 'BEGIN { exit !(ush < oldhp) }' ; then
+   (
+    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat DODGE)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
+   ) </dev/null &>/dev/null &
+   time_exit 17
+   cl_access
+   cat HP >old_HP ; date +%s >last_dodge
     # Verifica se é possível executar uma cura
     elif awk -v ush="$(cat HP)" -v hlhp="$HLHP" 'BEGIN { exit !(ush < hlhp) }' && \
          [ "$(( $(date +%s) - $(cat last_heal) ))" -gt 90 ] && \

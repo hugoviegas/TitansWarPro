@@ -129,6 +129,6 @@ messages_info
 
 # Main loop to continuously start the game based on current mode
 while true; do
-    sleep 1s  # Wait for one second between iterations
+    #sleep 1s  # Wait for one second between iterations
     twm_start  # Call the twm_start function to determine next action
 done
