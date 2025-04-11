@@ -16,7 +16,7 @@ coliseum_fight() {
     ) &
     time_exit 20
     #/enterFight
-    local LA=4    #2.Interval attack
+    local LA=5    #2.Interval attack
     local HPER=38 #3.HPER % to heal
     local RPER=5  #4.RPER % to random
     echo_t "Coliseum" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "🧱"
