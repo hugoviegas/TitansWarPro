@@ -1,8 +1,12 @@
 #!/bin/bash
 # shellcheck disable=SC1091
-SHARE_DIR="/usr/share/twm-library"
-INSTALL_DIR="/usr/games"
-. "${INSTALL_DIR}"/info.sh
+
+# Compatibility shim: prefer SHARE_DIR if provided, otherwise fallback to $HOME/twm
+: ${SHARE_DIR:="$HOME/twm"}
+: ${INSTALL_DIR:="${INSTALL_DIR:-$SHARE_DIR}"}
+: ${TMP:="${TMP:-$SHARE_DIR/tmp}"}
+
+. "${SHARE_DIR}"/info.sh
 colors
 RUN=$(cat "${SHARE_DIR}"/runmode_file)
 cd "${SHARE_DIR}" || exit

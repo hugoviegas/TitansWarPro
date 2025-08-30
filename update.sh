@@ -5,6 +5,11 @@ clear
 # Defina o diretório de instalação para /usr/games (onde os scripts vão agora)
 INSTALL_DIR="/usr/games"
 
+# Fallback for shared installation directory (keeps behavior compatible with user installs)
+: ${SHARE_DIR:="$HOME/twm"}
+: ${INSTALL_DIR:="${INSTALL_DIR:-$SHARE_DIR}"}
+: ${TMP:="${TMP:-$SHARE_DIR/tmp}"}
+
 # Define color codes for output formatting
 BLACK_CYAN='\033[01;36m\033[01;07m'
 BLACK_GREEN='\033[00;32m\033[01;07m'
@@ -114,9 +119,10 @@ for script in $SCRIPTS; do
         curl -s -L -O "${SERVER}${script}"  # Download if not present locally
     fi
 
-    # Make the script executable and copy it to the installation directory
+    # Make the script executable and copy it to the installation directory (default: $SHARE_DIR)
     chmod +x "$script"
-    sudo cp "$script" "$INSTALL_DIR/" 2>/dev/null
+    # Prefer copying to SHARE_DIR (user-local). If user wants system install, they can run with sudo.
+    cp "$script" "$SHARE_DIR/" 2>/dev/null || true
     
     sleep 0.1s  # Brief pause for download stability
 done

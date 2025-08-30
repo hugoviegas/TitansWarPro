@@ -1,6 +1,8 @@
 #!/bin/sh
-SHARE_DIR="/usr/share/twm-library"
-INSTALL_DIR="/usr/games"
+# Ensure SHARE_DIR/INSTALL_DIR/TMP are defined when this script runs standalone
+: ${SHARE_DIR:="$HOME/twm"}
+: ${INSTALL_DIR:="${INSTALL_DIR:-$SHARE_DIR}"}
+: ${TMP:="${TMP:-$SHARE_DIR/tmp}"}
 # Main script to manage the execution of the twm.sh script based on the provided run mode
 (
   RUN=$1  # Get the run mode from the first argument

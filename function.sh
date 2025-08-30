@@ -1,6 +1,41 @@
 # Variável global para controlar a saída dos loops
 EXIT_CONFIG="n"
 
+# --- Compatibility shim -------------------------------------------------
+# Provide sane defaults so beta/master mixed code paths don't fail when
+# SHARE_DIR, INSTALL_DIR, TMP or CONFIG_FILE are not set.
+: ${SHARE_DIR:="$HOME/twm"}
+: ${INSTALL_DIR:="${INSTALL_DIR:-$SHARE_DIR}"}
+: ${TMP:="${TMP:-$SHARE_DIR/tmp}"}
+: ${CONFIG_FILE:="${CONFIG_FILE:-$SHARE_DIR/config.cfg}"}
+
+# Backwards-compatible accessors for config values. Some beta changes
+# removed get_config/set_config; provide minimal implementations so other
+# scripts keep working until we refactor everything consistently.
+get_config() {
+    local key="$1"
+    if [ -f "$CONFIG_FILE" ]; then
+        # shellcheck disable=SC1090
+        . "$CONFIG_FILE" 2>/dev/null || true
+    fi
+    # Print the variable value (may be empty)
+    printf '%s' "${!key}"
+}
+
+set_config() {
+    local key="$1"
+    local value="$2"
+    mkdir -p "$(dirname "$CONFIG_FILE")" 2>/dev/null || true
+    # Remove any existing entry for the key (if file exists), then append
+    if [ -f "$CONFIG_FILE" ]; then
+        grep -v -E "^${key}=" "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" 2>/dev/null || true
+        mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE" 2>/dev/null || true
+    fi
+    printf '%s=%s\n' "$key" "$value" >> "$CONFIG_FILE"
+}
+
+# ------------------------------------------------------------------------
+
 update_config() {
     local key="$1"      # Nome da configuração a ser alterada
     local value="$2"    # Novo valor para a configuração
@@ -74,8 +109,8 @@ load_config() {
 
         # Escreve o arquivo config.cfg com os valores padrão
         {
-            echo "FUNC_check_rewards=$FUNC_check_rewards"
-            echo "FUNC_use_elixir=$FUNC_use_elixir"
+            echo "FUNC_rewards=$FUNC_rewards"
+            echo "FUNC_elixir=$FUNC_elixir"
             echo "FUNC_coliseum=$FUNC_coliseum"
             echo "SCRIPT_PAUSED=$SCRIPT_PAUSED"
         } > "$CONFIG_FILE"

@@ -1,7 +1,14 @@
+#!/bin/sh
+
+# Fallbacks for shared directories so scripts work even when beta set variables are missing
+: ${SHARE_DIR:="$HOME/twm"}
+: ${TMP:="${TMP:-$SHARE_DIR/tmp}"}
+
 twm_play() {
     echo "$RUN" > "${SHARE_DIR}/runmode_file"  # Save the run mode to a file
 
     # Function to restart the twm script if it is running
+    # shellcheck disable=SC2329
     restart_script() {
         # shellcheck disable=SC2317
         if [ "$RUN" != '-boot' ]; then
@@ -82,7 +89,7 @@ twm_play() {
         (*)
             # If running in coliseum mode, execute relevant functions.
             if echo "$RUN" | grep -q -E '[-]cl'; then
-                echo -e "Running in coliseum mode: $RUN\n"
+                printf "Running in coliseum mode: %s\n\n" "$RUN"
                 sleep 5s  # Pause before executing arena duel.
                 arena_duel
                 coliseum_start

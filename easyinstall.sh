@@ -1,5 +1,9 @@
 #!/bin/bash
 # shellcheck disable=all
+# Ensure SHARE_DIR/INSTALL_DIR/TMP are defined when running installer locally
+: ${SHARE_DIR:="$HOME/twm"}
+: ${INSTALL_DIR:="${INSTALL_DIR:-$SHARE_DIR}"}
+: ${TMP:="${TMP:-$SHARE_DIR/tmp}"}
 # Define installation paths
 INSTALL_DIR="/usr/games"
 SHARE_DIR="/usr/share/twm-library"
