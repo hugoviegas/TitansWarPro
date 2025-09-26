@@ -6,7 +6,7 @@ mkdir -p ~/twm
 if [ -z "$*" ]; then
   version="master"
 else
-  # ./easyinstall.sh beta, or backup
+  # ./easyinstall.sh beta, beta2 or backup
   version="$*"
 fi
 
