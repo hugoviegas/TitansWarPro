@@ -1,0 +1,197 @@
+[
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\.gitignore",
+    "size": 23,
+    "mtime": "2025-09-26T23:56:28.5861367+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\allies.sh",
+    "size": 8360,
+    "mtime": "2025-09-26T23:56:28.5901951+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\altars.sh",
+    "size": 6050,
+    "mtime": "2025-09-26T23:56:28.5901951+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\apt-cyg",
+    "size": 14564,
+    "mtime": "2025-09-26T23:56:28.5911962+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\arena.sh",
+    "size": 4429,
+    "mtime": "2025-09-26T23:56:28.5911962+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\campaign.sh",
+    "size": 996,
+    "mtime": "2025-09-26T23:56:28.5921952+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\career.sh",
+    "size": 1226,
+    "mtime": "2025-09-26T23:56:28.593196+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\cave.sh",
+    "size": 4341,
+    "mtime": "2025-09-26T23:56:28.593196+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\check.sh",
+    "size": 2868,
+    "mtime": "2025-09-26T23:56:28.5942015+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\clancoliseum.sh",
+    "size": 7727,
+    "mtime": "2025-09-26T23:56:28.5942015+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\clandmg.sh",
+    "size": 8989,
+    "mtime": "2025-09-26T23:56:28.5952011+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\clanfight.sh",
+    "size": 7513,
+    "mtime": "2025-09-26T23:56:28.5962051+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\clanid.sh",
+    "size": 8535,
+    "mtime": "2025-09-26T23:56:28.5962051+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\coliseum.sh",
+    "size": 13335,
+    "mtime": "2025-09-26T23:56:28.5972005+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\crono.sh",
+    "size": 3572,
+    "mtime": "2025-09-26T23:56:28.5972005+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\easyinstall.sh",
+    "size": 10585,
+    "mtime": "2025-09-26T23:56:28.5982017+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\flagfight.sh",
+    "size": 6683,
+    "mtime": "2025-09-26T23:56:28.5992017+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\function.sh",
+    "size": 9430,
+    "mtime": "2025-09-26T23:56:28.5992017+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\info.sh",
+    "size": 11547,
+    "mtime": "2025-09-26T23:56:28.6002015+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\king.sh",
+    "size": 8317,
+    "mtime": "2025-09-26T23:56:28.6012006+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\language.sh",
+    "size": 3029,
+    "mtime": "2025-09-26T23:56:28.6012006+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\league.sh",
+    "size": 9348,
+    "mtime": "2025-09-26T23:56:28.6022033+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\LICENSE",
+    "size": 1164,
+    "mtime": "2025-09-26T23:56:28.5881958+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\loginlogoff.sh",
+    "size": 4138,
+    "mtime": "2025-09-26T23:56:28.6022033+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\play.sh",
+    "size": 1715,
+    "mtime": "2025-09-26T23:56:28.6032595+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\README.md",
+    "size": 7292,
+    "mtime": "2025-09-26T23:56:28.5891976+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\requeriments.sh",
+    "size": 9244,
+    "mtime": "2025-09-26T23:56:28.6032595+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\run.sh",
+    "size": 3180,
+    "mtime": "2025-09-26T23:56:28.6042653+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\specialevent.sh",
+    "size": 2772,
+    "mtime": "2025-09-26T23:56:28.6042653+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\svproxy.sh",
+    "size": 796,
+    "mtime": "2025-09-26T23:56:28.605265+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\teste",
+    "size": 10841,
+    "mtime": "2025-09-26T23:56:28.6062656+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\trade.sh",
+    "size": 2220,
+    "mtime": "2025-09-26T23:56:28.6062656+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\twm_manifest.json",
+    "size": 0,
+    "mtime": "2025-09-27T00:02:27.1068913+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\twm.sh",
+    "size": 3971,
+    "mtime": "2025-09-26T23:56:28.6072651+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\undying.sh",
+    "size": 4012,
+    "mtime": "2025-09-26T23:56:28.6082646+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\update_check.sh",
+    "size": 2633,
+    "mtime": "2025-09-26T23:56:28.6092653+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\update.sh",
+    "size": 4382,
+    "mtime": "2025-09-26T23:56:28.6082646+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\userAgent.txt",
+    "size": 7875,
+    "mtime": "2025-09-26T23:56:28.6092653+01:00"
+  },
+  {
+    "path": "C:\\Users\\hugov\\OneDrive\\Documentos\\GitHub\\TitansWarPro\\.vscode\\settings.json",
+    "size": 104,
+    "mtime": "2025-09-26T23:56:28.5871898+01:00"
+  }
+]
