@@ -144,7 +144,6 @@ ACCOUNT_LABEL=$id_literal
 child_pid=""
 trap 'if [ -n "\$child_pid" ]; then kill "\$child_pid" 2>/dev/null; wait "\$child_pid" 2>/dev/null || true; fi; exit 0' INT TERM
 while true; do
-  cd "\$BASE_DIR" || exit 1
   echo "\$(date +'%Y-%m-%d %H:%M:%S') [\${ACCOUNT_ALIAS:-$account_id}] starting twm.sh" >> "\$LOG_FILE"
   "\${BASE_DIR}/twm.sh" >> "\$LOG_FILE" 2>&1 &
   child_pid=\$!
