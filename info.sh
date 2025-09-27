@@ -28,7 +28,7 @@ script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="Hugo Viegas"
     #collaborator="collaborator: @_hviegas"
-    versionNum="3.9.19" # to change the version number every time has an update!!!!!!!!!!!!!!!!!!!!!!!!
+    versionNum="3.10.01" # to change the version number every time has an update!!!!!!
 
 for i in $colors; do
 clear
@@ -62,21 +62,36 @@ done
 }
 
 language_setup() {
-    CONFIG_FILE="$TMP/config.cfg"  # Caminho para o arquivo de configuração
+    CONFIG_PATH="$ACCOUNT_CONFIG"
+    if [ -z "$CONFIG_PATH" ] && [ -n "$CONFIG_FILE" ]; then
+        CONFIG_PATH="$CONFIG_FILE"
+    fi
+    if [ -z "$CONFIG_PATH" ]; then
+        if [ -n "$TMP" ]; then
+            CONFIG_PATH="$TMP/config.cfg"
+        else
+            CONFIG_PATH="$HOME/twm/config.cfg"
+        fi
+    fi
+
+    CONFIG_DIR=$(dirname "$CONFIG_PATH")
+    mkdir -p "$CONFIG_DIR"
 
     # Verifica se o idioma está configurado no arquivo de configuração
-    LANGUAGE=$(grep -E "^LANGUAGE=" "$CONFIG_FILE" 2>/dev/null | cut -d '=' -f2)
+    LANGUAGE=$(grep -E "^LANGUAGE=" "$CONFIG_PATH" 2>/dev/null | cut -d '=' -f2)
 
     # Se o idioma não estiver definido, define o padrão como "en"
     if [ -z "$LANGUAGE" ]; then
         LANGUAGE="en"  # Idioma padrão
-        echo "LANGUAGE=$LANGUAGE" >> "$CONFIG_FILE"  # Salva no arquivo de configuração
+        grep -v '^LANGUAGE=' "$CONFIG_PATH" > "${CONFIG_PATH}.tmp" 2>/dev/null || true
+        mv "${CONFIG_PATH}.tmp" "$CONFIG_PATH"
+        echo "LANGUAGE=$LANGUAGE" >> "$CONFIG_PATH"  # Salva no arquivo de configuração
     fi
 
-    # Exporta a variável para torná-la disponível globalmente
-    export LANGUAGE
+    CONFIG_FILE="$CONFIG_PATH"
+    export LANGUAGE CONFIG_FILE
+    unset CONFIG_DIR CONFIG_PATH
 }
-language_setup
 
 # Função para imprimir com printf, usando tradução e cores
 printf_t() {
@@ -164,7 +179,7 @@ hpmp() {
     if echo "$@" | grep -q '\-fix'; then
         # Fetch the train page to get HP and MP values
         (
-            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 userAgent.txt)" >"$TMP"/TRAIN
+            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/TRAIN
         ) </dev/null > /dev/null 2>&1 &
         time_exit 20
         #/Fixed HP and MP.
@@ -183,31 +198,37 @@ hpmp() {
 }
 
 messages_info() {
-     echo " ⚔️ - Titans War Macro - ⚔️ V: $versionNum " > "$TMP"/msg_file
-     printf " --------- 📩 MAIL 📩 ---------------\n" >> "$TMP"/msg_file
+    msg_output="${ACCOUNT_LOGS:-$TMP}/msg_file"
+    msg_tmp="$TMP/msg_file"
+    mkdir -p "$(dirname "$msg_output")"
+    echo " ⚔️ - Titans War Macro - ⚔️ V: $versionNum " > "$msg_output"
+    printf " --------- 📩 MAIL 📩 ---------------\n" >> "$msg_output"
     (
-          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/mail" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tee "$TMP"/info_file | sed -n '/[|]\ mp/,/\[arrow\]/p' | sed '1,1d;$d;6q' >> "$TMP"/msg_file
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/mail" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tee "$TMP"/info_file | sed -n '/[|]\ mp/,/\[arrow\]/p' | sed '1,1d;$d;6q' >> "$msg_output"
     ) </dev/null > /dev/null 2>&1 &
     time_exit 17
-     printf " --------- 💬 CHAT TITANS 🔱 ---------\n" >> "$TMP"/msg_file
+    printf " --------- 💬 CHAT TITANS 🔱 ---------\n" >> "$msg_output"
     (
-          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/titans/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -n '/\(\»\)/,/\[chat\]/p' | sed '$d;6q' >> "$TMP"/msg_file
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/titans/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -n '/\(\»\)/,/\[chat\]/p' | sed '$d;6q' >> "$msg_output"
     ) </dev/null > /dev/null 2>&1 &
     time_exit 17
-     printf " --------- 💬 CHAT CLAN 🛡️ -----------\n" >> "$TMP"/msg_file
+    printf " --------- 💬 CHAT CLAN 🛡️ -----------\n" >> "$msg_output"
     (
-          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/clan/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -n '/\[[^a-z]\]/,/\[chat\]/p' | sed '$d;8q' >> "$TMP"/msg_file
+        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/clan/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -n '/\[[^a-z]\]/,/\[chat\]/p' | sed '$d;8q' >> "$msg_output"
     ) </dev/null > /dev/null 2>&1 &
     time_exit 17
-     sed -i 's/\[0\]/🔴/g;s/\[0-off\]/⭕/g;s/\[1\]/🔵/g;s/\[1-off\]/🔘/g;s/\[premium\]/👑/g;s/\[level\]/🔼/g;s/\[mail\]/📩/g;s/\[bot\]/⚫/g' "$TMP"/msg_file
-     printf " --------------------------------------\n" >> "$TMP"/msg_file
-    local_TRAIN="$HOME.${UR}/TRAIN"
-     if [ ! -e "$local_TRAIN" ] || find "$local_TRAIN" -mmin +30 >/dev/null 2>&1; then
+    sed -i 's/\[0\]/🔴/g;s/\[0-off\]/⭕/g;s/\[1\]/🔵/g;s/\[1-off\]/🔘/g;s/\[premium\]/👑/g;s/\[level\]/🔼/g;s/\[mail\]/📩/g;s/\[bot\]/⚫/g' "$msg_output"
+    printf " --------------------------------------\n" >> "$msg_output"
+    local_TRAIN="$TMP/TRAIN"
+    if [ ! -e "$local_TRAIN" ] || find "$local_TRAIN" -mmin +30 >/dev/null 2>&1; then
         hpmp -fix
     fi
-     echo -e "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}" >> "$TMP"/msg_file
-     # sed :a;N;s/\n//g;ta |
-     echo -e "${GREENb_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' "$TMP"/info_file | sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}" >>"$TMP"/msg_file
+    echo -e "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}" >> "$msg_output"
+    echo -e "${GREENb_BLACK}${ACC}$(grep -o -E '(lvl [0-9]{1,2} \| g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' "$TMP"/info_file | sed 's/lvl/\ lvl/g;s/g/\🪙 g/g;s/s/\🥈 s/g')${COLOR_RESET}" >>"$msg_output"
+
+    if [ "$msg_output" != "$msg_tmp" ]; then
+      cp "$msg_output" "$msg_tmp"
+    fi
 }
 
 player_stats() {

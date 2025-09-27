@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "defaultAccount": "A1",
+  "accounts": [
+    {
+      "id": "A1",
+      "alias": "Primary",
+      "server": "13",
+      "language": "en",
+      "timezone": "Europe/London",
+      "ur": "13",
+      "runMode": "-boot",
+      "active": true,
+      "autoRestart": true,
+      "notes": "Update the server, language, and credentials for each account you add."
+    }
+  ]
+}

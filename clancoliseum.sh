@@ -29,7 +29,7 @@ clancoliseum_fight() {
   }
   cf_access
 
-  >BREAK_LOOP
+  : >BREAK_LOOP
   cat USH >old_HP
   echo $(($(date +%s) - 20)) >last_dodge
   echo $(($(date +%s) - 90)) >last_heal
@@ -37,18 +37,23 @@ clancoliseum_fight() {
 
   until [ -s "BREAK_LOOP" ]; do
     #/heal
-    if awk -v ush="$(cat USH)" -v hlhp="$(cat HLHP)" 'BEGIN { exit !(ush < hlhp) }' && [ "$(($(date +%s) - $(cat last_heal)))" -gt 90 -a "$(($(date +%s) - $(cat last_heal)))" -lt 300 ]; then
+   if awk -v ush="$(cat USH)" -v hlhp="$(cat HLHP)" 'BEGIN { exit !(ush < hlhp) }' && \
+     [ "$(($(date +%s) - $(cat last_heal)))" -gt 90 ] && \
+     [ "$(($(date +%s) - $(cat last_heal)))" -lt 300 ]; then
       (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat HEAL)" -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+  w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat HEAL)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
       ) </dev/null &>/dev/null &
       time_exit 17
       cf_access
       cat USH >old_HP
       date +%s >last_heal
     #/dodge
-    elif ! grep -q -o 'txt smpl grey' "$src_ram" && [ "$(($(date +%s) - $(cat last_dodge)))" -gt 20 -a "$(($(date +%s) - $(cat last_dodge)))" -lt 300 ] && awk -v ush="$(cat USH)" -v oldhp="$(cat old_HP)" 'BEGIN { exit !(ush < oldhp) }'; then
+    elif ! grep -q -o 'txt smpl grey' "$src_ram" && \
+      [ "$(($(date +%s) - $(cat last_dodge)))" -gt 20 ] && \
+      [ "$(($(date +%s) - $(cat last_dodge)))" -lt 300 ] && \
+      awk -v ush="$(cat USH)" -v oldhp="$(cat old_HP)" 'BEGIN { exit !(ush < oldhp) }'; then
       (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat DODGE)" -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+  w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat DODGE)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
       ) </dev/null &>/dev/null &
       time_exit 17
       cf_access
@@ -57,7 +62,7 @@ clancoliseum_fight() {
     #/random
     elif awk -v latk="$(($(date +%s) - $(cat last_atk)))" -v atktime="$LA" 'BEGIN { exit !(latk != atktime) }' && ! grep -q -o 'txt smpl grey' "$src_ram" && awk -v rhp="$(cat RHP)" -v enh="$(cat ENH)" 'BEGIN { exit !(rhp < enh) }' || awk -v latk="$(($(date +%s) - $(cat last_atk)))" -v atktime="$LA" 'BEGIN { exit !(latk != atktime) }' && ! grep -q -o 'txt smpl grey' "$src_ram" && grep -q -o "$(cat CLAN)" "$TMP"/callies.txt; then
       (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat ATKRND)" -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+  w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat ATKRND)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
       ) </dev/null &>/dev/null &
       time_exit 17
       cf_access
@@ -65,14 +70,14 @@ clancoliseum_fight() {
     #/attack
     elif awk -v latk="$(($(date +%s) - $(cat last_atk)))" -v atktime="$LA" 'BEGIN { exit !(latk > atktime) }'; then
       (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat ATK)" -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+  w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat ATK)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
       ) </dev/null &>/dev/null &
       time_exit 17
       cf_access
       date +%s >last_atk
     else
       (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clancoliseum" -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+  w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clancoliseum" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
       ) </dev/null &>/dev/null &
       time_exit 17
       cf_access
@@ -108,17 +113,17 @@ clancoliseum_fight() {
     # apply to fight ${TMP}=$tmp_ram cp $src_ram SRC  apply_event clancoliseum cp SRC $src_ram cd $tmp_ram 
     #/FULL hp
     (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 userAgent.txt)" | grep -o -E '\(([0-9]+)\)' | sed 's/[()]//g' >"$full_ram"
+  w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | grep -o -E '\(([0-9]+)\)' | sed 's/[()]//g' >"$full_ram"
     ) </dev/null &>/dev/null &
     time_exit 17
     #/clancoliseum/?close=reward
     (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/clancoliseum/?close=reward" -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+  w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/clancoliseum/?close=reward" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
     ) </dev/null &>/dev/null &
     time_exit 17
     #/clancoliseum/enterFight
     (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/clancoliseum/enterFight" -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+  w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/clancoliseum/enterFight" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
     ) </dev/null &>/dev/null &
     time_exit 17
     echo_t "Clan coliseum will be started..." "${GOLD_BLACK}" "${COLOR_RESET}"
@@ -138,7 +143,7 @@ clancoliseum_fight() {
 
     #/clancoliseum/
     (
-      w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/clancoliseum/" -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+  w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/clancoliseum/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
     ) </dev/null &>/dev/null &
     time_exit 17
     #printf "\nClanColiseum\n$URL\n"
@@ -153,7 +158,7 @@ clancoliseum_fight() {
       printf " 💤	...\n${ACCESS}\n"
       #/clancoliseum/
       (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clancoliseum/" -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+  w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/clancoliseum/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
       ) </dev/null &>/dev/null &
       time_exit 17
       ACCESS=$(grep -o -E '(/clancoliseum/[a-z]+/[?]r[=][0-9]+)' "$src_ram" | grep -v 'dodge' | sed -n '1p')

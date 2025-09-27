@@ -120,15 +120,16 @@ Como outros módulos usam `function.sh`
 
 Arquivos temporários e configuração persistente
 
-- `~/twm/ur_file` — servidor selecionado (1..13). Define `URL` e `TMP`.
-- `~/twm/runmode_file` — runmode atual (-boot, -cv, -cl) para reinício automático.
-- `$TMP/` — pasta temporária por servidor (p.ex. `~/.1`, `~/.13`). Contém:
+- `~/twm/accounts/<id>/ur_file` — servidor selecionado (1..13) por conta. Define `URL` e `TMP`.
+- `~/twm/accounts/<id>/runmode_file` — runmode atual (-boot, -cv, -cl) para reinício automático por conta.
+- `$TMP/` — pasta temporária por conta e servidor (p.ex. `~/twm/accounts/<id>/tmp/.1`, `~/twm/accounts/<id>/tmp/.13`). Contém:
   - `SRC` — último fetch da página (HTML dump)
   - `TRAIN` — dados de treino (HP/MP)
   - `msg_file`, `info_file`, `bottom_file` — mensagens e resumo
   - `cript_file`, `cookie_file` — para login
   - `config.cfg` — configuração persistente local
-- `~/twm/userAgent.txt` e `$TMP/userAgent.txt` — User-Agent pool (usado por `fetch_page`)
+- `~/twm/accounts/<id>/userAgent.txt` e `$TMP/userAgent.txt` — User-Agent pool (usado por `fetch_page`, com fallback legado em `~/twm/userAgent.txt`)
+- `~/twm/accounts/<id>/ads_file` — controle diário de abertura de anúncios/links.
 
 Timeouts, travamentos e proteção
 

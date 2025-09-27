@@ -1,7 +1,12 @@
 #!/bin/bash
 
 # Nome do arquivo de traduções
-TRANSLATIONS_FILE="$HOME/twm/translations.po"
+TRANSLATIONS_FILE="${ACCOUNT_TRANSLATIONS:-$HOME/twm/translations.po}"
+TRANSLATIONS_DIR=$(dirname "$TRANSLATIONS_FILE")
+mkdir -p "$TRANSLATIONS_DIR"
+if [ ! -f "$TRANSLATIONS_FILE" ]; then
+    : > "$TRANSLATIONS_FILE"
+fi
 
 # Declarando os idiomas disponíveis para referência
 # shellcheck disable=SC2034
@@ -20,6 +25,7 @@ get_translation() {
 }
 
 # Função para carregar traduções do arquivo
+# shellcheck disable=SC2034
 load_translations() {
     declare -g -A translations  # Declarar um array associativo global
 

@@ -3,6 +3,7 @@
 # Main script to manage the execution of the twm.sh script based on the provided run mode
 (
   RUN=$1  # Get the run mode from the first argument
+  run_file="${ACCOUNT_RUN_FILE:-$HOME/twm/runmode_file}"
 
   while true; do
     # Get the PID of the running twm.sh script
@@ -20,16 +21,16 @@
       chmod +x "$HOME/twm/twm.sh"  # Ensure twm.sh is executable
 
       if echo "$RUN" | grep -q -E '[-]cl'; then
-      echo '-cl' > "$HOME/twm/runmode_file"  # Update run mode to coliseum
+      echo '-cl' > "$run_file"  # Update run mode to coliseum
         "$HOME"/twm/twm.sh -cl  # Run in clan mode
       elif echo "$RUN" | grep -q -E '[-]cv'; then
-      echo '-cv' > "$HOME/twm/runmode_file"  # Update run mode to cave
+      echo '-cv' > "$run_file"  # Update run mode to cave
         "$HOME"/twm/twm.sh -cv  # Run in cave mode
       elif echo "$RUN" | grep -q -E '[-]boot'; then
-        echo '-boot' > "$HOME/twm/runmode_file"  # Update run mode to boot
+        echo '-boot' > "$run_file"  # Update run mode to boot
         "$HOME"/twm/twm.sh -boot  # Run in boot mode
       else
-        echo '-boot' > "$HOME/twm/runmode_file"  # Default to boot mode if no specific mode is set
+        echo '-boot' > "$run_file"  # Default to boot mode if no specific mode is set
         "$HOME"/twm/twm.sh -boot  # Run in boot mode
       fi
     }

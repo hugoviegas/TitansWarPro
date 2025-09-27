@@ -1,26 +1,25 @@
 #!/bin/bash
-# shellcheck disable=SC1091
+# shellcheck disable=SC1091,SC2034
 . "$HOME"/twm/info.sh
 # if config.cfg exist load it
 if [ -f "$HOME"/twm/config.cfg ]; then
   . "$HOME"/twm/config.cfg
 fi
+
 colors
-language_setup
-RUN=$(cat "$HOME"/twm/runmode_file)
 cd "$HOME"/twm || exit
 
 script_ads() {
-  if [ "$RUN" != '-boot' ] && [ -f "$HOME/twm/ads_file" ] && [ -s "$HOME/twm/ads_file" ] && [ "$(cat "$HOME"/twm/ads_file)" != "$(date +%d)" ]; then
-    if [ "$(cat "$HOME"/twm/ads_file 2>/dev/null)" != "$(date +%d)" ]; then
+  ads_file="${ACCOUNT_ADS_FILE:-$HOME/twm/ads_file}"
+  if [ "$RUN" != '-boot' ] && [ -f "$ads_file" ] && [ -s "$ads_file" ] && [ "$(cat "$ads_file")" != "$(date +%d)" ]; then
+    if [ "$(cat "$ads_file" 2>/dev/null)" != "$(date +%d)" ]; then
       xdg-open "https://apps.disroot.org/search?q=Shell+Script&category_general=on&language=pt-BR&time_range=&safesearch=1&theme=beetroot"
-      date +%d >"$HOME"/twm/ads_file
+      date +%d >"$ads_file"
     fi
   else
-    date +%d >"$HOME"/twm/ads_file
+    date +%d >"$ads_file"
   fi
 }
-script_ads
 
 #echo_t "Starting the macro wait a few seconds..." "$BLACK_CYAN" "$COLOR_RESET" "after" "☕"
 #sleep 3s
@@ -85,12 +84,21 @@ func_unset() {
     unset HP1 HP2 YOU USER CLAN ENTER ENTER ATK ATKRND DODGE HEAL GRASS STONE BEXIT OUTGATE LEAVEFIGHT WDRED CAVE BREAK NEWCAVE
 }
 
-# Check if the user settings file exists and is not empty
-if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
-    echo_t "Starting with last settings used." "${GREEN_BLACK}" "${COLOR_RESET}\n"
-    
-    num=6  # Number of seconds to wait before reconfiguration prompt
+# Initialize account-specific paths before accessing cached selections
+set_account_paths
+language_setup
 
+if [ -f "$ACCOUNT_RUN_FILE" ]; then
+  RUN=$(cat "$ACCOUNT_RUN_FILE")
+else
+  RUN="-boot"
+fi
+
+script_ads
+
+# Check if the user settings file exists and is not empty
+if [ -f "$UR_FILE_PATH" ] && [ -s "$UR_FILE_PATH" ]; then
+    echo_t "Starting with last settings used." "${GREEN_BLACK}" "${COLOR_RESET}\n"
     # Countdown loop for reconfiguration prompt
     for i in $(seq 4 -1 1); do
         i=$((i - 1))
@@ -98,8 +106,9 @@ if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
             # Clear relevant files if Enter is pressed
             set_config "ALLIES" "" # Clear allies configuration
             : >"$TMP/allies.txt"
-            : >"$HOME/twm/ur_file"
-            : >"$HOME/twm/fileAgent.txt"
+      : >"$UR_FILE_PATH"
+      : >"${ACCOUNT_USER_AGENT_MODE:-$ACCOUNT_ROOT/fileAgent.txt}"
+      rm -f "${ACCOUNT_USER_AGENT_STORE:-$ACCOUNT_ROOT/userAgent.txt}" 2>/dev/null
             unset UR UA AL  # Unset user-related variables
             break &>/dev/null  # Exit the loop quietly if Enter is pressed
         fi

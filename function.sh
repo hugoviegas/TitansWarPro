@@ -5,6 +5,8 @@ update_config() {
     local key="$1"      # Name of the configuration to be changed
     local value="$2"    # New value for the configuration
 
+    load_config  # Ensure CONFIG_FILE is defined
+
     # Check if the key exists in the config.cfg file
     if grep -q "^${key}=" "$CONFIG_FILE"; then
         # Update the value in config.cfg using sed for substitution
@@ -28,8 +30,9 @@ request_update() {
         echo_t "2- Use elixir. Current value: " "" "$FUNC_use_elixir"
         echo_t "3- Auto update. Current value: " "" "$FUNC_AUTO_UPDATE"
         echo_t "4- Get to top in league. Current value: " "" "$FUNC_play_league"
-        echo_t "5- Change language. Current value: " "" "$LANGUAGE"
-        echo_t "6- Change allies. Current value: " "" "$ALLIES"
+    echo_t "5- Change language. Current value: " "" "$LANGUAGE"
+    echo_t "6- Change allies. Current value: " "" "$ALLIES"
+    echo_t "7- Update channel. Current value: " "" "$UPDATE_CHANNEL"
         echo_t "Press *'ENTER'* to exit configuration update mode." "" "" "after" "↩️"
         read -r -n 1 key
 
@@ -90,6 +93,30 @@ request_update() {
                 fi
                 break
                 ;;
+            (7|channel|update-channel)
+                echo_t "Select update channel: 1-Master, 2-Beta, 3-Beta2" "" ""
+                read -r value
+                case $value in
+                    (1|master|Master)
+                        set_config "UPDATE_CHANNEL" "master"
+                        UPDATE_CHANNEL="master"
+                        ;;
+                    (2|beta|Beta)
+                        set_config "UPDATE_CHANNEL" "beta"
+                        UPDATE_CHANNEL="beta"
+                        ;;
+                    (3|beta2|Beta2)
+                        set_config "UPDATE_CHANNEL" "beta2"
+                        UPDATE_CHANNEL="beta2"
+                        ;;
+                    (*)
+                        echo_t "Invalid channel option." "" "" "before" "❌"
+                        continue
+                        ;;
+                esac
+                echo_t "Update channel configured!" "" "" "before" "✅"
+                continue
+                ;;
             (exit|*)
                 echo_t "Exiting configuration update mode."
                 EXIT_CONFIG="y"  # Signal to exit both loops
@@ -131,12 +158,30 @@ request_update() {
 
 # Function to load configurations from the config.cfg file
 load_config() {
-    # Load the initial configuration
-    CONFIG_FILE="$TMP/config.cfg"
+    if [ -n "$ACCOUNT_CONFIG" ]; then
+        CONFIG_FILE="$ACCOUNT_CONFIG"
+    elif [ -z "$CONFIG_FILE" ] && [ -n "$TMP" ]; then
+        CONFIG_FILE="$TMP/config.cfg"
+    fi
+
+    if [ -z "$CONFIG_FILE" ]; then
+        echo_t "Configuration path is undefined." "${BLACK_RED}" "${COLOR_RESET}" "before" "⚠️"
+        return 1
+    fi
+
+    CONFIG_DIR=$(dirname "$CONFIG_FILE")
+    mkdir -p "$CONFIG_DIR"
+
     if [ -f "$CONFIG_FILE" ]; then
         # shellcheck source=/path/to/config.cfg
         # shellcheck disable=SC1091
         . "$CONFIG_FILE"  # Load the configuration file
+        if [ -z "$UPDATE_CHANNEL" ]; then
+            UPDATE_CHANNEL="master"
+            grep -v '^UPDATE_CHANNEL=' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" 2>/dev/null || true
+            mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
+            echo "UPDATE_CHANNEL=$UPDATE_CHANNEL" >> "$CONFIG_FILE"
+        fi
     else
         echo_t "Configuration file not found. Creating config.cfg with default values."
         
@@ -150,6 +195,7 @@ load_config() {
             FUNC_play_league=999
             FUNC_clan_figth="y"
             LANGUAGE="en"
+            UPDATE_CHANNEL="master"
             ALLIES=""
             SCRIPT_PAUSED="n"
 
@@ -164,10 +210,12 @@ load_config() {
             echo "SCRIPT_PAUSED=$SCRIPT_PAUSED"
             echo "LANGUAGE=$LANGUAGE"
             echo "ALLIES="
+            echo "UPDATE_CHANNEL=$UPDATE_CHANNEL"
             } > "$CONFIG_FILE"
         } 
         default_config 
     fi
+    unset CONFIG_DIR
 }
 
 # Function to get the configuration from file and return the value
@@ -229,10 +277,7 @@ testColour() {
    echo -e "${CYAN_CYAN}CYAN_CYAN${COLOR_RESET}\n"
    echo -e "${GOLD_BLACK}GOLD_BLACK${COLOR_RESET}\n"
    echo -e "${GREEN_BLACK}GREEN_BLACK${COLOR_RESET}\n"
-   echo -e "${PURPLEi_BLACK}PURPLEi_BLACK${COLOR_RESET}\n"
-   echo -e "${PURPLEis_BLACK}PURPLEis_BLACK${COLOR_RESET}\n"
    echo -e "${WHITE_BLACK}WHITE_BLACK${COLOR_RESET}\n"
-   echo -e "${WHITEb_BLACK}WHITEb_BLACK${COLOR_RESET}\n"
    echo -e "${RED_BLACK}RED_BLACK${COLOR_RESET}\n"
    echo -e "${BLUE_BLACK}BLUE_BLACK${COLOR_RESET}\n"
    sleep 30s

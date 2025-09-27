@@ -41,7 +41,7 @@ flagfight_fight() {
     #/heal/
     if awk -v ush="$(cat USH)" -v hlhp="$(cat HLHP)" 'BEGIN { exit !(ush < hlhp) }' && [ "$(($(date +%s) - $(cat last_heal)))" -gt 90 -a "$(($(date +%s) - $(cat last_heal)))" -lt 300 ]; then
       (
-        w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat SHIELD)" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
+  w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat SHIELD)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >$src_ram
       ) </dev/null &>/dev/null &
       time_exit 17
       cf_access
@@ -51,7 +51,7 @@ flagfight_fight() {
     #/dodge/
     elif ! grep -q -o 'txt smpl grey' $TMP/src.html && [ "$(($(date +%s) - $(cat last_dodge)))" -gt 20 -a "$(($(date +%s) - $(cat last_dodge)))" -lt 300 ] && awk -v ush="$(cat USH)" -v oldhp="$(cat old_HP)" 'BEGIN { exit !(ush < oldhp) }'; then
       (
-        w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat DODGE)" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
+  w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat DODGE)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >$src_ram
       ) </dev/null &>/dev/null &
       time_exit 17
       cf_access
@@ -60,7 +60,7 @@ flagfight_fight() {
     #/random
     elif awk -v latk="$(($(date +%s) - $(cat last_atk)))" -v atktime="$LA" 'BEGIN { exit !(latk != atktime) }' && ! grep -q -o 'txt smpl grey' $src_ram && awk -v rhp="$(cat RHP)" -v enh="$(cat ENH)" 'BEGIN { exit !(rhp < enh) }' || awk -v latk="$(($(date +%s) - $(cat last_atk)))" -v atktime="$LA" 'BEGIN { exit !(latk != atktime) }' && ! grep -q -o 'txt smpl grey' $TMP/src.html && grep -q -o "$(cat CLAN)" $TMP/callies.txt; then
       (
-        w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat ATKRND)" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
+  w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat ATKRND)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >$src_ram
       ) </dev/null &>/dev/null &
       time_exit 17
       cf_access
@@ -68,7 +68,7 @@ flagfight_fight() {
     #/attack
     elif awk -v latk="$(($(date +%s) - $(cat last_atk)))" -v atktime="$LA" 'BEGIN { exit !(latk > atktime) }'; then
       (
-        w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat ATK)" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
+  w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "${URL}$(cat ATK)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >$src_ram
       ) </dev/null &>/dev/null &
       time_exit 17
       cf_access
@@ -114,7 +114,7 @@ flagfight_start() {
   case $(date +%H:%M) in
   (10:1[0-4] | 16:1[0-4])
     (
-      w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 userAgent.txt)" | grep -o -E '\(([0-9]+)\)' | sed 's/[()]//g' >$full_ram
+  w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | grep -o -E '\(([0-9]+)\)' | sed 's/[()]//g' >$full_ram
     ) </dev/null &>/dev/null &
     time_exit 17
     fetch_page "/flagfight/?close=reward" "$src_ram"
@@ -126,7 +126,7 @@ flagfight_start() {
     done
 
     (
-      w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "$URL/flagfight/enterFight" -o user_agent="$(shuf -n1 userAgent.txt)" >$src_ram
+  w3m -cookie -o http_proxy=$PROXY -o accept_encoding=UTF-8 -debug -dump_source "$URL/flagfight/enterFight" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >$src_ram
     ) </dev/null &>/dev/null &
     time_exit 17
     #printf "\nFlag fight\n$URL\n"

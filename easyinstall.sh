@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #create fold twm if does not exist
-mkdir -p ~/twm
+mkdir -p ~/twm ~/twm/accounts
 
 if [ -z "$*" ]; then
   version="master"
@@ -273,6 +273,26 @@ esac
 }
 shortcut_set
 
+resolve_default_account(){
+  if [ -n "$ACCOUNT_ID" ]; then
+    printf '%s\n' "$ACCOUNT_ID"
+    return
+  fi
+  index_file="$HOME/twm/accounts/index.json"
+  if command -v jq >/dev/null 2>&1 && [ -f "$index_file" ]; then
+    jq -r '(.defaultAccount // empty)' "$index_file" 2>/dev/null | head -n 1
+  fi
+}
+
+run_with_account(){
+  mode="$1"
+  if [ -n "$default_account" ]; then
+    ACCOUNT_ID="$default_account" "$HOME/twm/play.sh" "$mode"
+  else
+    "$HOME/twm/play.sh" "$mode"
+  fi
+}
+
 APPISH=$(uname -a | grep -o "\-ish")
 if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = '-ish' ]; then
   sed -i 's,#!/bin/bash,#!/bin/sh,g' "$HOME"/twm/*.sh
@@ -298,18 +318,31 @@ until [ -z "$tipidf" ]; do
   tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/twm.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
   sleep 1s
 done
-if [ -f ~/twm/runmode_file ]; then
-  if awk -v arg="-cl" -v file="$(cat ~/twm/runmode_file)" 'BEGIN { exit !(arg == file) }'; then
-    printf "${BLACK_GREEN}Automatically restarting in 3s after update...${COLOR_RESET}\n"
-    sleep 3s
-    ~/twm/play.sh -cl
-  elif awk -v arg="-cv" -v file="$(cat ~/twm/runmode_file)" 'BEGIN { exit !(arg == file) }'; then
-    printf "${BLACK_GREEN}Automatically restarting in 3s after update...${COLOR_RESET}\n"
-    sleep 3s
-    ~/twm/play.sh -cv
-  else
-    printf "${BLACK_GREEN}Automatically restarting in 3s after update...${COLOR_RESET}\n"
-    sleep 3s
-    ~/twm/play.sh -boot
-  fi
+default_account=$(resolve_default_account)
+if [ -n "$default_account" ]; then
+  mkdir -p "$HOME/twm/accounts/$default_account"
+  run_file="$HOME/twm/accounts/$default_account/runmode_file"
+else
+  run_file="$HOME/twm/runmode_file"
+fi
+
+if [ ! -f "$run_file" ] && [ -f "$HOME/twm/runmode_file" ]; then
+  run_file="$HOME/twm/runmode_file"
+fi
+
+if [ -f "$run_file" ]; then
+  run_mode=$(cat "$run_file")
+  printf "${BLACK_GREEN}Automatically restarting in 3s after update...${COLOR_RESET}\n"
+  sleep 3s
+  case "$run_mode" in
+    -cl)
+      run_with_account "-cl"
+      ;;
+    -cv)
+      run_with_account "-cv"
+      ;;
+    *)
+      run_with_account "-boot"
+      ;;
+  esac
 fi

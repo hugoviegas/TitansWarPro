@@ -1,5 +1,6 @@
 twm_play() {
-    echo "$RUN" > "$HOME/twm/runmode_file"  # Save the run mode to a file
+    run_file="${ACCOUNT_RUN_FILE:-$HOME/twm/runmode_file}"
+    echo "$RUN" > "$run_file"  # Save the run mode to a file
 
     # Check if the CLD file exists; if not, call clan_id function
     if [ ! -s "$TMP/CLD" ]; then

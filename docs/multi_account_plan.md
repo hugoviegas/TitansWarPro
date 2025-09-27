@@ -24,7 +24,7 @@
   - `config.cfg`, `translations.po`, `userAgent.txt`, `runmode_file`, `ur_file` específicos;
   - subdiretório `tmp/` para arquivos temporários (`SRC`, `FULL`, `last_*`, etc.);
   - subdiretório `logs/` para saídas e mensagens (`msg_file`, `ERROR_DEBUG`).
-- Um arquivo central `~/twm/accounts/index.json` armazenará metadados: ID curto (A1, A2), apelido, servidor, idioma, `UR`.
+- Um arquivo central `~/twm/accounts/index.json` armazenará metadados: ID curto (A1, A2), apelido, servidor, idioma, `UR` (um esqueleto inicial já acompanha o repositório).
 - `function.sh` passa a oferecer comandos `add_account`, `select_account`, `list_accounts` reaproveitando o fluxo já existente.
 
 ### 2. Isolamento do w3m/cookies
@@ -35,10 +35,10 @@
 
 ### 3. Orquestrador multi-conta
 
-- Criar script `multi_runner.sh`:
-  1. Lê `accounts/index.json`.
-  2. Para cada conta ativa, exporta variáveis específicas (`ACCOUNT_ID`, `TMP`, `W3M_HOME`, `CONFIG_PATH`) e inicia `twm.sh` em subshell (`nohup` ou `coproc`) gravando stdout/stderr em `logs/<id>/twm.log`.
-  3. Gerencia ciclo de vida (reinício quando `twm.sh` termina, parada limpa por sinal).
+- Script `multi_runner.sh` (scaffolding inicial já disponível):
+  1.  Lê `accounts/index.json`.
+  2.  Para cada conta ativa, exporta variáveis específicas (`ACCOUNT_ID`, `TZ`) e inicia `twm.sh` via runner dedicado, gravando stdout/stderr em `accounts/<id>/logs/twm.log`.
+  3.  Gerencia ciclo de vida (reinício simples quando `twm.sh` termina, parada limpa por sinal) e oferece comandos `start/stop/status/restart`.
 - `play.sh` será atualizado para detectar se o usuário quer um perfil único (`play.sh -acct A1`) ou o gerenciador (`play.sh -multi`).
 - Incluir um FIFO ou socket (`~/twm/accounts/console`) para receber comandos de troca. A interface principal lê esse FIFO e, ao receber `A1`, passa a tail -f do `msg_file` da conta correspondente.
 

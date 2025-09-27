@@ -76,7 +76,7 @@ altars_fight () {
    date +%s >last_atk
   else
    (
-    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/altars" -o user_agent="$(shuf -n1 userAgent.txt)" >"$TMP"/src.html
+    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/altars" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/src.html
    ) </dev/null &>/dev/null &
    time_exit 17
    cf_access

@@ -1,18 +1,36 @@
 update() {
+  local version channel
+
   if [ -z "$*" ]; then
-  version="master"
+    if command -v get_config >/dev/null 2>&1; then
+      channel=$(get_config "UPDATE_CHANNEL" 2>/dev/null)
+    fi
+    version=${channel:-master}
   else
-  # ./easyinstall.sh beta, or backup
-  version="$*"
+    version="$*"
   fi
-  
+
+  case "$version" in
+    master|Master)
+      version="master"
+      ;;
+    beta|Beta)
+      version="beta"
+      ;;
+    beta2|Beta2)
+      version="beta2"
+      ;;
+    *)
+      version="master"
+      ;;
+  esac
+
   SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/${version}/"
-  SCRIPTS=("info.sh" "easyinstall.sh" "allies.sh" "altars.sh" "altars.sh" "arena.sh" "campaign.sh" "career.sh" "cave.sh"
+  SCRIPTS=("info.sh" "easyinstall.sh" "allies.sh" "altars.sh" "arena.sh" "campaign.sh" "career.sh" "cave.sh"
            "check.sh" "clancoliseum.sh" "clandmg.sh" "clanfight.sh" "clanid.sh" "coliseum.sh"
            "crono.sh" "function.sh" "king.sh" "language.sh" "league.sh"
            "loginlogoff.sh" "play.sh" "requeriments.sh" "run.sh" "svproxy.sh"
-           "specialevent.sh" "trade.sh" "twm.sh" "undying.sh update.sh update_check.sh")
-  NUM_SCRIPTS=${#SCRIPTS[@]}
+           "specialevent.sh" "trade.sh" "twm.sh" "undying.sh" "update.sh" "update_check.sh")
   files_to_update=()
   cd ~/twm || exit
   . language.sh
@@ -20,6 +38,7 @@ update() {
   load_config
   # Exibe a mensagem de loading
   echo_t "Looking for new updates, please wait..." "" "" "after" "🔍"
+  echo_t "Update channel: ${version}" "" ""
 
   # Verifica cada script
   for script in "${SCRIPTS[@]}"; do

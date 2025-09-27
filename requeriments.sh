@@ -1,6 +1,60 @@
 #!/bin/sh
 
+set_account_paths() {
+    suffix="$1"
+    base="$HOME/twm"
+    if [ -n "$ACCOUNT_ID" ]; then
+        ACCOUNT_ROOT="$base/accounts/$ACCOUNT_ID"
+        mkdir -p "$ACCOUNT_ROOT"
+    else
+        ACCOUNT_ROOT="$base"
+    fi
+    ACCOUNT_CONFIG="$ACCOUNT_ROOT/config.cfg"
+    ACCOUNT_TMP_DIR="$ACCOUNT_ROOT/tmp"
+    ACCOUNT_LOGS="$ACCOUNT_ROOT/logs"
+    ACCOUNT_W3M_DIR="$ACCOUNT_ROOT/w3m"
+    ACCOUNT_RUN_FILE="$ACCOUNT_ROOT/runmode_file"
+    ACCOUNT_ADS_FILE="$ACCOUNT_ROOT/ads_file"
+    ACCOUNT_TRANSLATIONS="$ACCOUNT_ROOT/translations.po"
+    ACCOUNT_USER_AGENT_STORE="$ACCOUNT_ROOT/userAgent.txt"
+    ACCOUNT_USER_AGENT_MODE="$ACCOUNT_ROOT/fileAgent.txt"
+
+    mkdir -p "$ACCOUNT_TMP_DIR" "$ACCOUNT_LOGS" "$ACCOUNT_W3M_DIR"
+
+    if [ -n "$suffix" ]; then
+        TMP="$ACCOUNT_TMP_DIR/$suffix"
+    else
+        TMP="$ACCOUNT_TMP_DIR"
+    fi
+    mkdir -p "$TMP"
+
+    ACCOUNT_TMP="$TMP"
+    UR_FILE_PATH="$ACCOUNT_ROOT/ur_file"
+    CONFIG_FILE="$ACCOUNT_CONFIG"
+    W3M_HOME="$ACCOUNT_W3M_DIR"
+
+    if [ ! -f "$ACCOUNT_RUN_FILE" ]; then
+        echo "-boot" > "$ACCOUNT_RUN_FILE"
+    fi
+
+    export ACCOUNT_ROOT ACCOUNT_TMP ACCOUNT_LOGS ACCOUNT_CONFIG UR_FILE_PATH CONFIG_FILE
+    export ACCOUNT_TMP_DIR ACCOUNT_W3M_DIR ACCOUNT_RUN_FILE ACCOUNT_ADS_FILE ACCOUNT_TRANSLATIONS
+    export ACCOUNT_USER_AGENT_STORE ACCOUNT_USER_AGENT_MODE W3M_HOME
+    unset suffix base
+}
+
+
 requer_func() {
+    if [ -z "$UR_FILE_PATH" ]; then
+        if [ -n "$ACCOUNT_ID" ]; then
+            UR_FILE_PATH="$HOME/twm/accounts/$ACCOUNT_ID/ur_file"
+        else
+            UR_FILE_PATH="$HOME/twm/ur_file"
+        fi
+        export UR_FILE_PATH
+    fi
+    ALLIAS="_WORK"
+    export ALLIAS
 	# Função para exibir o menu de seleção de servidores
 	display_menu() {
 			clear
@@ -15,6 +69,9 @@ requer_func() {
 			echo "8) Polski: Wojna Tytanów"
 			echo "9) Română: Războiul Titanilor"
 			echo "10) Русский: Битва Титанов"
+        if [ -f "$TMP/userAgent.txt" ]; then
+            cp "$TMP/userAgent.txt" "$agent_store/userAgent.txt"
+        fi
 			echo "11) Srpski: Rat Titana"
 			echo "12) 中文, Chinese: 泰坦之战"
 			echo "13) English, Global: Titan's War"
@@ -22,12 +79,12 @@ requer_func() {
 	}
 
 	# Função para processar a entrada do usuário
-	process_input() {
-			local input="$1"
+    process_input() {
+            input="$1"
 
-			case "$input" in
-					[1-9]|10|11|12|13)
-							echo "$input" > "$HOME/twm/ur_file"
+            case "$input" in
+                    [1-9]|10|11|12|13)
+                            echo "$input" > "$UR_FILE_PATH"
 							echo_t "Selected server: $input"
 							return 0  # Saída para parar o loop
 							;;
@@ -40,13 +97,12 @@ requer_func() {
 							return 1  # Continua o loop
 							;;
 			esac
-	}
+    }
 
 	# Função para encerrar o script
 	terminate_script() {
-			echo_t "Terminating script..."
-			local pidf
-			pidf=$(pgrep -f "sh.*twm/play.sh")
+            echo_t "Terminating script..."
+            pidf=$(pgrep -f "sh.*twm/play.sh")
 			while [ -n "$pidf" ]; do
 					kill -9 "$pidf" 2>/dev/null
 					pidf=$(pgrep -f "sh.*twm/play.sh")
@@ -66,106 +122,106 @@ requer_func() {
 	}
 
 	# Verifica se o arquivo ur_file existe e é válido
-	if [ -f "$HOME/twm/ur_file" ] && [ -s "$HOME/twm/ur_file" ]; then
-			UR=$(cat "$HOME/twm/ur_file")
+    if [ -f "$UR_FILE_PATH" ] && [ -s "$UR_FILE_PATH" ]; then
+        UR=$(cat "$UR_FILE_PATH")
 			echo_t "Using existing selection: $UR"
 	else
 			menu_loop
-			UR=$(cat "$HOME/twm/ur_file")  # Atualiza UR após o menu
+        UR=$(cat "$UR_FILE_PATH")  # Atualiza UR após o menu
 	fi
 
 	# Estrutura case para associar a seleção do usuário com os idiomas e configurações
 	menu_language(){
 	case $UR in
     (1|bra|pt)
+        set_account_paths ".1"
         URL=$(echo "ZnVyaWFkZXRpdGFzLm5ldA==" | base64 -d)
-        echo "1" > "$HOME/twm/ur_file"
-        TMP="$HOME/twm/.1"
-        export TZ="America/Bahia"; ALLIAS="_WORK"
+        echo "1" > "$UR_FILE_PATH"
+    export TZ="America/Bahia"
         set_config "LANGUAGE" "pt"
         ;;
     (2|ger|de)
+        set_account_paths ".2"
         URL=$(echo "dGl0YW5lbi5tb2Jp" | base64 -d)
-        echo "2" > "$HOME/twm/ur_file"
-        TMP="$HOME/twm/.2"
-        export TZ="Europe/Berlin"; ALLIAS="_WORK"
+        echo "2" > "$UR_FILE_PATH"
+    export TZ="Europe/Berlin"
         set_config "LANGUAGE" "de"
         ;;
     (3|esp|es)
+        set_account_paths ".3"
         URL=$(echo "Z3VlcnJhZGV0aXRhbmVzLm5ldA==" | base64 -d)
-        echo "3" > "$HOME/twm/ur_file"
-        TMP="$HOME/twm/.3"
-        export TZ="America/Cancun"; ALLIAS="_WORK"
+        echo "3" > "$UR_FILE_PATH"
+    export TZ="America/Cancun"
         set_config "LANGUAGE" "es"
         ;;
     (4|fran|fr)
+        set_account_paths ".4"
         URL=$(echo "dGl3YXIuZnI=" | base64 -d)
-        echo "4" > "$HOME/twm/ur_file"
-        TMP="$HOME/twm/.4"
-        export TZ="Europe/Paris"; ALLIAS="_WORK"
+        echo "4" > "$UR_FILE_PATH"
+    export TZ="Europe/Paris"
         set_config "LANGUAGE" "fr"
         ;;
     (5|indi|hi)
+        set_account_paths ".5"
         URL=$(echo "aW4udGl3YXIubmV0" | base64 -d)
-        echo "5" > "$HOME/twm/ur_file"
-        TMP="$HOME/twm/.5"
-        export TZ="Asia/Kolkata"; ALLIAS="_WORK"
+        echo "5" > "$UR_FILE_PATH"
+    export TZ="Asia/Kolkata"
         set_config "LANGUAGE" "hi"
         ;;
     (6|indo|id)
+        set_account_paths ".6"
         URL=$(echo "dGl3YXItaWQubmV0" | base64 -d)
-        echo "6" > "$HOME/twm/ur_file"
-        TMP="$HOME/twm/.6"
-        export TZ="Asia/Jakarta"; ALLIAS="_WORK"
+        echo "6" > "$UR_FILE_PATH"
+    export TZ="Asia/Jakarta"
         set_config "LANGUAGE" "id"
         ;;
     (7|ital|it)
+        set_account_paths ".7"
         URL=$(echo "Z3VlcnJhZGl0aXRhbmkubmV0" | base64 -d)
-        echo "7" > "$HOME/twm/ur_file"
-        TMP="$HOME/twm/.7"
-        export TZ="Europe/Rome"; ALLIAS="_WORK"
+        echo "7" > "$UR_FILE_PATH"
+    export TZ="Europe/Rome"
         set_config "LANGUAGE" "it"
         ;;
     (8|pol|pl)
+        set_account_paths ".8"
         URL=$(echo "dGl3YXIucGw=" | base64 -d)
-        echo "8" > "$HOME/twm/ur_file"
-        TMP="$HOME/twm/.8"
-        export TZ="Europe/Warsaw"; ALLIAS="_WORK"
+        echo "8" > "$UR_FILE_PATH"
+    export TZ="Europe/Warsaw"
         set_config "LANGUAGE" "pl"
         ;;
     (9|rom|ro)
+        set_account_paths ".9"
         URL=$(echo "dGl3YXIucm8=" | base64 -d)
-        echo "9" > "$HOME/twm/ur_file"
-        TMP="$HOME/twm/.9"
-        export TZ="Europe/Bucharest"; ALLIAS="_WORK"
+        echo "9" > "$UR_FILE_PATH"
+    export TZ="Europe/Bucharest"
         set_config "LANGUAGE" "ro"
         ;;
     (10|rus|ru)
+        set_account_paths ".10"
         URL=$(echo "dGl3YXIucnU=" | base64 -d)
-        echo "10" > "$HOME/twm/ur_file"
-        TMP="$HOME/twm/.10"
-        export TZ="Europe/Moscow"; ALLIAS="_WORK"
+        echo "10" > "$UR_FILE_PATH"
+    export TZ="Europe/Moscow"
         set_config "LANGUAGE" "ru"
         ;;
     (11|ser|sr)
+        set_account_paths ".11"
         URL=$(echo "cnMudGl3YXIubmV0" | base64 -d)
-        echo "11" > "$HOME/twm/ur_file"
-        TMP="$HOME/twm/.11"
-        export TZ="Europe/Belgrade"; ALLIAS="_WORK"
+        echo "11" > "$UR_FILE_PATH"
+    export TZ="Europe/Belgrade"
         set_config "LANGUAGE" "sr"
         ;;
     (12|chi|zh)
+        set_account_paths ".12"
         URL=$(echo "Y24udGl3YXIubmV0" | base64 -d)
-        echo "12" > "$HOME/twm/ur_file"
-        TMP="$HOME/twm/.12"
-        export TZ="Asia/Shanghai"; ALLIAS="_WORK"
+        echo "12" > "$UR_FILE_PATH"
+    export TZ="Asia/Shanghai"
         set_config "LANGUAGE" "zh"
         ;;
     (13|eng|en)
+        set_account_paths ".13"
         URL=$(echo "dGl3YXIubmV0" | base64 -d)
-        echo "13" > "$HOME/twm/ur_file"
-        TMP="$HOME/twm/.13"
-        export TZ="Europe/London"; ALLIAS="_WORK"
+        echo "13" > "$UR_FILE_PATH"
+    export TZ="Europe/London"
         set_config "LANGUAGE" "en"
         ;;
     (*)
@@ -214,11 +270,14 @@ user_agent() {
     echo_t "1) Manual"
     echo_t "2) Automatic"
 
-    twm_dir="twm"  # Define twm_dir variable
+    agent_store="${ACCOUNT_ROOT:-$HOME/twm}"
+    agent_mode_file="${ACCOUNT_USER_AGENT_MODE:-$agent_store/fileAgent.txt}"
+    agent_library="${ACCOUNT_USER_AGENT_STORE:-$agent_store/userAgent.txt}"
+    fallback_library="$HOME/twm/userAgent.txt"
 
     # Verifica se o arquivo de User-Agent já existe e tem conteúdo
-    if [ -f "$HOME/$twm_dir/fileAgent.txt" ] && [ -s "$HOME/$twm_dir/fileAgent.txt" ]; then
-        UA=$(cat "$HOME/$twm_dir/fileAgent.txt")
+    if [ -f "$agent_mode_file" ] && [ -s "$agent_mode_file" ]; then
+        UA=$(cat "$agent_mode_file")
     else
         echo_t "Set up User-Agent [1 to 2]:"
         read -r UA
@@ -227,10 +286,14 @@ user_agent() {
     case $UA in
         0)
             clear
-            echo "0" > "$HOME/$twm_dir/fileAgent.txt"
+            echo "0" > "$agent_mode_file"
 
             if [ ! -e "$TMP/userAgent.txt" ] || [ -z "$UA" ]; then
-                cat "$HOME/$twm_dir/userAgent.txt" > "$TMP/userAgent.txt"
+                if [ -f "$agent_library" ] && [ -s "$agent_library" ]; then
+                    cat "$agent_library" > "$TMP/userAgent.txt"
+                else
+                    cat "$fallback_library" > "$TMP/userAgent.txt"
+                fi
             else
                 random_ua
             fi
@@ -239,13 +302,17 @@ user_agent() {
         1)
             clear
             xdg-open "$(echo "aHR0cHM6Ly93d3cud2hhdHNteXVhLmluZm8=" | base64 -d)" >/dev/null 2>&1
-            echo "0" > "$HOME/$twm_dir/fileAgent.txt"
+            echo "0" > "$agent_mode_file"
             read -r UA
             echo "$UA" > "$TMP/userAgent.txt"
 
             if [ ! -e "$TMP/userAgent.txt" ] || [ -z "$UA" ]; then
                 echo_t " ..."
-                cat "$HOME/$twm_dir/userAgent.txt" > "$TMP/userAgent.txt"
+                if [ -f "$agent_library" ] && [ -s "$agent_library" ]; then
+                    cat "$agent_library" > "$TMP/userAgent.txt"
+                else
+                    cat "$fallback_library" > "$TMP/userAgent.txt"
+                fi
             else
                 random_ua
             fi
@@ -253,8 +320,12 @@ user_agent() {
 
         2)
             echo_t " ..."
-            cat "$HOME/$twm_dir/userAgent.txt" > "$TMP/userAgent.txt"
-            echo "0" > "$HOME/$twm_dir/fileAgent.txt"
+            if [ -f "$agent_library" ] && [ -s "$agent_library" ]; then
+                cat "$agent_library" > "$TMP/userAgent.txt"
+            else
+                cat "$fallback_library" > "$TMP/userAgent.txt"
+            fi
+            echo "0" > "$agent_mode_file"
 
             if [ -e "$TMP/userAgent.txt" ]; then
                 random_ua
@@ -276,20 +347,27 @@ user_agent() {
             ;;
     esac
 
-    unset UA
+    if [ -f "$TMP/userAgent.txt" ]; then
+        cp "$TMP/userAgent.txt" "$agent_library"
+    fi
+
+    unset UA agent_store agent_library agent_mode_file fallback_library
 }
 
-  if [ ! -e "$TMP/userAgent.txt" ] || [ "$(wc -c < "$TMP/userAgent.txt")" -lt 10 ] || [ "$(wc -c < "$TMP/userAgent.txt")" -gt 65 ]; then
-	# Check if the user agent file is missing or has an invalid size; if so, prompt for a new one.
-		if [ ! -e "$TMP/userAgent.txt" ] || [ $(cat "$TMP/userAgent.txt" | wc -c) -lt 10 ] || [ $(cat "$TMP/userAgent.txt" | wc -c) -gt 65 ]; then
-			user_agent # Call function to set up user agent if conditions are met.
-		else
-		# Display a random user agent from the existing list.
-			echo_t "User-Agent: $(shuf -n 1 "$TMP"/userAgent.txt)" "${BLACK_PINK}" "${COLOR_RESET}"
-		fi
-		sed -i 's/^M$//g' "$TMP/userAgent.txt" >/dev/null 2>&1 # Remove carriage return characters (DOS)
-		sed -i 's/\x0D$//g' "$TMP/userAgent.txt" >/dev/null 2>&1 # Another method to ensure line endings are clean
-		sed -i 's/^M$//g' "$TMP/userAgent.txt" &>/dev/null # Remove carriage return characters (DOS)
-		sed -i 's/\x0D$//g' "$TMP/userAgent.txt" &>/dev/null # Another method to ensure line endings are clean
-	fi
+size=0
+if [ -e "$TMP/userAgent.txt" ]; then
+    size=$(wc -c < "$TMP/userAgent.txt")
+fi
+
+if [ ! -e "$TMP/userAgent.txt" ] || [ "$size" -lt 10 ] || [ "$size" -gt 65 ]; then
+    # Prompt for user agent when the current file is missing or has an invalid size.
+    user_agent
+else
+    # Display a random user agent from the existing list.
+    echo_t "User-Agent: $(shuf -n 1 "$TMP"/userAgent.txt)" "${BLACK_PINK}" "${COLOR_RESET}"
+fi
+
+sed -i 's/^M$//g' "$TMP/userAgent.txt" >/dev/null 2>&1 # Remove carriage return characters (DOS)
+sed -i 's/\x0D$//g' "$TMP/userAgent.txt" >/dev/null 2>&1 # Another method to ensure line endings are clean
+unset size
 }

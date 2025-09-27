@@ -25,21 +25,21 @@ coliseum_fight() {
     # Get initial data
     (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" \
-            -o user_agent="$(shuf -n1 userAgent.txt)" | grep -o -E '\(([0-9]+)\)' | sed 's/[()]//g' >"$full_ram"
+            -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | grep -o -E '\(([0-9]+)\)' | sed 's/[()]//g' >"$full_ram"
     ) &
     time_exit 20
     
     # Set graphics settings
     (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL"/settings/graphics/0 \
-            -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+            -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
     ) </dev/null &>/dev/null &
     time_exit 17
     
     # Get coliseum page
     (
         w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/coliseum" \
-            -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+            -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
     ) </dev/null &>/dev/null &
     time_exit 17
     
@@ -47,13 +47,13 @@ coliseum_fight() {
     if grep -q -o '?end_fight' "$src_ram"; then
         (
             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL/coliseum/?end_fight=true" \
-                -o user_agent="$(shuf -n1 userAgent.txt)" | head -n 11 | tail -n 7 | sed "/\[2hit/d;/\[str/d;/combat/d"
+                -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | head -n 11 | tail -n 7 | sed "/\[2hit/d;/\[str/d;/combat/d"
         ) </dev/null &>/dev/null &
         time_exit 17
         
         (
             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/coliseum" \
-                -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+                -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
         ) </dev/null &>/dev/null &
         time_exit 17
     fi
@@ -67,7 +67,7 @@ coliseum_fight() {
         echo_t "  Entering..." "" "\n" "before" "🤺"
         (
             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${go_stop}" \
-                -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+                -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
         ) </dev/null &>/dev/null &
         time_exit 17
         
@@ -79,7 +79,7 @@ coliseum_fight() {
         until grep -q -o 'coliseum/dodge/' "$src_ram" || awk -v ltime="(($(date +%s) - $first_time))" 'BEGIN { exit !(ltime > 30) }'; do
             (
                 w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$access_link" \
-                    -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+                    -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
             ) </dev/null &>/dev/null &
             time_exit 17
             local access_link=$(grep -o -E '/(coliseum/[A-Za-z]+/[?]r[=][0-9]+|coliseum)' "$src_ram" | grep -v 'dodge' | sed -n 1p)
@@ -119,7 +119,7 @@ coliseum_fight() {
                     if awk -v ltime="(($(date +%s) - $first_time))" 'BEGIN { exit !(ltime < 300) }'; then
                         (
                             w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/coliseum" \
-                                -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+                                -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
                         ) </dev/null &>/dev/null &
                         time_exit 17
                         printf "\n     🤺‍ "
@@ -152,7 +152,7 @@ coliseum_fight() {
                [[ "$time_since_last_heal" -gt 90 && "$time_since_last_heal" -lt 300 ]]; then
                 (
                     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$HEAL" \
-                        -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+                        -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
                 ) </dev/null &>/dev/null &
                 time_exit 17
                 cl_access
@@ -166,7 +166,7 @@ coliseum_fight() {
                  awk -v ush="$USH" -v oldhp="$OLDHP" 'BEGIN { exit !(ush < oldhp) }'; then
                 (
                     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$DODGE" \
-                        -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+                        -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
                 ) </dev/null &>/dev/null &
                 time_exit 17
                 cl_access
@@ -182,7 +182,7 @@ coliseum_fight() {
                  ! grep -q -o 'txt smpl grey' "$src_ram" && grep -q -o "$USER" allies.txt)); then
                 (
                     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$ATKRND" \
-                        -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+                        -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
                 ) </dev/null &>/dev/null &
                 time_exit 17
                 cl_access
@@ -192,7 +192,7 @@ coliseum_fight() {
             elif awk -v latk="$time_since_last_atk" -v atktime="$LA" 'BEGIN { exit !(latk > atktime) }'; then
                 (
                     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$ATK" \
-                        -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+                        -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
                 ) </dev/null &>/dev/null &
                 time_exit 17
                 cl_access
@@ -202,7 +202,7 @@ coliseum_fight() {
             else
                 (
                     w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/coliseum" \
-                        -o user_agent="$(shuf -n1 userAgent.txt)" >"$src_ram"
+                        -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
                 ) </dev/null &>/dev/null &
                 time_exit 17
                 cl_access

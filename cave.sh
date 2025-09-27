@@ -66,7 +66,8 @@ cave_start() {
         unset ACCESS1 ACCESS2 ACTION DOWN MEGA
     done
   echo -e "${GREEN_BLACK}Cave Done ✅${COLOR_RESET}\n"
-  echo "-boot" > "$HOME/twm/runmode_file"  # Change the run mode and save to a file
+  run_file="${ACCOUNT_RUN_FILE:-$HOME/twm/runmode_file}"
+  echo "-boot" > "$run_file"  # Change the run mode and save to a file
   restart_script
 }
 

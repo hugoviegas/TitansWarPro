@@ -26,7 +26,7 @@ login_logoff () {
  ACC=$(cat $TMP/acc_file)
 
  if [ -n "$ACC" ] && [ -n "$URL" ]; then
-  local check=4
+    check=4
 
   until [ "$check" -lt 1 ]; do
    clear
@@ -34,7 +34,7 @@ login_logoff () {
    echo -ne "${GOLD_BLACK}> [$ACC] ${COLOR_RESET}- "
    echo_t "To change your user account press the button" "" "${GOLD_BLACK} [ENTER] ${check}s ...${COLOR_RESET}"
 
-   local check=$((check - 1))
+    check=$((check - 1))
    if read -t 1; then
     ACC=""
     unset FIXHP FIXMP STATUS NOWHP NOWMP HPPER MPPER
@@ -57,8 +57,8 @@ login_logoff () {
    echo_t "In case of error will repeat" "${BLACK_YELLOW}" "${COLOR_RESET}"
    echo_t "Username: "
    read -r username
-   local prompt="$(translate_and_cache "$LANGUAGE" "Password: ")"
-   local charcount=0
+    prompt="$(translate_and_cache "$LANGUAGE" "Password: ")"
+    charcount=0
 
    while read -p "$prompt" -r -s -n 1 char; do
 
@@ -71,17 +71,17 @@ login_logoff () {
     if [ "$char" = $'\177' ] || [ "$char" = $'\577' ]; then
 
      if [ "$charcount" -gt 0 ]; then
-      local charcount=$((charcount - 1))
-      local prompt=$(echo -n $'\b \b')
-      local password=$(echo "$password" | sed 's/.$//')
+    charcount=$((charcount - 1))
+    prompt=$(echo -n $'\b \b')
+    password=$(echo "$password" | sed 's/.$//')
      else
-      local prompt=$(echo -n '')
+    prompt=$(echo -n '')
      fi
 
     else
-     local charcount=$((charcount + 1))
-     local prompt=$(echo -n '*')
-     local password="${password}${char}"
+    charcount=$((charcount + 1))
+    prompt=$(echo -n '*')
+    password="${password}${char}"
     fi
 
    done

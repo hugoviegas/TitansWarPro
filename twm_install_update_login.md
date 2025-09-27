@@ -58,8 +58,8 @@ Fluxo de atualização (detalhado)
 
 Fluxo de seleção de servidor / configuração inicial
 
-- `requeriments.sh::requer_func` apresenta um menu de servidores (1..13) e grava a escolha em `~/twm/ur_file`.
-- Cada opção define `URL` (base64 nos scripts), `TMP` (p.ex. `~/twm/.1`, `~/twm/.13`), TZ, e chama `set_config "LANGUAGE" "xx"`.
+- `requeriments.sh::requer_func` apresenta um menu de servidores (1..13) e grava a escolha em `~/twm/accounts/<id>/ur_file`.
+- Cada opção define `URL` (base64 nos scripts), `TMP` (p.ex. `~/twm/accounts/<id>/tmp/.1`, `~/twm/accounts/<id>/tmp/.13`), TZ, e chama `set_config "LANGUAGE" "xx"`.
 - Cria `TMP` e muda para esse diretório antes de prosseguir com login/config.
 
 Fluxo de login (detalhado)
@@ -95,17 +95,17 @@ Parsing de páginas
 
 Arquivos de configuração e persistência
 
-- `~/twm/ur_file` — servidor selecionado (número).
-- `~/twm/runmode_file` — runmode atual (-boot, -cv, -cl).
-- `~/twm/fileAgent.txt` — modo de User-Agent salvo.
-- `~/twm/userAgent.txt` — lista de UAs (vem com repositório).
-- `~/twm/config.cfg` e `$TMP/config.cfg` — chaves salvas (LANGUAGE, ALLIES, etc.).
-- `~/twm/ads_file` — controle de abertura de anúncios/links.
+- `~/twm/accounts/<id>/ur_file` — servidor selecionado (número) por conta.
+- `~/twm/accounts/<id>/runmode_file` — runmode atual (-boot, -cv, -cl) por conta.
+- `~/twm/accounts/<id>/fileAgent.txt` — modo de User-Agent salvo por conta.
+- `~/twm/accounts/<id>/userAgent.txt` — lista de UAs (vem com repositório; modo legado mantém fallback em `~/twm/userAgent.txt`).
+- `~/twm/accounts/<id>/config.cfg` e `$TMP/config.cfg` — chaves salvas (LANGUAGE, ALLIES, etc.).
+- `~/twm/accounts/<id>/ads_file` — controle de abertura de anúncios/links por conta.
 
 Contratos mínimos (inputs/outputs)
 
 - Inputs: escolha de versão (update), escolha de servidor (requeriments), credenciais (username/password), confirmação de updates (opcional).
-- Outputs: `~/twm` populado com scripts, `ur_file`, `runmode_file`, `.tmp` por servidor com cookies/arquivos temporários, sessão válida no jogo (via cookie w3m).
+- Outputs: `~/twm` populado com scripts, diretórios `accounts/<id>/` com `ur_file`, `runmode_file`, `tmp/.<server>` com cookies/arquivos temporários, sessão válida no jogo (via cookie w3m).
 - Critérios de sucesso:
   - `~/twm` contém a lista de scripts e são executáveis.
   - `login_logoff` obteve e validou `ACC` (nome do usuário) após login.
