@@ -30,7 +30,6 @@ func_cat() {
     }
     
     while true; do
-       
         echo_t "No battles now, waiting ${i}s" "\033[02m" "${COLOR_RESET}"
         echo_t "Enter a command or for more info enter:" "${WHITEb_BLACK}" "info or config${COLOR_RESET}"
 
@@ -64,7 +63,6 @@ func_sleep() {
     if [ "$(date +%d)" -eq 01 ]; then
         # Check if the current hour is between 0 and 8 (inclusive)
         if [ "$HOUR" -lt 9 ]; then  # This covers hours 00 to 08
-            #arena_duel  # Start arena duel
             coliseum_start  # Start coliseum activities
             reset; clear  # Clear the terminal screen
             i=60  # Set wait time to 60 seconds
@@ -72,32 +70,42 @@ func_sleep() {
         fi
     fi
 
-    # Check if the current minute is between 25 and 29 inclusive
+    # Check if the current minute is between 29 and 30
     if [ "$MIN" -ge 29 ] && [ "$MIN" -le 30 ]; then
-        reset; clear  # Clear the terminal screen
-        i=15  # Set wait time to 15 seconds
-        func_cat  # Call func_cat to display information
+        reset; clear
+        i=15
+        func_cat
     else
-        reset; clear  # Clear the terminal screen for any other minute value
-        i=60  # Set wait time to 60 seconds
-        func_cat  # Call func_cat to display information
+        reset; clear
+        i=60
+        func_cat
     fi
 }
 
 start() {
-    load_config      # Load configuration file
-    arena_duel       # Start arena duel function
-    career_func      # Call career-related function
-    cave_routine     # Execute cave routine function 
-    func_trade       # Call trading function 
-    campaign_func    # Start campaign function 
-    clanDungeon      # Execute clan dungeon function 
-    clan_statue      # Check the clan statue
-    check_missions   # Check for missions 
-    check_rewards    # Check for rewards
-    specialEvent     # Check the current Event
-    clanQuests       # Check the clan missions opened
-    messages_info    # Display messages information 
-    func_crono       # Display current time again 
-    func_sleep       # Call sleep function to manage timing 
+    load_config              # Load configuration file
+
+    pause_missions_weekend   # Pause or reactivate mission collection on weekends
+
+    arena_duel               # Start arena duel function
+    career_func              # Call career-related function
+    cave_routine             # Execute cave routine function 
+    func_trade               # Call trading function 
+    campaign_func            # Start campaign function 
+    clanDungeon              # Execute clan dungeon function 
+    clan_statue              # Check the clan statue
+    check_missions           # Check for missions 
+    check_rewards            # Check for rewards
+
+    if [ "${FUNC_auto_events:-y}" = "y" ]; then
+        specialEvent
+    fi
+
+    if [ "${FUNC_clan_missions:-y}" = "y" ]; then
+        clanQuests
+    fi
+
+    messages_info            # Display messages information 
+    func_crono               # Display current time again 
+    func_sleep               # Call sleep function to manage timing 
 }

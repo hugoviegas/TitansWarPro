@@ -25,7 +25,6 @@ load_translations() {
 
     if [ -f "$TRANSLATIONS_FILE" ]; then
         while IFS="|" read -r original translated; do
-            # Remover espaços extras
             original=$(echo "$original" | xargs)
             translated=$(echo "$translated" | xargs)
             translations["$original"]="$translated"
@@ -38,35 +37,72 @@ translate_and_cache() {
     local target_lang="$1"
     local text="$2"
 
-    # Remover espaços extras no texto original
     text=$(echo "$text" | xargs)
 
-    # Se o idioma for inglês, não traduzir e retornar o texto original
+    # Se o idioma for inglês retorna sem traduzir
     if [ "$target_lang" = "en" ]; then
         echo "$text"
         return
     fi
 
-    # Verificar se já existe a tradução no arquivo de cache
-    translated_text=$(grep "^$text|" "$TRANSLATIONS_FILE" | tail -n 1 | cut -d'|' -f2-)
-    
-    if [ -n "$translated_text" ]; then
-        # Se a tradução existir, retornar a tradução armazenada
-        echo "$translated_text"
-    else
-        # Se a tradução não existe, chamar a função para traduzir
-        translated_text=$(get_translation "$target_lang" "$text")
+    #
+    # DETECTAR SE É TEXTO DO function.sh
+    #
+    is_func=""
+    if [[ "$text" == __FUNC__* ]]; then
+        is_func="yes"
+        text="${text#__FUNC__ }"   # Remove o marcador
+    fi
 
-        # Verificar se a tradução foi bem-sucedida e salvar no cache
-        if [ -n "$translated_text" ]; then
-            echo "$text|$translated_text" >> "$TRANSLATIONS_FILE"
-            echo "$translated_text"
-        else
-            # Se falhar, retornar o texto original
-            echo "$text"
+    #
+    # DETECTAR PREFIXO EX: A- B- C- 0- X-
+    #
+    prefix=""
+    rest="$text"
+
+    if [ "$is_func" = "yes" ]; then
+        if [[ "$text" =~ ^([^[:space:]]+-)[[:space:]]*(.*)$ ]]; then
+    prefix="${BASH_REMATCH[1]} "
+    rest="$(echo "${BASH_REMATCH[2]}" | xargs)"
         fi
     fi
+
+    #
+    # TENTAR PEGAR DO CACHE
+    #
+    translated_text=$(grep "^${text}|" "$TRANSLATIONS_FILE" | tail -n 1 | cut -d'|' -f2-)
+
+    if [ -n "$translated_text" ]; then
+        echo "$translated_text"
+        return
+    fi
+
+    #
+    # REALIZAR TRADUÇÃO
+    #
+    if [ -n "$prefix" ]; then
+        raw_translation=$(get_translation "$target_lang" "$rest")
+        translated_text="${prefix}${raw_translation}"
+    else
+        translated_text=$(get_translation "$target_lang" "$text")
+    fi
+
+    #
+    # SE FALHAR A TRADUÇÃO, RETORNA TEXTO ORIGINAL
+    #
+    if [ -z "$translated_text" ]; then
+        echo "$text"
+        return
+    fi
+
+    #
+    # SALVAR NO CACHE
+    #
+    echo "${text}|${translated_text}" >> "$TRANSLATIONS_FILE"
+
+    echo "$translated_text"
 }
+
 # Inicializar
 load_translations
 
