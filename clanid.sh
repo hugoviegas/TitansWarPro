@@ -22,6 +22,11 @@ checkQuest() {
   quest_id="$1"
   action="$2" # Segundo argumento que define se é "apply" ou "end"
 
+  # Block clan missions if disabled
+  if [ "${FUNC_clan_missions:-y}" != "y" ]; then
+      return 0
+  fi
+
   if [ -n "${CLD}" ]; then
     fetch_page "/clan/${CLD}/quest/"
     #fetch_page "/clan/${CLD}/quest/" "$TMP/debug_output.txt"
