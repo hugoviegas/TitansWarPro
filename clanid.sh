@@ -100,6 +100,11 @@ check_leader() {
 }
 
 clan_statue() {
+    # Check if clan statue auto-activation is enabled in settings
+    if [ "${FUNC_clan_statue:-y}" != "y" ]; then
+        return
+    fi
+
     check_leader
     if [ -n "$CLD" ] && [ "$is_leader" == true ]; then  # Proceed only if CLD is set (indicating a valid clan)
         echo_t "Clan statue check" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "🗿"

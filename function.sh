@@ -42,6 +42,7 @@ request_update() {
         echo_t "__FUNC__ 8- Pause mission rewards on weekends. Current value: " "" "$FUNC_pause_weekends"
         echo_t "__FUNC__ 9- Complete events. Current value: " "" "$FUNC_auto_events"
         echo_t "__FUNC__ A- Complete clan missions. Current value: " "" "$FUNC_clan_missions"
+        echo_t "__FUNC__ B- Enable clan statue automatically. Current value: " "" "$FUNC_clan_statue"
         echo_t "Press *'ENTER'* to exit configuration update mode." "" "" "after" "↩️"
 
         read -r -n 1 key
@@ -116,6 +117,10 @@ request_update() {
                 echo_t "Do you want to complete the clan missions? (y or n):"
                 key="FUNC_clan_missions"
                 ;;
+            (B|auto-clan-statue)
+                echo_t "Do you want to enable clan statue automatically? (y or n):"
+                key="FUNC_clan_statue"
+                ;;
             (exit|*)
                 echo_t "Exiting configuration update mode."
                 EXIT_CONFIG="y"  # Signal to exit both loops
@@ -173,6 +178,7 @@ load_config() {
             FUNC_pause_weekends="n"
             FUNC_auto_events="y"
             FUNC_clan_missions="y"
+            FUNC_clan_statue="y"
             LANGUAGE="en"
             ALLIES=""
             SCRIPT_PAUSED="n"
@@ -188,6 +194,7 @@ load_config() {
             echo "FUNC_pause_weekends=$FUNC_pause_weekends"
             echo "FUNC_auto_events=$FUNC_auto_events"
             echo "FUNC_clan_missions=$FUNC_clan_missions"
+            echo "FUNC_clan_statue=$FUNC_clan_statue"
             echo "SCRIPT_PAUSED=$SCRIPT_PAUSED"
             echo "LANGUAGE=$LANGUAGE"
             echo "ALLIES="
