@@ -117,7 +117,7 @@ request_update() {
                 echo_t "Do you want to complete the clan missions? (y or n):"
                 key="FUNC_clan_missions"
                 ;;
-            (B|clan-statue)
+            (B|auto-clan-statue)
                 echo_t "Do you want to enable clan statue automatically? (y or n):"
                 key="FUNC_clan_statue"
                 ;;
