@@ -19,45 +19,59 @@ clan_id() {
 
 
 checkQuest() {
-  quest_id="$1"
-  action="$2" # Segundo argumento que define se é "apply" ou "end"
+    quest_id="$1"
+    action="$2" 
 
-  # Block clan missions if disabled
-  if [ "${FUNC_clan_missions:-y}" != "y" ]; then
-      return 0
-  fi
-
-  if [ -n "${CLD}" ]; then
-    fetch_page "/clan/${CLD}/quest/"
-    #fetch_page "/clan/${CLD}/quest/" "$TMP/debug_output.txt"
-    
-    # Dependendo do valor de $action, alterar os padrões de busca do grep
-    if [ "$action" == "apply" ]; then
-      click=$(grep -o -E "/quest/(take|help)/$quest_id/\?r=[0-9]{8}" "$TMP/SRC" | sed -n '1p')
-    elif [ "$action" == "end" ]; then
-      click=$(grep -o -E "/quest/(deleteHelp|end)/$quest_id/\?r=[0-9]{8}" "$TMP/SRC" | sed -n '1p')
-    else
-      echo_t "Invalid action:" && printf "$action." && echo_t "Use 'apply' or 'end'."
-      return 1 # Retorna falha se a ação for inválida
+    # Verificar se missões de clã estão habilitadas
+    if [ "${FUNC_clan_missions:-y}" != "y" ]; then
+        return 1
     fi
 
-    # Verificar se encontrou o botão correto
+    # Verificar se o ID do clã foi identificado
+    if [ -z "$CLD" ]; then
+        echo_t "CLAN ID not available, trying to fetch it."
+        clan_id  # Revalida o ID do clã
+        if [ -z "$CLD" ]; then
+            echo_t "Failed to retrieve CLAN ID."
+            return 1
+        fi
+    fi
+
+    # Carregar a página de missões do clã
+    fetch_page "/clan/${CLD}/quest/"
+
+    # Certifica que o arquivo temporário contém os dados necessários
+    if [ ! -s "$TMP/SRC" ]; then
+        echo_t "Source file $TMP/SRC is empty, fetch_page may have failed."
+        return 1
+    fi
+
+    # Dependendo do valor de $action, altera os padrões de busca do grep
+    case "$action" in
+        apply)
+            click=$(grep -o -E "/quest/(take|help)/$quest_id/\?r=[0-9]{8}" "$TMP/SRC" | sed -n '1p')
+            ;;
+        end)
+            click=$(grep -o -E "/quest/(deleteHelp|end)/$quest_id/\?r=[0-9]{8}" "$TMP/SRC" | sed -n '1p')
+            ;;
+        *)
+            # echo_t "Invalid action: $action. Use 'apply' or 'end'."
+            return 1
+            ;;
+    esac
+
+    # Verificar se o botão correto foi encontrado
     if [ -n "$click" ]; then
-        fetch_page "/clan/${CLD}$click"
+        fetch_page "/clan/${CLD}${click}"
         if [ "$action" == "apply" ]; then
             echo_t " Starting clan mission: " "" "" "after" " ${quest_id} 🔎"
         else
             echo_t " Collect reward from mission: " "" "" "after" " ${quest_id} 🎁"
         fi
-        return 0 # Sucesso se o botão foi encontrado
+        return 0
     else
         # echo_t " Can not start the clan mission:" "" "" "after" " ${quest_id} 🔎"
-        return 1 # Não encontrou o botão
-    fi
-    else
-        fetch_page "/clanrating/wantedToClan"
-        # echo_t " Can not find the clan mission: " "" "" "after" " ${quest_id} ❌🔎"
-        return 1 # Falha se CLD estiver vazio
+        return 1
     fi
 }
 

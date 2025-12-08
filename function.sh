@@ -113,11 +113,11 @@ request_update() {
                 echo_t "Do you want to run special events? (y or n):"
                 key="FUNC_auto_events"
                 ;;
-            (A|auto-clanquests)
+            (A|a|auto-clanquests)
                 echo_t "Do you want to complete the clan missions? (y or n):"
                 key="FUNC_clan_missions"
                 ;;
-            (B|auto-clan-statue)
+            (B|b|auto-clan-statue)
                 echo_t "Do you want to enable clan statue automatically? (y or n):"
                 key="FUNC_clan_statue"
                 ;;
@@ -146,7 +146,7 @@ request_update() {
             if [ "$success" -ne 0 ]; then
                 echo_t "Invalid key. Please try again." "" "" "before" "❌"
             else
-                echo_t "Configuration updated successfully!"   "" "" "before" "✅"
+                echo_t "Configuration updated successfully!\n"   "" "" "before" "✅"
                 config
                 break
             fi

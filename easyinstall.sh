@@ -36,7 +36,7 @@ else
 fi
 
 cd ~/ || exit
-printf "${BLACK_CYAN} Installing TWM...\n⌛ Please wait...⌛${COLOR_RESET}"
+printf "${BLACK_CYAN} Installing TWM...\n⌛ Please wait...⌛\n${COLOR_RESET}"
 
 #termux
 if [ -d /data/data/com.termux/files/usr/share/doc ]; then
@@ -131,7 +131,7 @@ if uname | grep -q -i "cygwin"; then
 APPISH=$(uname -a | grep -o "\-ish")
 if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = '-ish' ]; then
   LS='/usr/share/doc'
-  printf "${BLACK_CYAN}Install the necessary packages for Alpine on app ISh(Iphone):${COLOR_RESET}\n apk update\n apk add curl ; apk add w3m ; apk add coreutils ; apk add --no-cache tzdata\n\n"
+  printf "${BLACK_CYAN}Install the necessary packages for Alpine on app iSH(iOS):${COLOR_RESET}\n apk update\n apk add curl ; apk add w3m ; apk add coreutils ; apk add bash ; apk add --no-cache tzdata\n\n"
   sleep 5s
 #/UserLAnd Terminal
 elif [ "$SHELL" != "/bin/ash" ] && [ "$APPISH" != '-ish' ] && uname -m | grep -q -E '(aarch64|armhf|armv7|mips64)' && [ ! -d /data/data/com.termux/files/usr/share/doc ]; then
@@ -222,7 +222,8 @@ check_if_exists() {
 shortcut_set(){
   # Define a função play-twm e o comando a ser adicionado
   function_definition='play-twm() { $HOME/twm/play.sh "$@"; }'
- # Função para verificar se o atalho já está configurado
+  # função play-twm para o iSH
+  function_definition_ish="alias play-twm='$HOME/twm/play.sh'"
 
 # Detecta o sistema operacional e adiciona o comando no arquivo correto
 case "$(uname)" in
@@ -255,14 +256,23 @@ case "$(uname)" in
         # Verifica se a função já está presente no arquivo de configuração
         if check_if_exists "$config_file"; then
             echo "O atalho 'play-twm' já está configurado em $config_file. Pulando a configuração."
+            echo "Por favor, espere..."
+            sleep 3s
         else
+            # verifica se o shell está no iSH
+            if [ "$SHELL" = "/bin/ash" ]; then
+                echo "$function_definition_ish" >> "$config_file"
+            else
             # Adiciona a função e exporta
-            echo "$function_definition" >> "$config_file"
-            echo 'export -f play-twm' >> "$config_file"
+                echo "$function_definition" >> "$config_file"
+                echo 'export -f play-twm' >> "$config_file"
+            fi
             echo "Atalho 'play-twm' configurado com sucesso em $config_file!"
             # Recarrega o arquivo de configuração para que a função fique disponível imediatamente
             # shellcheck disable=SC1090
             . "$config_file"
+            echo "Por favor, espere..."
+            sleep 3s
         fi
         ;;
     *)
@@ -271,11 +281,49 @@ case "$(uname)" in
         ;;
 esac
 }
+
 shortcut_set
 
+# cria arquivo temporario para escrever a funcao que permite iSH rodar em segundo plano
+cat > $TMP/run_bg_ish.tmp << 'EOF'
+  # solicita conexao de localizacao (cat /dev/location)
+  cleanup_location() {
+    if [ -n "$LOC_PID" ] && ps -p "$LOC_PID" >/dev/null 2>&1; then
+      kill "$LOC_PID" 2>/dev/null
+      echo "Localização encerrada (PID $LOC_PID)"
+      sleep 0.7s
+    fi
+  }
+
+  if [ -e /dev/location ]; then
+    if ! pgrep -f "cat /dev/location" >/dev/null 2>&1; then
+      echo "Solicitando localização via /dev/location..."
+      sleep 0.7s
+      cat /dev/location > /dev/null &
+      LOC_PID=$!
+      trap 'cleanup_location; exit' INT TERM EXIT
+      echo "Localização em background (PID $LOC_PID)"
+      sleep 0.7s
+    else
+      echo "Processo de localização já ativo."
+      sleep 0.7s
+      LOC_PID=$(pgrep -f "cat /dev/location" | head -n1)
+      trap 'cleanup_location; exit' INT TERM EXIT
+    fi
+  else
+    echo "/dev/location não encontrado. Não foi possível usar cat /dev/location."
+    sleep 0.7s
+  fi
+EOF
+
+# escreve a funcao dentro do 'play.sh' se estiver rodando no iSH
 APPISH=$(uname -a | grep -o "\-ish")
 if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = '-ish' ]; then
-  sed -i 's,#!/bin/bash,#!/bin/sh,g' "$HOME"/twm/*.sh
+  sed -i "/^[[:space:]]*RUN=\$1\b/ r $TMP/run_bg_ish.tmp" $HOME/twm/play.sh
+  echo "Adicionando função para iSH rodar em segundo plano via GPS..."
+  sleep 3s
+  # apaga arquivo temporario apos escrever a funcao
+  rm $TMP/run_bg_ish.tmp
 fi
 
 script_slogan

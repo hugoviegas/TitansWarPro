@@ -39,24 +39,20 @@ translate_and_cache() {
 
     text=$(echo "$text" | xargs)
 
-    # Se o idioma for inglês retorna sem traduzir
-    if [ "$target_lang" = "en" ]; then
-        echo "$text"
-        return
-    fi
-
-    #
     # DETECTAR SE É TEXTO DO function.sh
-    #
     is_func=""
     if [[ "$text" == __FUNC__* ]]; then
         is_func="yes"
         text="${text#__FUNC__ }"   # Remove o marcador
     fi
 
-    #
+    # Se o idioma for inglês retorna sem traduzir
+    if [ "$target_lang" = "en" ]; then
+        echo "$text"
+        return
+    fi
+
     # DETECTAR PREFIXO EX: A- B- C- 0- X-
-    #
     prefix=""
     rest="$text"
 
