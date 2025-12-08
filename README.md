@@ -138,7 +138,7 @@ sudo apk add curl ; apk add w3m ; apk add procps ; apk add coreutils ; apk add j
 > Iphone(iSH):
 
 ```bash
-apk add curl ; apk add w3m ; apk add procps ; apk add coreutils ; apk add jq ; apk add --no-cache tzdata
+apk add curl ; apk add w3m ; apk add procps ; apk add coreutils ; apk add jq ; apk add bash ; apk add --no-cache tzdata
 ```
 
 > 3 - Copie e cole este comando para baixar o instalador do twm(O link faz parte do comando)
