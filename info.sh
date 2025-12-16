@@ -27,8 +27,8 @@ colors() {
 script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="Hugo Viegas"
-    #collaborator="collaborator: @_hviegas"
-    versionNum="3.9.19" # to change the version number every time has an update!!!!!!!!!!!!!!!!!!!!!!!!
+    collaborator="Alessandro Almeida"
+    versionNum="3.9.25" # to change the version number every time has an update!!!!!!!!!!!!!!!!!!!!!!!!
 
 for i in $colors; do
 clear
@@ -56,6 +56,7 @@ printf "\033[1;38;5;${i}m
 ╚═╝     ╚═╝  ╚═╝ ╚═════╝ 
 "
 printf "\033[1;38;5;${i}mMod author: ${author}\n\033[02m"
+printf "\033[1;38;5;${i}mCollaborator: ${collaborator}\n\033[02m"
 printf "Version: ${versionNum}${COLOR_RESET}\n"
 sleep 0.2s
 done
