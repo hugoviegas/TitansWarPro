@@ -43,6 +43,7 @@ request_update() {
         echo_t "__FUNC__ 9- Complete events. Current value: " "" "$FUNC_auto_events"
         echo_t "__FUNC__ A- Complete clan missions. Current value: " "" "$FUNC_clan_missions"
         echo_t "__FUNC__ B- Enable clan statue automatically. Current value: " "" "$FUNC_clan_statue"
+        echo_t "__FUNC__ C- Use gold to collect 3 ores in the cave. Current value: " "" "$FUNC_cave_boost"
         echo_t "Press *'ENTER'* to exit configuration update mode." "" "" "after" "↩️"
 
         read -r -n 1 key
@@ -113,13 +114,17 @@ request_update() {
                 echo_t "Do you want to run special events? (y or n):"
                 key="FUNC_auto_events"
                 ;;
-            (A|a|auto-clanquests)
+            (a|A|auto-clanquests)
                 echo_t "Do you want to complete the clan missions? (y or n):"
                 key="FUNC_clan_missions"
                 ;;
-            (B|b|auto-clan-statue)
+            (b|B|auto-clan-statue)
                 echo_t "Do you want to enable clan statue automatically? (y or n):"
                 key="FUNC_clan_statue"
+                ;;
+            (c|C|auto-cave-boost)
+                echo_t "Do you want to use gold to collect 3 ores in the cave? (y or n):"
+                key="FUNC_cave_boost"
                 ;;
             (exit|*)
                 echo_t "Exiting configuration update mode."
@@ -146,7 +151,7 @@ request_update() {
             if [ "$success" -ne 0 ]; then
                 echo_t "Invalid key. Please try again." "" "" "before" "❌"
             else
-                echo_t "Configuration updated successfully!\n"   "" "" "before" "✅"
+                echo_t "Configuration updated successfully!" "" "" "before" "✅"
                 config
                 break
             fi
@@ -168,17 +173,18 @@ load_config() {
         # Write the config.cfg file with default values
         default_config() {
             # Define default values
-            FUNC_check_rewards="y"
+            FUNC_check_rewards="n"
             FUNC_use_elixir="n"
             FUNC_coliseum="y"
             FUNC_AUTO_UPDATE="y"
             FUNC_play_league=999
             FUNC_clan_figth="y"
-            FUNC_collect_mission_rewards="y"
+            FUNC_collect_mission_rewards="n"
             FUNC_pause_weekends="n"
             FUNC_auto_events="y"
-            FUNC_clan_missions="y"
+            FUNC_clan_missions="n"
             FUNC_clan_statue="y"
+            FUNC_cave_boost="y"
             LANGUAGE="en"
             ALLIES=""
             SCRIPT_PAUSED="n"
@@ -195,6 +201,7 @@ load_config() {
             echo "FUNC_auto_events=$FUNC_auto_events"
             echo "FUNC_clan_missions=$FUNC_clan_missions"
             echo "FUNC_clan_statue=$FUNC_clan_statue"
+            echo "FUNC_cave_boost=$FUNC_cave_boost"
             echo "SCRIPT_PAUSED=$SCRIPT_PAUSED"
             echo "LANGUAGE=$LANGUAGE"
             echo "ALLIES="
