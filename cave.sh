@@ -11,7 +11,7 @@ read_boost_gold_cost() {
     BOOST_GOLD_COST=$(
         grep -o -E '/cave/chance/2/[?]r=[0-9]+' "$TMP/SRC" \
         | head -n1 \
-        | xargs -I{} grep -o -E "gold.png[^0-9]*[0-9][0-9,]*[KMB]?" "$TMP/SRC" \
+        | grep -o -E "gold.png[^0-9]*[0-9][0-9,]*[KMB]?" "$TMP/SRC" \
         | grep -v -E '[KMB]' \
         | head -n1 \
         | sed -E 's/.*gold.png[^0-9]*([0-9][0-9,]*).*/\1/' \
@@ -29,7 +29,7 @@ read_speedup_silver_cost() {
     SPEEDUP_SILVER_COST=$(
         grep -o -E '/cave/speedUp/[^ ]+' "$TMP/SRC" \
         | head -n1 \
-        | xargs -I{} grep -o -E "silver.png[^0-9]*[0-9][0-9,]*[KMB]?" "$TMP/SRC" \
+        | grep -o -E "silver.png[^0-9]*[0-9][0-9,]*[KMB]?" "$TMP/SRC" \
         | grep -v -E '[KMB]' \
         | head -n1 \
         | sed -E 's/.*silver.png[^0-9]*([0-9][0-9,]*).*/\1/' \
