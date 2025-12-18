@@ -131,7 +131,7 @@ if uname | grep -q -i "cygwin"; then
 APPISH=$(uname -a | grep -o "\-ish")
 if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = '-ish' ]; then
   LS='/usr/share/doc'
-  printf "${BLACK_CYAN}Install the necessary packages for Alpine on app iSH(iOS):${COLOR_RESET}\n apk update\n apk add curl ; apk add w3m ; apk add coreutils ; apk add bash ; apk add --no-cache tzdata\n\n"
+  printf "${BLACK_CYAN}Install the necessary packages for Alpine on app iSH(iOS):${COLOR_RESET}\n apk update\n apk add curl ; apk add w3m ; apk add procps ; apk add coreutils ; apk add jq ; apk add bash ; apk add grep ; apk add --no-cache tzdata\n\n"
   sleep 5s
 #/UserLAnd Terminal
 elif [ "$SHELL" != "/bin/ash" ] && [ "$APPISH" != '-ish' ] && uname -m | grep -q -E '(aarch64|armhf|armv7|mips64)' && [ ! -d /data/data/com.termux/files/usr/share/doc ]; then
