@@ -146,7 +146,7 @@ cave_start() {
       local HERBS_FOUND=$(echo "$RESOURCES" | grep -E '^(6|7|8|9)$' | wc -l)
       local BOOST_LINK=$(grep -o -E '/cave/chance/2/[?]r=[0-9]+' "$TMP/SRC" | head -n 1)
 
-      local CAN_ATTACK_MONSTER=0
+      local CAN_ATTACK_MONSTER=${CAN_ATTACK_MONSTER:-0}
       local MONSTER_ATTACK=$(grep -o -E '/cave/attack/[?]r=[0-9]+' "$TMP/SRC" | head -n1)
       local MONSTER_RUNAWAY=$(grep -o -E '/cave/runaway/[?]r=[0-9]+' "$TMP/SRC" | head -n1)
 
@@ -181,8 +181,7 @@ cave_start() {
 
       fi
 
-      # reseta consumo de ouro para proximo ataque no monstro
-      CAN_ATTACK_MONSTER=0
+      # echo "DEBUG: CAN_ATTACK_MONSTER=$CAN_ATTACK_MONSTER"
 
       # faz a leitura do valor gasto em prata
       read_speedup_silver_cost
@@ -190,7 +189,11 @@ cave_start() {
       fetch_page "$CAVE"
 
       case $RESULT in
-        down*) echo_t "New search" "" "" "after" "🔍";;
+        down*)
+        echo_t "New search" "" "" "after" "🔍"
+        # reseta consumo de ouro para proximo ataque no monstro
+        CAN_ATTACK_MONSTER=0
+        ;;
         gather*) echo_t "Start mining" "" "" "after" "⛏️";;
         speedUp*) echo_t "Speeding up mining" "" "" "after" "⚡";;
       esac
