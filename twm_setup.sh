@@ -458,8 +458,9 @@ edit_account() {
         printf "  3) Change language\n"
         printf "  4) Change allies (1-4)\n"
         printf "  5) Toggle auto-update (y/n)\n"
+        printf "  6) Configure macro functions (relics, events, etc)\n"
         printf "  0) Back\n\n"
-        printf "Select (0-5): "
+        printf "Select (0-6): "
         read -r edit_opt
 
         case "$edit_opt" in
@@ -517,6 +518,11 @@ edit_account() {
                     sed -i "s/^FUNC_AUTO_UPDATE=.*/FUNC_AUTO_UPDATE=$new_au/" "$config_file"
                     printf "✅ Auto-update set to %s.\n" "$new_au"
                 fi
+                read -rp "Press Enter..."
+                ;;
+            6)
+                # Show config menu for macro functions
+                config_account "$target_id" "$(grep '^LANGUAGE=' "$config_file" 2>/dev/null | cut -d= -f2 || echo 'pt')"
                 read -rp "Press Enter..."
                 ;;
             0) return ;;

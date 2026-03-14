@@ -47,6 +47,7 @@ translate() {
                 "edit_account") echo "Editar conta existente" ;;
                 "remove_account") echo "Remover conta" ;;
                 "show_guide") echo "Mostrar guia de monitoramento" ;;
+                "update_script") echo "Atualizar scripts da aplicação" ;;
                 "exit") echo "Sair" ;;
                 "select_option") echo "Selecione uma opção" ;;
                 "invalid_option") echo "Opção inválida. Tente novamente." ;;
@@ -59,6 +60,14 @@ translate() {
                 "goodbye") echo "Até logo!" ;;
                 "change_language") echo "Alterar idioma (atual: PT)" ;;
                 "language_saved") echo "Idioma salvo:" ;;
+                "update_confirm") echo "⚠️  AVISO: Isto irá parar TODAS as contas ativas." ;;
+                "update_confirm_proceed") echo "Deseja prosseguir e atualizar? (s/n):" ;;
+                "update_stopped") echo "Parando todas as contas..." ;;
+                "update_check") echo "Verificando se há atualizações..." ;;
+                "update_running") echo "Executando atualização..." ;;
+                "update_complete") echo "Atualização concluída!" ;;
+                "update_no_update") echo "Scripts já estão atualizados." ;;
+                "update_cancelled") echo "Atualização cancelada." ;;
                 *) echo "$key" ;;
             esac
             ;;
@@ -81,6 +90,7 @@ translate() {
                 "edit_account") echo "Edit existing account" ;;
                 "remove_account") echo "Remove account" ;;
                 "show_guide") echo "Show monitoring guide" ;;
+                "update_script") echo "Update application scripts" ;;
                 "exit") echo "Exit" ;;
                 "select_option") echo "Select option" ;;
                 "invalid_option") echo "Invalid option. Try again." ;;
@@ -93,6 +103,14 @@ translate() {
                 "goodbye") echo "Goodbye!" ;;
                 "change_language") echo "Change language (current: EN)" ;;
                 "language_saved") echo "Language saved:" ;;
+                "update_confirm") echo "⚠️  WARNING: This will stop ALL active accounts." ;;
+                "update_confirm_proceed") echo "Proceed with update? (y/n):" ;;
+                "update_stopped") echo "Stopping all accounts..." ;;
+                "update_check") echo "Checking for updates..." ;;
+                "update_running") echo "Running update..." ;;
+                "update_complete") echo "Update completed!" ;;
+                "update_no_update") echo "Scripts are already up to date." ;;
+                "update_cancelled") echo "Update cancelled." ;;
                 *) echo "$key" ;;
             esac
             ;;
@@ -194,6 +212,7 @@ display_menu() {
     printf "  9) $(translate "add_account")\n"
     printf "  A) $(translate "edit_account")\n"
     printf "  R) $(translate "remove_account")\n"
+    printf "  U) $(translate "update_script")\n"
     printf "  G) $(translate "change_language")\n\n"
 
     printf "${GREENb_BLACK}$(translate "help_info")${COLOR_RESET}\n"
@@ -296,6 +315,79 @@ change_language_interactive() {
     sleep 1
 }
 
+update_script_interactive() {
+    colors
+    clear
+
+    printf "${BLACK_CYAN}"
+    printf "╔════════════════════════════════════════════════════╗\n"
+    printf "║           $(translate "update_script")\n"
+    printf "╚════════════════════════════════════════════════════╝\n"
+    printf "${COLOR_RESET}\n"
+
+    # Show currently running accounts
+    printf "${GREENb_BLACK}Active accounts:${COLOR_RESET}\n"
+    running_count=0
+    if cd "$BASE_DIR" && ./multi_runner.sh status 2>/dev/null | grep -q "UP"; then
+        cd "$BASE_DIR" && ./multi_runner.sh status | grep "UP" | while read -r line; do
+            printf "  🟢 %s\n" "$line"
+            running_count=$((running_count + 1))
+        done
+    fi
+
+    printf "\n${BLACK_RED}$(translate "update_confirm")${COLOR_RESET}\n"
+    printf "${GOLD_BLACK}$(translate "update_confirm_proceed")${COLOR_RESET} "
+    read -r confirm_update
+
+    if [[ ! "$confirm_update" =~ ^[yYsS]$ ]]; then
+        printf "\n${GREENb_BLACK}$(translate "update_cancelled")${COLOR_RESET}\n"
+        sleep 1
+        return
+    fi
+
+    # Stop all accounts
+    printf "\n${BLACK_CYAN}$(translate "update_stopped")${COLOR_RESET}\n"
+    cd "$BASE_DIR" && ./multi_runner.sh stop 2>/dev/null || true
+    sleep 2
+
+    # Check if update.sh itself needs updating
+    printf "\n${BLACK_CYAN}$(translate "update_check")${COLOR_RESET}\n"
+    if [ -f "$BASE_DIR/update.sh" ]; then
+        # Check if there's a newer version on the repository
+        local remote_size=$(curl -s -I "https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh" 2>/dev/null | grep -i "content-length" | awk '{print $2}' | tr -d '\r')
+        local local_size=$(wc -c <"$BASE_DIR/update.sh" 2>/dev/null || echo "0")
+
+        if [ -n "$remote_size" ] && [ "$remote_size" != "$local_size" ]; then
+            printf "  📥 Updating update.sh itself...\n"
+            curl -s "https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh" -o "$BASE_DIR/update.sh.tmp" 2>/dev/null
+            if [ -f "$BASE_DIR/update.sh.tmp" ] && [ -s "$BASE_DIR/update.sh.tmp" ]; then
+                mv "$BASE_DIR/update.sh.tmp" "$BASE_DIR/update.sh"
+                chmod +x "$BASE_DIR/update.sh"
+                printf "  ✅ update.sh updated\n"
+            else
+                rm -f "$BASE_DIR/update.sh.tmp"
+                printf "  ⚠️  Could not update update.sh, proceeding with existing version\n"
+            fi
+        else
+            printf "  ✅ update.sh is up to date\n"
+        fi
+    fi
+
+    # Run the update script
+    printf "\n${BLACK_CYAN}$(translate "update_running")${COLOR_RESET}\n\n"
+
+    if [ -f "$BASE_DIR/update.sh" ]; then
+        # Run update.sh with master branch selection (non-interactive)
+        cd "$BASE_DIR" && bash ./update.sh 3 2>&1 | head -50
+        printf "\n${GREENb_BLACK}$(translate "update_complete")${COLOR_RESET}\n"
+    else
+        printf "${RED_BLACK}Error: update.sh not found${COLOR_RESET}\n"
+    fi
+
+    sleep 1
+    read -rp "Press Enter to return to main menu..."
+}
+
 main() {
     colors
 
@@ -384,6 +476,9 @@ main() {
                 ;;
             r|R)
                 remove_account_interactive
+                ;;
+            u|U)
+                update_script_interactive
                 ;;
             g|G)
                 change_language_interactive
