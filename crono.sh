@@ -36,13 +36,6 @@ func_cat() {
     # Guard: ensure $i is a positive integer — prevents infinite CPU spin if unset
     [[ "$i" =~ ^[0-9]+$ ]] && [ "$i" -gt 0 ] || i=60
 
-    # Detect if running with a real terminal on stdin.
-    # When launched by multi_runner.sh, stdin is /dev/null — read returns immediately
-    # (EOF) regardless of timeout, causing the idle loop to spin at ~1Hz instead of
-    # sleeping for the full $i seconds.
-    local _interactive=0
-    [ -t 0 ] && _interactive=1
-
     while true; do
 
         # Check for a queued command written by the monitor
@@ -58,21 +51,11 @@ func_cat() {
                 _last_i="$i"
             fi
 
-            if [ "$_interactive" -eq 1 ]; then
-                # Interactive terminal: block on stdin with timeout — user can type commands
-                read -r -t "$i" cmd
-            else
-                # Background mode (stdin = /dev/null): sleep the full interval without busy-wait
-                # This is the critical fix — read would return in microseconds here
-                sleep "$i"
-                # After waking, pick up any command queued to cmd_file during the sleep
-                if [ -s "$cmd_file" ]; then
-                    cmd=$(cat "$cmd_file")
-                    : > "$cmd_file"
-                else
-                    cmd=""
-                fi
-            fi
+            # Always use read with timeout:
+            # - Interactive terminal: returns immediately when user types + presses Enter
+            # - Background (stdin=/dev/null): times out quickly, then checks cmd_file
+            # No busy-wait because outer loop in twm.sh has `sleep 1s` floor
+            read -r -t "$i" cmd || cmd=""
         fi
 
         if [ "$cmd" = " " ]; then
