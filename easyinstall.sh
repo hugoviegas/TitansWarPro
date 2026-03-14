@@ -322,44 +322,5 @@ Or, alternatively, run: ${GOLD_BLACK}./twm/play.sh${COLOR_RESET}\n\
        For coliseum, use: ${GOLD_BLACK}play-twm -cl${COLOR_RESET} or ${GOLD_BLACK}./twm/play.sh -cl${COLOR_RESET}\n\
            For cave, use: ${GOLD_BLACK}play-twm -cv${COLOR_RESET} or ${GOLD_BLACK}./twm/play.sh -cv${COLOR_RESET}\n"
 
-# shellcheck disable=SC2009
-tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/play.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
-until [ -z "$tipidf" ]; do
-  kill -9 "$tipidf" 2>/dev/null
-  tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/play.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
-  sleep 1s
-done
-tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/twm.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
-until [ -z "$tipidf" ]; do
-  kill -9 "$tipidf" 2>/dev/null
-  tipidf=$(ps ax -o pid=,args= | grep "sh.*twm/twm.sh" | grep -v 'grep' | head -n 1 | grep -o -E '([0-9]{3,5})')
-  sleep 1s
-done
-default_account=$(resolve_default_account)
-if [ -n "$default_account" ]; then
-  mkdir -p "$HOME/twm/accounts/$default_account"
-  run_file="$HOME/twm/accounts/$default_account/runmode_file"
-else
-  run_file="$HOME/twm/runmode_file"
-fi
-
-if [ ! -f "$run_file" ] && [ -f "$HOME/twm/runmode_file" ]; then
-  run_file="$HOME/twm/runmode_file"
-fi
-
-if [ -f "$run_file" ]; then
-  run_mode=$(cat "$run_file")
-  printf "${BLACK_GREEN}Automatically restarting in 3s after update...${COLOR_RESET}\n"
-  sleep 3s
-  case "$run_mode" in
-    -cl)
-      run_with_account "-cl"
-      ;;
-    -cv)
-      run_with_account "-cv"
-      ;;
-    *)
-      run_with_account "-boot"
-      ;;
-  esac
-fi
+# Do NOT auto-restart - let user decide when to restart
+# The update process should only update files, not force a restart
