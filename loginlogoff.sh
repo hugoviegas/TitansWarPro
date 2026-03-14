@@ -46,7 +46,11 @@ login_logoff () {
  clear
  echo_t "Please wait..."
 
- while [ -z "$ACC" ] && [ -n "$URL" ]; do
+ # Add login attempt counter to prevent infinite loop
+ LOGIN_ATTEMPTS=0
+ MAX_LOGIN_ATTEMPTS=3
+
+ while [ -z "$ACC" ] && [ -n "$URL" ] && [ "$LOGIN_ATTEMPTS" -lt "$MAX_LOGIN_ATTEMPTS" ]; do
 
   log_in () {
    #/logoff
@@ -57,6 +61,14 @@ login_logoff () {
    echo_t "In case of error will repeat" "${BLACK_YELLOW}" "${COLOR_RESET}"
    echo_t "Username: "
    read -r username
+
+   # Check if username was read successfully
+   if [ -z "$username" ]; then
+    echo_t "ERROR: Could not read username. Input stream may be unavailable." "${RED_BLACK}" "${COLOR_RESET}"
+    echo_t "Please run the script with a proper terminal (TTY)." "${RED_BLACK}" "${COLOR_RESET}"
+    return 1
+   fi
+
     prompt="$(translate_and_cache "$LANGUAGE" "Password: ")"
     charcount=0
 
@@ -114,7 +126,7 @@ login_logoff () {
    echo_t "Session configured."
    rm $TMP/cookie_file &>/dev/null
   }
-  log_in
+  log_in || break
 
   clear
   echo_t "Please wait..."
@@ -125,11 +137,24 @@ login_logoff () {
   echo_t "Checking if user matches..."
   ACC=$(cat $TMP/acc_file)
 
-  if [ -n "$ACC" ]; then
-   break &>/dev/null
+  if [ -z "$ACC" ]; then
+   LOGIN_ATTEMPTS=$((LOGIN_ATTEMPTS + 1))
+   if [ "$LOGIN_ATTEMPTS" -lt "$MAX_LOGIN_ATTEMPTS" ]; then
+    echo_t "Login failed. Attempt $LOGIN_ATTEMPTS of $MAX_LOGIN_ATTEMPTS" "${RED_BLACK}" "${COLOR_RESET}"
+    sleep 2
+   fi
   fi
 
  done
+
+ # If max attempts reached, show error and exit
+ if [ "$LOGIN_ATTEMPTS" -ge "$MAX_LOGIN_ATTEMPTS" ] && [ -z "$ACC" ]; then
+  echo_t "ERROR: Maximum login attempts ($MAX_LOGIN_ATTEMPTS) reached." "${RED_BLACK}" "${COLOR_RESET}"
+  echo_t "Unable to authenticate. Exiting." "${RED_BLACK}" "${COLOR_RESET}"
+  sleep 3
+  exit 1
+ fi
+
  messages_info
  clan_id
  #start
