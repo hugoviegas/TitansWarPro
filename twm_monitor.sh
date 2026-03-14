@@ -177,7 +177,7 @@ render() {
   draw_log
 }
 
-# ── follow mode (live tail -f) ────────────────────────────────────────────────
+# ── follow mode (live tail -f with command input) ────────────────────────────────────────────────
 follow_mode() {
   local id="${account_ids[$current_index]}"
   local alias="${account_aliases[$current_index]}"
@@ -191,21 +191,44 @@ follow_mode() {
   clear
   hline
   printf " \033[1;33mFOLLOWING LIVE: %s (%s)\033[0m" "$alias" "$id"
-  printf "   \033[0;36mCtrl+C → return to monitor\033[0m\n"
+  printf "   \033[0;36m[C]=Send Cmd  Ctrl+C=Return\033[0m\n"
   hline
 
-  # Override INT: Ctrl+C returns to monitor instead of full exit
-  trap '_restore_raw_mode; return' INT
-
-  if [ -f "$log_file" ]; then
-    tail -f "$log_file" 2>/dev/null
-  else
+  # Wait for log file to appear
+  if [ ! -f "$log_file" ]; then
     printf '\033[0;33m  Waiting for log file to appear...\033[0m\n'
     until [ -f "$log_file" ]; do sleep 1; done
-    tail -f "$log_file" 2>/dev/null
   fi
 
-  # Reached only if tail exits without Ctrl+C (e.g. log deleted)
+  # Tail output continuously, while checking for [C] input
+  tail -f "$log_file" 2>/dev/null &
+  local tail_pid=$!
+
+  # Override INT to kill tail and return
+  trap '
+    kill '"$tail_pid"' 2>/dev/null
+    _restore_raw_mode
+    return
+  ' INT
+
+  # Check for [C] input during tail
+  while kill -0 "$tail_pid" 2>/dev/null; do
+    # Non-blocking input check: timeout after 0.5s
+    if read -r -t 0.5 input_char 2>/dev/null; then
+      case "$input_char" in
+        c|C)
+          # User pressed [C] — kill tail and send command
+          kill "$tail_pid" 2>/dev/null
+          wait "$tail_pid" 2>/dev/null || true
+          _restore_raw_mode
+          send_command
+          return
+          ;;
+      esac
+    fi
+  done
+
+  # Tail process died naturally
   _restore_raw_mode
 }
 

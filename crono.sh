@@ -62,11 +62,11 @@ func_cat() {
         if [ -s "$cmd_file" ]; then
             cmd=$(cat "$cmd_file")
             : > "$cmd_file"
-            echo_t "Running command: $cmd" "${BLACK_BLACK}" "${COLOR_RESET}"
+            echo_t "Running command: $cmd" "${GRAY_BLACK}" "${COLOR_RESET}"
         else
             # Show prompts once per wait interval (not every second)
             if [ "$i" != "$_last_i" ]; then
-                printf_t " No battles now, waiting " "${BLACK_BLACK}" "${COLOR_RESET}$i s\n"
+                echo_t " No battles now, waiting ${i}s" "${GRAY_BLACK}" "${COLOR_RESET}"
                 if [ "$_interactive" -eq 1 ]; then
                     # Interactive mode: user can type directly
                     echo_t "Type commands start, config, stop Then press ENTER"
@@ -79,29 +79,36 @@ func_cat() {
 
             # Two paths:
             # - Interactive terminal (stdin is real): read blocks waiting for user
-            # - Background mode (stdin=/dev/null): sleep full interval, then check
+            # - Background mode (stdin=/dev/null): check cmd_file frequently instead of long sleep
             if [ "$_interactive" -eq 1 ]; then
                 # Interactive: user can type commands, returns immediately on Enter
                 read -r -t "$i" cmd || cmd=""
             else
-                # Background mode: actually sleep the full timeout
-                sleep "$i"
+                # Background mode: sleep in short intervals and check cmd_file frequently
+                # This allows commands sent by monitor to execute within ~1 second instead of up to 60s
+                local _sleep_count=0
+                while [ $_sleep_count -lt "$i" ]; do
+                    # Check if a command was queued
+                    if [ -s "$cmd_file" ]; then
+                        cmd=$(cat "$cmd_file")
+                        : > "$cmd_file"
+                        break
+                    fi
 
-                # After sleep, check if time changed (new event may be due)
-                local _current_time
-                printf -v _current_time '%(%H:%M)T' -1
-                if [ "$_current_time" != "$_last_time_check" ]; then
-                    # Time changed → break and let twm_play re-evaluate
-                    break
-                fi
+                    # Check if time changed (new event may be due) — break to re-evaluate
+                    printf -v _current_time '%(%H:%M)T' -1
+                    if [ "$_current_time" != "$_last_time_check" ]; then
+                        cmd=""
+                        break
+                    fi
 
-                # Check if command was queued to cmd_file during sleep
-                if [ -s "$cmd_file" ]; then
-                    cmd=$(cat "$cmd_file")
-                    : > "$cmd_file"
-                else
-                    cmd=""
-                fi
+                    # Sleep 1 second, then loop to check again
+                    sleep 1s
+                    _sleep_count=$((++_sleep_count))
+                done
+
+                # If loop completed without break, cmd is already empty
+                [ -z "$cmd" ] && cmd=""
             fi
         fi
 
