@@ -92,21 +92,38 @@ collect_password() {
 create_account_config() {
     local account_root="$1"
     local language="$2"
-    local allies="$3"
-    local auto_update="${4:-y}"
+    # Use provided config values, or defaults
+    local check_rewards="${3:-y}"
+    local use_elixir="${4:-y}"
+    local coliseum="${5:-y}"
+    local auto_update="${6:-n}"
+    local play_league="${7:-999}"
+    local clan_fight="${8:-y}"
+    local collect_mission_rewards="${9:-y}"
+    local pause_weekends="${10:-y}"
+    local auto_events="${11:-y}"
+    local clan_missions="${12:-y}"
+    local clan_statue="${13:-n}"
+    local cave_boost="${14:-n}"
 
     mkdir -p "$account_root"
 
     cat > "$account_root/config.cfg" <<EOF
-FUNC_check_rewards=y
-FUNC_use_elixir=n
-FUNC_coliseum=y
+FUNC_check_rewards=$check_rewards
+FUNC_use_elixir=$use_elixir
+FUNC_coliseum=$coliseum
 FUNC_AUTO_UPDATE=$auto_update
-FUNC_play_league=999
-FUNC_clan_figth=y
+FUNC_play_league=$play_league
+FUNC_clan_figth=$clan_fight
+FUNC_collect_mission_rewards=$collect_mission_rewards
+FUNC_pause_weekends=$pause_weekends
+FUNC_auto_events=$auto_events
+FUNC_clan_missions=$clan_missions
+FUNC_clan_statue=$clan_statue
+FUNC_cave_boost=$cave_boost
 SCRIPT_PAUSED=n
 LANGUAGE=$language
-ALLIES=$allies
+ALLIES=4
 UPDATE_CHANNEL=master
 EOF
 
@@ -145,10 +162,122 @@ update_index() {
     fi
 }
 
+# Configuration menu for custom setup (similar to function.sh)
+config_account() {
+    local account_id="$1"
+    local language="$2"
+    local config_file="$ACCOUNTS_DIR/$account_id/config.cfg"
+
+    # Initialize with defaults
+    local check_rewards="y"
+    local use_elixir="y"
+    local coliseum="y"
+    local auto_update="n"
+    local play_league="999"
+    local clan_fight="y"
+    local collect_mission_rewards="y"
+    local pause_weekends="y"
+    local auto_events="y"
+    local clan_missions="y"
+    local clan_statue="n"
+    local cave_boost="n"
+
+    local cmd choice
+    while true; do
+        clear
+        printf "${BLACK_CYAN}"
+        printf "╔════════════════════════════════════════════════════╗\n"
+        printf "║         Configure Macro Settings\n"
+        printf "╚════════════════════════════════════════════════════╝\n"
+        printf "${COLOR_RESET}\n"
+
+        printf " 1- Collect relics               [${check_rewards}]\n"
+        printf " 2- Use elixir                   [${use_elixir}]\n"
+        printf " 3- Coliseum                     [${coliseum}]\n"
+        printf " 4- Get to top in league         [${play_league}]\n"
+        printf " 5- Collect mission rewards      [${collect_mission_rewards}]\n"
+        printf " 6- Pause rewards on weekends    [${pause_weekends}]\n"
+        printf " 7- Complete events              [${auto_events}]\n"
+        printf " 8- Complete clan missions       [${clan_missions}]\n"
+        printf " 9- Enable clan statue           [${clan_statue}]\n"
+        printf "10- Use gold for cave boost      [${cave_boost}]\n"
+        printf "\nOption (1-10, or Enter to save): "
+        read -r -n 2 choice
+
+        case "$choice" in
+            1)
+                printf "\nEnable collect relics? (y/n): "
+                read -r -n 1 check_rewards
+                printf "\n"
+                ;;
+            2)
+                printf "\nEnable use elixir? (y/n): "
+                read -r -n 1 use_elixir
+                printf "\n"
+                ;;
+            3)
+                printf "\nEnable coliseum? (y/n): "
+                read -r -n 1 coliseum
+                printf "\n"
+                ;;
+            4)
+                printf "\nLeague rank to reach (1-999): "
+                read -r play_league
+                [ -n "$play_league" ] || play_league="999"
+                printf "\n"
+                ;;
+            5)
+                printf "\nEnable mission rewards? (y/n): "
+                read -r -n 1 collect_mission_rewards
+                printf "\n"
+                ;;
+            6)
+                printf "\nPause rewards on weekends? (y/n): "
+                read -r -n 1 pause_weekends
+                printf "\n"
+                ;;
+            7)
+                printf "\nEnable events? (y/n): "
+                read -r -n 1 auto_events
+                printf "\n"
+                ;;
+            8)
+                printf "\nEnable clan missions? (y/n): "
+                read -r -n 1 clan_missions
+                printf "\n"
+                ;;
+            9)
+                printf "\nEnable clan statue? (y/n): "
+                read -r -n 1 clan_statue
+                printf "\n"
+                ;;
+            10)
+                printf "\nEnable cave boost? (y/n): "
+                read -r -n 1 cave_boost
+                printf "\n"
+                ;;
+            '')
+                # Save config and exit
+                create_account_config "$ACCOUNTS_DIR/$account_id" "$language" \
+                    "$check_rewards" "$use_elixir" "$coliseum" "$auto_update" \
+                    "$play_league" "$clan_fight" "$collect_mission_rewards" \
+                    "$pause_weekends" "$auto_events" "$clan_missions" \
+                    "$clan_statue" "$cave_boost"
+                printf "✅ Config saved (custom settings)\n"
+                sleep 1s
+                return
+                ;;
+            *)
+                printf "\nInvalid option\n"
+                ;;
+        esac
+    done
+}
+
 setup_account() {
     show_header
 
-    printf "${GREENb_BLACK}Step 1/6 — Account Information${COLOR_RESET}\n\n"
+    printf "${GREENb_BLACK}Step 1/5 — Account Information${COLOR_RESET}\n\n"
     printf "Account ID (e.g., A1, A2): "
     read -r account_id
     [ -z "$account_id" ] && { printf "Cancelled.\n"; exit 0; }
@@ -158,7 +287,7 @@ setup_account() {
     [ -z "$alias" ] && alias="$account_id"
 
     show_header
-    printf "${GREENb_BLACK}Step 2/6 — Game Server${COLOR_RESET}\n\n"
+    printf "${GREENb_BLACK}Step 2/5 — Game Server${COLOR_RESET}\n\n"
     printf "  1)  Brasil         — furiadetigas.net\n"
     printf "  2)  Germany        — titanen.mobi\n"
     printf "  3)  Spain          — guerradetibitanes.net\n"
@@ -177,7 +306,7 @@ setup_account() {
     [ -z "$server_num" ] && server_num=1
 
     show_header
-    printf "${GREENb_BLACK}Step 3/6 — Language${COLOR_RESET}\n\n"
+    printf "${GREENb_BLACK}Step 3/5 — Language${COLOR_RESET}\n\n"
     printf "  en) English  pt) Portuguese  de) German\n"
     printf "  es) Spanish  fr) French\n\n"
     printf "Language (default: pt): "
@@ -185,37 +314,42 @@ setup_account() {
     [ -z "$language" ] && language="pt"
 
     show_header
-    printf "${GREENb_BLACK}Step 4/6 — Game Allies${COLOR_RESET}\n\n"
-    printf "  1) All battles (Heroes + Clan)\n"
-    printf "  2) Heroes only (Coliseum / King of Immortals)\n"
-    printf "  3) Clan only (Altars / Clan events)\n"
-    printf "  4) No allies\n\n"
-    printf "Select (1-4, default: 4): "
-    read -r allies_choice
-    [ -z "$allies_choice" ] && allies_choice="4"
-
-    show_header
-    printf "${GREENb_BLACK}Step 5/6 — Auto-Update${COLOR_RESET}\n\n"
-    printf "Auto-update scripts on startup? (y/n, default: n): "
-    read -r auto_update
-    [ -z "$auto_update" ] && auto_update="n"
-
-    show_header
-    printf "${GREENb_BLACK}Step 6/6 — Game Credentials${COLOR_RESET}\n\n"
+    printf "${GREENb_BLACK}Step 4/5 — Game Credentials${COLOR_RESET}\n\n"
     printf "Enter your game username and password.\n"
     printf "These are stored locally (base64 encoded) and used to auto-login.\n\n"
     printf "Username: "
     read -r username
     collect_password
 
+    # Show default configs and ask user preference
+    show_header
+    printf "${GREENb_BLACK}Step 5/5 — Macro Configuration${COLOR_RESET}\n\n"
+    printf "Choose configuration mode:\n\n"
+    printf "  ${GREENb_BLACK}1) Use Default Settings${COLOR_RESET}\n"
+    printf "     ✓ Collect relics       ✓ Use elixir\n"
+    printf "     ✓ Coliseum             ✓ Mission rewards\n"
+    printf "     ✓ Events               ✓ Clan missions\n"
+    printf "     ✗ Clan statue          ✗ Cave boost\n\n"
+    printf "  ${GREENb_BLACK}2) Custom Configuration${COLOR_RESET}\n"
+    printf "     Configure each feature individually\n\n"
+    printf "Select (1-2, default: 1): "
+    read -r config_choice
+    [ -z "$config_choice" ] && config_choice="1"
+
     # Create directories
     mkdir -p "$ACCOUNTS_DIR/$account_id/tmp"
     mkdir -p "$ACCOUNTS_DIR/$account_id/logs"
     mkdir -p "$ACCOUNTS_DIR/$account_id/w3m"
 
-    # Write config
-    create_account_config "$ACCOUNTS_DIR/$account_id" "$language" "$allies_choice" "$auto_update"
-    printf "✅ Config created\n"
+    # If custom config, show menu
+    if [ "$config_choice" = "2" ]; then
+        show_header
+        config_account "$account_id" "$language"
+    else
+        # Use default config
+        create_account_config "$ACCOUNTS_DIR/$account_id" "$language"
+        printf "✅ Config created (default settings)\n"
+    fi
 
     # Write server selection
     printf "%s\n" "$server_num" > "$ACCOUNTS_DIR/$account_id/ur_file"
@@ -236,12 +370,10 @@ setup_account() {
     printf "  Account ID : ${GOLD_BLACK}%s${COLOR_RESET}\n" "$account_id"
     printf "  Alias      : ${GOLD_BLACK}%s${COLOR_RESET}\n" "$alias"
     printf "  Server     : ${GOLD_BLACK}%s${COLOR_RESET}\n" "$server_num"
-    printf "  Language   : ${GOLD_BLACK}%s${COLOR_RESET}\n" "$language"
-    printf "  Allies     : ${GOLD_BLACK}%s${COLOR_RESET}\n" "$allies_choice"
-    printf "  Auto-update: ${GOLD_BLACK}%s${COLOR_RESET}\n\n" "$auto_update"
+    printf "  Language   : ${GOLD_BLACK}%s${COLOR_RESET}\n\n" "$language"
     printf "Run:\n"
     printf "  ${GOLD_BLACK}./multi_runner.sh start${COLOR_RESET}   — launch all accounts\n"
-    printf "  ${GOLD_BLACK}./play.sh${COLOR_RESET}                 — launch this account\n"
+    printf "  ${GOLD_BLACK}./play.sh A1${COLOR_RESET}              — launch this account\n"
     printf "  ${GOLD_BLACK}./twm_monitor.sh${COLOR_RESET}          — monitor logs\n\n"
     read -rp "Press Enter to exit..."
 }
