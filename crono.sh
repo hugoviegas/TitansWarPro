@@ -39,8 +39,12 @@ func_cat() {
     # Reset all attributes before content — ensures dim mode from func_crono doesn't bleed
     printf "\033[0m"
 
-    # Clear screen before showing message output to prevent terminal pollution
-    printf "\033[2J\033[H"
+    # Only clear screen if in fully interactive mode (connected to real terminal on both stdin and stdout)
+    # If running in background (stdout redirected to log), don't clear to preserve monitor header
+    if [ -t 1 ]; then
+        # stdout is terminal → interactive play.sh, safe to clear
+        printf "\033[2J\033[H"
+    fi
 
     # Read file without forking cat — bash $(<file) reads directly, no subprocess
     [[ -s "$TMP/msg_file" ]] && printf '%s\n' "$(<"$TMP/msg_file")"
@@ -175,7 +179,7 @@ func_sleep() {
         # Check if the current hour is between 0 and 8 (inclusive)
         if [ "$HOUR" -lt 9 ]; then  # This covers hours 00 to 08
             coliseum_start  # Start coliseum activities
-            clear  # Clear screen for coliseum
+            [ -t 1 ] && clear  # Clear screen only if interactive (not background/monitor)
             i=60  # Set wait time to 60 seconds
             func_cat  # Call func_cat to display information
             return
@@ -184,7 +188,7 @@ func_sleep() {
 
     # Check if the current minute is between 29 and 30 (near event time)
     if [ "$MIN" -ge 29 ] && [ "$MIN" -le 30 ]; then
-        clear  # Clear screen before event
+        [ -t 1 ] && clear  # Clear screen only if interactive (not background/monitor)
         i=15  # Shorter wait time (15s) when approaching event
         func_cat
     else
