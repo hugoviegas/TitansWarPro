@@ -71,7 +71,7 @@ while [ "$should_exit" -eq 0 ]; do
   wait_status=$?
   child_pid=""
 
-  if [ "$wait_status" -eq 143 ] || [ "$wait_status" -eq 130 ]; then
+  if [ "$wait_status" -eq 99 ] || [ "$wait_status" -eq 143 ] || [ "$wait_status" -eq 130 ]; then
     exit 0
   fi
 

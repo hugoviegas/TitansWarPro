@@ -55,7 +55,7 @@ func_cat() {
             # Show prompts once per wait interval (not every second)
             if [ "$i" != "$_last_i" ]; then
                 echo_t "No battles now, waiting ${i}s" "\033[02m" "${COLOR_RESET}"
-                echo_t "Enter a command (or ${GOLD_BLACK}stop${COLOR_RESET}|x to stop):" "${WHITE_BLACK}" "${COLOR_RESET}"
+                echo_t "Enter a command (config, info or stop|x to stop):" "${WHITE_BLACK}" "${COLOR_RESET}"
                 _last_i="$i"
             fi
 
@@ -90,8 +90,8 @@ func_cat() {
         # Handle stop/exit commands (any mode)
         case "$cmd" in
             stop|exit|parar|q|x)
-                echo_t "Stopping macro..." "\033[01;31m" "${COLOR_RESET}"
-                exit 0
+                printf "\033[01;31m$(translate "Stopping macro")...\033[0m\n"
+                exit 99  # Exit code 99 signals intentional stop (not a crash/restart)
                 ;;
             " ")
                 # Single space = exit func_cat (existing behavior)

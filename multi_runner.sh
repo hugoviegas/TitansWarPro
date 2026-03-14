@@ -153,6 +153,14 @@ while true; do
   exit_code=\$?
   child_pid=""
   echo "\$(date +'%Y-%m-%d %H:%M:%S') [\${ACCOUNT_ALIAS:-$account_id}] twm.sh exited with code \$exit_code" >> "\$LOG_FILE"
+
+  # Exit code 99 = intentional stop (user typed stop/exit/parar/q/x)
+  # Exit codes 143/130 = signal-based stop (SIGTERM/SIGINT)
+  # Any other code = crash/unexpected → restart
+  if [ "\$exit_code" -eq 99 ] || [ "\$exit_code" -eq 143 ] || [ "\$exit_code" -eq 130 ]; then
+    exit 0
+  fi
+
   if [ "\$AUTO_RESTART" != "true" ]; then
     exit "\$exit_code"
   fi
