@@ -71,7 +71,9 @@ display_account_detail() {
 
   IFS='|' read -r state pid runmode <<< "$(get_account_status "$account_id")"
 
-  clear
+  # Use cursor positioning instead of clear to avoid flickering
+  # Position cursor at top-left and clear from cursor to bottom
+  printf '\033[H\033[J'
 
   # Header
   printf "\033[1;36m╔════════════════════════════════════════════════════╗\033[0m\n"
@@ -103,7 +105,8 @@ display_account_detail() {
 }
 
 display_list() {
-  clear
+  # Use cursor positioning instead of clear
+  printf '\033[H\033[J'
 
   printf "\033[1;36m╔════════════════════════════════════════════════════╗\033[0m\n"
   printf "\033[1;36m║  TWM Monitor - Account List              \033[0m      ║\033[0m\n"
@@ -158,9 +161,15 @@ EOF
     fatal "No active accounts found"
   fi
 
+  # Clear screen initially
+  clear
+
   # Set terminal to raw mode for immediate key input
   local tty_state=$(stty -g)
   trap "stty $tty_state; exit 0" EXIT INT TERM
+
+  # Enable non-blocking input
+  stty -icanon -echo min 0 time 0
 
   while true; do
     current_index=$((current_index % account_count + 1))
@@ -169,8 +178,9 @@ EOF
 
     display_account_detail "$current_id" "$current_alias"
 
-    # Check for input (non-blocking with timeout)
-    if read -t 0.5 -r -n 1 key 2>/dev/null; then
+    # Use longer timeout to reduce flickering (2 seconds)
+    # Check for input - non-blocking now
+    if read -t 2 -r -n 1 key 2>/dev/null; then
       case "$key" in
         n|N)
           current_index=$((current_index % account_count + 1))
@@ -179,8 +189,12 @@ EOF
           current_index=$(((current_index - 2 + account_count) % account_count + 1))
           ;;
         l|L)
+          # Restore terminal before showing list
+          stty $tty_state
           display_list
           read -t 30 -r -n 1 selection
+          # Re-enable raw mode
+          stty -icanon -echo min 0 time 0
           if [[ "$selection" =~ ^[0-9]+$ ]]; then
             if [ "$selection" -ge 1 ] && [ "$selection" -le "$account_count" ]; then
               current_index="$selection"
@@ -188,9 +202,10 @@ EOF
           fi
           ;;
         r|R)
-          # Just refresh on next loop
+          # Just refresh on next loop (cursor positioning already handles this)
           ;;
         q|Q)
+          stty $tty_state
           exit 0
           ;;
         [0-9])
