@@ -312,8 +312,8 @@ interactive_monitor() {
     local cur_tail=""
     if [ -f "$log_file" ]; then
       cur_tail=$(tail -1 "$log_file" 2>/dev/null)
-      # Remove trailing whitespace/newlines for accurate comparison
-      cur_tail="${cur_tail%"${cur_tail##*[![:space:]]}"}
+      # Remove trailing whitespace for accurate comparison (use sed instead of complex expansion)
+      cur_tail=$(printf '%s' "$cur_tail" | sed 's/[[:space:]]*$//')
     fi
 
     # Re-render when: last line changed, forced, or 60s status interval
