@@ -4,6 +4,7 @@
 BASE_DIR="${HOME}/twm"
 ACCOUNTS_DIR="${BASE_DIR}/accounts"
 INDEX_FILE="${ACCOUNTS_DIR}/index.json"
+LANGUAGE="${LANGUAGE:-en}"
 
 colors() {
     BLACK_CYAN='\033[01;36m\033[01;07m'
@@ -14,6 +15,53 @@ colors() {
     BLACK_RED='\033[01;31m\033[01;07m'
     BLACK_YELLOW='\033[00;33m\033[01;07m'
     COLOR_RESET='\033[00m'
+}
+
+# Translation function for setup messages
+translate() {
+    local key="$1"
+    case "$LANGUAGE" in
+        pt)
+            case "$key" in
+                "setup_title") echo "🐉 TITANS WAR - CONFIGURAR CONTA 🐉" ;;
+                "add_or_edit") echo "Adicionar ou editar conta?" ;;
+                "step") echo "Passo" ;;
+                "account_id") echo "ID da Conta" ;;
+                "account_alias") echo "Apelido da Conta" ;;
+                "select_server") echo "Selecione um servidor (1-13):" ;;
+                "language") echo "Idioma" ;;
+                "allies") echo "Aliados" ;;
+                "auto_update") echo "Atualização automática (s/n)" ;;
+                "username") echo "Usuário" ;;
+                "password") echo "Senha" ;;
+                "success") echo "✓ Conta criada/editada com sucesso!" ;;
+                "error") echo "✗ Erro ao processar conta" ;;
+                "cancel") echo "Cancelado" ;;
+                "remove_confirm") echo "Deseja remover a conta?" ;;
+                *) echo "$key" ;;
+            esac
+            ;;
+        *)  # Default English
+            case "$key" in
+                "setup_title") echo "🐉 TITANS WAR - ACCOUNT SETUP 🐉" ;;
+                "add_or_edit") echo "Add or edit account?" ;;
+                "step") echo "Step" ;;
+                "account_id") echo "Account ID" ;;
+                "account_alias") echo "Account Alias" ;;
+                "select_server") echo "Select a server (1-13):" ;;
+                "language") echo "Language" ;;
+                "allies") echo "Allies" ;;
+                "auto_update") echo "Auto-update (y/n)" ;;
+                "username") echo "Username" ;;
+                "password") echo "Password" ;;
+                "success") echo "✓ Account created/edited successfully!" ;;
+                "error") echo "✗ Error processing account" ;;
+                "cancel") echo "Cancelled" ;;
+                "remove_confirm") echo "Confirm removal of account?" ;;
+                *) echo "$key" ;;
+            esac
+            ;;
+    esac
 }
 
 require_jq() {
@@ -28,7 +76,7 @@ show_header() {
     clear
     printf "${BLACK_CYAN}"
     printf "╔════════════════════════════════════════════════════╗\n"
-    printf "║          🐉 TITANS WAR - ACCOUNT SETUP 🐉          ║\n"
+    printf "║          $(translate "setup_title")\n"
     printf "╚════════════════════════════════════════════════════╝\n"
     printf "${COLOR_RESET}\n"
 }
