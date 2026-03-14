@@ -105,7 +105,7 @@ king_fight () {
    date +%s >last_atk
   else #...attack_all
    (
-  w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/king" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
+  w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/king" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
    ) </dev/null &>/dev/null &
    time_exit 17
    cl_access
@@ -122,6 +122,7 @@ king_fight () {
 king_start () {
  case $(date +%H:%M) in
  (12:2[5-9]|16:2[5-9]|22:2[5-9])
+  cd "$TMP" || return
   (
    w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)"|grep -o -E '\(([0-9]+)\)'|sed 's/[()]//g' >"$TMP"/FULL
   ) </dev/null &>/dev/null &

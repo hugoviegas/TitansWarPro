@@ -138,7 +138,7 @@ draw_account_header() {
 
   printf " \033[1;33m▶ %s\033[0m \033[0;37m(%s)\033[0m  %b  pid:\033[1;33m%s\033[0m  mode:\033[1;33m%s\033[0m%b  \033[0;36m[%d/%d]\033[0m\n" \
     "$alias" "$id" "$sfmt" "$pid" "$mode" "$last_ts" "$current_index" "$account_count"
-  printf " \033[0;36m [N]ext [P]rev [F]ollow [L]ist [R]efresh [Q]uit  [1-9] jump\033[0m\n"
+  printf " \033[0;36m [N]ext [P]rev [F]ollow [L]ist [C]md [R]efresh [Q]uit  [1-9] jump\033[0m\n"
   hline
 }
 
@@ -240,7 +240,38 @@ list_select() {
   fi
 }
 
-# ── main interactive loop ─────────────────────────────────────────────────────
+# ── send command to account macro ─────────────────────────────────────────────
+send_command() {
+  stty "$tty_state" 2>/dev/null
+  printf '\033[?25h'
+
+  local id="${account_ids[$current_index]}"
+  local alias="${account_aliases[$current_index]}"
+  local cmd_file="${ACCOUNTS_DIR}/${id}/cmd_file"
+
+  update_term_size
+  printf '\033[H\033[J'
+  hline
+  printf " \033[1;36mSend Command to: \033[1;33m%s \033[0;37m(%s)\033[0m\n" "$alias" "$id"
+  printf " \033[0;37mThe command runs on the macro's next idle cycle.\033[0m\n"
+  hline
+  printf ' Command (Enter to cancel): '
+
+  local cmd=""
+  read -r cmd
+
+  stty -icanon -echo min 0 time 0 2>/dev/null
+  printf '\033[?25l'
+  force_render=1
+
+  if [ -n "$cmd" ]; then
+    printf '%s\n' "$cmd" > "$cmd_file"
+    printf '\033[1;32m  Queued: %s\033[0m\n' "$cmd"
+    sleep 1
+  fi
+}
+
+
 interactive_monitor() {
   load_accounts
   [ "$account_count" -gt 0 ] || fatal "No active accounts found in $INDEX_FILE"
@@ -290,6 +321,9 @@ interactive_monitor() {
         l|L)
           list_select
           ;;
+        c|C)
+          send_command
+          ;;
         r|R)
           force_render=1
           ;;
@@ -335,6 +369,7 @@ usage() {
     N / P       Next / Previous account
     F           Follow live (tail -f)  ← Ctrl+C to return
     L           Account list (select by number)
+    C           Send command to macro (runs on next idle cycle)
     R           Force refresh
     Q           Quit
     1-9         Jump directly to account by number

@@ -81,21 +81,16 @@ flagfight_fight() {
 
   done
 
-  rm -rf $tmp_ram
-  rm $src_ram $full_ram
-  unset dir_ram tmp_ram src_ram full_ram ACCESS cf_access
-
+  unset cf_access _random
   #/end
+  cp "$src_ram" "$TMP/SRC" 2>/dev/null
+  apply_event flagfight
   echo_t "Flagfight" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
   sleep 10s
-
-  #apply to fight
-  cd "$TMP" || exit
-  cp "$src_ram" SRC
-  apply_event flagfight
-  cp SRC "$src_ram"
-  cd "$tmp_ram" || exit
   clear
+  rm -rf "$tmp_ram"
+  rm -f "$src_ram" "$full_ram"
+  unset dir_ram tmp_ram src_ram full_ram ACCESS cf_access
 }
 
 flagfight_start() {

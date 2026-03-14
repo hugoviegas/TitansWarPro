@@ -29,22 +29,30 @@ func_cat() {
         read -r -t 30  # Wait for user input for 5 seconds
     }
     
-    while true; do
-       
-        echo_t "No battles now, waiting ${i}s" "\033[02m" "${COLOR_RESET}"
-        echo_t "Enter a command or for more info enter:" "${WHITEb_BLACK}" "info or config${COLOR_RESET}"
+    local cmd_file="${ACCOUNT_ROOT:-$HOME/twm}/cmd_file"
 
-        read -r -t "$i" cmd  # Read user command with a timeout
+    while true; do
+
+        # Check for a queued command written by the monitor
+        if [ -s "$cmd_file" ]; then
+            cmd=$(cat "$cmd_file")
+            : > "$cmd_file"
+            echo_t "Running command: $cmd" "\033[02m" "${COLOR_RESET}"
+        else
+            echo_t "No battles now, waiting ${i}s" "\033[02m" "${COLOR_RESET}"
+            echo_t "Enter a command or for more info enter:" "${WHITEb_BLACK}" "info or config${COLOR_RESET}"
+            read -r -t "$i" cmd  # Read user command with a timeout
+        fi
 
         if [ "$cmd" = " " ]; then
             break  # Exit loop if only space is entered
         fi
 
         printf "\n"
-        
+
         # Lista de comandos que não interrompem o loop
         commands_no_break=("config" "requer_func")
-        
+
         # Executa o comando
         $cmd
 

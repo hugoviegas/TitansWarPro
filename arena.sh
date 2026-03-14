@@ -89,6 +89,7 @@ arena_duel() {
 
 
 arena_fullmana() {
+  cd "$TMP" || return
   echo "energy arena ...\n"
   (
     w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}"/arena/quit -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed "s/href='/\n/g" | grep 'attack/1' | head -n1 | awk -F\/ '{ print $5 }' | tr -cd "[[:digit:]]" >ARENA
