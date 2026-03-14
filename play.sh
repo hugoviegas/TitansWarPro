@@ -55,13 +55,13 @@ while [ "$should_exit" -eq 0 ]; do
 
     if echo "$RUN" | grep -q -E '[-]cl'; then
       echo '-cl' > "$run_file"
-      "$HOME"/twm/twm.sh -cl
+      "$HOME"/twm/twm.sh -cl < /dev/tty
     elif echo "$RUN" | grep -q -E '[-]cv'; then
       echo '-cv' > "$run_file"
-      "$HOME"/twm/twm.sh -cv
+      "$HOME"/twm/twm.sh -cv < /dev/tty
     else
       echo '-boot' > "$run_file"
-      "$HOME"/twm/twm.sh -boot
+      "$HOME"/twm/twm.sh -boot < /dev/tty
     fi
   }
 

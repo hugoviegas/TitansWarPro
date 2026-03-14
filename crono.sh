@@ -59,13 +59,13 @@ func_cat() {
         else
             # Show prompts once per wait interval (not every second)
             if [ "$i" != "$_last_i" ]; then
-                echo_t "No battles now, waiting ${i}s" "\033[02m" "${COLOR_RESET}"
+                printf " \033[02mNo battles now, waiting %ss\033[0m\n" "$i"
                 if [ "$_interactive" -eq 1 ]; then
                     # Interactive mode: user can type directly
-                    echo_t "Commands: ${GOLD_BLACK}config${COLOR_RESET} ${GOLD_BLACK}requer_func${COLOR_RESET} ${GOLD_BLACK}stop${COLOR_RESET}" "${WHITE_BLACK}" "${COLOR_RESET}"
+                    printf " Commands: config | requer_func | stop\n"
                 else
                     # Background mode: use monitor to send commands
-                    echo_t "Use ${GOLD_BLACK}twm_monitor.sh${COLOR_RESET} [C] to send: config, requer_func, stop" "${WHITE_BLACK}" "${COLOR_RESET}"
+                    printf " Use twm_monitor.sh [C] to send: config, requer_func, stop\n"
                 fi
                 _last_i="$i"
             fi
