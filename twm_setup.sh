@@ -125,6 +125,9 @@ SCRIPT_PAUSED=n
 LANGUAGE=$language
 ALLIES=4
 UPDATE_CHANNEL=master
+COLISEUM_LA=5
+COLISEUM_HPER=38
+COLISEUM_RPER=5
 EOF
 
     chmod 600 "$account_root/config.cfg"

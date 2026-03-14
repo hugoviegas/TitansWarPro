@@ -47,6 +47,9 @@ request_update() {
         echo_t "__FUNC__ 11- Enable clan statue automatically. Current value: " "" "$FUNC_clan_statue"
         echo_t "__FUNC__ 12- Use gold to collect 3 ores in the cave. Current value: " "" "$FUNC_cave_boost"
         echo_t "__FUNC__ 13- Reset config to defaults. Current value: " "" "Reset"
+        echo_t "__FUNC__ 14- Coliseum attack interval (seconds). Current value: " "" "${COLISEUM_LA:-5}"
+        echo_t "__FUNC__ 15- Coliseum heal threshold (%). Current value: " "" "${COLISEUM_HPER:-38}"
+        echo_t "__FUNC__ 16- Coliseum random atk threshold (%). Current value: " "" "${COLISEUM_RPER:-5}"
         echo_t "Press *'ENTER'* to exit configuration update mode." "" "" "after" "↩️"
 
         read -r -n 2 key
@@ -143,6 +146,52 @@ request_update() {
                 fi
                 continue
                 ;;
+            (14)
+                echo_t "Enter coliseum attack interval in seconds (e.g. 5 or 4.5, min 2, max 15):"
+                while true; do
+                    read -r value
+                    if [[ $value =~ ^[0-9]+\.?[0-9]*$ ]] && \
+                       awk -v v="$value" 'BEGIN { exit !(v >= 2 && v <= 15) }'; then
+                        update_config "COLISEUM_LA" "$value"
+                        COLISEUM_LA="$value"
+                        echo_t "Configuration updated successfully!" "" "" "before" "✅"
+                        break
+                    else
+                        echo_t "Invalid input. Enter a number between 2 and 15:" "" "" "before" "❌"
+                    fi
+                done
+                continue
+                ;;
+            (15)
+                echo_t "Enter coliseum heal threshold % (e.g. 38, min 10, max 80):"
+                while true; do
+                    read -r value
+                    if [[ $value =~ ^[0-9]+$ ]] && [ "$value" -ge 10 ] && [ "$value" -le 80 ]; then
+                        update_config "COLISEUM_HPER" "$value"
+                        COLISEUM_HPER="$value"
+                        echo_t "Configuration updated successfully!" "" "" "before" "✅"
+                        break
+                    else
+                        echo_t "Invalid input. Enter a number between 10 and 80:" "" "" "before" "❌"
+                    fi
+                done
+                continue
+                ;;
+            (16)
+                echo_t "Enter coliseum random attack threshold % (e.g. 5, min 1, max 50):"
+                while true; do
+                    read -r value
+                    if [[ $value =~ ^[0-9]+$ ]] && [ "$value" -ge 1 ] && [ "$value" -le 50 ]; then
+                        update_config "COLISEUM_RPER" "$value"
+                        COLISEUM_RPER="$value"
+                        echo_t "Configuration updated successfully!" "" "" "before" "✅"
+                        break
+                    else
+                        echo_t "Invalid input. Enter a number between 1 and 50:" "" "" "before" "❌"
+                    fi
+                done
+                continue
+                ;;
             ('')
                 # Empty input (ENTER key) — exit config and return to crono run
                 echo_t "Exiting configuration update mode."
@@ -221,6 +270,9 @@ reset_config_to_defaults() {
     LANGUAGE="pt"
     ALLIES="4"
     UPDATE_CHANNEL="master"
+    COLISEUM_LA=5
+    COLISEUM_HPER=38
+    COLISEUM_RPER=5
 
     {
     echo "FUNC_check_rewards=$FUNC_check_rewards"
@@ -239,6 +291,9 @@ reset_config_to_defaults() {
     echo "LANGUAGE=$LANGUAGE"
     echo "ALLIES=$ALLIES"
     echo "UPDATE_CHANNEL=$UPDATE_CHANNEL"
+    echo "COLISEUM_LA=$COLISEUM_LA"
+    echo "COLISEUM_HPER=$COLISEUM_HPER"
+    echo "COLISEUM_RPER=$COLISEUM_RPER"
     } > "$CONFIG_FILE"
 }
 
@@ -261,6 +316,9 @@ default_config() {
     ALLIES="4"
     SCRIPT_PAUSED="n"
     UPDATE_CHANNEL="master"
+    COLISEUM_LA=5
+    COLISEUM_HPER=38
+    COLISEUM_RPER=5
 
     {
     echo "FUNC_check_rewards=$FUNC_check_rewards"
@@ -279,6 +337,9 @@ default_config() {
     echo "LANGUAGE=$LANGUAGE"
     echo "ALLIES=$ALLIES"
     echo "UPDATE_CHANNEL=$UPDATE_CHANNEL"
+    echo "COLISEUM_LA=$COLISEUM_LA"
+    echo "COLISEUM_HPER=$COLISEUM_HPER"
+    echo "COLISEUM_RPER=$COLISEUM_RPER"
     } > "$CONFIG_FILE"
 }
 

@@ -36,7 +36,7 @@ script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="Hugo Viegas"
     collaborator="Alessandro Almeida"
-    versionNum="3.10.10" # to change the version number every time has an update!!!!!!!!!!!!!!!
+    versionNum="3.10.11" # to change the version number every time has an update!
 
 for i in $colors; do
 [ -t 1 ] && clear
