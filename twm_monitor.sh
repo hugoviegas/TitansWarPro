@@ -166,9 +166,19 @@ draw_log() {
 render() {
   local cur_tail="${1:-}"
   update_term_size
-  printf '\033[2J\033[H'   # clear entire screen THEN cursor home (correct order)
+  printf '\033[2J'       # Clear entire screen only (no cursor movement)
+  printf '\033[1;1H'     # Position cursor to top-left (1,1)
   draw_top_bar
   draw_account_header "$cur_tail"
+
+  # Position cursor to line 7 (after 6-line header) before drawing log
+  # This ensures log content won't overwrite the header
+  printf '\033[7;1H'
+
+  # Clear from current cursor position to end of screen
+  # This removes old log content cleanly
+  printf '\033[J'
+
   # Use 'cat' instead of 'tail' to avoid substring re-reading when scrolling
   # This reduces visual updates and flickering
   draw_log
