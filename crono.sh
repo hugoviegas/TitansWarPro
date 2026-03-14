@@ -39,6 +39,9 @@ func_cat() {
     # Reset all attributes before content — ensures dim mode from func_crono doesn't bleed
     printf "\033[0m"
 
+    # Clear screen before showing message output to prevent terminal pollution
+    printf "\033[2J\033[H"
+
     # Read file without forking cat — bash $(<file) reads directly, no subprocess
     [[ -s "$TMP/msg_file" ]] && printf '%s\n' "$(<"$TMP/msg_file")"
     printf "\033[0m"

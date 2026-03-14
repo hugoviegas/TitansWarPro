@@ -169,6 +169,7 @@ draw_log() {
 render() {
   local cur_tail="${1:-}"
   update_term_size
+  clear  # Explicit clear to prevent terminal pollution
   printf '\033[2J\033[H'   # clear entire screen THEN cursor home (correct order)
   draw_top_bar
   draw_account_header "$cur_tail"
@@ -200,8 +201,8 @@ follow_mode() {
     until [ -f "$log_file" ]; do sleep 1; done
   fi
 
-  # Tail output continuously, while checking for [C] input
-  tail -f "$log_file" 2>/dev/null &
+  # Tail output continuously with more history (50 lines), while checking for [C] input
+  tail -n 50 -f "$log_file" 2>/dev/null &
   local tail_pid=$!
 
   # Override INT to kill tail and return
