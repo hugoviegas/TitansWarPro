@@ -51,10 +51,7 @@ coliseum_debug() {
         ) </dev/null &>/dev/null &
         time_exit 20
 
-        printf '\n--- RAW HTML SOURCE ---\n' >> "$debug_file"
-        cat "$src_ram" >> "$debug_file" 2>/dev/null
-
-        printf '\n\n--- W3M RENDERED DUMP ---\n' >> "$debug_file"
+        printf '\n--- W3M RENDERED DUMP ---\n' >> "$debug_file"
         w3m -dump -T text/html "$src_ram" >> "$debug_file" 2>/dev/null
 
         printf '\n--- EXTRACTED LINKS ---\n' >> "$debug_file"
@@ -84,6 +81,10 @@ coliseum_debug() {
         printf 'ATKRND: %s\n' "$(grep -o -E '/coliseum/atkrnd/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)" >> "$debug_file"
         printf 'DODGE: %s\n' "$(grep -o -E '/coliseum/dodge/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)" >> "$debug_file"
         printf 'HEAL: %s\n' "$(grep -o -E '/coliseum/heal/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)" >> "$debug_file"
+        printf 'STONE: %s\n' "$(grep -o -E '/coliseum/stone/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)" >> "$debug_file"
+        printf 'GRASS: %s\n' "$(grep -o -E '/coliseum/grass/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)" >> "$debug_file"
+        printf 'STONE grey: %s\n' "$(grep -o "b_grey[^>]*href='/coliseum/stone" "$src_ram" 2>/dev/null | head -1)" >> "$debug_file"
+        printf 'GRASS grey: %s\n' "$(grep -o "b_grey[^>]*href='/coliseum/grass" "$src_ram" 2>/dev/null | head -1)" >> "$debug_file"
 
         printf '\n--- FULL TEXT SEARCH (victory/defeat keywords) ---\n' >> "$debug_file"
         local rendered
@@ -271,6 +272,10 @@ _cl_display_battle() {
     printf '  %s──────────────────────────────%s\n' "$GRAY_BLACK" "$COLOR_RESET"
     printf '  ATK:%d  RND:%d  DODGE:%d  HEAL:%d\n' \
         "$_cl_match_atks" "$_cl_match_atkrnds" "$_cl_match_dodges" "$_cl_match_heals"
+    local stone_st grass_st
+    [ "${_cl_stone_used:-0}" -eq 0 ] && stone_st="${GREEN_BLACK}READY${COLOR_RESET}" || stone_st="${GRAY_BLACK}USED${COLOR_RESET}"
+    [ "${_cl_grass_used:-0}" -eq 0 ] && grass_st="${GREEN_BLACK}READY${COLOR_RESET}" || grass_st="${GRAY_BLACK}USED${COLOR_RESET}"
+    printf '  🪨 Stone:%b  🌿 Grass:%b\n' "$stone_st" "$grass_st"
 }
 
 _cl_display_post_match() {
@@ -513,6 +518,7 @@ coliseum_fight() {
     _cl_opp_type="normal"
     _cl_loop_count=0
     _cl_battle_start=0
+    _cl_stone_used=0; _cl_grass_used=0
 
     # ── Load cumulative stats ──────────────────────────────────────
     _cl_stats_load
@@ -589,6 +595,8 @@ coliseum_fight() {
             ATKRND=$(grep -o -E '/coliseum/atkrnd/[?]r[=][0-9]+' "$src_ram")
             DODGE=$(grep -o -E '/coliseum/dodge/[?]r[=][0-9]+' "$src_ram")
             HEAL=$(grep -o -E '/coliseum/heal/[?]r[=][0-9]+' "$src_ram")
+            STONE=$(grep -o -E '/coliseum/stone/[?]r[=][0-9]+' "$src_ram")
+            GRASS=$(grep -o -E '/coliseum/grass/[?]r[=][0-9]+' "$src_ram")
 
             # Compute thresholds
             RHP=$(awk -v ush="$USH" -v rper="$RPER" 'BEGIN { printf "%.0f", ush * rper / 100 + ush }')
@@ -651,8 +659,17 @@ coliseum_fight() {
                 _cl_adapt_hper
             fi
 
+            # ── Priority 0: STONE (first action of battle) ────────
+            if [ "$_cl_stone_used" -eq 0 ] && [ -n "$STONE" ] && \
+               ! grep -q "b_grey[^>]*href='/coliseum/stone" "$src_ram"; then
+                _cl_fetch "$STONE"
+                cl_access
+                _cl_stone_used=1
+                last_atk=$now
+                _cl_last_action="🪨 Stone (+35% dmg)"
+
             # ── Priority 1: HEAL ───────────────────────────────────
-            if awk -v ush="$USH" -v hlhp="$HLHP" 'BEGIN { exit !(ush < hlhp) }' &&
+            elif awk -v ush="$USH" -v hlhp="$HLHP" 'BEGIN { exit !(ush < hlhp) }' &&
                [[ "$time_since_last_heal" -gt 90 && "$time_since_last_heal" -lt 300 ]]; then
                 _cl_fetch "$HEAL"
                 cl_access
@@ -661,6 +678,17 @@ coliseum_fight() {
                 last_atk=$now
                 _cl_match_heals=$((_cl_match_heals + 1))
                 _cl_last_action="🌿 Heal → HP:${USH}"
+
+            # ── Priority 1.5: GRASS (use once when HP <= 50%) ─────
+            elif [ "$_cl_grass_used" -eq 0 ] && [ -n "$GRASS" ] && \
+                 ! grep -q "b_grey[^>]*href='/coliseum/grass" "$src_ram" && \
+                 awk -v ush="$USH" -v mx="$(cat "$full_ram" 2>/dev/null)" \
+                     'BEGIN { exit !(mx > 0 && ush <= mx * 0.50) }'; then
+                _cl_fetch "$GRASS"
+                cl_access
+                _cl_grass_used=1
+                last_atk=$now
+                _cl_last_action="🌿 Grass (-35% dmg)"
 
             # ── Priority 2: DODGE ──────────────────────────────────
             elif ! grep -q -o 'txt smpl grey' "$src_ram" &&
@@ -755,11 +783,12 @@ coliseum_fight() {
         # ── Cleanup ────────────────────────────────────────────────
         rm -f "$src_ram" "$full_ram"
         rm -rf "$tmp_ram"
-        unset last_heal last_dodge last_atk USH ENH USER ATK ATKRND DODGE HEAL BREAK_LOOP cl_access
+        unset last_heal last_dodge last_atk USH ENH USER ATK ATKRND DODGE HEAL STONE GRASS BREAK_LOOP cl_access
         unset _cl_match_heals _cl_match_dodges _cl_match_atks _cl_match_atkrnds
         unset _cl_match_kills _cl_match_deaths _cl_result _cl_opponent _cl_team
         unset _cl_last_action _cl_battle_start _cl_atk_failures _cl_atk_successes _cl_la_adjusted
         unset _cl_hp_times _cl_hp_values _cl_hp_count _cl_opp_type _cl_loop_count
+        unset _cl_stone_used _cl_grass_used
         func_unset
 
         if awk -v smodplay="$RUN" -v rmodplay="-cl" 'BEGIN { exit !(smodplay != rmodplay) }'; then
