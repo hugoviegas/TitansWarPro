@@ -260,15 +260,18 @@ send_command() {
   local cmd=""
   read -r cmd
 
+  if [ -n "$cmd" ]; then
+    printf '%s\n' "$cmd" > "$cmd_file"
+    printf '\033[1;32m  ✓ Queued: %s\033[0m\n' "$cmd"
+    sleep 0.5
+  else
+    printf '\033[0;33m  Cancelled\033[0m\n'
+    sleep 0.5
+  fi
+
   stty -icanon -echo min 0 time 0 2>/dev/null
   printf '\033[?25l'
   force_render=1
-
-  if [ -n "$cmd" ]; then
-    printf '%s\n' "$cmd" > "$cmd_file"
-    printf '\033[1;32m  Queued: %s\033[0m\n' "$cmd"
-    sleep 1
-  fi
 }
 
 
@@ -284,6 +287,7 @@ interactive_monitor() {
   printf '\033[?25l'
 
   local last_log_lines=-1
+  local last_log_tail=""
   local last_status_time=0
 
   while true; do
@@ -292,14 +296,20 @@ interactive_monitor() {
     local now; now=$(date +%s 2>/dev/null || echo 0)
     local age=$((now - last_status_time))
 
-    # Count log lines — fast heuristic for change detection
-    local cur_lines=0
-    [ -f "$log_file" ] && cur_lines=$(wc -l < "$log_file" 2>/dev/null || echo 0)
+    # Reset state when exiting interactive functions (follow_mode, list_select, send_command)
+    # or when first run (force_render already set to 1 at startup)
+    if [ "$force_render" -eq 1 ]; then
+      last_log_tail=""
+    fi
 
-    # Re-render when: log grew, forced, or 60s status interval
-    if [ "$cur_lines" -ne "$last_log_lines" ] || [ "$force_render" -eq 1 ] || [ "$age" -ge 60 ]; then
+    # Get last line of log — detects meaningful changes (new action/event)
+    local cur_tail=""
+    [ -f "$log_file" ] && cur_tail=$(tail -1 "$log_file" 2>/dev/null)
+
+    # Re-render when: last line changed, forced, or 60s status interval
+    if [ "$cur_tail" != "$last_log_tail" ] || [ "$force_render" -eq 1 ] || [ "$age" -ge 60 ]; then
       render
-      last_log_lines="$cur_lines"
+      last_log_tail="$cur_tail"
       last_status_time="$now"
       force_render=0
     fi
@@ -309,11 +319,11 @@ interactive_monitor() {
       case "$key" in
         n|N)
           current_index=$((current_index % account_count + 1))
-          last_log_lines=-1; force_render=1
+          force_render=1
           ;;
         p|P)
           current_index=$(( (current_index - 2 + account_count) % account_count + 1 ))
-          last_log_lines=-1; force_render=1
+          force_render=1
           ;;
         f|F)
           follow_mode
@@ -333,7 +343,7 @@ interactive_monitor() {
         [1-9])
           if [ "$key" -le "$account_count" ]; then
             current_index="$key"
-            last_log_lines=-1; force_render=1
+            force_render=1
           fi
           ;;
       esac
