@@ -102,42 +102,15 @@ EOF
 }
 
 add_account_interactive() {
-    clear
-    printf "${BLACK_CYAN}"
-    printf "╔════════════════════════════════════════════════════╗\n"
-    printf "║  ADD NEW ACCOUNT                                   ║\n"
-    printf "╚════════════════════════════════════════════════════╝\n"
-    printf "${COLOR_RESET}\n"
+    if [ ! -x "$BASE_DIR/twm_setup.sh" ]; then
+      printf "Setting up wizard...\n"
+    fi
 
-    printf "NOTE: This is a helper. Please edit ${GOLD_BLACK}accounts/index.json${COLOR_RESET} directly for full control.\n\n"
-
-    printf "Account ID (e.g., A3, B1): "
-    read -r id
-    [ -z "$id" ] && { printf "Cancelled.\n"; read -p "Press Enter..."; return; }
-
-    printf "Account Alias/Name (e.g., Player3): "
-    read -r alias
-
-    printf "Server Number (1-13, or leave empty): "
-    read -r ur
-
-    printf "Run Mode (-boot, -cl, -cv, or leave empty): "
-    read -r runmode
-
-    printf "\nAfter editing index.json, restart:\n"
-    printf "  ${GREENb_BLACK}./multi_runner.sh start${COLOR_RESET}\n\n"
-    printf "Open accounts/index.json? (y/n): "
-    read -r confirm
-    [ "$confirm" = "y" ] || [ "$confirm" = "Y" ] && {
-        if command -v nano >/dev/null; then
-            nano "$ACCOUNTS_DIR/index.json"
-        elif command -v vi >/dev/null; then
-            vi "$ACCOUNTS_DIR/index.json"
-        else
-            printf "Please edit manually: $ACCOUNTS_DIR/index.json\n"
-        fi
+    cd "$BASE_DIR" && ./twm_setup.sh || {
+      printf "${RED_BLACK}Setup wizard failed or was cancelled.${COLOR_RESET}\n"
+      read -p "Press Enter..."
+      return
     }
-    read -p "Press Enter..."
 }
 
 main() {

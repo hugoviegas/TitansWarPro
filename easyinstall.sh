@@ -152,7 +152,7 @@ cd ~/twm || exit
 printf "${BLACK_CYAN}\n ⌛ Wait downloading scripts...${COLOR_RESET}\n"
 
 sync_func() {
-  SCRIPTS="allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh check.sh clancoliseum.sh clandmg.sh clanfight.sh clanid.sh coliseum.sh crono.sh flagfight.sh function.sh king.sh language.sh league.sh loginlogoff.sh play.sh requeriments.sh run.sh svproxy.sh specialevent.sh trade.sh twm.sh undying.sh update_check.sh multi_runner.sh twm_view.sh twm_monitor.sh twm_control.sh"
+  SCRIPTS="allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh check.sh clancoliseum.sh clandmg.sh clanfight.sh clanid.sh coliseum.sh crono.sh flagfight.sh function.sh king.sh language.sh league.sh loginlogoff.sh play.sh requeriments.sh run.sh svproxy.sh specialevent.sh trade.sh twm.sh undying.sh update_check.sh multi_runner.sh twm_view.sh twm_monitor.sh twm_control.sh twm_setup.sh"
   NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
   LEN=0
   for script in $SCRIPTS; do
@@ -189,6 +189,9 @@ sync_func() {
   if curl --silent --head --fail "${SERVER}HOW_TO_MONITOR.md" >/dev/null 2>&1; then
     curl "${SERVER}HOW_TO_MONITOR.md" -s -L -o ~/twm/HOW_TO_MONITOR.md || true
   fi
+  if curl --silent --head --fail "${SERVER}QUICK_START.md" >/dev/null 2>&1; then
+    curl "${SERVER}QUICK_START.md" -s -L -o ~/twm/QUICK_START.md || true
+  fi
   : > /dev/null
 }
 
@@ -220,6 +223,9 @@ sync_func_other() {
   # Download documentation if available
   if curl --silent --head --fail "${SERVER}HOW_TO_MONITOR.md" >/dev/null 2>&1; then
     curl "${SERVER}HOW_TO_MONITOR.md" -s -L -o ~/twm/HOW_TO_MONITOR.md || true
+  fi
+  if curl --silent --head --fail "${SERVER}QUICK_START.md" >/dev/null 2>&1; then
+    curl "${SERVER}QUICK_START.md" -s -L -o ~/twm/QUICK_START.md || true
   fi
   : > /dev/null
 }
