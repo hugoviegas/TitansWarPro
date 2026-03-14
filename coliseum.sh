@@ -18,7 +18,7 @@ _cl_fetch() {
 }
 
 # ============================================================================
-# MODULE: DEBUG - Captures raw HTML from all coliseum page states
+# MODULE: DEBUG - Runs a complete coliseum battle with full logging
 # ============================================================================
 
 coliseum_debug() {
@@ -32,129 +32,520 @@ coliseum_debug() {
     mkdir -p "$dir_ram"
     local src_ram
     src_ram=$(mktemp -p "$dir_ram" debug.XXXXXX)
+    local full_ram
+    full_ram=$(mktemp -p "$dir_ram" debug.XXXXXX)
+    local tmp_ram
+    tmp_ram=$(mktemp -d -t twmdbg.XXXXXX)
+    cp -r "$TMP"/* "$tmp_ram" 2>/dev/null
+    cd "$tmp_ram" || return 1
 
-    # Helper: capture a single page state
-    _debug_capture() {
+    # Load config with defaults
+    local LA="${COLISEUM_LA:-5}"
+    local HPER="${COLISEUM_HPER:-38}"
+    local RPER="${COLISEUM_RPER:-5}"
+    _cl_stats_load
+
+    # ── Helper: log a page state to debug file ────────────────────────────
+    _dbg_page() {
         local label="$1"
-        local url_path="$2"
-
-        printf '\n%s\n' "============================================================" >> "$debug_file"
-        printf '=  %s\n' "$label" >> "$debug_file"
-        printf '============================================================\n' >> "$debug_file"
-        printf 'URL: %s%s\n' "$URL" "$url_path" >> "$debug_file"
-        printf 'Timestamp: %(%Y-%m-%d %H:%M:%S)T\n' -1 >> "$debug_file"
-
-        (
-            w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
-                -debug -dump_source "${URL}${url_path}" \
-                -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
-        ) </dev/null &>/dev/null &
-        time_exit 20
-
-        printf '\n--- W3M RENDERED DUMP ---\n' >> "$debug_file"
-        w3m -dump -T text/html "$src_ram" >> "$debug_file" 2>/dev/null
-
-        printf '\n--- EXTRACTED LINKS ---\n' >> "$debug_file"
-        grep -o -E '/coliseum/[A-Za-z]+(/[?]r[=][0-9]+)?' "$src_ram" >> "$debug_file" 2>/dev/null
-        printf '(enterFight): %s\n' "$(grep -o -E '/coliseum/enterFight/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)" >> "$debug_file"
-
-        printf '\n--- HP VALUES ---\n' >> "$debug_file"
-        printf 'Player HP pattern (hp): %s\n' "$(grep -o -E '(hp)[^A-Za-z0-9]{1,4}[0-9]{2,5}' "$src_ram" 2>/dev/null)" >> "$debug_file"
-        printf 'Player HP value: %s\n' "$(grep -o -E '(hp)[^A-Za-z0-9]{1,4}[0-9]{2,5}' "$src_ram" 2>/dev/null | grep -o -E '[0-9]{2,5}')" >> "$debug_file"
-        printf 'Enemy HP pattern (nbsp): %s\n' "$(grep -o -E '(nbsp)[^A-Za-z0-9]{1,2}[0-9]{1,6}' "$src_ram" 2>/dev/null)" >> "$debug_file"
-        printf 'Enemy HP value: %s\n' "$(grep -o -E '(nbsp)[^A-Za-z0-9]{1,2}[0-9]{1,6}' "$src_ram" 2>/dev/null | sed -n 's,nbsp[;],,;s,\ ,,;1p')" >> "$debug_file"
-
-        printf '\n--- USERNAMES ---\n' >> "$debug_file"
-        printf 'Pattern matches:\n' >> "$debug_file"
-        grep -o -E "([[:upper:]][[:lower:]]{0,15}( [[:upper:]][[:lower:]]{0,13})?)[[:space:]][^[:alnum:]]s" "$src_ram" >> "$debug_file" 2>/dev/null
-
-        printf '\n--- MARKERS ---\n' >> "$debug_file"
-        printf 'end_fight present: %s\n' "$(grep -c 'end_fight' "$src_ram" 2>/dev/null)" >> "$debug_file"
-        printf 'dodge link present: %s\n' "$(grep -c '/dodge/' "$src_ram" 2>/dev/null)" >> "$debug_file"
-        printf 'txt smpl grey: %s\n' "$(grep -c 'txt smpl grey' "$src_ram" 2>/dev/null)" >> "$debug_file"
-        printf 'team [0] count: %s\n' "$(grep -o '\[0\]' "$src_ram" 2>/dev/null | wc -l)" >> "$debug_file"
-        printf 'team [1] count: %s\n' "$(grep -o '\[1\]' "$src_ram" 2>/dev/null | wc -l)" >> "$debug_file"
-        printf 'rip count: %s\n' "$(grep -o '\[rip\]' "$src_ram" 2>/dev/null | wc -l)" >> "$debug_file"
-
-        printf '\n--- ACTION LINKS ---\n' >> "$debug_file"
-        printf 'ATK: %s\n' "$(grep -o -E '/coliseum/atk/[?]r[=][0-9]+' "$src_ram" 2>/dev/null | head -1)" >> "$debug_file"
-        printf 'ATKRND: %s\n' "$(grep -o -E '/coliseum/atkrnd/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)" >> "$debug_file"
-        printf 'DODGE: %s\n' "$(grep -o -E '/coliseum/dodge/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)" >> "$debug_file"
-        printf 'HEAL: %s\n' "$(grep -o -E '/coliseum/heal/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)" >> "$debug_file"
-        printf 'STONE: %s\n' "$(grep -o -E '/coliseum/stone/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)" >> "$debug_file"
-        printf 'GRASS: %s\n' "$(grep -o -E '/coliseum/grass/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)" >> "$debug_file"
-        printf 'STONE grey: %s\n' "$(grep -o "b_grey[^>]*href='/coliseum/stone" "$src_ram" 2>/dev/null | head -1)" >> "$debug_file"
-        printf 'GRASS grey: %s\n' "$(grep -o "b_grey[^>]*href='/coliseum/grass" "$src_ram" 2>/dev/null | head -1)" >> "$debug_file"
-
-        printf '\n--- FULL TEXT SEARCH (victory/defeat keywords) ---\n' >> "$debug_file"
-        local rendered
-        rendered=$(w3m -dump -T text/html "$src_ram" 2>/dev/null)
-        echo "$rendered" | grep -i -E 'vit[oó]ria|victory|defeat|derrota|perdeu|ganhou|won|lost|winner|loser|venceu|reward' >> "$debug_file" 2>/dev/null
-        printf '(end of keyword search)\n' >> "$debug_file"
+        {
+            printf '\n============================================================\n'
+            printf '=  %s\n' "$label"
+            printf '============================================================\n'
+            printf 'Timestamp: %(%Y-%m-%d %H:%M:%S)T\n' -1
+            printf '\n--- W3M RENDERED DUMP ---\n'
+            w3m -dump -T text/html "$src_ram" 2>/dev/null
+            printf '\n--- EXTRACTED LINKS ---\n'
+            grep -o -E '/coliseum/[A-Za-z]+(/[?]r[=][0-9]+)?' "$src_ram" 2>/dev/null
+            printf '\n--- ACTION LINKS ---\n'
+            printf 'ATK:    %s\n' "$(grep -o -E '/coliseum/atk/[?]r[=][0-9]+' "$src_ram" 2>/dev/null | head -1)"
+            printf 'ATKRND: %s\n' "$(grep -o -E '/coliseum/atkrnd/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)"
+            printf 'DODGE:  %s\n' "$(grep -o -E '/coliseum/dodge/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)"
+            printf 'HEAL:   %s\n' "$(grep -o -E '/coliseum/heal/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)"
+            printf 'STONE:  %s  grey:%s\n' \
+                "$(grep -o -E '/coliseum/stone/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)" \
+                "$(grep -o "b_grey[^>]*href='/coliseum/stone" "$src_ram" 2>/dev/null | head -1)"
+            printf 'GRASS:  %s  grey:%s\n' \
+                "$(grep -o -E '/coliseum/grass/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)" \
+                "$(grep -o "b_grey[^>]*href='/coliseum/grass" "$src_ram" 2>/dev/null | head -1)"
+            printf '\n--- HP VALUES ---\n'
+            printf 'Player HP: %s\n' "$(grep -o -E '(hp)[^A-Za-z0-9]{1,4}[0-9]{2,5}' "$src_ram" 2>/dev/null | grep -o -E '[0-9]{2,5}')"
+            printf 'Enemy HP:  %s\n' "$(grep -o -E '(nbsp)[^A-Za-z0-9]{1,2}[0-9]{1,6}' "$src_ram" 2>/dev/null | sed -n 's,nbsp[;],,;s, ,,;1p')"
+            printf '\n--- MARKERS ---\n'
+            printf 'dodge:%s  end_fight:%s  grey:%s  rip:%s\n' \
+                "$(grep -c '/dodge/' "$src_ram" 2>/dev/null)" \
+                "$(grep -c 'end_fight' "$src_ram" 2>/dev/null)" \
+                "$(grep -c 'txt smpl grey' "$src_ram" 2>/dev/null)" \
+                "$(grep -c '\[rip\]' "$src_ram" 2>/dev/null)"
+            printf '\n--- KEYWORD SEARCH ---\n'
+            w3m -dump -T text/html "$src_ram" 2>/dev/null | \
+                grep -i -E 'vit[oó]ria|victory|defeat|derrota|perdeu|ganhou|venceu' 2>/dev/null || true
+        } >> "$debug_file"
     }
 
-    echo_t "Coliseum Debug - Starting capture..." "${GOLD_BLACK}" "${COLOR_RESET}" "after" "🔍"
-    printf 'Coliseum Debug Log - %(%Y-%m-%d %H:%M:%S)T\n' -1 > "$debug_file"
-    printf 'Server URL: %s\n' "$URL" >> "$debug_file"
+    # ── Helper: log a battle action ───────────────────────────────────────
+    _dbg_action() {
+        local action_label="$1" ush_before="$2" enh_before="$3" la_val="$4" ush_after="$5" enh_after="$6"
+        local ts
+        printf -v ts '%(%H:%M:%S)T' -1
+        {
+            printf '[%s] #%d | %s\n' "$ts" "$_dbg_loop" "$action_label"
+            printf '       HP: %s→%s  ENH: %s→%s  LA:%.1fs  HPER:%s%%  RPER:%s%%\n' \
+                "$ush_before" "${ush_after:--}" "$enh_before" "${enh_after:--}" \
+                "$la_val" "$HPER" "$RPER"
+        } >> "$debug_file"
+    }
 
-    # 1. Lobby
-    _debug_capture "STATE: LOBBY (main /coliseum page)" "/coliseum"
+    # ── Helper: extract current page data ────────────────────────────────
+    local _dbg_USH _dbg_ENH _dbg_ATK _dbg_ATKRND _dbg_DODGE _dbg_HEAL _dbg_STONE _dbg_GRASS _dbg_USER
+    _dbg_extract() {
+        _dbg_USH=$(grep -o -E '(hp)[^A-Za-z0-9]{1,4}[0-9]{2,5}' "$src_ram" | grep -o -E '[0-9]{2,5}' | sed 's, ,,g')
+        _dbg_ENH=$(grep -o -E '(nbsp)[^A-Za-z0-9]{1,2}[0-9]{1,6}' "$src_ram" | sed -n 's,nbsp[;],,;s, ,,;1p')
+        _dbg_ATK=$(grep -o -E '/coliseum/atk/[?]r[=][0-9]+' "$src_ram" | head -1)
+        _dbg_ATKRND=$(grep -o -E '/coliseum/atkrnd/[?]r[=][0-9]+' "$src_ram")
+        _dbg_DODGE=$(grep -o -E '/coliseum/dodge/[?]r[=][0-9]+' "$src_ram")
+        _dbg_HEAL=$(grep -o -E '/coliseum/heal/[?]r[=][0-9]+' "$src_ram")
+        _dbg_STONE=$(grep -o -E '/coliseum/stone/[?]r[=][0-9]+' "$src_ram")
+        _dbg_GRASS=$(grep -o -E '/coliseum/grass/[?]r[=][0-9]+' "$src_ram")
+        _dbg_USER=$(grep -o -E '([[:upper:]][[:lower:]]{0,15}( [[:upper:]][[:lower:]]{0,13})?)[[:space:]][^[:alnum:]]s' "$src_ram" | sed -n 's, [<]s,,;s, ,_,;2p')
+        [ -n "$_dbg_USER" ] && _dbg_opponent="$_dbg_USER"
+    }
 
-    # 2. Check for enterFight link
-    local ef_link
-    ef_link=$(grep -o -E '/coliseum/enterFight/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)
+    # ──────────────────────────────────────────────────────────────────────
+    # Write debug file header
+    # ──────────────────────────────────────────────────────────────────────
+    {
+        printf 'Coliseum Debug Log - %(%Y-%m-%d %H:%M:%S)T\n' -1
+        printf 'Server: %s  Account: %s\n' "$URL" "${ACCOUNT_ID:-unknown}"
+        printf '\n--- CONFIG ---\n'
+        printf 'LA=%.1fs  HPER=%s%%  RPER=%s%%\n' "$LA" "$HPER" "$RPER"
+        printf 'COLISEUM_LA=%s  COLISEUM_HPER=%s  COLISEUM_RPER=%s\n' \
+            "${COLISEUM_LA:-5}" "${COLISEUM_HPER:-38}" "${COLISEUM_RPER:-5}"
+        printf '\n--- CUMULATIVE STATS ---\n'
+        printf 'Total:%d  W:%d  L:%d  Streak:%d (best:%d)\n' \
+            "$cl_total_matches" "$cl_wins" "$cl_losses" \
+            "$cl_current_win_streak" "$cl_longest_win_streak"
+    } > "$debug_file"
 
-    if [ -n "$ef_link" ]; then
-        # 3. Enter fight
-        _debug_capture "STATE: ENTER FIGHT (clicking enterFight)" "$ef_link"
+    # ── Terminal: pre-battle config panel ────────────────────────────────
+    printf '\n'
+    printf '  %s╔══════════════════════════════════════╗%s\n' "$GOLD_BLACK" "$COLOR_RESET"
+    printf '  %s║     COLISEUM  DEBUG  MODE  ⚔️         ║%s\n' "$GOLD_BLACK" "$COLOR_RESET"
+    printf '  %s╠══════════════════════════════════════╣%s\n' "$GOLD_BLACK" "$COLOR_RESET"
+    printf '  %s║ LA: %.1fs  HPER: %s%%  RPER: %s%%        ║%s\n' "$GOLD_BLACK" "$LA" "$HPER" "$RPER" "$COLOR_RESET"
+    local _wr=0
+    [ "$cl_total_matches" -gt 0 ] && _wr=$(awk -v w="$cl_wins" -v t="$cl_total_matches" 'BEGIN{printf"%.0f",w/t*100}')
+    printf '  %s║ Stats: W:%d L:%d (%s%%)  Streak:%d (best:%d) ║%s\n' \
+        "$GOLD_BLACK" "$cl_wins" "$cl_losses" "$_wr" \
+        "$cl_current_win_streak" "$cl_longest_win_streak" "$COLOR_RESET"
+    printf '  %s╚══════════════════════════════════════╝%s\n' "$GOLD_BLACK" "$COLOR_RESET"
 
-        # 4. Waiting for battle (poll a couple of times)
-        local wait_count=0
-        while ! grep -q -o 'coliseum/dodge/' "$src_ram" && [ "$wait_count" -lt 12 ]; do
-            sleep 3s
-            local wait_link
-            wait_link=$(grep -o -E '/coliseum(/[A-Za-z]+/[?]r[=][0-9]+|/)' "$src_ram" | grep -v 'dodge' | head -1)
-            [ -z "$wait_link" ] && wait_link="/coliseum"
-            _debug_capture "STATE: WAITING (poll #$((wait_count+1)))" "$wait_link"
-            wait_count=$((wait_count + 1))
-        done
-
-        # 5. In battle (if dodge appeared)
-        if grep -q -o 'coliseum/dodge/' "$src_ram"; then
-            _debug_capture "STATE: IN BATTLE (dodge link found)" "/coliseum"
-        fi
-    else
-        printf '\n(No enterFight link found - not battle time or already in battle)\n' >> "$debug_file"
-    fi
-
-    # 6. Check for end_fight
-    if grep -q -o 'end_fight' "$src_ram"; then
-        _debug_capture "STATE: END FIGHT (result page)" "/coliseum/?end_fight=true"
-    fi
-
-    # 7. Merchant page
-    _debug_capture "STATE: MERCHANT (shop page)" "/coliseum/merchant/"
-
-    # 8. Max HP from /train
-    printf '\n============================================================\n' >> "$debug_file"
-    printf '=  MAX HP FROM /train\n' >> "$debug_file"
-    printf '============================================================\n' >> "$debug_file"
+    # ── Get max HP from /train ────────────────────────────────────────────
     (
         w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
             -debug -dump_source "$URL/train" \
+            -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | \
+            grep -o -E '\(([0-9]+)\)' | sed 's/[()]//g' >"$full_ram"
+    ) &
+    time_exit 20
+    local _dbg_maxhp
+    _dbg_maxhp=$(cat "$full_ram" 2>/dev/null)
+    printf '  %sMax HP: %s%s\n' "$GRAY_BLACK" "${_dbg_maxhp:-?}" "$COLOR_RESET"
+    printf '\n--- MAX HP ---\nMax HP: %s\n' "$_dbg_maxhp" >> "$debug_file"
+
+    # Set graphics to 0 for clean HTML
+    (
+        w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
+            -debug "$URL/settings/graphics/0" \
+            -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >>"$src_ram"
+    ) </dev/null &>/dev/null &
+    time_exit 17
+
+    # ── Fetch lobby ───────────────────────────────────────────────────────
+    (
+        w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
+            -debug -dump_source "${URL}/coliseum" \
             -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
     ) </dev/null &>/dev/null &
-    time_exit 20
-    printf 'Full HP pattern: %s\n' "$(grep -o -E '\(([0-9]+)\)' "$src_ram" 2>/dev/null)" >> "$debug_file"
-    printf 'Full HP value: %s\n' "$(grep -o -E '\(([0-9]+)\)' "$src_ram" 2>/dev/null | sed 's/[()]//g')" >> "$debug_file"
+    time_exit 17
+    _dbg_page "STATE: LOBBY"
 
-    # Cleanup
-    rm -f "$src_ram"
-    unset _debug_capture
+    # Handle leftover end_fight
+    if grep -q 'end_fight' "$src_ram" 2>/dev/null; then
+        (
+            w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
+                -debug -dump_source "${URL}/coliseum/?end_fight=true" \
+                -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
+        ) </dev/null &>/dev/null &
+        time_exit 17
+        _dbg_page "STATE: LEFTOVER END_FIGHT"
+        # Re-fetch lobby
+        (
+            w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
+                -debug -dump_source "${URL}/coliseum" \
+                -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
+        ) </dev/null &>/dev/null &
+        time_exit 17
+    fi
 
-    echo_t "Debug capture complete!" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅"
-    printf 'File: %s\n' "$debug_file"
-    printf 'Size: %s bytes\n' "$(wc -c < "$debug_file" 2>/dev/null)"
+    # ── Find enterFight ───────────────────────────────────────────────────
+    local ef_link
+    ef_link=$(grep -o -E '/coliseum/enterFight/[?]r[=][0-9]+' "$src_ram" 2>/dev/null)
+
+    if [ -z "$ef_link" ]; then
+        printf '  %s(No battle available at this time)%s\n' "$RED_BLACK" "$COLOR_RESET"
+        printf '\n(No enterFight link found)\n' >> "$debug_file"
+        rm -f "$src_ram" "$full_ram"
+        cd - >/dev/null 2>&1; rm -rf "$tmp_ram"
+        unset _dbg_page _dbg_action _dbg_extract
+        return 1
+    fi
+
+    # ── Enter fight ───────────────────────────────────────────────────────
+    printf '  %s⏳ Entering battle queue...%s\n' "$GOLD_BLACK" "$COLOR_RESET"
+    (
+        w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
+            -debug -dump_source "${URL}${ef_link}" \
+            -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
+    ) </dev/null &>/dev/null &
+    time_exit 17
+    _dbg_page "STATE: ENTER FIGHT"
+
+    # ── Wait for battle (max 90s) ─────────────────────────────────────────
+    local _dbg_wait_start
+    _dbg_wait_start=$(date +%s)
+    local _dbg_wait_n=0
+    until grep -q '/coliseum/dodge/' "$src_ram" 2>/dev/null || \
+          [ $(( $(date +%s) - _dbg_wait_start )) -gt 90 ]; do
+        local _dbg_welapsed=$(( $(date +%s) - _dbg_wait_start ))
+        local _dbg_qstat
+        _dbg_qstat=$(w3m -dump -T text/html "$src_ram" 2>/dev/null | \
+                     grep -o -E 'na fila: [0-9]+ de [0-9]+|Titãs na fila: [0-9]+' | head -1)
+        printf '\r  %s⏳ Queue: %-20s [%02ds]%s' \
+            "$GOLD_BLACK" "${_dbg_qstat:-waiting...}" "$_dbg_welapsed" "$COLOR_RESET"
+
+        local _dbg_qlink
+        _dbg_qlink=$(grep -o -E '/coliseum(/[A-Za-z]+/[?]r[=][0-9]+|/)' "$src_ram" 2>/dev/null | \
+                     grep -v 'dodge\|enter' | head -1)
+        [ -z "$_dbg_qlink" ] && _dbg_qlink="/coliseum"
+        (
+            w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
+                -debug -dump_source "${URL}${_dbg_qlink}" \
+                -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
+        ) </dev/null &>/dev/null &
+        time_exit 17
+        _dbg_wait_n=$(( _dbg_wait_n + 1 ))
+        _dbg_page "STATE: WAITING (poll #${_dbg_wait_n})"
+        sleep 3s
+    done
+    printf '\n'
+
+    if ! grep -q '/coliseum/dodge/' "$src_ram" 2>/dev/null; then
+        printf '  %s(Timeout: battle did not start within 90s)%s\n' "$RED_BLACK" "$COLOR_RESET"
+        printf '\n(Timeout waiting for battle)\n' >> "$debug_file"
+        rm -f "$src_ram" "$full_ram"
+        cd - >/dev/null 2>&1; rm -rf "$tmp_ram"
+        unset _dbg_page _dbg_action _dbg_extract
+        return 1
+    fi
+
+    # ── Battle started ────────────────────────────────────────────────────
+    local _dbg_battle_start
+    _dbg_battle_start=$(date +%s)
+    _dbg_extract
+
+    # Detect team (player's icon appears first in rendered dump)
+    local _dbg_team=""
+    local _dbg_pfive
+    _dbg_pfive=$(w3m -dump -T text/html "$src_ram" 2>/dev/null | head -n 5)
+    if echo "$_dbg_pfive" | grep -q '\[1\]'; then
+        _dbg_team="1"
+    elif echo "$_dbg_pfive" | grep -q '\[0\]'; then
+        _dbg_team="0"
+    fi
+    local _dbg_opponent="${_dbg_USER:-?}"
+
+    printf '\n'
+    printf '  %s⚔️  BATTLE STARTED! vs %s  [Team %s]%s\n' \
+        "$GREEN_BLACK" "${_dbg_opponent}" "${_dbg_team:-?}" "$COLOR_RESET"
+    printf '  %sMax HP: %s  Enemy HP: %s%s\n' \
+        "$GRAY_BLACK" "${_dbg_maxhp:-?}" "${_dbg_ENH:-?}" "$COLOR_RESET"
+    {
+        printf '\n============================================================\n'
+        printf '=  BATTLE START\n'
+        printf '============================================================\n'
+        printf 'Timestamp: %(%Y-%m-%d %H:%M:%S)T\n' -1
+        printf 'Opponent: %s  Team: [%s]  MaxHP: %s  EnemyHP: %s\n' \
+            "$_dbg_opponent" "${_dbg_team:-?}" "${_dbg_maxhp:-?}" "${_dbg_ENH:-?}"
+        printf '\n--- ACTION LOG ---\n'
+        printf '%-10s %-4s %-38s %-14s %-16s\n' \
+            'TIME' '#' 'ACTION' 'HP_before→after' 'ENH_before→after'
+        printf '%s\n' '──────────────────────────────────────────────────────────────────────────'
+    } >> "$debug_file"
+
+    # ── Battle variables ──────────────────────────────────────────────────
+    local _dbg_OLDHP="$_dbg_USH"
+    local _dbg_last_heal=$(( _dbg_battle_start - 90 ))
+    local _dbg_last_dodge=$(( _dbg_battle_start - 20 ))
+    local _dbg_last_atk=$(( _dbg_battle_start - ${LA%%.*} ))
+    local _dbg_stone_used=0 _dbg_grass_used=0
+    local _dbg_heals=0 _dbg_dodges=0 _dbg_atks=0 _dbg_atkrnds=0
+    local _dbg_la_failures=0 _dbg_la_successes=0 _dbg_la_adjusted=0
+    local _dbg_loop=0 _dbg_BREAK=0
+
+    # ── Main battle loop ──────────────────────────────────────────────────
+    while [ "$_dbg_BREAK" -eq 0 ]; do
+        local _dbg_now
+        _dbg_now=$(date +%s)
+        local _dbg_elapsed=$(( _dbg_now - _dbg_battle_start ))
+        local _dbg_min=$(( _dbg_elapsed / 60 ))
+        local _dbg_sec=$(( _dbg_elapsed % 60 ))
+        local _dbg_tsh=$(( _dbg_now - _dbg_last_heal ))
+        local _dbg_tsd=$(( _dbg_now - _dbg_last_dodge ))
+        local _dbg_tsa=$(( _dbg_now - _dbg_last_atk ))
+        local _dbg_hp_before="$_dbg_USH"
+        local _dbg_enh_before="$_dbg_ENH"
+        local _dbg_action_label=""
+
+        _dbg_loop=$(( _dbg_loop + 1 ))
+
+        # Detect battle end
+        if ! grep -q '/coliseum/dodge/' "$src_ram" 2>/dev/null; then
+            _dbg_BREAK=1
+            break
+        fi
+
+        # ── Priority 0: STONE ──────────────────────────────────────────
+        if [ "$_dbg_stone_used" -eq 0 ] && [ -n "$_dbg_STONE" ] && \
+           ! grep -q "b_grey[^>]*href='/coliseum/stone" "$src_ram" 2>/dev/null; then
+            (
+                w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
+                    -debug -dump_source "${URL}${_dbg_STONE}" \
+                    -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
+            ) </dev/null &>/dev/null &
+            time_exit 17
+            _dbg_extract; _dbg_stone_used=1; _dbg_last_atk=$_dbg_now
+            _dbg_action_label="🪨 STONE (+35% dmg)"
+
+        # ── Priority 1: HEAL ───────────────────────────────────────────
+        elif awk -v ush="$_dbg_USH" \
+             -v hlhp="$(awk -v m="${_dbg_maxhp:-0}" -v h="$HPER" 'BEGIN{printf"%.0f",m*h/100}')" \
+             'BEGIN { exit !(ush+0 < hlhp+0) }' && \
+             [ "$_dbg_tsh" -gt 90 ] && [ "$_dbg_tsh" -lt 300 ] && [ -n "$_dbg_HEAL" ]; then
+            (
+                w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
+                    -debug -dump_source "${URL}${_dbg_HEAL}" \
+                    -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
+            ) </dev/null &>/dev/null &
+            time_exit 17
+            _dbg_extract; _dbg_last_heal=$_dbg_now; _dbg_last_atk=$_dbg_now
+            _dbg_heals=$(( _dbg_heals + 1 ))
+            _dbg_action_label="💚 HEAL → HP:${_dbg_USH}"
+
+        # ── Priority 1.5: GRASS ────────────────────────────────────────
+        elif [ "$_dbg_grass_used" -eq 0 ] && [ -n "$_dbg_GRASS" ] && \
+             ! grep -q "b_grey[^>]*href='/coliseum/grass" "$src_ram" 2>/dev/null && \
+             awk -v ush="$_dbg_USH" -v mx="${_dbg_maxhp:-0}" \
+                 'BEGIN { exit !(mx+0 > 0 && ush+0 <= mx*0.50) }'; then
+            (
+                w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
+                    -debug -dump_source "${URL}${_dbg_GRASS}" \
+                    -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
+            ) </dev/null &>/dev/null &
+            time_exit 17
+            _dbg_extract; _dbg_grass_used=1; _dbg_last_atk=$_dbg_now
+            _dbg_action_label="🌿 GRASS (-35% dmg recv)"
+
+        # ── Priority 2: DODGE ──────────────────────────────────────────
+        elif ! grep -q 'txt smpl grey' "$src_ram" 2>/dev/null && \
+             [ "$_dbg_tsd" -gt 20 ] && [ "$_dbg_tsd" -lt 300 ] && \
+             awk -v ush="$_dbg_USH" -v old="$_dbg_OLDHP" 'BEGIN { exit !(ush+0 < old+0) }' && \
+             [ -n "$_dbg_DODGE" ]; then
+            (
+                w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
+                    -debug -dump_source "${URL}${_dbg_DODGE}" \
+                    -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
+            ) </dev/null &>/dev/null &
+            time_exit 17
+            _dbg_extract; _dbg_OLDHP=$_dbg_USH; _dbg_last_dodge=$_dbg_now; _dbg_last_atk=$_dbg_now
+            _dbg_dodges=$(( _dbg_dodges + 1 ))
+            _dbg_action_label="🛡️ DODGE"
+
+        # ── Priority 3: RANDOM ATTACK ──────────────────────────────────
+        elif awk -v t="$_dbg_tsa" -v la="${LA%%.*}" 'BEGIN { exit !(t+0 >= la+0) }' && \
+             ! grep -q 'txt smpl grey' "$src_ram" 2>/dev/null && \
+             awk -v ush="$_dbg_USH" -v enh="$_dbg_ENH" -v rper="$RPER" \
+                 'BEGIN { exit !(enh+0 > ush+0*(rper+100)/100) }' && \
+             [ -n "$_dbg_ATKRND" ]; then
+            local _dbg_prev_enh="$_dbg_ENH"
+            (
+                w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
+                    -debug -dump_source "${URL}${_dbg_ATKRND}" \
+                    -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
+            ) </dev/null &>/dev/null &
+            time_exit 17
+            _dbg_extract; _dbg_last_atk=$_dbg_now
+            _dbg_atkrnds=$(( _dbg_atkrnds + 1 ))
+            _dbg_action_label="🎲 ATKRND (ENH: ${_dbg_prev_enh}→${_dbg_ENH})"
+
+        # ── Priority 4: REGULAR ATTACK ─────────────────────────────────
+        elif awk -v t="$_dbg_tsa" -v la="${LA%%.*}" 'BEGIN { exit !(t+0 >= la+0) }' && \
+             [ -n "$_dbg_ATK" ]; then
+            local _dbg_prev_enh="$_dbg_ENH"
+            local _dbg_prev_atk="$_dbg_ATK"
+            (
+                w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
+                    -debug -dump_source "${URL}${_dbg_ATK}" \
+                    -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
+            ) </dev/null &>/dev/null &
+            time_exit 17
+            _dbg_extract; _dbg_last_atk=$_dbg_now
+
+            # Check attack success
+            local _dbg_success=1
+            local _dbg_rcheck
+            _dbg_rcheck=$(w3m -dump -T text/html "$src_ram" 2>/dev/null | head -n 20)
+            if echo "$_dbg_rcheck" | grep -q -i -E 'perdeu|falhou|failed|cooldown|too fast'; then
+                _dbg_success=0
+            elif [ "$_dbg_ENH" = "$_dbg_prev_enh" ] && \
+                 [ "$_dbg_ATK" = "$_dbg_prev_atk" ] && [ -n "$_dbg_ATK" ]; then
+                _dbg_success=0
+            fi
+
+            if [ "$_dbg_success" -eq 0 ]; then
+                _dbg_la_failures=$(( _dbg_la_failures + 1 ))
+                _dbg_la_successes=0
+                LA=$(awk -v la="$LA" 'BEGIN { printf "%.1f", la + 0.2 }')
+                _dbg_la_adjusted=1
+                _dbg_action_label="⚔️ ATK → MISS ❌ (LA→${LA}s)"
+            else
+                _dbg_la_successes=$(( _dbg_la_successes + 1 ))
+                _dbg_atks=$(( _dbg_atks + 1 ))
+                _dbg_action_label="⚔️ ATK → HIT ✓ (ENH:${_dbg_prev_enh}→${_dbg_ENH})"
+                if [ "$_dbg_la_successes" -ge 10 ] && [ "$_dbg_la_adjusted" -eq 1 ]; then
+                    if awk -v la="$LA" 'BEGIN { exit !(la > 3.0) }'; then
+                        LA=$(awk -v la="$LA" 'BEGIN { printf "%.1f", la - 0.1 }')
+                        _dbg_action_label="${_dbg_action_label} LA↓${LA}s"
+                    fi
+                    _dbg_la_successes=0
+                fi
+            fi
+
+        # ── Priority 5: REFRESH ────────────────────────────────────────
+        else
+            (
+                w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
+                    -debug -dump_source "${URL}/coliseum" \
+                    -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
+            ) </dev/null &>/dev/null &
+            time_exit 17
+            _dbg_extract
+            _dbg_action_label="🔄 REFRESH"
+            sleep 1s
+        fi
+
+        # ── Log action to file ─────────────────────────────────────────
+        _dbg_action "$_dbg_action_label" "$_dbg_hp_before" "$_dbg_enh_before" \
+                    "$LA" "$_dbg_USH" "$_dbg_ENH"
+
+        # ── Terminal display ───────────────────────────────────────────
+        local _dbg_hp_pct
+        _dbg_hp_pct=$(awk -v c="${_dbg_USH:-0}" -v m="${_dbg_maxhp:-1}" \
+                      'BEGIN { v=c/m*100; if(v>100)v=100; if(v<0)v=0; printf "%.0f", v }')
+        local _dbg_bfill
+        _dbg_bfill=$(awk -v p="$_dbg_hp_pct" 'BEGIN { v=int(p*16/100); if(v<0)v=0; if(v>16)v=16; print v }')
+        local _dbg_bempty=$(( 16 - _dbg_bfill ))
+        local _dbg_bar="" _dbg_j
+        for (( _dbg_j=0; _dbg_j<_dbg_bfill; _dbg_j++ )); do _dbg_bar+="█"; done
+        for (( _dbg_j=0; _dbg_j<_dbg_bempty; _dbg_j++ )); do _dbg_bar+="░"; done
+        local _dbg_hcol
+        if [ "$_dbg_hp_pct" -gt 60 ] 2>/dev/null; then _dbg_hcol="$GREEN_BLACK"
+        elif [ "$_dbg_hp_pct" -gt 30 ] 2>/dev/null; then _dbg_hcol="$GOLD_BLACK"
+        else _dbg_hcol="$RED_BLACK"; fi
+
+        local _dbg_stone_st _dbg_grass_st
+        [ "$_dbg_stone_used" -eq 0 ] \
+            && _dbg_stone_st="${GREEN_BLACK}READY${COLOR_RESET}" \
+            || _dbg_stone_st="${GRAY_BLACK}USED${COLOR_RESET}"
+        [ "$_dbg_grass_used" -eq 0 ] \
+            && _dbg_grass_st="${GREEN_BLACK}READY${COLOR_RESET}" \
+            || _dbg_grass_st="${GRAY_BLACK}USED${COLOR_RESET}"
+
+        printf '\n  %s══ DEBUG BATTLE %dm%02ds (loop #%d) ══%s\n' \
+            "$GOLD_BLACK" "$_dbg_min" "$_dbg_sec" "$_dbg_loop" "$COLOR_RESET"
+        printf '  HP: %s%s/%s%s [%s] %d%%\n' \
+            "$_dbg_hcol" "${_dbg_USH:-?}" "${_dbg_maxhp:-?}" "$COLOR_RESET" "$_dbg_bar" "$_dbg_hp_pct"
+        printf '  VS: %-16s  ENH: %-8s  Team:[%s]\n' \
+            "${_dbg_opponent:-?}" "${_dbg_ENH:-?}" "${_dbg_team:-?}"
+        printf '  %s────────────────────────────────%s\n' "$GRAY_BLACK" "$COLOR_RESET"
+        printf '  %s\n' "$_dbg_action_label"
+        printf '  %sLA:%.1fs  HPER:%s%%  RPER:%s%%  Fails:%d%s\n' \
+            "$GRAY_BLACK" "$LA" "$HPER" "$RPER" "$_dbg_la_failures" "$COLOR_RESET"
+        printf '  %s────────────────────────────────%s\n' "$GRAY_BLACK" "$COLOR_RESET"
+        printf '  ATK:%d  RND:%d  DODGE:%d  HEAL:%d\n' \
+            "$_dbg_atks" "$_dbg_atkrnds" "$_dbg_dodges" "$_dbg_heals"
+        printf '  🪨 Stone:%b  🌿 Grass:%b\n' "$_dbg_stone_st" "$_dbg_grass_st"
+    done
+
+    # ── Post-battle ───────────────────────────────────────────────────────
+    local _dbg_dur=$(( $(date +%s) - _dbg_battle_start ))
+    local _dbg_dmin=$(( _dbg_dur / 60 )) _dbg_dsec=$(( _dbg_dur % 60 ))
+
+    _dbg_page "STATE: POST-BATTLE (end_fight)"
+
+    # Parse result
+    local _dbg_result="unknown"
+    local _dbg_rend
+    _dbg_rend=$(w3m -dump -T text/html "$src_ram" 2>/dev/null)
+    if echo "$_dbg_rend" | grep -q -i -E 'vit[oó]ria|victory|victoire'; then
+        _dbg_result="WIN"
+    elif echo "$_dbg_rend" | grep -q -i -E 'derrota|defeat|defaite'; then
+        _dbg_result="LOSS"
+    fi
+
+    # ── Terminal post-match display ───────────────────────────────────────
+    printf '\n'
+    printf '  %s╔══════════════════════════════════════╗%s\n' "$GOLD_BLACK" "$COLOR_RESET"
+    if [ "$_dbg_result" = "WIN" ]; then
+        printf '  %s║     ✅  VICTORY!                     ║%s\n' "$GREEN_BLACK" "$COLOR_RESET"
+    elif [ "$_dbg_result" = "LOSS" ]; then
+        printf '  %s║     ❌  DEFEAT                       ║%s\n' "$RED_BLACK" "$COLOR_RESET"
+    else
+        printf '  %s║     ❓  RESULT UNKNOWN               ║%s\n' "$GOLD_BLACK" "$COLOR_RESET"
+    fi
+    printf '  %s╠══════════════════════════════════════╣%s\n' "$GOLD_BLACK" "$COLOR_RESET"
+    printf '  %s║ Duration: %dm%02ds  |  Loops: %-5d      ║%s\n' \
+        "$GOLD_BLACK" "$_dbg_dmin" "$_dbg_dsec" "$_dbg_loop" "$COLOR_RESET"
+    printf '  %s║ ATK:%-3d  RND:%-3d  DODGE:%-3d  HEAL:%-3d ║%s\n' \
+        "$GOLD_BLACK" "$_dbg_atks" "$_dbg_atkrnds" "$_dbg_dodges" "$_dbg_heals" "$COLOR_RESET"
+    printf '  %s║ ATK Fails:%-3d  LA Start:%-4s  LA End:%.1fs ║%s\n' \
+        "$GOLD_BLACK" "$_dbg_la_failures" "${COLISEUM_LA:-5}" "$LA" "$COLOR_RESET"
+    printf '  %s╠══════════════════════════════════════╣%s\n' "$GOLD_BLACK" "$COLOR_RESET"
+    printf '  %s║ Debug file saved to:                 ║%s\n' "$GRAY_BLACK" "$COLOR_RESET"
+    printf '  %s║ %-36.36s ║%s\n' "$GRAY_BLACK" "$debug_file" "$COLOR_RESET"
+    printf '  %s╚══════════════════════════════════════╝%s\n' "$GOLD_BLACK" "$COLOR_RESET"
+
+    # ── Write battle summary to debug file ───────────────────────────────
+    {
+        printf '\n============================================================\n'
+        printf '=  BATTLE SUMMARY\n'
+        printf '============================================================\n'
+        printf 'Result: %s\n' "$_dbg_result"
+        printf 'Duration: %dm %ds  |  Loops: %d\n' "$_dbg_dmin" "$_dbg_dsec" "$_dbg_loop"
+        printf 'ATK:%d  RND:%d  DODGE:%d  HEAL:%d\n' \
+            "$_dbg_atks" "$_dbg_atkrnds" "$_dbg_dodges" "$_dbg_heals"
+        printf 'ATK Fails:%d  LA Start:%s  LA End:%.1f\n' \
+            "$_dbg_la_failures" "${COLISEUM_LA:-5}" "$LA"
+        printf 'HPER Final:%s  RPER Final:%s\n' "$HPER" "$RPER"
+        printf 'Stone used:%s  Grass used:%s\n' "$_dbg_stone_used" "$_dbg_grass_used"
+    } >> "$debug_file"
+
+    # ── Cleanup ───────────────────────────────────────────────────────────
+    rm -f "$src_ram" "$full_ram"
+    cd - >/dev/null 2>&1
+    rm -rf "$tmp_ram"
+    unset _dbg_page _dbg_action _dbg_extract
+    unset _dbg_USH _dbg_ENH _dbg_ATK _dbg_ATKRND _dbg_DODGE _dbg_HEAL _dbg_STONE _dbg_GRASS _dbg_USER
 }
 
 # ============================================================================
@@ -238,11 +629,11 @@ _cl_display_battle() {
 
     # HP percentage
     local hp_pct
-    hp_pct=$(awk -v cur="$USH" -v mx="$max_hp" 'BEGIN { v=cur/mx*100; if(v>100)v=100; printf "%.0f", v }')
+    hp_pct=$(awk -v cur="$USH" -v mx="$max_hp" 'BEGIN { v=cur/mx*100; if(v>100)v=100; if(v<0)v=0; printf "%.0f", v }')
 
     # HP bar (16 chars)
     local bar_filled bar_empty hp_color
-    bar_filled=$(awk -v pct="$hp_pct" 'BEGIN { v=pct*16/100; if(v<0)v=0; if(v>16)v=16; printf "%.0f", v }')
+    bar_filled=$(awk -v pct="$hp_pct" 'BEGIN { v=int(pct*16/100); if(v<0)v=0; if(v>16)v=16; print v }')
     bar_empty=$((16 - bar_filled))
 
     if [ "$hp_pct" -gt 60 ] 2>/dev/null; then
@@ -253,8 +644,7 @@ _cl_display_battle() {
         hp_color="$RED_BLACK"
     fi
 
-    local bar=""
-    local j
+    local bar="" j
     for ((j=0; j<bar_filled; j++)); do bar+="█"; done
     for ((j=0; j<bar_empty; j++)); do bar+="░"; done
 
@@ -262,19 +652,30 @@ _cl_display_battle() {
     local min=$((elapsed / 60))
     local sec=$((elapsed % 60))
 
+    # Adaptive state indicator
+    local adp_info=""
+    [ "$_cl_la_adjusted" -eq 1 ] && adp_info="${GOLD_BLACK}(adapted)${COLOR_RESET}"
+
     printf '\n'
     printf '  %s═══════ COLISEUM BATTLE ═══════%s\n' "$GOLD_BLACK" "$COLOR_RESET"
     printf '  HP: %s%s/%s%s [%s] %d%%   %(%H:%M)T  (%dm%02ds)\n' \
         "$hp_color" "$USH" "$max_hp" "$COLOR_RESET" "$bar" "$hp_pct" -1 "$min" "$sec"
-    printf '  VS: %s  ENH: %s\n' "${_cl_opponent:-?}" "${ENH:-?}"
+    printf '  VS: %-16s  ENH: %-8s  Team:[%s]\n' \
+        "${_cl_opponent:-?}" "${ENH:-?}" "${_cl_team:-?}"
     printf '  %s──────────────────────────────%s\n' "$GRAY_BLACK" "$COLOR_RESET"
-    printf '  Last: %-28s  LA: %ss\n' "$_cl_last_action" "$LA"
+    printf '  Last: %-28s  LA: %ss %b\n' "$_cl_last_action" "$LA" "$adp_info"
+    printf '  %sHPER:%s%%  RPER:%s%%  Fails:%d  Streak:%d%s\n' \
+        "$GRAY_BLACK" "$HPER" "$RPER" "$_cl_atk_failures" "$cl_current_win_streak" "$COLOR_RESET"
     printf '  %s──────────────────────────────%s\n' "$GRAY_BLACK" "$COLOR_RESET"
     printf '  ATK:%d  RND:%d  DODGE:%d  HEAL:%d\n' \
         "$_cl_match_atks" "$_cl_match_atkrnds" "$_cl_match_dodges" "$_cl_match_heals"
     local stone_st grass_st
-    [ "${_cl_stone_used:-0}" -eq 0 ] && stone_st="${GREEN_BLACK}READY${COLOR_RESET}" || stone_st="${GRAY_BLACK}USED${COLOR_RESET}"
-    [ "${_cl_grass_used:-0}" -eq 0 ] && grass_st="${GREEN_BLACK}READY${COLOR_RESET}" || grass_st="${GRAY_BLACK}USED${COLOR_RESET}"
+    [ "${_cl_stone_used:-0}" -eq 0 ] \
+        && stone_st="${GREEN_BLACK}READY${COLOR_RESET}" \
+        || stone_st="${GRAY_BLACK}USED${COLOR_RESET}"
+    [ "${_cl_grass_used:-0}" -eq 0 ] \
+        && grass_st="${GREEN_BLACK}READY${COLOR_RESET}" \
+        || grass_st="${GRAY_BLACK}USED${COLOR_RESET}"
     printf '  🪨 Stone:%b  🌿 Grass:%b\n' "$stone_st" "$grass_st"
 }
 
@@ -282,24 +683,31 @@ _cl_display_post_match() {
     local duration=$(( $(date +%s) - _cl_battle_start ))
     local min=$((duration / 60))
     local sec=$((duration % 60))
+    local wr=0
+    [ "$cl_total_matches" -gt 0 ] && \
+        wr=$(awk -v w="$cl_wins" -v t="$cl_total_matches" 'BEGIN{printf"%.0f",w/t*100}')
 
     printf '\n'
-    printf '  %s═══════ MATCH COMPLETE ═══════%s\n' "$GOLD_BLACK" "$COLOR_RESET"
-
+    printf '  %s╔══════════════════════════════════════╗%s\n' "$GOLD_BLACK" "$COLOR_RESET"
     if [ "$_cl_result" = "win" ]; then
-        printf '  Result: %sVICTORY!%s\n' "$GREEN_BLACK" "$COLOR_RESET"
+        printf '  %s║     ✅  VICTORY!                     ║%s\n' "$GREEN_BLACK" "$COLOR_RESET"
+    elif [ "$_cl_result" = "loss" ]; then
+        printf '  %s║     ❌  DEFEAT                       ║%s\n' "$RED_BLACK" "$COLOR_RESET"
     else
-        printf '  Result: %sDEFEAT%s\n' "$RED_BLACK" "$COLOR_RESET"
+        printf '  %s║     ❓  RESULT UNKNOWN               ║%s\n' "$GOLD_BLACK" "$COLOR_RESET"
     fi
-
-    printf '  Duration: %dm %ds  |  Opponent: %s\n' "$min" "$sec" "${_cl_opponent:-?}"
-    printf '  %s──────────────────────────────%s\n' "$GRAY_BLACK" "$COLOR_RESET"
-    printf '  ATK:%d  RND:%d  DODGE:%d  HEAL:%d\n' \
-        "$_cl_match_atks" "$_cl_match_atkrnds" "$_cl_match_dodges" "$_cl_match_heals"
-    printf '  Kills: %d   Deaths: %d\n' "$_cl_match_kills" "$_cl_match_deaths"
-    printf '  %s──────────────────────────────%s\n' "$GRAY_BLACK" "$COLOR_RESET"
-    _cl_stats_show
-    printf '  %s══════════════════════════════%s\n' "$GOLD_BLACK" "$COLOR_RESET"
+    printf '  %s╠══════════════════════════════════════╣%s\n' "$GOLD_BLACK" "$COLOR_RESET"
+    printf '  %s║ Duration: %dm%02ds  |  vs %-16s ║%s\n' \
+        "$GOLD_BLACK" "$min" "$sec" "${_cl_opponent:-?}" "$COLOR_RESET"
+    printf '  %s║ ATK:%-3d  RND:%-3d  DODGE:%-3d  HEAL:%-3d ║%s\n' \
+        "$GOLD_BLACK" "$_cl_match_atks" "$_cl_match_atkrnds" "$_cl_match_dodges" "$_cl_match_heals" "$COLOR_RESET"
+    printf '  %s║ Kills:%-3d  Deaths:%-3d  LA Final:%.1fs   ║%s\n' \
+        "$GOLD_BLACK" "$_cl_match_kills" "$_cl_match_deaths" "$LA" "$COLOR_RESET"
+    printf '  %s╠══════════════════════════════════════╣%s\n' "$GOLD_BLACK" "$COLOR_RESET"
+    printf '  %s║ Session: W:%d L:%d (%s%%)  Streak:%d (best:%d) ║%s\n' \
+        "$GOLD_BLACK" "$cl_wins" "$cl_losses" "$wr" \
+        "$cl_current_win_streak" "$cl_longest_win_streak" "$COLOR_RESET"
+    printf '  %s╚══════════════════════════════════════╝%s\n' "$GOLD_BLACK" "$COLOR_RESET"
 }
 
 # ============================================================================
@@ -320,8 +728,6 @@ _cl_parse_end_fight() {
 
     # Count rips (deaths) per team from rendered output
     local team0_rip=0 team1_rip=0
-    # Each line with [rip] also has a team marker [0] or [1] nearby
-    # Parse line by line from rendered dump
     while IFS= read -r line; do
         if echo "$line" | grep -q '\[rip\]'; then
             if echo "$line" | grep -q '\[0\]'; then
@@ -425,7 +831,6 @@ _cl_adapt_hper() {
     max_hp=$(cat "$full_ram" 2>/dev/null)
     [ -z "$max_hp" ] || [ "$max_hp" -eq 0 ] 2>/dev/null && return
 
-    # damage_rate = HP lost per second
     local high_threshold low_threshold
     high_threshold=$(awk -v mx="$max_hp" 'BEGIN { printf "%.1f", mx * 0.02 }')
     low_threshold=$(awk -v mx="$max_hp" 'BEGIN { printf "%.1f", mx * 0.005 }')
@@ -433,10 +838,8 @@ _cl_adapt_hper() {
     dmg_rate=$(awk -v hp1="$hp1" -v hp2="$hp2" -v dt="$dt" 'BEGIN { r=(hp1-hp2)/dt; if(r<0)r=0; printf "%.1f", r }')
 
     if awk -v rate="$dmg_rate" -v th="$high_threshold" 'BEGIN { exit !(rate > th) }'; then
-        # Heavy damage - heal earlier (increase %, max 60)
         HPER=$(awk -v h="$HPER" 'BEGIN { v=h+5; if(v>60)v=60; printf "%.0f", v }')
     elif awk -v rate="$dmg_rate" -v th="$low_threshold" 'BEGIN { exit !(rate < th) }'; then
-        # Light damage - be aggressive (decrease %, min 20)
         HPER=$(awk -v h="$HPER" 'BEGIN { v=h-2; if(v<20)v=20; printf "%.0f", v }')
     fi
 }
@@ -466,7 +869,6 @@ _cl_adapt_rper() {
 _cl_detect_opponent() {
     _cl_opp_type="normal"
 
-    # Check allied
     if [ -n "$USER" ] && grep -q -o "$USER" allies.txt 2>/dev/null; then
         _cl_opp_type="ally"
         RPER=100
@@ -523,7 +925,19 @@ coliseum_fight() {
     # ── Load cumulative stats ──────────────────────────────────────
     _cl_stats_load
 
-    echo_t "Coliseum" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "🧱"
+    # ── Pre-battle config panel ────────────────────────────────────
+    local _cf_wr=0
+    [ "$cl_total_matches" -gt 0 ] && \
+        _cf_wr=$(awk -v w="$cl_wins" -v t="$cl_total_matches" 'BEGIN{printf"%.0f",w/t*100}')
+    printf '\n'
+    printf '  %s╔═══════════════════════════════════╗%s\n' "$GOLD_BLACK" "$COLOR_RESET"
+    printf '  %s║  ⚔️  COLISEUM                      ║%s\n' "$GOLD_BLACK" "$COLOR_RESET"
+    printf '  %s╠═══════════════════════════════════╣%s\n' "$GOLD_BLACK" "$COLOR_RESET"
+    printf '  %s║  LA: %.1fs  HPER: %s%%  RPER: %s%%     ║%s\n' \
+        "$GOLD_BLACK" "$LA" "$HPER" "$RPER" "$COLOR_RESET"
+    printf '  %s║  W:%-3d L:%-3d (%s%%)  Streak:%-3d     ║%s\n' \
+        "$GOLD_BLACK" "$cl_wins" "$cl_losses" "$_cf_wr" "$cl_current_win_streak" "$COLOR_RESET"
+    printf '  %s╚═══════════════════════════════════╝%s\n' "$GOLD_BLACK" "$COLOR_RESET"
 
     # ── Get max HP from /train ─────────────────────────────────────
     (
@@ -533,6 +947,11 @@ coliseum_fight() {
             grep -o -E '\(([0-9]+)\)' | sed 's/[()]//g' >"$full_ram"
     ) &
     time_exit 20
+
+    local _cf_maxhp
+    _cf_maxhp=$(cat "$full_ram" 2>/dev/null)
+    [ -n "$_cf_maxhp" ] && \
+        printf '  %sMax HP: %s%s\n' "$GRAY_BLACK" "$_cf_maxhp" "$COLOR_RESET"
 
     # ── Set graphics to 0 ─────────────────────────────────────────
     (
@@ -559,32 +978,31 @@ coliseum_fight() {
         echo_t "  Entering..." "" "\n" "before" "🤺"
         _cl_fetch "$go_stop"
 
-        echo_t " Preparing for battle, waiting for other players..." "" "\n" "before" "😠"
-
-        # ── Wait for battle to start (max 30s) ─────────────────────
+        # ── Wait for battle to start (max 90s) ─────────────────────
         local wait_start
         wait_start=$(date +%s)
         until grep -q -o 'coliseum/dodge/' "$src_ram" || \
-              [ $(($(date +%s) - wait_start)) -gt 30 ]; do
+              [ $(($(date +%s) - wait_start)) -gt 90 ]; do
+            local _wt=$(( $(date +%s) - wait_start ))
+            local _qstat
+            _qstat=$(w3m -dump -T text/html "$src_ram" 2>/dev/null | \
+                     grep -o -E 'na fila: [0-9]+ de [0-9]+' | head -1)
+            printf '\r  %s⏳ Queue: %-20s [%02ds]%s' \
+                "$GOLD_BLACK" "${_qstat:-waiting...}" "$_wt" "$COLOR_RESET"
             local access_link
             access_link=$(grep -o -E '/coliseum(/[A-Za-z]+/[?]r[=][0-9]+|/)' "$src_ram" | \
-                          grep -v 'dodge' | head -1)
+                          grep -v 'dodge\|enter' | head -1)
             [ -z "$access_link" ] && access_link="/coliseum"
             _cl_fetch "$access_link"
-            echo_t " 	Preparing..." "" "\n" "before" "😡"
             sleep 3s
         done
+        printf '\n'
 
         # ── Battle started ─────────────────────────────────────────
         _cl_battle_start=$(date +%s)
 
-        # Parse current state
+        # Parse current state (extract data only - NO timer reinitialization)
         cl_access() {
-            # Initialize cooldown timers
-            last_heal=$(($(date +%s) - 90))
-            last_dodge=$(($(date +%s) - 20))
-            last_atk=$(($(date +%s) - ${LA%%.*}))
-
             # Extract battle data
             USH=$(grep -o -E '(hp)[^A-Za-z0-9]{1,4}[0-9]{2,5}' "$src_ram" | grep -o -E '[0-9]{2,5}' | sed 's, ,,g')
             ENH=$(grep -o -E '(nbsp)[^A-Za-z0-9]{1,2}[0-9]{1,6}' "$src_ram" | sed -n 's,nbsp[;],,;s, ,,;1p')
@@ -612,10 +1030,10 @@ coliseum_fight() {
             if [ -z "$_cl_team" ]; then
                 local player_line
                 player_line=$(w3m -dump -T text/html "$src_ram" 2>/dev/null | head -n 5)
-                if echo "$player_line" | grep -q '\[0\]'; then
-                    _cl_team="0"
-                elif echo "$player_line" | grep -q '\[1\]'; then
+                if echo "$player_line" | grep -q '\[1\]'; then
                     _cl_team="1"
+                elif echo "$player_line" | grep -q '\[0\]'; then
+                    _cl_team="0"
                 fi
             fi
 
@@ -636,10 +1054,19 @@ coliseum_fight() {
             fi
         }
 
-        # ── Initialize battle ──────────────────────────────────────
+        # ── Initialize cooldown timers (ONCE, before the battle loop) ─
+        last_heal=$(($(date +%s) - 90))
+        last_dodge=$(($(date +%s) - 20))
+        last_atk=$(($(date +%s) - ${LA%%.*}))
+
+        # ── Initial state extraction ───────────────────────────────
         cl_access
         local OLDHP=$USH
         BREAK_LOOP=""
+
+        # Announce battle start
+        printf '  %s⚔️  BATTLE vs %-16s [Team %s]%s\n' \
+            "$GREEN_BLACK" "${_cl_opponent:-?}" "${_cl_team:-?}" "$COLOR_RESET"
 
         # Detect opponent and adapt
         _cl_detect_opponent
@@ -677,7 +1104,7 @@ coliseum_fight() {
                 last_heal=$now
                 last_atk=$now
                 _cl_match_heals=$((_cl_match_heals + 1))
-                _cl_last_action="🌿 Heal → HP:${USH}"
+                _cl_last_action="💚 Heal → HP:${USH}"
 
             # ── Priority 1.5: GRASS (use once when HP <= 50%) ─────
             elif [ "$_cl_grass_used" -eq 0 ] && [ -n "$GRASS" ] && \
@@ -703,20 +1130,19 @@ coliseum_fight() {
                 _cl_last_action="🛡️ Dodge"
 
             # ── Priority 3: RANDOM ATTACK ──────────────────────────
-            elif awk -v latk="$time_since_last_atk" -v atktime="${LA%%.*}" 'BEGIN { exit !(latk != atktime) }' &&
+            elif awk -v latk="$time_since_last_atk" -v atktime="${LA%%.*}" 'BEGIN { exit !(latk >= atktime) }' &&
                  ! grep -q -o 'txt smpl grey' "$src_ram" &&
-                 (awk -v rhp="$RHP" -v enh="$ENH" 'BEGIN { exit !(rhp < enh) }' ||
-                 (awk -v latk="$time_since_last_atk" -v atktime="${LA%%.*}" 'BEGIN { exit !(latk != atktime) }' &&
-                 ! grep -q -o 'txt smpl grey' "$src_ram" && grep -q -o "$USER" allies.txt 2>/dev/null)); then
+                 (awk -v rhp="$RHP" -v enh="$ENH" 'BEGIN { exit !(enh > rhp) }' ||
+                  grep -q -o "$USER" allies.txt 2>/dev/null); then
                 local prev_enh_val="$ENH"
                 _cl_fetch "$ATKRND"
                 cl_access
                 last_atk=$now
                 _cl_match_atkrnds=$((_cl_match_atkrnds + 1))
-                _cl_last_action="🎲 Random Atk"
+                _cl_last_action="🎲 Random Atk (ENH:${prev_enh_val}→${ENH})"
 
             # ── Priority 4: REGULAR ATTACK ─────────────────────────
-            elif awk -v latk="$time_since_last_atk" -v atktime="${LA%%.*}" 'BEGIN { exit !(latk > atktime) }'; then
+            elif awk -v latk="$time_since_last_atk" -v atktime="${LA%%.*}" 'BEGIN { exit !(latk >= atktime) }'; then
                 local prev_enh_val="$ENH"
                 local prev_atk_token="$ATK"
                 _cl_fetch "$ATK"
@@ -732,7 +1158,7 @@ coliseum_fight() {
                 else
                     _cl_atk_successes=$((_cl_atk_successes + 1))
                     _cl_match_atks=$((_cl_match_atks + 1))
-                    _cl_last_action="⚔️ Atk → hit!"
+                    _cl_last_action="⚔️ Atk → hit! (ENH:${prev_enh_val}→${ENH})"
                     # After 10 consecutive successes, try reducing LA
                     if [ "$_cl_atk_successes" -ge 10 ] && [ "$_cl_la_adjusted" -eq 1 ]; then
                         if awk -v la="$LA" 'BEGIN { exit !(la > 3.0) }'; then
