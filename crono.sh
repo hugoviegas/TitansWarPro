@@ -15,6 +15,18 @@ func_crono() {
 declare -g _last_i=-1
 
 func_cat() {
+    # Idle loop handler. Waits for user commands or events.
+    #
+    # Two modes:
+    #  - INTERACTIVE (play.sh A1): stdin is a real terminal, user types commands
+    #  - BACKGROUND (multi_runner.sh): stdin is /dev/null, commands via twm_monitor.sh [C]
+    #
+    # Available commands: config, info, requer_func, stop|exit|parar|q|x
+    #
+    # Important: This function only executes during IDLE time. When a game event
+    # is running (arena, cave, coliseum, etc), you cannot send commands until
+    # the event completes and returns to idle.
+    #
     func_crono
 
     # Reset all attributes before content — ensures dim mode from func_crono doesn't bleed
@@ -55,7 +67,13 @@ func_cat() {
             # Show prompts once per wait interval (not every second)
             if [ "$i" != "$_last_i" ]; then
                 echo_t "No battles now, waiting ${i}s" "\033[02m" "${COLOR_RESET}"
-                echo_t "Enter a command (config, info or stop|x to stop):" "${WHITE_BLACK}" "${COLOR_RESET}"
+                if [ "$_interactive" -eq 1 ]; then
+                    # Interactive mode: user can type directly
+                    echo_t "Commands: ${GOLD_BLACK}config${COLOR_RESET} ${GOLD_BLACK}info${COLOR_RESET} ${GOLD_BLACK}requer_func${COLOR_RESET} ${GOLD_BLACK}stop${COLOR_RESET}" "${WHITE_BLACK}" "${COLOR_RESET}"
+                else
+                    # Background mode: use monitor to send commands
+                    echo_t "Use ${GOLD_BLACK}twm_monitor.sh${COLOR_RESET} [C] to send commands (config, info, requer_func, stop)" "${WHITE_BLACK}" "${COLOR_RESET}"
+                fi
                 _last_i="$i"
             fi
 
@@ -106,9 +124,23 @@ func_cat() {
 
         printf "\n"
 
-        # Execute user command
+        # Execute user command — with error checking
         commands_no_break=("config" "requer_func")
-        $cmd
+
+        # Only execute if cmd is not empty
+        if [ -n "$cmd" ]; then
+            # Try to execute the command; show error if it fails
+            if ! $cmd 2>/tmp/cmd_error.txt; then
+                # Command failed — show error message
+                if [ -s /tmp/cmd_error.txt ]; then
+                    printf "\033[01;31mError executing '${cmd}': $(cat /tmp/cmd_error.txt | head -1)\033[0m\n"
+                else
+                    printf "\033[01;31mCommand not found or failed: ${cmd}\033[0m\n"
+                    printf "\033[02mAvailable: config, info, requer_func, stop\033[0m\n"
+                fi
+                rm -f /tmp/cmd_error.txt
+            fi
+        fi
 
         # Check if command should continue loop or break
         # shellcheck disable=SC2076
