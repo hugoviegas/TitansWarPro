@@ -117,7 +117,7 @@ twm_control.sh twm_setup.sh"
 
   # Account scaffold + docs
   mkdir -p ~/twm/accounts
-  curl "${SERVER}accounts/index.json" -s -L -o ~/twm/accounts/index.json 2>/dev/null || true
+  [ -f ~/twm/accounts/index.json ] || curl "${SERVER}accounts/index.json" -s -L -o ~/twm/accounts/index.json 2>/dev/null || true
   curl "${SERVER}HOW_TO_MONITOR.md" -s -L -o ~/twm/HOW_TO_MONITOR.md 2>/dev/null || true
   curl "${SERVER}QUICK_START.md" -s -L -o ~/twm/QUICK_START.md 2>/dev/null || true
 
@@ -157,7 +157,7 @@ twm_monitor.sh twm_control.sh"
   chmod +x ~/twm/*.sh
 
   mkdir -p ~/twm/accounts
-  curl "${SERVER}accounts/index.json" -s -L -o ~/twm/accounts/index.json 2>/dev/null || true
+  [ -f ~/twm/accounts/index.json ] || curl "${SERVER}accounts/index.json" -s -L -o ~/twm/accounts/index.json 2>/dev/null || true
   curl "${SERVER}HOW_TO_MONITOR.md" -s -L -o ~/twm/HOW_TO_MONITOR.md 2>/dev/null || true
   curl "${SERVER}QUICK_START.md" -s -L -o ~/twm/QUICK_START.md 2>/dev/null || true
 }
