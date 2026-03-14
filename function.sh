@@ -43,12 +43,13 @@ request_update() {
         echo_t "__FUNC__ 7- Collect mission rewards. Current value: " "" "$FUNC_collect_mission_rewards"
         echo_t "__FUNC__ 8- Pause mission rewards on weekends. Current value: " "" "$FUNC_pause_weekends"
         echo_t "__FUNC__ 9- Complete events. Current value: " "" "$FUNC_auto_events"
-        echo_t "__FUNC__ A- Complete clan missions. Current value: " "" "$FUNC_clan_missions"
-        echo_t "__FUNC__ B- Enable clan statue automatically. Current value: " "" "$FUNC_clan_statue"
-        echo_t "__FUNC__ C- Use gold to collect 3 ores in the cave. Current value: " "" "$FUNC_cave_boost"
+        echo_t "__FUNC__ 10- Complete clan missions. Current value: " "" "$FUNC_clan_missions"
+        echo_t "__FUNC__ 11- Enable clan statue automatically. Current value: " "" "$FUNC_clan_statue"
+        echo_t "__FUNC__ 12- Use gold to collect 3 ores in the cave. Current value: " "" "$FUNC_cave_boost"
+        echo_t "__FUNC__ 13- Reset config to defaults. Current value: " "" "Reset"
         echo_t "Press *'ENTER'* to exit configuration update mode." "" "" "after" "↩️"
 
-        read -r -n 1 key
+        read -r -n 2 key
 
         case $key in
             (1|relics)
@@ -116,21 +117,41 @@ request_update() {
                 echo_t "Do you want to run special events? (y or n):"
                 key="FUNC_auto_events"
                 ;;
-            (a|A|auto-clanquests)
+            (10|auto-clanquests)
                 echo_t "Do you want to complete the clan missions? (y or n):"
                 key="FUNC_clan_missions"
                 ;;
-            (b|B|auto-clan-statue)
+            (11|auto-clan-statue)
                 echo_t "Do you want to enable clan statue automatically? (y or n):"
                 key="FUNC_clan_statue"
                 ;;
-            (c|C|auto-cave-boost)
+            (12|auto-cave-boost)
                 echo_t "Do you want to use gold to collect 3 ores in the cave? (y or n):"
                 key="FUNC_cave_boost"
                 ;;
-            (exit|*)
+            (13|reset)
+                echo_t "Are you sure you want to reset to default settings? (y or n):"
+                while true; do
+                    read -r -n 1 value
+                    echo
+                    [[ $value =~ ^[yYnN]$ ]] && break
+                    echo_t "Invalid input. Enter 'y' or 'n':" "" "" "before" "❌"
+                done
+                if [ "$value" = "y" ]; then
+                    reset_config_to_defaults
+                    echo_t "Configuration reset to defaults successfully!" "" "" "before" "✅"
+                fi
+                continue
+                ;;
+            ('')
+                # Empty input (ENTER key) — exit config and return to crono run
                 echo_t "Exiting configuration update mode."
-                EXIT_CONFIG="y"  # Signal to exit both loops
+                EXIT_CONFIG="y"
+                return
+                ;;
+            (*)
+                echo_t "Exiting configuration update mode."
+                EXIT_CONFIG="y"
                 return
                 ;;
         esac
@@ -177,44 +198,88 @@ load_config() {
         echo_t "Configuration file not found. Creating config.cfg with default values."
 
         # Write the config.cfg file with default values
-        default_config() {
-            # Define default values
-            FUNC_check_rewards="n"
-            FUNC_use_elixir="n"
-            FUNC_coliseum="y"
-            FUNC_AUTO_UPDATE="y"
-            FUNC_play_league=999
-            FUNC_clan_figth="y"
-            FUNC_collect_mission_rewards="n"
-            FUNC_pause_weekends="y"
-            FUNC_auto_events="y"
-            FUNC_clan_missions="n"
-            FUNC_clan_statue="y"
-            FUNC_cave_boost="y"
-            LANGUAGE="en"
-            ALLIES="4"
-            SCRIPT_PAUSED="n"
-
-            {
-            echo "FUNC_check_rewards=$FUNC_check_rewards"
-            echo "FUNC_use_elixir=$FUNC_use_elixir"
-            echo "FUNC_coliseum=$FUNC_coliseum"
-            echo "FUNC_AUTO_UPDATE=$FUNC_AUTO_UPDATE"
-            echo "FUNC_play_league=$FUNC_play_league"
-            echo "FUNC_clan_figth=$FUNC_clan_figth"
-            echo "FUNC_collect_mission_rewards=$FUNC_collect_mission_rewards"
-            echo "FUNC_pause_weekends=$FUNC_pause_weekends"
-            echo "FUNC_auto_events=$FUNC_auto_events"
-            echo "FUNC_clan_missions=$FUNC_clan_missions"
-            echo "FUNC_clan_statue=$FUNC_clan_statue"
-            echo "FUNC_cave_boost=$FUNC_cave_boost"
-            echo "SCRIPT_PAUSED=$SCRIPT_PAUSED"
-            echo "LANGUAGE=$LANGUAGE"
-            echo "ALLIES=$ALLIES"
-            } > "$CONFIG_FILE"
-        }
         default_config
     fi
+}
+
+# Function to reset configuration to default values
+reset_config_to_defaults() {
+    # Define default values
+    FUNC_check_rewards="y"
+    FUNC_use_elixir="y"
+    FUNC_coliseum="y"
+    FUNC_AUTO_UPDATE="n"
+    FUNC_play_league=999
+    FUNC_clan_figth="y"
+    FUNC_collect_mission_rewards="y"
+    FUNC_pause_weekends="y"
+    FUNC_auto_events="y"
+    FUNC_clan_missions="y"
+    FUNC_clan_statue="n"
+    FUNC_cave_boost="n"
+    SCRIPT_PAUSED="n"
+    LANGUAGE="pt"
+    ALLIES="4"
+    UPDATE_CHANNEL="master"
+
+    {
+    echo "FUNC_check_rewards=$FUNC_check_rewards"
+    echo "FUNC_use_elixir=$FUNC_use_elixir"
+    echo "FUNC_coliseum=$FUNC_coliseum"
+    echo "FUNC_AUTO_UPDATE=$FUNC_AUTO_UPDATE"
+    echo "FUNC_play_league=$FUNC_play_league"
+    echo "FUNC_clan_figth=$FUNC_clan_figth"
+    echo "FUNC_collect_mission_rewards=$FUNC_collect_mission_rewards"
+    echo "FUNC_pause_weekends=$FUNC_pause_weekends"
+    echo "FUNC_auto_events=$FUNC_auto_events"
+    echo "FUNC_clan_missions=$FUNC_clan_missions"
+    echo "FUNC_clan_statue=$FUNC_clan_statue"
+    echo "FUNC_cave_boost=$FUNC_cave_boost"
+    echo "SCRIPT_PAUSED=$SCRIPT_PAUSED"
+    echo "LANGUAGE=$LANGUAGE"
+    echo "ALLIES=$ALLIES"
+    echo "UPDATE_CHANNEL=$UPDATE_CHANNEL"
+    } > "$CONFIG_FILE"
+}
+
+# Function to create default config (called on first run)
+default_config() {
+    # Define default values
+    FUNC_check_rewards="y"
+    FUNC_use_elixir="y"
+    FUNC_coliseum="y"
+    FUNC_AUTO_UPDATE="n"
+    FUNC_play_league=999
+    FUNC_clan_figth="y"
+    FUNC_collect_mission_rewards="y"
+    FUNC_pause_weekends="y"
+    FUNC_auto_events="y"
+    FUNC_clan_missions="y"
+    FUNC_clan_statue="n"
+    FUNC_cave_boost="n"
+    LANGUAGE="pt"
+    ALLIES="4"
+    SCRIPT_PAUSED="n"
+    UPDATE_CHANNEL="master"
+
+    {
+    echo "FUNC_check_rewards=$FUNC_check_rewards"
+    echo "FUNC_use_elixir=$FUNC_use_elixir"
+    echo "FUNC_coliseum=$FUNC_coliseum"
+    echo "FUNC_AUTO_UPDATE=$FUNC_AUTO_UPDATE"
+    echo "FUNC_play_league=$FUNC_play_league"
+    echo "FUNC_clan_figth=$FUNC_clan_figth"
+    echo "FUNC_collect_mission_rewards=$FUNC_collect_mission_rewards"
+    echo "FUNC_pause_weekends=$FUNC_pause_weekends"
+    echo "FUNC_auto_events=$FUNC_auto_events"
+    echo "FUNC_clan_missions=$FUNC_clan_missions"
+    echo "FUNC_clan_statue=$FUNC_clan_statue"
+    echo "FUNC_cave_boost=$FUNC_cave_boost"
+    echo "SCRIPT_PAUSED=$SCRIPT_PAUSED"
+    echo "LANGUAGE=$LANGUAGE"
+    echo "ALLIES=$ALLIES"
+    echo "UPDATE_CHANNEL=$UPDATE_CHANNEL"
+    } > "$CONFIG_FILE"
 }
 
 # Function to get the configuration from file and return the value
