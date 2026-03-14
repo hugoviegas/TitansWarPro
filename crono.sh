@@ -9,6 +9,9 @@ func_crono() {
     echo -e " \033[02m$URL ⏰ $(date +%H):$(date +%M)${COLOR_RESET}"
 }
 
+# Global flag to track if we've already shown idle status (reduce spam)
+declare -g _last_i=-1
+
 func_cat() {
     func_crono
 
@@ -35,8 +38,12 @@ func_cat() {
             : > "$cmd_file"
             echo_t "Running command: $cmd" "\033[02m" "${COLOR_RESET}"
         else
-            echo_t "No battles now, waiting ${i}s" "\033[02m" "${COLOR_RESET}"
-            echo_t "Enter a command or for more info enter:" "${WHITEb_BLACK}" "info or config${COLOR_RESET}"
+            # Show prompts once per wait interval (not every second)
+            if [ "$i" != "$_last_i" ]; then
+                echo_t "No battles now, waiting ${i}s" "\033[02m" "${COLOR_RESET}"
+                echo_t "Enter a command or for more info enter:" "${WHITEb_BLACK}" "info or config${COLOR_RESET}"
+                _last_i="$i"
+            fi
             read -r -t "$i" cmd  # Read user command with a timeout
         fi
 
