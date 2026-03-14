@@ -136,7 +136,7 @@ cave_start() {
   fetch_page "/cave/"
   set_cave_limits
 
-  while echo "$RUN" | grep -q -E '[-]cv'; do
+  while [[ "$RUN" =~ [-]cv ]]; do
 
       local CAVE=$(grep -o -E '/cave/(gather|down|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
       local RESULT=$(echo "$CAVE" | cut -d'/' -f3)

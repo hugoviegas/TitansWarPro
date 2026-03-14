@@ -20,7 +20,8 @@ func_cat() {
     # Reset all attributes before content — ensures dim mode from func_crono doesn't bleed
     printf "\033[0m"
 
-    cat "$TMP/msg_file"
+    # Read file without forking cat — bash $(<file) reads directly, no subprocess
+    [[ -s "$TMP/msg_file" ]] && printf '%s\n' "$(<"$TMP/msg_file")"
     printf "\033[0m"
 
     info() {
@@ -34,6 +35,13 @@ func_cat() {
 
     # Guard: ensure $i is a positive integer — prevents infinite CPU spin if unset
     [[ "$i" =~ ^[0-9]+$ ]] && [ "$i" -gt 0 ] || i=60
+
+    # Detect if running with a real terminal on stdin.
+    # When launched by multi_runner.sh, stdin is /dev/null — read returns immediately
+    # (EOF) regardless of timeout, causing the idle loop to spin at ~1Hz instead of
+    # sleeping for the full $i seconds.
+    local _interactive=0
+    [ -t 0 ] && _interactive=1
 
     while true; do
 
@@ -49,7 +57,22 @@ func_cat() {
                 echo_t "Enter a command or for more info enter:" "${WHITE_BLACK}" "info or config${COLOR_RESET}"
                 _last_i="$i"
             fi
-            read -r -t "$i" cmd  # Read user command with a timeout
+
+            if [ "$_interactive" -eq 1 ]; then
+                # Interactive terminal: block on stdin with timeout — user can type commands
+                read -r -t "$i" cmd
+            else
+                # Background mode (stdin = /dev/null): sleep the full interval without busy-wait
+                # This is the critical fix — read would return in microseconds here
+                sleep "$i"
+                # After waking, pick up any command queued to cmd_file during the sleep
+                if [ -s "$cmd_file" ]; then
+                    cmd=$(cat "$cmd_file")
+                    : > "$cmd_file"
+                else
+                    cmd=""
+                fi
+            fi
         fi
 
         if [ "$cmd" = " " ]; then
@@ -78,8 +101,12 @@ func_cat() {
 }
 
 func_sleep() {
+    # Update time using bash printf builtin — no date subprocess fork
+    # (HOUR and MIN may already be set by twm_play's case; refresh them here)
+    local _d
+    printf -v _d '%(%d)T' -1
     # Check if it's the first day of the month
-    if [ "$(date +%d)" -eq 01 ]; then
+    if [ "$((10#$_d))" -eq 1 ]; then
         # Check if the current hour is between 0 and 8 (inclusive)
         if [ "$HOUR" -lt 9 ]; then  # This covers hours 00 to 08
             coliseum_start  # Start coliseum activities

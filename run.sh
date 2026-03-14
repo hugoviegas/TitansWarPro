@@ -7,8 +7,16 @@ twm_play() {
         clan_id
     fi
 
+    # Get current time with bash printf builtin — no date subprocess fork
+    # These also set global HOUR/MIN used by func_sleep for near-event detection
+    local _h _m
+    printf -v _h '%(%H)T' -1
+    printf -v _m '%(%M)T' -1
+    HOUR=$((10#$_h))
+    MIN=$((10#$_m))
+
     # Determine game time actions based on current time
-    case $(date +%H:%M) in
+    case "${_h}:${_m}" in
         # No events time with coliseum (00:55 to 03:55)
         (00:[0-5]5|01:[0-5]5|02:[0-5]5|03:[0-5]5)
             coliseum_fight
@@ -72,7 +80,7 @@ twm_play() {
             ;;
         (*)
             # If running in coliseum mode, execute relevant functions.
-            if echo "$RUN" | grep -q -E '[-]cl'; then
+            if [[ "$RUN" =~ [-]cl ]]; then
                 echo -e "Running in coliseum mode: $RUN\n"
                 sleep 5s  # Pause before executing arena duel.
                 arena_duel
