@@ -24,21 +24,21 @@ coliseum_fight() {
     
     # Get initial data
     (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" \
+        w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" \
             -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | grep -o -E '\(([0-9]+)\)' | sed 's/[()]//g' >"$full_ram"
     ) &
     time_exit 20
     
     # Set graphics settings
     (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL"/settings/graphics/0 \
+        w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL"/settings/graphics/0 \
             -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
     ) </dev/null &>/dev/null &
     time_exit 17
     
     # Get coliseum page
     (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/coliseum" \
+        w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/coliseum" \
             -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
     ) </dev/null &>/dev/null &
     time_exit 17
@@ -46,13 +46,13 @@ coliseum_fight() {
     # Check and handle end_fight
     if grep -q -o '?end_fight' "$src_ram"; then
         (
-            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL/coliseum/?end_fight=true" \
+            w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "$URL/coliseum/?end_fight=true" \
                 -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | head -n 11 | tail -n 7 | sed "/\[2hit/d;/\[str/d;/combat/d"
         ) </dev/null &>/dev/null &
         time_exit 17
         
         (
-            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/coliseum" \
+            w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/coliseum" \
                 -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
         ) </dev/null &>/dev/null &
         time_exit 17
@@ -66,7 +66,7 @@ coliseum_fight() {
     if [ -n "$go_stop" ]; then
         echo_t "  Entering..." "" "\n" "before" "🤺"
         (
-            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${go_stop}" \
+            w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${go_stop}" \
                 -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
         ) </dev/null &>/dev/null &
         time_exit 17
@@ -78,7 +78,7 @@ coliseum_fight() {
         local first_time=$(date +%s)
         until grep -q -o 'coliseum/dodge/' "$src_ram" || awk -v ltime="(($(date +%s) - $first_time))" 'BEGIN { exit !(ltime > 30) }'; do
             (
-                w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$access_link" \
+                w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$access_link" \
                     -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
             ) </dev/null &>/dev/null &
             time_exit 17
@@ -118,7 +118,7 @@ coliseum_fight() {
                 if grep -q -o '?end_fight=true' "$src_ram"; then
                     if awk -v ltime="(($(date +%s) - $first_time))" 'BEGIN { exit !(ltime < 300) }'; then
                         (
-                            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/coliseum" \
+                            w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/coliseum" \
                                 -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
                         ) </dev/null &>/dev/null &
                         time_exit 17
@@ -151,7 +151,7 @@ coliseum_fight() {
             if awk -v ush="$USH" -v hlhp="$HLHP" 'BEGIN { exit !(ush < hlhp) }' && 
                [[ "$time_since_last_heal" -gt 90 && "$time_since_last_heal" -lt 300 ]]; then
                 (
-                    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$HEAL" \
+                    w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$HEAL" \
                         -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
                 ) </dev/null &>/dev/null &
                 time_exit 17
@@ -165,7 +165,7 @@ coliseum_fight() {
                  [[ "$time_since_last_dodge" -gt 20 && "$time_since_last_dodge" -lt 300 ]] && 
                  awk -v ush="$USH" -v oldhp="$OLDHP" 'BEGIN { exit !(ush < oldhp) }'; then
                 (
-                    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$DODGE" \
+                    w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$DODGE" \
                         -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
                 ) </dev/null &>/dev/null &
                 time_exit 17
@@ -181,7 +181,7 @@ coliseum_fight() {
                  (awk -v latk="$time_since_last_atk" -v atktime="$LA" 'BEGIN { exit !(latk != atktime) }' && 
                  ! grep -q -o 'txt smpl grey' "$src_ram" && grep -q -o "$USER" allies.txt)); then
                 (
-                    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$ATKRND" \
+                    w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$ATKRND" \
                         -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
                 ) </dev/null &>/dev/null &
                 time_exit 17
@@ -191,7 +191,7 @@ coliseum_fight() {
             # Regular attack if time permits
             elif awk -v latk="$time_since_last_atk" -v atktime="$LA" 'BEGIN { exit !(latk > atktime) }'; then
                 (
-                    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$ATK" \
+                    w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}$ATK" \
                         -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
                 ) </dev/null &>/dev/null &
                 time_exit 17
@@ -201,7 +201,7 @@ coliseum_fight() {
             # Wait and refresh if no action can be taken
             else
                 (
-                    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/coliseum" \
+                    w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/coliseum" \
                         -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
                 ) </dev/null &>/dev/null &
                 time_exit 17
@@ -241,7 +241,7 @@ coliseum_start() {
         # Handle boot mode - quest related coliseum fights
         if echo "$RUN" | grep -q -E '[-]boot'; then
             (
-                w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" \
+                w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" \
                     -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
             ) </dev/null &>/dev/null &
             time_exit 20
@@ -250,7 +250,7 @@ coliseum_start() {
             while grep -q -o -E '/coliseum/[?]quest_t[=]quest&quest_id[=]11&qz[=][a-z0-9]+' "$TMP"/SRC; do
                 coliseum_fight
                 (
-                    w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" \
+                    w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/quest/" \
                         -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
                 ) </dev/null &>/dev/null &
                 time_exit 20
@@ -259,7 +259,7 @@ coliseum_start() {
                 local ENDQUEST=$(grep -o -E '/quest/end/11[?]r[=][A_z0-9]+' "$TMP"/SRC)
                 if [ -n "$ENDQUEST" ]; then
                     (
-                        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${ENDQUEST}" \
+                        w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${ENDQUEST}" \
                             -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/SRC
                     ) </dev/null &>/dev/null &
                     time_exit 20

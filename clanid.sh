@@ -59,7 +59,7 @@ checkQuest() {
 
 check_leader() {
   # Fetch clan page and extract relevant data
-  if ! w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/clan/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[arrow\]/p' > "$TMP/CODE" 2>/dev/null; then
+  if ! w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/clan/" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -ne '/\[[^a-z]\]/,/\[arrow\]/p' > "$TMP/CODE" 2>/dev/null; then
     echo "Failed to fetch the clan page."
     return 1
   fi
@@ -101,26 +101,26 @@ clan_statue() {
 
         # Fetch the code from the arena/quit page
         (
-          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/arena/quit" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed "s/href='/\n/g" | grep "attack/1" | head -n 1 | awk -F / '{ print $5 }' | tr -cd "[:digit:]" >"$TMP"/CODE
+          w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/arena/quit" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed "s/href='/\n/g" | grep "attack/1" | head -n 1 | awk -F / '{ print $5 }' | tr -cd "[:digit:]" >"$TMP"/CODE
         ) &
         time_exit 17  # Wait for the process to finish
 
         # Upgrade clan building with gold
         (
-          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "${URL}/clan/${CLD}/built/?goldUpgrade=true&r=$(cat "$TMP"/CODE)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
+          w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "${URL}/clan/${CLD}/built/?goldUpgrade=true&r=$(cat "$TMP"/CODE)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
         ) &
         time_exit 17  # Wait for the process to finish
         echo_t " Gold Statue Upgrade..."
 
         # Fetch the code again for silver upgrade
         (
-          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/arena/quit" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed "s/href='/\n/g" | grep "attack/1" | head -n 1 | awk -F / '{ print $5 }' | tr -cd "[:digit:]" >"$TMP"/CODE
+          w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}/arena/quit" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed "s/href='/\n/g" | grep "attack/1" | head -n 1 | awk -F / '{ print $5 }' | tr -cd "[:digit:]" >"$TMP"/CODE
         ) &
         time_exit 17  # Wait for the process to finish
 
         # Upgrade clan building with silver
         (
-          w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "${URL}/clan/${CLD}/built/?silverUpgrade=true&r=$(cat "$TMP"/CODE)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
+          w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug "${URL}/clan/${CLD}/built/?silverUpgrade=true&r=$(cat "$TMP"/CODE)" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tail -n 0
         ) &
         time_exit 17  # Wait for the process to finish
         echo_t " Silver Statue Upgrade..."

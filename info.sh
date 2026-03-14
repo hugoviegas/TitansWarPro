@@ -24,6 +24,13 @@ colors() {
     WHITEb_BLACK='\033[01;38m\033[05;01m'   # Bold white text with blinking effect
 }
 
+# w3m wrapper that uses the per-account cookie directory.
+# W3M_HOME is set by set_account_paths() in requeriments.sh.
+# Falls back to $HOME (default w3m behaviour) when not set.
+w3mc() {
+    HOME="${W3M_HOME:-$HOME}" w3m "$@"
+}
+
 script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="Hugo Viegas"
@@ -166,7 +173,7 @@ fetch_page() {
     local output_file="${2:-$TMP/SRC}"  # Use the second argument if provided, otherwise default to $TMP/SRC
 
     (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${relative_url}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$output_file"
+        w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "${URL}${relative_url}" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" > "$output_file"
     ) </dev/null > /dev/null 2>&1  # Run in background and suppress output
 
     time_exit 17  # Wait for the process to finish
@@ -179,7 +186,7 @@ hpmp() {
     if echo "$@" | grep -q '\-fix'; then
         # Fetch the train page to get HP and MP values
         (
-            w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/TRAIN
+            w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -debug -dump_source "$URL/train" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$TMP"/TRAIN
         ) </dev/null > /dev/null 2>&1 &
         time_exit 20
         #/Fixed HP and MP.
@@ -204,17 +211,17 @@ messages_info() {
     echo " ⚔️ - Titans War Macro - ⚔️ V: $versionNum " > "$msg_output"
     printf " --------- 📩 MAIL 📩 ---------------\n" >> "$msg_output"
     (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/mail" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tee "$TMP"/info_file | sed -n '/[|]\ mp/,/\[arrow\]/p' | sed '1,1d;$d;6q' >> "$msg_output"
+        w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/mail" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | tee "$TMP"/info_file | sed -n '/[|]\ mp/,/\[arrow\]/p' | sed '1,1d;$d;6q' >> "$msg_output"
     ) </dev/null > /dev/null 2>&1 &
     time_exit 17
     printf " --------- 💬 CHAT TITANS 🔱 ---------\n" >> "$msg_output"
     (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/titans/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -n '/\(\»\)/,/\[chat\]/p' | sed '$d;6q' >> "$msg_output"
+        w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/titans/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -n '/\(\»\)/,/\[chat\]/p' | sed '$d;6q' >> "$msg_output"
     ) </dev/null > /dev/null 2>&1 &
     time_exit 17
     printf " --------- 💬 CHAT CLAN 🛡️ -----------\n" >> "$msg_output"
     (
-        w3m -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/clan/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -n '/\[[^a-z]\]/,/\[chat\]/p' | sed '$d;8q' >> "$msg_output"
+        w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 -dump "${URL}/chat/clan/changeRoom" -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" | sed -n '/\[[^a-z]\]/,/\[chat\]/p' | sed '$d;8q' >> "$msg_output"
     ) </dev/null > /dev/null 2>&1 &
     time_exit 17
     sed -i 's/\[0\]/🔴/g;s/\[0-off\]/⭕/g;s/\[1\]/🔵/g;s/\[1-off\]/🔘/g;s/\[premium\]/👑/g;s/\[level\]/🔼/g;s/\[mail\]/📩/g;s/\[bot\]/⚫/g' "$msg_output"

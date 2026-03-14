@@ -87,18 +87,11 @@ twm_play() {
 
 }
 
-# Function to restart the twm script if it is running
+# Function to restart the twm script if it is running.
+# Exits the current process so that the supervisor (multi_runner.sh or play.sh)
+# can restart it cleanly without killing other account instances.
 restart_script() {
     if [ "$RUN" = "-boot" ]; then
-        # Mata todas as instâncias do script
-        pidf=$(pgrep -f "sh.*twm/twm.sh")
-        while [ -n "$pidf" ]; do
-            kill -9 "$pidf" 2>/dev/null
-            sleep 1s
-            pidf=$(pgrep -f "sh.*twm/twm.sh")
-        done
-
-        # Reinicia o script
-        nohup sh "$HOME/twm/twm.sh" "$RUN" >/dev/null 2>&1 &
+        exit 0
     fi
 }
