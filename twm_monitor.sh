@@ -157,7 +157,12 @@ draw_log() {
   log_lines=$((log_lines - 1))
 
   if [ -f "$log_file" ]; then
-    tail -n "$log_lines" "$log_file" 2>/dev/null | cat
+    # Strip cursor-movement and screen-clear escape codes before displaying.
+    # Macro scripts write `clear` to stdout which ends up in the log as ESC[H ESC[2J.
+    # If these codes reach the monitor's terminal during draw_log, they destroy the header.
+    # SGR color codes (ending in 'm') are deliberately preserved so log colors still show.
+    tail -n "$log_lines" "$log_file" 2>/dev/null \
+      | sed $'s/\033\[[0-9;]*[HJKfABCDEFGST]//g; s/\033c//g'
   else
     printf '\033[0;33m  Waiting for log file: %s\033[0m\n' "$log_file"
   fi
