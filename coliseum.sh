@@ -218,7 +218,7 @@ coliseum_debug() {
         local _dbg_qstat
         _dbg_qstat=$(w3m -dump -T text/html "$src_ram" 2>/dev/null | \
                      grep -o -E 'na fila: [0-9]+ de [0-9]+|Titãs na fila: [0-9]+' | head -1)
-        printf "\r%b" "  ${GOLD_BLACK}⏳ Queue: %-20s [%02ds]${COLOR_RESET}" "${_dbg_qstat:-waiting...}" "$_dbg_welapsed"
+        printf "\r\033[K  ${GOLD_BLACK}⏳ Queue: %-20s [%02ds]${COLOR_RESET}" "${_dbg_qstat:-waiting...}" "$_dbg_welapsed"
 
         local _dbg_qlink
         _dbg_qlink=$(grep -o -E '/coliseum(/[A-Za-z]+/[?]r[=][0-9]+|/)' "$src_ram" 2>/dev/null | \
@@ -262,8 +262,11 @@ coliseum_debug() {
     local _dbg_opponent="${_dbg_USER:-?}"
 
     printf '\n'
-    printf "%b\n" "  ${GREEN_BLACK}⚔️  BATTLE vs %-16s [Team %s]${COLOR_RESET}" "$_dbg_opponent" "${_dbg_team:-?}"
-    printf "%b\n" "  ${GRAY_BLACK}Max HP: %s  Enemy HP: %s${COLOR_RESET}" "${_dbg_maxhp:-?}" "${_dbg_ENH:-?}"
+    # Reset LA to 4.5 at start of each battle (will adapt based on hits/misses)
+    LA="4.5"
+    _dbg_la_adjusted=0
+    printf "  ${GREEN_BLACK}⚔️  BATTLE vs %-16s [Team %d]${COLOR_RESET}\n" "${_dbg_opponent:-?}" "${_dbg_team:-0}"
+    printf "  ${GRAY_BLACK}Max HP: %-6d  Enemy HP: %-6d${COLOR_RESET}\n" "$_dbg_maxhp" "$_dbg_ENH"
     {
         printf '\n============================================================\n'
         printf '=  BATTLE START\n'
@@ -475,9 +478,11 @@ coliseum_debug() {
         printf "  ${GREEN_BLACK}ATK: %-3d  RND: %-3d  DODGE: %-3d  HEAL: %-3d${COLOR_RESET}\n" "$_dbg_atks" "$_dbg_atkrnds" "$_dbg_dodges" "$_dbg_heals"
         printf "  🪨 Stone: ${_dbg_stone_st}  🌿 Grass: ${_dbg_grass_st}\n"
         printf "  ${GRAY_BLACK}─── GAME LOG ───${COLOR_RESET}\n"
-        w3m -dump -T text/html "$src_ram" 2>/dev/null | tail -n 3 | while IFS= read -r logline; do
-            printf "  ${GRAY_BLACK}%-30s${COLOR_RESET}\n" "$logline"
-        done
+        w3m -dump -T text/html "$src_ram" 2>/dev/null | \
+            grep -E 'hp [0-9]|participantes:|batalh' | head -n 3 | \
+            while IFS= read -r logline; do
+                printf "  ${GRAY_BLACK}%.50s${COLOR_RESET}\n" "$logline"
+            done
     done
 
     # ── Post-battle ───────────────────────────────────────────────────────
@@ -668,9 +673,11 @@ _cl_display_battle() {
     printf "  ${GREEN_BLACK}ATK: %-3d  RND: %-3d  DODGE: %-3d  HEAL: %-3d${COLOR_RESET}\n" "$_cl_match_atks" "$_cl_match_atkrnds" "$_cl_match_dodges" "$_cl_match_heals"
     printf "  🪨 Stone: ${stone_st}  🌿 Grass: ${grass_st}\n"
     printf "  ${GRAY_BLACK}────── GAME LOG ──────${COLOR_RESET}\n"
-    w3m -dump -T text/html "$src_ram" 2>/dev/null | tail -n 4 | while IFS= read -r logline; do
-        printf "  ${GRAY_BLACK}%-30s${COLOR_RESET}\n" "$logline"
-    done
+    w3m -dump -T text/html "$src_ram" 2>/dev/null | \
+        grep -E 'hp [0-9]|participantes:|batalh' | head -n 3 | \
+        while IFS= read -r logline; do
+            printf "  ${GRAY_BLACK}%.50s${COLOR_RESET}\n" "$logline"
+        done
 }
 
 _cl_display_post_match() {
@@ -921,8 +928,8 @@ coliseum_fight() {
     printf "\n  ${GOLD_BLACK}╔═══════════════════════════════════╗${COLOR_RESET}\n"
     printf "  ${GOLD_BLACK}║  ⚔️  COLISEUM  BATTLE              ║${COLOR_RESET}\n"
     printf "  ${GOLD_BLACK}╠═══════════════════════════════════╣${COLOR_RESET}\n"
-    printf "  ${GOLD_BLACK}║  LA: ${LA}s  HPER: ${HPER}%  RPER: ${RPER}%     ║${COLOR_RESET}\n"
-    printf "  ${GOLD_BLACK}║  W:${GREEN_BLACK}%-3d${GOLD_BLACK} L:${RED_BLACK}%-3d${GOLD_BLACK} (${_cf_wr}%)  Streak:${GREEN_BLACK}%-3d${GOLD_BLACK}  ║${COLOR_RESET}\n" "$cl_wins" "$cl_losses" "$cl_current_win_streak"
+    printf "  ${GOLD_BLACK}║  LA: %-5.1f  HPER: %-2d%%  RPER: %-2d%%   ║${COLOR_RESET}\n" "$LA" "$HPER" "$RPER"
+    printf "  ${GOLD_BLACK}║  W:${GREEN_BLACK}%-3d${GOLD_BLACK} L:${RED_BLACK}%-3d${GOLD_BLACK} (%-2d%%)  Streak:${GREEN_BLACK}%-3d${GOLD_BLACK}  ║${COLOR_RESET}\n" "$cl_wins" "$cl_losses" "$_cf_wr" "$cl_current_win_streak"
     printf "  ${GOLD_BLACK}╚═══════════════════════════════════╝${COLOR_RESET}\n"
 
     # ── Get max HP from /train ─────────────────────────────────────
@@ -973,7 +980,7 @@ coliseum_fight() {
             local _qstat
             _qstat=$(w3m -dump -T text/html "$src_ram" 2>/dev/null | \
                      grep -o -E 'na fila: [0-9]+ de [0-9]+' | head -1)
-            printf '\r%b' "  ${GOLD_BLACK}⏳ Queue: %-20s [%02ds]${COLOR_RESET}" "${_qstat:-waiting...}" "$_wt"
+            printf "\r\033[K  ${GOLD_BLACK}⏳ Queue: %-20s [%02ds]${COLOR_RESET}" "${_qstat:-waiting...}" "$_wt"
             local access_link
             access_link=$(grep -o -E '/coliseum(/[A-Za-z]+/[?]r[=][0-9]+|/)' "$src_ram" | \
                           grep -v 'dodge\|enter' | head -1)
@@ -1190,10 +1197,7 @@ coliseum_fight() {
         _cl_stats_save
         _cl_history_append
 
-        # Save adapted LA if changed
-        if [ "$_cl_la_adjusted" -eq 1 ]; then
-            update_config "COLISEUM_LA" "$LA"
-        fi
+        # LA is NOT saved to config - always resets to 4.5 at next battle start
 
         # ── Cleanup ────────────────────────────────────────────────
         rm -f "$src_ram" "$full_ram"
