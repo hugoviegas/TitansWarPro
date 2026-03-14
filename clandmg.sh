@@ -96,7 +96,7 @@ clandmgfight_fight() {
   #/end
   func_unset
   echo_t "Clan duel" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
-  clear
+  [ -t 1 ] && clear
 }
 clandmgfight_start() {
   cd "$TMP" || exit

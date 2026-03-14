@@ -29,7 +29,7 @@ login_logoff () {
     check=4
 
   until [ "$check" -lt 1 ]; do
-   clear
+   [ -t 1 ] && clear
    echo_t "Please wait..."
    echo -ne "${GOLD_BLACK}> [$ACC] ${COLOR_RESET}- "
    echo_t "To change your user account press the button" "" "${GOLD_BLACK} [ENTER] ${check}s ...${COLOR_RESET}"
@@ -43,7 +43,7 @@ login_logoff () {
   done
  fi
 
- clear
+ [ -t 1 ] && clear
  echo_t "Please wait..."
 
  # Add login attempt counter to prevent infinite loop
@@ -128,7 +128,7 @@ login_logoff () {
   }
   log_in || break
 
-  clear
+  [ -t 1 ] && clear
   echo_t "Please wait..."
   (
    w3mc -cookie -o http_proxy=$PROXY -debug "$URL/user" -o user_agent="$(shuf -n1 $TMP/userAgent.txt)" | grep "\[level" | grep -o -E "[[:space:]][[:upper:]][[:lower:]]{0,15}[[:space:]]{0,1}[[:upper:]]{0,1}[[:lower:]]{0,14}[[:space:]]" > $TMP/acc_file

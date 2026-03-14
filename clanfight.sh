@@ -97,7 +97,7 @@ clanfight_fight() {
   func_unset
   echo_t "ClanFight" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
   sleep 10s
-  clear
+  [ -t 1 ] && clear
 }
 clanfight_start() {
   cd $TMP || exit
