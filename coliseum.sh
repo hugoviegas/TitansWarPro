@@ -134,7 +134,7 @@ coliseum_debug() {
     printf "%b\n" "  ${GOLD_BLACK}║ LA: ${LA}s  HPER: ${HPER}%  RPER: ${RPER}%        ║${COLOR_RESET}"
     local _wr=0
     [ "$cl_total_matches" -gt 0 ] && _wr=$(awk -v w="$cl_wins" -v t="$cl_total_matches" 'BEGIN{printf"%.0f",w/t*100}')
-    printf "%b\n" "  ${GOLD_BLACK}║ Stats: ${GREEN_BLACK}W:${cl_wins}${GOLD_BLACK} ${RED_BLACK}L:${cl_losses}${GOLD_BLACK} (${_wr}%)  ${GREENb_BLACK}Streak:${cl_current_win_streak}${GOLD_BLACK}${COLOR_RESET}"
+    printf "%b\n" "  ${GOLD_BLACK}║ Stats: ${GREEN_BLACK}W:${cl_wins}${GOLD_BLACK} ${RED_BLACK}L:${cl_losses}${GOLD_BLACK} (${_wr}%)  ${GREEN_BLACK}Streak:${cl_current_win_streak}${GOLD_BLACK}${COLOR_RESET}"
     printf '%b\n' "  ${GOLD_BLACK}╚══════════════════════════════════════╝${COLOR_RESET}"
 
     # ── Get max HP from /train ────────────────────────────────────────────
@@ -472,7 +472,7 @@ coliseum_debug() {
         printf "%b\n" "  ${_dbg_action_label}"
         printf "%b\n" "  ${GRAY_BLACK}LA:${LA}s  HPER:${HPER}%  RPER:${RPER}%  Fails:${_dbg_la_failures}${COLOR_RESET}"
         printf "%b\n" "  ${GRAY_BLACK}────────────────────────────────${COLOR_RESET}"
-        printf "%b\n" "  ${GREENb_BLACK}ATK:${_dbg_atks}  RND:${_dbg_atkrnds}  DODGE:${_dbg_dodges}  HEAL:${_dbg_heals}${COLOR_RESET}"
+        printf "%b\n" "  ${GREEN_BLACK}ATK:${_dbg_atks}  RND:${_dbg_atkrnds}  DODGE:${_dbg_dodges}  HEAL:${_dbg_heals}${COLOR_RESET}"
         printf "%b\n" "  🪨 Stone:${_dbg_stone_st}  🌿 Grass:${_dbg_grass_st}"
         printf "%b" "  ${GRAY_BLACK}─── GAME LOG ─── ${COLOR_RESET}\n"
         w3m -dump -T text/html "$src_ram" 2>/dev/null | tail -n 3 | sed 's/^/  /'
@@ -506,7 +506,7 @@ coliseum_debug() {
     fi
     printf '%b\n' "  ${GOLD_BLACK}╠══════════════════════════════════════╣${COLOR_RESET}"
     printf "%b\n" "  ${GOLD_BLACK}║ Duration: ${_dbg_dmin}m${_dbg_dsec}s  |  Loops: %-5d      ║${COLOR_RESET}" "$_dbg_loop"
-    printf "%b\n" "  ${GOLD_BLACK}║ ATK:${GREENb_BLACK}${_dbg_atks}${GOLD_BLACK}  RND:${GREENb_BLACK}${_dbg_atkrnds}${GOLD_BLACK}  DODGE:${GREENb_BLACK}${_dbg_dodges}${GOLD_BLACK}  HEAL:${GREENb_BLACK}${_dbg_heals}${GOLD_BLACK} ║${COLOR_RESET}"
+    printf "%b\n" "  ${GOLD_BLACK}║ ATK:${GREEN_BLACK}${_dbg_atks}${GOLD_BLACK}  RND:${GREEN_BLACK}${_dbg_atkrnds}${GOLD_BLACK}  DODGE:${GREEN_BLACK}${_dbg_dodges}${GOLD_BLACK}  HEAL:${GREEN_BLACK}${_dbg_heals}${GOLD_BLACK} ║${COLOR_RESET}"
     printf "%b\n" "  ${GOLD_BLACK}║ ATK Fails:${RED_BLACK}${_dbg_la_failures}${GOLD_BLACK}  LA Start:${COLISEUM_LA:-5}  LA End:${LA} ║${COLOR_RESET}"
     printf '%b\n' "  ${GOLD_BLACK}╠══════════════════════════════════════╣${COLOR_RESET}"
     printf '%b\n' "  ${GRAY_BLACK}║ Debug file:                          ║${COLOR_RESET}"
@@ -652,18 +652,24 @@ _cl_display_battle() {
         && grass_st="${GREEN_BLACK}READY${COLOR_RESET}" \
         || grass_st="${GRAY_BLACK}USED${COLOR_RESET}"
 
+    # Format time using printf -v to avoid format specifier issues
+    local current_time
+    printf -v current_time '%(%H:%M)T' -1
+
     printf '\n'
     printf '%b\n' "  ${GOLD_BLACK}═══════ COLISEUM BATTLE ═══════${COLOR_RESET}"
-    printf "%b" "  ${hp_color}HP: ${USH}/${max_hp}${COLOR_RESET} [${bar}] ${hp_pct}%   %(%H:%M)T  (${min}m${sec}s)\n" -1
+    printf "%b\n" "  ${hp_color}HP: ${USH}/${max_hp}${COLOR_RESET} [${bar}] ${hp_pct}%   ${current_time}  (${min}m${sec}s)"
     printf "%b\n" "  ${GRAY_BLACK}VS: %-16s  ENH: %-8s  Team:[%s]${COLOR_RESET}" "${_cl_opponent:-?}" "${ENH:-?}" "${_cl_team:-?}"
     printf "%b\n" "  ${GRAY_BLACK}──────────────────────────────${COLOR_RESET}"
-    printf "%b\n" "  Last: %-28s  LA: ${LA}s ${adp_info}"
+    printf "%b\n" "  ${GRAY_BLACK}LA: ${LA}s ${adp_info}${COLOR_RESET}"
     printf "%b\n" "  ${GRAY_BLACK}HPER:${HPER}%  RPER:${RPER}%  Fails:${_cl_atk_failures}  Streak:${cl_current_win_streak}${COLOR_RESET}"
     printf "%b\n" "  ${GRAY_BLACK}──────────────────────────────${COLOR_RESET}"
-    printf "%b\n" "  ${GREENb_BLACK}ATK:${_cl_match_atks}  RND:${_cl_match_atkrnds}  DODGE:${_cl_match_dodges}  HEAL:${_cl_match_heals}${COLOR_RESET}"
+    printf "%b\n" "  ${GREEN_BLACK}ATK:${_cl_match_atks}  RND:${_cl_match_atkrnds}  DODGE:${_cl_match_dodges}  HEAL:${_cl_match_heals}${COLOR_RESET}"
     printf "%b\n" "  🪨 Stone:${stone_st}  🌿 Grass:${grass_st}"
-    printf "%b" "  ${GRAY_BLACK}────── GAME LOG ──────${COLOR_RESET}\n"
-    w3m -dump -T text/html "$src_ram" 2>/dev/null | tail -n 4 | sed "s/^/  ${GRAY_BLACK}/; s/$/${COLOR_RESET}/"
+    printf "%b\n" "  ${GRAY_BLACK}────── GAME LOG ──────${COLOR_RESET}"
+    w3m -dump -T text/html "$src_ram" 2>/dev/null | tail -n 4 | while IFS= read -r logline; do
+        printf "%b\n" "  ${GRAY_BLACK}${logline}${COLOR_RESET}"
+    done
 }
 
 _cl_display_post_match() {
@@ -685,10 +691,10 @@ _cl_display_post_match() {
     fi
     printf '%b\n' "  ${GOLD_BLACK}╠══════════════════════════════════════╣${COLOR_RESET}"
     printf "%b\n" "  ${GOLD_BLACK}║ Duration: ${min}m${sec}s  |  vs %-16s ║${COLOR_RESET}" "${_cl_opponent:-?}"
-    printf "%b\n" "  ${GOLD_BLACK}║ ATK:${GREENb_BLACK}${_cl_match_atks}${GOLD_BLACK}  RND:${GREENb_BLACK}${_cl_match_atkrnds}${GOLD_BLACK}  DODGE:${GREENb_BLACK}${_cl_match_dodges}${GOLD_BLACK}  HEAL:${GREENb_BLACK}${_cl_match_heals}${GOLD_BLACK} ║${COLOR_RESET}"
+    printf "%b\n" "  ${GOLD_BLACK}║ ATK:${GREEN_BLACK}${_cl_match_atks}${GOLD_BLACK}  RND:${GREEN_BLACK}${_cl_match_atkrnds}${GOLD_BLACK}  DODGE:${GREEN_BLACK}${_cl_match_dodges}${GOLD_BLACK}  HEAL:${GREEN_BLACK}${_cl_match_heals}${GOLD_BLACK} ║${COLOR_RESET}"
     printf "%b\n" "  ${GOLD_BLACK}║ Kills:${GREEN_BLACK}${_cl_match_kills}${GOLD_BLACK}  Deaths:${RED_BLACK}${_cl_match_deaths}${GOLD_BLACK}  LA Final:${LA}   ║${COLOR_RESET}"
     printf '%b\n' "  ${GOLD_BLACK}╠══════════════════════════════════════╣${COLOR_RESET}"
-    printf "%b\n" "  ${GOLD_BLACK}║ Session: W:${GREEN_BLACK}${cl_wins}${GOLD_BLACK} L:${RED_BLACK}${cl_losses}${GOLD_BLACK} (${wr}%)  Streak:${GREENb_BLACK}${cl_current_win_streak}${GOLD_BLACK} (best:${cl_longest_win_streak}) ║${COLOR_RESET}"
+    printf "%b\n" "  ${GOLD_BLACK}║ Session: W:${GREEN_BLACK}${cl_wins}${GOLD_BLACK} L:${RED_BLACK}${cl_losses}${GOLD_BLACK} (${wr}%)  Streak:${GREEN_BLACK}${cl_current_win_streak}${GOLD_BLACK} (best:${cl_longest_win_streak}) ║${COLOR_RESET}"
     printf '%b\n' "  ${GOLD_BLACK}╚══════════════════════════════════════╝${COLOR_RESET}"
 }
 
@@ -916,7 +922,7 @@ coliseum_fight() {
     printf '%b\n' "  ${GOLD_BLACK}║  ⚔️  COLISEUM  BATTLE              ║${COLOR_RESET}"
     printf '%b\n' "  ${GOLD_BLACK}╠═══════════════════════════════════╣${COLOR_RESET}"
     printf "%b\n" "  ${GOLD_BLACK}║  LA: ${LA}s  HPER: ${HPER}%  RPER: ${RPER}%     ║${COLOR_RESET}"
-    printf "%b\n" "  ${GOLD_BLACK}║  W:${GREEN_BLACK}%-3d${GOLD_BLACK} L:${RED_BLACK}%-3d${GOLD_BLACK} (${_cf_wr}%)  Streak:${GREENb_BLACK}%-3d${GOLD_BLACK}${COLOR_RESET}" "$cl_wins" "$cl_losses" "$cl_current_win_streak"
+    printf "%b\n" "  ${GOLD_BLACK}║  W:${GREEN_BLACK}%-3d${GOLD_BLACK} L:${RED_BLACK}%-3d${GOLD_BLACK} (${_cf_wr}%)  Streak:${GREEN_BLACK}%-3d${GOLD_BLACK}${COLOR_RESET}" "$cl_wins" "$cl_losses" "$cl_current_win_streak"
     printf '%b\n' "  ${GOLD_BLACK}╚═══════════════════════════════════╝${COLOR_RESET}"
 
     # ── Get max HP from /train ─────────────────────────────────────

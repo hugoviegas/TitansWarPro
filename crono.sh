@@ -122,7 +122,7 @@ func_cat() {
         # Handle stop/exit commands (any mode)
         case "$cmd" in
             stop|exit|parar|q|x)
-                printf "\033[01;31m$(translate "Stopping macro")...\033[0m\n"
+                printf_t "Stopping macro...\n" "${RED_BLACK}" "${COLOR_RESET}"
                 exit 99  # Exit code 99 signals intentional stop (not a crash/restart)
                 ;;
             " ")
