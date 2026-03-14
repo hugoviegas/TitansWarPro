@@ -381,29 +381,23 @@ show_status() {
 }
 
 usage() {
-  cat <<'EOF'
-
-  Usage: ./twm_monitor.sh [command]
-
-  Commands:
-    (no args)   Interactive monitor
-    status      Status table (non-interactive)
-    help        This message
-
-  Keys in monitor:
-    N / P       Next / Previous account
-    F           Follow live (tail -f)  ← Ctrl+C to return
-    L           Account list (select by number)
-    C           Send command to macro (runs on next idle cycle)
-    R           Force refresh
-    Q           Quit
-    1-9         Jump directly to account by number
-
-  Refresh behaviour:
-    Renders immediately when the log file grows (active battle = fast updates,
-    idle = naturally quiet). Forces a status re-check every 60 seconds.
-
-EOF
+  printf '\n'
+  printf '  Usage: ./twm_monitor.sh [command]\n\n'
+  printf '  Commands:\n'
+  printf '    (no args)   Interactive monitor\n'
+  printf '    status      Status table (non-interactive)\n'
+  printf '    help        This message\n\n'
+  printf '  Keys in monitor:\n'
+  printf '    N / P       Next / Previous account\n'
+  printf '    F           Follow live (tail -f)  ← Ctrl+C to return\n'
+  printf '    L           Account list (select by number)\n'
+  printf '    C           Send command to macro (runs on next idle cycle)\n'
+  printf '    R           Force refresh\n'
+  printf '    Q           Quit\n'
+  printf '    1-9         Jump directly to account by number\n\n'
+  printf '  Refresh behaviour:\n'
+  printf '    Renders immediately when the log file grows (active battle = fast updates,\n'
+  printf '    idle = naturally quiet). Forces a status re-check every 60 seconds.\n\n'
 }
 
 # ── entry ─────────────────────────────────────────────────────────────────────
