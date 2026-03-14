@@ -1,20 +1,14 @@
 #!/bin/sh
 
-#create fold twm if does not exist
+# ─── Bootstrap ────────────────────────────────────────────────────────────────
 mkdir -p ~/twm ~/twm/accounts
 
-if [ -z "$*" ]; then
-  version="master"
-else
-  # ./easyinstall.sh beta, beta2 or backup
-  version="$*"
-fi
+VERSION="${1:-master}"
+SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/$VERSION/"
 
-
-if [ ! -e "$HOME/info.sh" ]; then
-  curl https://raw.githubusercontent.com/hugoviegas/TitansWarPro/"$version"/info.sh -s -L >"$HOME"/twm/info.sh
+if [ ! -e "$HOME/twm/info.sh" ]; then
+  curl "${SERVER}info.sh" -s -L -o "$HOME/twm/info.sh"
   chmod +x ~/twm/info.sh
-  sleep 0.5s
 fi
 
 # shellcheck disable=SC1090
@@ -22,212 +16,192 @@ fi
 colors
 script_slogan
 
-#access dir
 cd ~/twm || exit
 
-#
-
-SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/$version/"
-remote_count=$(curl "${SERVER}"easyinstall.sh -s -L | wc -c)
-if [ -e "easyinstall.sh" ]; then
-  local_count=$(wc -c <"easyinstall.sh")
-else
-  local_count=1
-fi
-
+# ─── Platform setup ───────────────────────────────────────────────────────────
 cd ~/ || exit
-printf "${BLACK_CYAN} Installing TWM...\n⌛ Please wait...⌛${COLOR_RESET}"
 
-#termux
+# Termux (Android)
 if [ -d /data/data/com.termux/files/usr/share/doc ]; then
   termux-wake-lock
-  if ! grep -q "nameserver 1.1.1.1" "$PREFIX"/etc/resolv.conf; then
-    printf "nameserver 1.1.1.1\nnameserver 1.0.0.1" >> "$PREFIX"/etc/resolv.conf 2>/dev/null
-  fi
-  if ! grep -q "nameserver 8.8.8.8" "$PREFIX"/etc/resolv.conf; then
-    printf "nameserver 8.8.8.8\n" >> "$PREFIX"/etc/resolv.conf
-  fi
-  LS="/data/data/com.termux/files/usr/share/doc"
-  rm -rf ~/.termux/boot/play.sh 2>/dev/null
+  grep -q "nameserver 1.1.1.1" "$PREFIX/etc/resolv.conf" 2>/dev/null || \
+    printf "nameserver 1.1.1.1\nnameserver 1.0.0.1\n" >> "$PREFIX/etc/resolv.conf" 2>/dev/null
+  grep -q "nameserver 8.8.8.8" "$PREFIX/etc/resolv.conf" 2>/dev/null || \
+    printf "nameserver 8.8.8.8\n" >> "$PREFIX/etc/resolv.conf" 2>/dev/null
+
+  rm -f ~/.termux/boot/play.sh 2>/dev/null
   mkdir -p ~/.termux/boot
-  echo "IyEvZGF0YS9kYXRhL2NvbS50ZXJtdXgvZmlsZXMvdXNyL2Jpbi9zaApiYXNoICRIT01FL3R3bS90d20uc2ggLWJvb3QK" | base64 -d >~/.termux/boot/play.sh 2>/dev/null
+  printf "IyEvZGF0YS9kYXRhL2NvbS50ZXJtdXgvZmlsZXMvdXNyL2Jpbi9zaApiYXNoICRIT01FL3R3bS90d20uc2ggLWJvb3QK" | base64 -d >~/.termux/boot/play.sh 2>/dev/null
   chmod +x ~/.termux/boot/play.sh 2>/dev/null
-  if whereis -b w3m >/dev/null 2>&1; then
-    :
-  else
-    pkg install w3m -y
-  fi
 
-  if whereis -b jq >/dev/null 2>&1; then
-    :
-  else
-    pkg install jq -y
-  fi
-
-  if whereis -b coreutils >/dev/null 2>&1; then
-    :
-  else
-    pkg install coreutils ncurses-utils -y
-  fi
-
-  if [ -e "${LS}/termux-api" ]; then
-    :
-  else
-    pkg install termux-api -y
-  fi
-
-  if [ -e "${LS}/procps" ]; then
-    :
-  else
-    pkg install procps ncurses-utils -y
-  fi
+  printf "${BLACK_CYAN}  Checking Termux packages...${COLOR_RESET}\n"
+  command -v w3m  >/dev/null 2>&1 || pkg install w3m -y
+  command -v jq   >/dev/null 2>&1 || pkg install jq -y
+  [ -d /data/data/com.termux/files/usr/share/doc/coreutils ] || pkg install coreutils ncurses-utils -y
+  [ -d /data/data/com.termux/files/usr/share/doc/termux-api ] || pkg install termux-api -y
+  [ -d /data/data/com.termux/files/usr/share/doc/procps    ] || pkg install procps ncurses-utils -y
 fi
 
-#/cygwin
+# Cygwin (Windows)
 if uname | grep -q -i "cygwin"; then
   LS="/usr/share/doc"
-  if [ -e /bin/apt-cyg ]; then
-    :
-  else
-    #/cygwin repository
-    curl -s -L -O "https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/apt-cyg" &
-    : > /dev/null
+  if [ ! -e /bin/apt-cyg ]; then
+    curl -s -L -O "https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/apt-cyg"
     install apt-cyg /bin
   fi
-
-  if [ -e "${LS}/w3m" ]; then
-    :
-  else
-    apt-cyg install w3m -y &
-    : > /dev/null
-  fi
-
-  if [ -e "${LS}/ncurses-term" ]; then
-    :
-  else
-    apt-cyg install ncurses-term -y &
-    : > /dev/null
-  fi
-
-  if [ -e "${LS}/coreutils" ]; then
-    : > /dev/null
-  else
-    apt-cyg install coreutils -y &
-  fi
-  if [ -e "${LS}/procps" ]; then
-    : > /dev/null
-  else
-    apt-cyg install procps -y &
-  fi
-  if [ -e "${LS}/jq" ]; then
-      :> /dev/null
-  else
-      apt-cyg install jq -y &
-  fi
-  
-  fi
-
-#/ish Iphone
-APPISH=$(uname -a | grep -o "\-ish")
-if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = '-ish' ]; then
-  LS='/usr/share/doc'
-  printf "${BLACK_CYAN}Install the necessary packages for Alpine on app ISh(Iphone):${COLOR_RESET}\n apk update\n apk add curl ; apk add w3m ; apk add coreutils ; apk add --no-cache tzdata\n\n"
-  sleep 5s
-#/UserLAnd Terminal
-elif [ "$SHELL" != "/bin/ash" ] && [ "$APPISH" != '-ish' ] && uname -m | grep -q -E '(aarch64|armhf|armv7|mips64)' && [ ! -d /data/data/com.termux/files/usr/share/doc ]; then
-  LS='/usr/share/doc'
-  printf "${BLACK_CYAN}Install the necessary packages for Alpine on app UserLAnd(Android):${COLOR_RESET}\n apk update\n sudo apk add curl ; sudo apk add w3m ; sudo apk add coreutils ; sudo apk add --no-cache tzdata\n\n"
-  sleep 5s
-#/other linux
-elif [ "$SHELL" != "/bin/ash" ] && [ "$APPISH" != '-ish' ] && uname -m | grep -q -E "(ppc64le|riscv64|s390x|x86|x86_64)" && [ ! -d /data/data/com.termux/files/usr/share/doc ]; then
-  LS='/usr/share/doc'
-  printf "${BLACK_CYAN}Install required packages for Linux or Windows WSL:${COLOR_RESET}\n sudo apt update\n sudo apt install curl coreutils ncurses-term procps w3m jq -y\n"
-  sleep 5s
+  [ -e "${LS}/w3m"          ] || apt-cyg install w3m -y
+  [ -e "${LS}/ncurses-term" ] || apt-cyg install ncurses-term -y
+  [ -e "${LS}/coreutils"    ] || apt-cyg install coreutils -y
+  [ -e "${LS}/procps"       ] || apt-cyg install procps -y
+  [ -e "${LS}/jq"           ] || apt-cyg install jq -y
+  unset LS
 fi
 
-#starting...
-unset LS
+# iSH (iPhone) / UserLAnd / Generic Linux / WSL
+APPISH=$(uname -a | grep -o "\-ish")
+if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = '-ish' ]; then
+  printf "${BLACK_CYAN}Install the necessary packages for Alpine on app ISh (iPhone):${COLOR_RESET}\n"
+  printf "  apk update\n  apk add curl; apk add w3m; apk add coreutils; apk add --no-cache tzdata\n\n"
+  sleep 5s
+elif [ "$APPISH" != '-ish' ] && uname -m | grep -q -E '(aarch64|armhf|armv7|mips64)' && [ ! -d /data/data/com.termux ]; then
+  printf "${BLACK_CYAN}Install the necessary packages for Alpine on app UserLAnd (Android):${COLOR_RESET}\n"
+  printf "  apk update\n  sudo apk add curl; sudo apk add w3m; sudo apk add coreutils; sudo apk add --no-cache tzdata\n\n"
+  sleep 5s
+elif [ "$APPISH" != '-ish' ] && uname -m | grep -q -E "(ppc64le|riscv64|s390x|x86|x86_64)" && [ ! -d /data/data/com.termux ]; then
+  printf "${BLACK_CYAN}Install required packages for Linux or Windows WSL:${COLOR_RESET}\n"
+  printf "  sudo apt update\n  sudo apt install curl coreutils ncurses-term procps w3m jq -y\n"
+  sleep 5s
+fi
+unset APPISH
+
 cd ~/twm || exit
-#script_slogan
-printf "${BLACK_CYAN}\n ⌛ Wait downloading scripts...${COLOR_RESET}\n"
 
-sync_func() {
-  SCRIPTS="allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh check.sh clancoliseum.sh clandmg.sh clanfight.sh clanid.sh coliseum.sh crono.sh flagfight.sh function.sh king.sh language.sh league.sh loginlogoff.sh play.sh requeriments.sh run.sh svproxy.sh specialevent.sh trade.sh twm.sh undying.sh update_check.sh multi_runner.sh twm_view.sh twm_monitor.sh twm_control.sh twm_setup.sh"
-  NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
-  LEN=0
-  for script in $SCRIPTS; do
-    LEN=$((LEN + 1))
-    printf "Checking $LEN/$NUM_SCRIPTS $script\n"
-    remote_count=$(curl "${SERVER}$script" -s -L | wc -c)
+# ─── Download helpers ─────────────────────────────────────────────────────────
 
-    if [ -e ~/twm/"$script" ]; then
-      local_count=$(wc -c <"$script")
-    else
-      local_count=1
-    fi
-
-    if [ -e ~/twm/"$script" ] && [ "$remote_count" -eq "$local_count" ]; then
-      printf "✅ ${BLACK_CYAN}File updated $script${COLOR_RESET}\n"
-    elif [ -e ~/twm/"$script" ] && [ "$remote_count" -ne "$local_count" ]; then
-      printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
-      curl "${SERVER}$script" -s -L >"$script"
-    else
-      printf "🔽 ${BLACK_YELLOW}Downloading $script${COLOR_RESET}\n"
-      curl "${SERVER}$script" -s -L -O
-    fi
-    sleep 0.1s
-  done
-  #DOS to Unix
-  find ~/twm -type f -name '*.sh' -print0 | xargs -0 sed -i 's/\r$//' 2>/dev/null
-  chmod +x ~/twm/*.sh &
-  # Ensure accounts scaffold exists and download index.json if available
-  mkdir -p ~/twm/accounts
-  if curl --silent --head --fail "${SERVER}accounts/index.json" >/dev/null 2>&1; then
-    curl "${SERVER}accounts/index.json" -s -L -o ~/twm/accounts/index.json || true
+# Download a single file; returns 0=new/updated, 1=failed, 2=unchanged
+download_file() {
+  url="$1" dest="$2"
+  tmpfile=$(mktemp /tmp/twm_XXXXXX 2>/dev/null || printf '%s' "/tmp/twm_dl_$$")
+  if ! curl "$url" -s -L -o "$tmpfile"; then
+    rm -f "$tmpfile"
+    return 1
   fi
-  # Download documentation if available
-  if curl --silent --head --fail "${SERVER}HOW_TO_MONITOR.md" >/dev/null 2>&1; then
-    curl "${SERVER}HOW_TO_MONITOR.md" -s -L -o ~/twm/HOW_TO_MONITOR.md || true
+  if [ -e "$dest" ] && cmp -s "$tmpfile" "$dest" 2>/dev/null; then
+    rm -f "$tmpfile"
+    return 2
   fi
-  if curl --silent --head --fail "${SERVER}QUICK_START.md" >/dev/null 2>&1; then
-    curl "${SERVER}QUICK_START.md" -s -L -o ~/twm/QUICK_START.md || true
-  fi
-  : > /dev/null
+  mv "$tmpfile" "$dest"
+  return 0
 }
 
+# Download documentation files
+download_docs() {
+  printf "\n${BLACK_CYAN}  📄 Documentation${COLOR_RESET}\n"
+  for doc in HOW_TO_MONITOR.md QUICK_START.md; do
+    if curl --silent --head --fail "${SERVER}${doc}" >/dev/null 2>&1; then
+      download_file "${SERVER}${doc}" ~/twm/"$doc"
+      printf "     ✅ %s\n" "$doc"
+    fi
+  done
+}
+
+# ─── Main sync (standard install) ─────────────────────────────────────────────
+sync_func() {
+  SCRIPTS="allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh check.sh \
+clancoliseum.sh clandmg.sh clanfight.sh clanid.sh coliseum.sh crono.sh \
+flagfight.sh function.sh king.sh language.sh league.sh loginlogoff.sh \
+play.sh requeriments.sh run.sh svproxy.sh specialevent.sh trade.sh twm.sh \
+undying.sh update_check.sh multi_runner.sh twm_view.sh twm_monitor.sh \
+twm_control.sh twm_setup.sh"
+
+  NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
+  LEN=0 UPDATED=0 NEW=0 OK=0 FAILED=0
+
+  printf "${BLACK_CYAN}  ⬇  Downloading scripts...${COLOR_RESET}\n\n"
+
+  for script in $SCRIPTS; do
+    LEN=$((LEN + 1))
+    label=$(printf "[%02d/%02d]" "$LEN" "$NUM_SCRIPTS")
+    existed=false
+    [ -e ~/twm/"$script" ] && existed=true
+
+    download_file "${SERVER}$script" ~/twm/"$script"
+    rc=$?
+
+    case $rc in
+      0)
+        if $existed; then
+          printf "  🔽 %s %-32s ${GREENb_BLACK}updated${COLOR_RESET}\n" "$label" "$script"
+          UPDATED=$((UPDATED + 1))
+        else
+          printf "  🆕 %s %-32s ${BLACK_YELLOW}new${COLOR_RESET}\n" "$label" "$script"
+          NEW=$((NEW + 1))
+        fi
+        ;;
+      2)
+        printf "  ✅ %s %s\n" "$label" "$script"
+        OK=$((OK + 1))
+        ;;
+      *)
+        printf "  ❌ %s %-32s ${BLACK_RED}FAILED${COLOR_RESET}\n" "$label" "$script"
+        FAILED=$((FAILED + 1))
+        ;;
+    esac
+  done
+
+  # DOS to Unix + permissions
+  find ~/twm -type f -name '*.sh' -print0 | xargs -0 sed -i 's/\r$//' 2>/dev/null
+  chmod +x ~/twm/*.sh
+
+  # Account scaffold
+  mkdir -p ~/twm/accounts
+  if curl --silent --head --fail "${SERVER}accounts/index.json" >/dev/null 2>&1; then
+    curl "${SERVER}accounts/index.json" -s -L -o ~/twm/accounts/index.json || true
+  fi
+
+  download_docs
+
+  printf "\n${BLACK_CYAN}  Summary: ✅ %d ok  🔽 %d updated  🆕 %d new  ❌ %d failed${COLOR_RESET}\n" \
+    "$OK" "$UPDATED" "$NEW" "$FAILED"
+}
+
+# ─── Merge sync (legacy single-file install) ──────────────────────────────────
 sync_func_other() {
-  SCRIPTS="requeriments.sh svproxy.sh loginlogoff.sh crono.sh check.sh run.sh clanid.sh allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh clancoliseum.sh clandungeon.sh clandmg.sh clanfight.sh coliseum.sh flagfight.sh function.sh king.sh language.sh league.sh specialevent.sh trade.sh undying.sh update_check.sh multi_runner.sh twm_view.sh twm_monitor.sh twm_control.sh"
-  curl "${SERVER}"play.sh -s -L -O
-  curl "${SERVER}"info.sh -s -L >twm.sh
-  curl "${SERVER}"twm.sh -s -L | sed -n '3,33p' >>twm.sh
+  SCRIPTS="requeriments.sh svproxy.sh loginlogoff.sh crono.sh check.sh run.sh \
+clanid.sh allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh \
+clancoliseum.sh clandungeon.sh clandmg.sh clanfight.sh coliseum.sh \
+flagfight.sh function.sh king.sh language.sh league.sh specialevent.sh \
+trade.sh undying.sh update_check.sh multi_runner.sh twm_view.sh \
+twm_monitor.sh twm_control.sh"
+
+  printf "${BLACK_CYAN}  🔁 Merge mode (legacy single-file)${COLOR_RESET}\n\n"
+
+  curl "${SERVER}play.sh" -s -L -O
+  curl "${SERVER}info.sh" -s -L >twm.sh
+  curl "${SERVER}twm.sh"  -s -L | sed -n '3,33p' >>twm.sh
+
   NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
   LEN=0
 
   for script in $SCRIPTS; do
     LEN=$((LEN + 1))
-    printf "Checking $LEN/$NUM_SCRIPTS $script\n"
-    printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
+    label=$(printf "[%02d/%02d]" "$LEN" "$NUM_SCRIPTS")
+    printf "  🔁 %s %s\n" "$label" "$script"
     curl "${SERVER}$script" -s -L >>twm.sh
     printf "\n#\n" >>twm.sh
-    sleep 0.1s
   done
-  curl "${SERVER}"twm.sh -s -L | sed -n '40,120p' >>twm.sh
 
-  #DOS to Unix
+  curl "${SERVER}twm.sh" -s -L | sed -n '40,120p' >>twm.sh
+
   find ~/twm -type f -name '*.sh' -print0 | xargs -0 sed -i 's/\r$//' 2>/dev/null
-  chmod +x ~/twm/*.sh &
+  chmod +x ~/twm/*.sh
+
   mkdir -p ~/twm/accounts
   if curl --silent --head --fail "${SERVER}accounts/index.json" >/dev/null 2>&1; then
     curl "${SERVER}accounts/index.json" -s -L -o ~/twm/accounts/index.json || true
   fi
-  # Download documentation if available
-  if curl --silent --head --fail "${SERVER}HOW_TO_MONITOR.md" >/dev/null 2>&1; then
-    curl "${SERVER}HOW_TO_MONITOR.md" -s -L -o ~/twm/HOW_TO_MONITOR.md || true
-  fi
-  if curl --silent --head --fail "${SERVER}QUICK_START.md" >/dev/null 2>&1; then
-    curl "${SERVER}QUICK_START.md" -s -L -o ~/twm/QUICK_START.md || true
-  fi
-  : > /dev/null
+
+  download_docs
 }
 
 #/merge
@@ -237,96 +211,55 @@ else
   sync_func
 fi
 
+# ─── Shell shortcut ───────────────────────────────────────────────────────────
 check_if_exists() {
-  config_file="$1"
-  grep -q 'play-twm' "$config_file" 2>/dev/null
+  grep -q 'play-twm' "$1" 2>/dev/null
 }
 
-shortcut_set(){
-  # Define a função play-twm e o comando a ser adicionado
+shortcut_set() {
   function_definition='play-twm() { $HOME/twm/play.sh "$@"; }'
- # Função para verificar se o atalho já está configurado
 
-# Detecta o sistema operacional e adiciona o comando no arquivo correto
-case "$(uname)" in
+  case "$(uname)" in
     "Linux")
-        # Verifica a distribuição e o shell em uso
-        if grep -qiE 'debian|ubuntu|mint' /etc/os-release; then
-            config_file="$HOME/.bashrc"
-        
-        elif grep -qiE 'arch|manjaro' /etc/os-release; then
-            config_file="$HOME/.bashrc"
+      if [ "$SHELL" = "/bin/ash" ] || [ -e /etc/alpine-release ]; then
+        config_file="$HOME/.profile"
+      elif [ -n "$ZSH_VERSION" ]; then
+        config_file="$HOME/.zshrc"
+      else
+        config_file="$HOME/.bashrc"
+      fi
 
-        elif grep -qi 'fedora' /etc/os-release; then
-            config_file="$HOME/.bashrc"
-
-        elif grep -qi 'termux' /etc/os-release; then
-            config_file="$HOME/.bashrc"
-            
-        elif [ "$SHELL" = "/bin/ash" ]; then
-            config_file="$HOME/.profile"
-
-        else
-            # Se o shell for diferente (zsh, etc.), tenta adicionar no .zshrc
-            if [ -n "$ZSH_VERSION" ]; then
-                config_file="$HOME/.zshrc"
-            else
-                config_file="$HOME/.bashrc"
-            fi
-        fi
-
-        # Verifica se a função já está presente no arquivo de configuração
-        if check_if_exists "$config_file"; then
-            echo "O atalho 'play-twm' já está configurado em $config_file. Pulando a configuração."
-        else
-            # Adiciona a função e exporta
-            echo "$function_definition" >> "$config_file"
-            echo 'export -f play-twm' >> "$config_file"
-            echo "Atalho 'play-twm' configurado com sucesso em $config_file!"
-            # Recarrega o arquivo de configuração para que a função fique disponível imediatamente
-            # shellcheck disable=SC1090
-            . "$config_file"
-        fi
-        ;;
+      if check_if_exists "$config_file"; then
+        printf "\n  ✅ Shortcut ${GOLD_BLACK}play-twm${COLOR_RESET} already set in %s\n" "$config_file"
+      else
+        printf '%s\n'       "$function_definition" >> "$config_file"
+        printf 'export -f play-twm\n'              >> "$config_file"
+        printf "\n  ✅ Shortcut ${GOLD_BLACK}play-twm${COLOR_RESET} added to %s\n" "$config_file"
+        # shellcheck disable=SC1090
+        . "$config_file" 2>/dev/null || true
+      fi
+      ;;
     *)
-        echo "Sistema operacional não suportado ou desconhecido."
-        exit 1
-        ;;
-esac
+      printf "\n  ⚠️  Add manually to your shell config: %s\n" "$function_definition"
+      ;;
+  esac
 }
 shortcut_set
 
-resolve_default_account(){
-  if [ -n "$ACCOUNT_ID" ]; then
-    printf '%s\n' "$ACCOUNT_ID"
-    return
-  fi
-  index_file="$HOME/twm/accounts/index.json"
-  if command -v jq >/dev/null 2>&1 && [ -f "$index_file" ]; then
-    jq -r '(.defaultAccount // empty)' "$index_file" 2>/dev/null | head -n 1
-  fi
-}
-
-run_with_account(){
-  mode="$1"
-  if [ -n "$default_account" ]; then
-    ACCOUNT_ID="$default_account" "$HOME/twm/play.sh" "$mode"
-  else
-    "$HOME/twm/play.sh" "$mode"
-  fi
-}
-
+# iSH: rewrite shebang for compatibility
 APPISH=$(uname -a | grep -o "\-ish")
 if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = '-ish' ]; then
   sed -i 's,#!/bin/bash,#!/bin/sh,g' "$HOME"/twm/*.sh
 fi
+unset APPISH
 
-script_slogan
-printf "✅ ${BLACK_CYAN}Updated scripts!${COLOR_RESET}\n\
-To execute, you can use the shortcut command: ${GOLD_BLACK}play-twm${COLOR_RESET}\n\
-Or, alternatively, run: ${GOLD_BLACK}./twm/play.sh${COLOR_RESET}\n\
-       For coliseum, use: ${GOLD_BLACK}play-twm -cl${COLOR_RESET} or ${GOLD_BLACK}./twm/play.sh -cl${COLOR_RESET}\n\
-           For cave, use: ${GOLD_BLACK}play-twm -cv${COLOR_RESET} or ${GOLD_BLACK}./twm/play.sh -cv${COLOR_RESET}\n"
-
-# Do NOT auto-restart - let user decide when to restart
-# The update process should only update files, not force a restart
+# ─── Done ─────────────────────────────────────────────────────────────────────
+printf "\n${BLACK_CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${COLOR_RESET}\n"
+printf "${GREENb_BLACK}  ✅  Installation complete!${COLOR_RESET}\n"
+printf "${BLACK_CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${COLOR_RESET}\n\n"
+printf "  Start bot:      ${GOLD_BLACK}play-twm${COLOR_RESET}\n"
+printf "  Coliseum:       ${GOLD_BLACK}play-twm -cl${COLOR_RESET}\n"
+printf "  Cave:           ${GOLD_BLACK}play-twm -cv${COLOR_RESET}\n"
+printf "  Multi-account:  ${GOLD_BLACK}./twm/multi_runner.sh start${COLOR_RESET}\n"
+printf "  Monitor:        ${GOLD_BLACK}./twm/twm_monitor.sh${COLOR_RESET}\n"
+printf "  Setup account:  ${GOLD_BLACK}./twm/twm_setup.sh${COLOR_RESET}\n\n"
