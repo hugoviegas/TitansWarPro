@@ -113,7 +113,7 @@ clan_allies() {
 
 conf_allies() {
     cd "$TMP" || exit  # Change to the temporary directory
-    clear
+    [ -t 1 ] && clear
 
     # Exibe o cabeçalho da seção de configuração de aliados
     echo_t "The script will consider users on your friends list and Clan as allies. Leader on friend list will add Clan allies." "$BLACK_CYAN" "$COLOR_RESET"
@@ -184,7 +184,7 @@ conf_allies() {
             : >> "$TMP/callies.txt"
             ;;
         *)
-            clear
+            [ -t 1 ] && clear
             if [ -n "$AL" ]; then
                 echo_t "Invalid option: " "" "$AL"
                 kill -9 $$

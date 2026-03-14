@@ -89,7 +89,7 @@ altars_fight () {
  apply_event
  echo_t "Altars" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
  sleep 10s
- clear
+ [ -t 1 ] && clear
 }
 altars_start () {
  case $(date +%H:%M) in

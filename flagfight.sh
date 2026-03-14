@@ -87,7 +87,7 @@ flagfight_fight() {
   apply_event flagfight
   echo_t "Flagfight" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
   sleep 10s
-  clear
+  [ -t 1 ] && clear
   rm -rf "$tmp_ram"
   rm -f "$src_ram" "$full_ram"
   unset dir_ram tmp_ram src_ram full_ram ACCESS cf_access

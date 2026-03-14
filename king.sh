@@ -117,7 +117,7 @@ king_fight () {
  apply_event
  echo -e "${RED_BLACK}👑King ✅${COLOR_RESET}"
  sleep 10s
- clear
+ [ -t 1 ] && clear
 }
 king_start () {
  case $(date +%H:%M) in

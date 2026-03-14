@@ -91,7 +91,7 @@ clancoliseum_fight() {
   #/end
   echo_t "Clancoliseum" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
   sleep 10s
-  clear
+  [ -t 1 ] && clear
 }
 
  clancoliseum_start() {
