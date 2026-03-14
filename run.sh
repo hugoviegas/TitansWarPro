@@ -87,9 +87,8 @@ twm_play() {
                 coliseum_start
                 messages_info  # Call to gather message information.
             fi
-            
-            func_sleep   # Call sleep function.
-            func_crono   # Call cron function.
+
+            func_sleep   # Call sleep function → calls func_cat → calls func_crono (once)
             ;;
     esac
 

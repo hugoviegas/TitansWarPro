@@ -36,6 +36,14 @@ func_cat() {
     # Guard: ensure $i is a positive integer — prevents infinite CPU spin if unset
     [[ "$i" =~ ^[0-9]+$ ]] && [ "$i" -gt 0 ] || i=60
 
+    # Detect interactive vs background mode
+    # [ -t 0 ] = true if fd 0 (stdin) is connected to a terminal
+    local _interactive=0
+    [ -t 0 ] && _interactive=1
+
+    # Track last time check to detect event transitions during idle
+    local _last_time_check="${HOUR}:${MIN}"
+
     while true; do
 
         # Check for a queued command written by the monitor
@@ -47,30 +55,62 @@ func_cat() {
             # Show prompts once per wait interval (not every second)
             if [ "$i" != "$_last_i" ]; then
                 echo_t "No battles now, waiting ${i}s" "\033[02m" "${COLOR_RESET}"
-                echo_t "Enter a command or for more info enter:" "${WHITE_BLACK}" "info or config${COLOR_RESET}"
+                echo_t "Enter a command (or ${GOLD_BLACK}stop${COLOR_RESET}|x to stop):" "${WHITE_BLACK}" "${COLOR_RESET}"
                 _last_i="$i"
             fi
 
-            # Always use read with timeout:
-            # - Interactive terminal: returns immediately when user types + presses Enter
-            # - Background (stdin=/dev/null): times out quickly, then checks cmd_file
-            # No busy-wait because outer loop in twm.sh has `sleep 1s` floor
-            read -r -t "$i" cmd || cmd=""
+            # Two paths:
+            # - Interactive terminal (stdin is real): read blocks waiting for user
+            # - Background mode (stdin=/dev/null): sleep full interval, then check
+            if [ "$_interactive" -eq 1 ]; then
+                # Interactive: user can type commands, returns immediately on Enter
+                read -r -t "$i" cmd || cmd=""
+            else
+                # Background mode: actually sleep the full timeout
+                sleep "$i"
+
+                # After sleep, check if time changed (new event may be due)
+                local _current_time
+                printf -v _current_time '%(%H:%M)T' -1
+                if [ "$_current_time" != "$_last_time_check" ]; then
+                    # Time changed → break and let twm_play re-evaluate
+                    break
+                fi
+
+                # Check if command was queued to cmd_file during sleep
+                if [ -s "$cmd_file" ]; then
+                    cmd=$(cat "$cmd_file")
+                    : > "$cmd_file"
+                else
+                    cmd=""
+                fi
+            fi
         fi
 
-        if [ "$cmd" = " " ]; then
-            break  # Exit loop if only space is entered
-        fi
+        # Handle stop/exit commands (any mode)
+        case "$cmd" in
+            stop|exit|parar|q|x)
+                echo_t "Stopping macro..." "\033[01;31m" "${COLOR_RESET}"
+                exit 0
+                ;;
+            " ")
+                # Single space = exit func_cat (existing behavior)
+                break
+                ;;
+            "")
+                # Empty command (timeout in interactive, or normal idle after sleep in background)
+                # Don't execute anything, just continue waiting
+                continue
+                ;;
+        esac
 
         printf "\n"
 
-        # Lista de comandos que não interrompem o loop
+        # Execute user command
         commands_no_break=("config" "requer_func")
-
-        # Executa o comando
         $cmd
 
-        # Checa se o comando está na lista de comandos que não requerem break
+        # Check if command should continue loop or break
         # shellcheck disable=SC2076
         # shellcheck disable=SC2199
         if [[ " ${commands_no_break[@]} " =~ " ${cmd} " ]]; then
@@ -78,7 +118,7 @@ func_cat() {
             sleep 0.5s
             continue
         else
-            break  # Sai do loop para comandos que não estão na lista
+            break  # Exit func_cat for other commands
         fi
     done
 }

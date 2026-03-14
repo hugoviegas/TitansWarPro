@@ -186,13 +186,13 @@ load_config() {
             FUNC_play_league=999
             FUNC_clan_figth="y"
             FUNC_collect_mission_rewards="n"
-            FUNC_pause_weekends="n"
+            FUNC_pause_weekends="y"
             FUNC_auto_events="y"
             FUNC_clan_missions="n"
             FUNC_clan_statue="y"
             FUNC_cave_boost="y"
             LANGUAGE="en"
-            ALLIES=""
+            ALLIES="4"
             SCRIPT_PAUSED="n"
 
             {
@@ -210,7 +210,7 @@ load_config() {
             echo "FUNC_cave_boost=$FUNC_cave_boost"
             echo "SCRIPT_PAUSED=$SCRIPT_PAUSED"
             echo "LANGUAGE=$LANGUAGE"
-            echo "ALLIES="
+            echo "ALLIES=$ALLIES"
             } > "$CONFIG_FILE"
         }
         default_config
