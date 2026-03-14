@@ -325,6 +325,29 @@ update_script_interactive() {
     printf "╚════════════════════════════════════════════════════╝\n"
     printf "${COLOR_RESET}\n"
 
+    # Ask user which branch to download
+    printf "${GREENb_BLACK}Select update branch:${COLOR_RESET}\n\n"
+    printf "  1) Master (stable release)\n"
+    printf "  2) Beta (pre-release testing)\n"
+    printf "  3) Beta2 (development branch)\n"
+    printf "  4) Other (delete all and reinstall)\n\n"
+    printf "${GOLD_BLACK}Choose [1-4]:${COLOR_RESET} "
+    read -r branch_choice
+
+    case "$branch_choice" in
+        1) branch_num="1"; branch_name="Master" ;;
+        2) branch_num="2"; branch_name="Beta" ;;
+        3) branch_num="3"; branch_name="Beta2" ;;
+        4) branch_num="4"; branch_name="Other" ;;
+        *)
+            printf "${RED_BLACK}Invalid selection.${COLOR_RESET}\n"
+            sleep 1
+            return
+            ;;
+    esac
+
+    printf "\n${GREENb_BLACK}Selected branch: ${GOLD_BLACK}${branch_name}${COLOR_RESET}\n\n"
+
     # Show currently running accounts
     printf "${GREENb_BLACK}Active accounts:${COLOR_RESET}\n"
     running_count=0
@@ -373,12 +396,13 @@ update_script_interactive() {
         fi
     fi
 
-    # Run the update script
-    printf "\n${BLACK_CYAN}$(translate "update_running")${COLOR_RESET}\n\n"
+    # Run the update script with selected branch
+    printf "\n${BLACK_CYAN}$(translate "update_running")${COLOR_RESET}\n"
+    printf "Updating from ${GOLD_BLACK}${branch_name}${COLOR_RESET} branch...\n\n"
 
     if [ -f "$BASE_DIR/update.sh" ]; then
-        # Run update.sh with master branch selection (non-interactive)
-        cd "$BASE_DIR" && bash ./update.sh 3 2>&1 | head -50
+        # Run update.sh with selected branch (pass the branch number as argument)
+        cd "$BASE_DIR" && bash ./update.sh "$branch_num" 2>&1 | head -50
         printf "\n${GREENb_BLACK}$(translate "update_complete")${COLOR_RESET}\n"
     else
         printf "${RED_BLACK}Error: update.sh not found${COLOR_RESET}\n"
