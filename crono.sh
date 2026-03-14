@@ -21,7 +21,7 @@ func_cat() {
     #  - INTERACTIVE (play.sh A1): stdin is a real terminal, user types commands
     #  - BACKGROUND (multi_runner.sh): stdin is /dev/null, commands via twm_monitor.sh [C]
     #
-    # Available commands: config, info, requer_func, stop|exit|parar|q|x
+    # Available commands: config (change config), requer_func (reconfigure), stop|exit|parar|q|x (quit)
     #
     # Important: This function only executes during IDLE time. When a game event
     # is running (arena, cave, coliseum, etc), you cannot send commands until
@@ -35,13 +35,6 @@ func_cat() {
     # Read file without forking cat — bash $(<file) reads directly, no subprocess
     [[ -s "$TMP/msg_file" ]] && printf '%s\n' "$(<"$TMP/msg_file")"
     printf "\033[0m"
-
-    info() {
-        printf "\n"
-        # List functions defined in scripts
-        grep -o -E '[[:alpha:]]+?[_]?[[:alpha:]]+?[ ]?\() \{' ~/twm/*.sh | awk -F\: '{ print $2 }' | awk -F \( '{ print $1 }'
-        read -r -t 30  # Wait for user input for 5 seconds
-    }
 
     local cmd_file="${ACCOUNT_ROOT:-$HOME/twm}/cmd_file"
 
@@ -69,10 +62,10 @@ func_cat() {
                 echo_t "No battles now, waiting ${i}s" "\033[02m" "${COLOR_RESET}"
                 if [ "$_interactive" -eq 1 ]; then
                     # Interactive mode: user can type directly
-                    echo_t "Commands: ${GOLD_BLACK}config${COLOR_RESET} ${GOLD_BLACK}info${COLOR_RESET} ${GOLD_BLACK}requer_func${COLOR_RESET} ${GOLD_BLACK}stop${COLOR_RESET}" "${WHITE_BLACK}" "${COLOR_RESET}"
+                    echo_t "Commands: ${GOLD_BLACK}config${COLOR_RESET} ${GOLD_BLACK}requer_func${COLOR_RESET} ${GOLD_BLACK}stop${COLOR_RESET}" "${WHITE_BLACK}" "${COLOR_RESET}"
                 else
                     # Background mode: use monitor to send commands
-                    echo_t "Use ${GOLD_BLACK}twm_monitor.sh${COLOR_RESET} [C] to send commands (config, info, requer_func, stop)" "${WHITE_BLACK}" "${COLOR_RESET}"
+                    echo_t "Use ${GOLD_BLACK}twm_monitor.sh${COLOR_RESET} [C] to send: config, requer_func, stop" "${WHITE_BLACK}" "${COLOR_RESET}"
                 fi
                 _last_i="$i"
             fi
@@ -136,7 +129,7 @@ func_cat() {
                     printf "\033[01;31mError executing '${cmd}': $(cat /tmp/cmd_error.txt | head -1)\033[0m\n"
                 else
                     printf "\033[01;31mCommand not found or failed: ${cmd}\033[0m\n"
-                    printf "\033[02mAvailable: config, info, requer_func, stop\033[0m\n"
+                    printf "\033[02mAvailable: config, requer_func, stop\033[0m\n"
                 fi
                 rm -f /tmp/cmd_error.txt
             fi
