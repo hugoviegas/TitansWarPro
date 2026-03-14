@@ -4,6 +4,10 @@
 BASE_DIR="${HOME}/twm"
 ACCOUNTS_DIR="${BASE_DIR}/accounts"
 INDEX_FILE="${ACCOUNTS_DIR}/index.json"
+CONTROL_CFG="${BASE_DIR}/control.cfg"
+
+# Load saved language preference (overrides env default)
+[ -f "$CONTROL_CFG" ] && . "$CONTROL_CFG" 2>/dev/null
 LANGUAGE="${LANGUAGE:-en}"
 
 colors() {
@@ -53,6 +57,8 @@ translate() {
                 "select_account") echo "Selecione uma conta:" ;;
                 "which_account_stop") echo "Qual conta deseja parar?" ;;
                 "goodbye") echo "Até logo!" ;;
+                "change_language") echo "Alterar idioma (atual: PT)" ;;
+                "language_saved") echo "Idioma salvo:" ;;
                 *) echo "$key" ;;
             esac
             ;;
@@ -85,6 +91,8 @@ translate() {
                 "select_account") echo "Select an account:" ;;
                 "which_account_stop") echo "Which account to stop?" ;;
                 "goodbye") echo "Goodbye!" ;;
+                "change_language") echo "Change language (current: EN)" ;;
+                "language_saved") echo "Language saved:" ;;
                 *) echo "$key" ;;
             esac
             ;;
@@ -158,7 +166,8 @@ display_menu() {
     printf "${GREENb_BLACK}$(translate "setup_config")${COLOR_RESET}\n"
     printf "  9) $(translate "add_account")\n"
     printf "  A) $(translate "edit_account")\n"
-    printf "  R) $(translate "remove_account")\n\n"
+    printf "  R) $(translate "remove_account")\n"
+    printf "  G) $(translate "change_language")\n\n"
 
     printf "${GREENb_BLACK}$(translate "help_info")${COLOR_RESET}\n"
     printf "  H) $(translate "show_guide")\n"
@@ -238,6 +247,28 @@ remove_account_interactive() {
     }
 }
 
+change_language_interactive() {
+    clear
+    printf "${GREENb_BLACK}Language / Idioma${COLOR_RESET}\n\n"
+    printf "  1) English (en)\n"
+    printf "  2) Português (pt)\n\n"
+    printf "${GOLD_BLACK}Select [1-2]:${COLOR_RESET} "
+    read -r sel
+    local new_lang=""
+    case "$sel" in
+        1) new_lang="en" ;;
+        2) new_lang="pt" ;;
+        *) printf "${RED_BLACK}Invalid selection.${COLOR_RESET}\n"
+           read -rp "Press Enter..."
+           return ;;
+    esac
+    # Save to control.cfg so it persists across sessions
+    printf 'LANGUAGE=%s\n' "$new_lang" > "$CONTROL_CFG"
+    LANGUAGE="$new_lang"
+    printf "${GREENb_BLACK}$(translate "language_saved") %s${COLOR_RESET}\n" "$new_lang"
+    sleep 1
+}
+
 main() {
     while true; do
         display_menu
@@ -296,6 +327,9 @@ main() {
                 ;;
             r|R)
                 remove_account_interactive
+                ;;
+            g|G)
+                change_language_interactive
                 ;;
             h|H)
                 show_guide

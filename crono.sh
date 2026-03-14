@@ -1,12 +1,14 @@
 # shellcheck disable=SC2154
 # shellcheck disable=SC2317
 func_crono() {
-    # Get current hour and minute, removing leading zeros
-    HOUR=$(date +%H | sed 's/^0//')
-    MIN=$(date +%M | sed 's/^0//')
-
-    # Format and print the time
-    echo -e " \033[02m$URL ⏰ $(date +%H):$(date +%M)${COLOR_RESET}"
+    # Use bash printf builtin for time — no date/sed subprocess forks
+    local h m
+    printf -v h '%(%H)T' -1
+    printf -v m '%(%M)T' -1
+    # Set global HOUR/MIN as plain integers (no leading zeros) for func_sleep arithmetic
+    HOUR=$((10#$h))
+    MIN=$((10#$m))
+    printf " \033[02m%s ⏰ %s:%s\033[0m\n" "$URL" "$h" "$m"
 }
 
 # Global flag to track if we've already shown idle status (reduce spam)
@@ -15,11 +17,11 @@ declare -g _last_i=-1
 func_cat() {
     func_crono
 
-    # Use consistent white color — no time-based color changes that cause flicker
-    printf "${WHITE_BLACK}"
+    # Reset all attributes before content — ensures dim mode from func_crono doesn't bleed
+    printf "\033[0m"
 
     cat "$TMP/msg_file"
-    printf "${COLOR_RESET}"
+    printf "\033[0m"
 
     info() {
         printf "\n"
@@ -29,6 +31,9 @@ func_cat() {
     }
 
     local cmd_file="${ACCOUNT_ROOT:-$HOME/twm}/cmd_file"
+
+    # Guard: ensure $i is a positive integer — prevents infinite CPU spin if unset
+    [[ "$i" =~ ^[0-9]+$ ]] && [ "$i" -gt 0 ] || i=60
 
     while true; do
 
@@ -41,7 +46,7 @@ func_cat() {
             # Show prompts once per wait interval (not every second)
             if [ "$i" != "$_last_i" ]; then
                 echo_t "No battles now, waiting ${i}s" "\033[02m" "${COLOR_RESET}"
-                echo_t "Enter a command or for more info enter:" "${WHITEb_BLACK}" "info or config${COLOR_RESET}"
+                echo_t "Enter a command or for more info enter:" "${WHITE_BLACK}" "info or config${COLOR_RESET}"
                 _last_i="$i"
             fi
             read -r -t "$i" cmd  # Read user command with a timeout
@@ -60,6 +65,8 @@ func_cat() {
         $cmd
 
         # Checa se o comando está na lista de comandos que não requerem break
+        # shellcheck disable=SC2076
+        # shellcheck disable=SC2199
         if [[ " ${commands_no_break[@]} " =~ " ${cmd} " ]]; then
             # Pausa breve antes de continuar o loop
             sleep 0.5s

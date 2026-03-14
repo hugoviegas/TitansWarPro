@@ -5,6 +5,7 @@
 #   - Renders immediately when log grows (battles: rapid; idle: ~60s natural pause)
 #   - Forces a status check every 60s even when log is quiet
 #   - Follow mode: tail -f live stream, Ctrl+C returns to monitor
+shopt -s extglob
 
 BASE_DIR="${HOME}/twm"
 ACCOUNTS_DIR="${BASE_DIR}/accounts"
@@ -20,6 +21,8 @@ current_index=1
 force_render=1
 TERM_COLS=80
 TERM_LINES=24
+_hline_cache=""
+_hline_cols=0
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 fatal()   { printf "twm_monitor: %s\n" "$*" >&2; exit 1; }
@@ -58,9 +61,14 @@ update_term_size() {
 }
 
 hline() {
-  printf '\033[1;36m'
-  printf '─%.0s' $(seq 1 "$TERM_COLS")
-  printf '\033[0m\n'
+  # Rebuild cache only when terminal width changes (no seq subprocess)
+  if [ "$TERM_COLS" != "$_hline_cols" ]; then
+    local i=0 line=""
+    for ((i=0; i<TERM_COLS; i++)); do line+="─"; done
+    _hline_cache=$'\033[1;36m'"${line}"$'\033[0m'
+    _hline_cols="$TERM_COLS"
+  fi
+  printf '%s\n' "$_hline_cache"
 }
 
 state_fmt() {   # usage: state_fmt RUNNING  → outputs color+dot+state+reset
@@ -93,7 +101,7 @@ draw_top_bar() {
   hline
   printf ' '
   local i
-  for i in $(seq 1 "$account_count"); do
+  for ((i=1; i<=account_count; i++)); do
     local id="${account_ids[$i]}"
     local alias="${account_aliases[$i]}"
     local info; info=$(get_status "$id")
@@ -120,6 +128,7 @@ draw_top_bar() {
 }
 
 draw_account_header() {
+  local passed_tail="${1:-}"   # cur_tail already read in main loop — no extra tail fork
   local id="${account_ids[$current_index]}"
   local alias="${account_aliases[$current_index]}"
   local info; info=$(get_status "$id")
@@ -127,13 +136,11 @@ draw_account_header() {
   local pid;   pid="${info#*|}"; pid="${pid%|*}"
   local mode;  mode="${info##*|}"
   local sfmt;  sfmt=$(state_fmt "$state")
-  local log_file="${ACCOUNTS_DIR}/${id}/logs/twm.log"
 
-  # Show age of last log entry (when was the macro last active?)
+  # Extract timestamp from the already-read tail line (no extra subprocess)
   local last_ts=""
-  if [ -f "$log_file" ]; then
-    last_ts=$(tail -1 "$log_file" 2>/dev/null | grep -oE '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}')
-    [ -n "$last_ts" ] && last_ts=" | last: \033[0;37m${last_ts}\033[0m"
+  if [ -n "$passed_tail" ] && [[ "$passed_tail" =~ ^([0-9]{4}-[0-9]{2}-[0-9]{2}\ [0-9]{2}:[0-9]{2}:[0-9]{2}) ]]; then
+    last_ts=" | last: \033[0;37m${BASH_REMATCH[1]}\033[0m"
   fi
 
   printf " \033[1;33m▶ %s\033[0m \033[0;37m(%s)\033[0m  %b  pid:\033[1;33m%s\033[0m  mode:\033[1;33m%s\033[0m%b  \033[0;36m[%d/%d]\033[0m\n" \
@@ -160,10 +167,11 @@ draw_log() {
 }
 
 render() {
+  local cur_tail="${1:-}"
   update_term_size
   printf '\033[2J\033[H'   # clear entire screen THEN cursor home (correct order)
   draw_top_bar
-  draw_account_header
+  draw_account_header "$cur_tail"
   # Use 'cat' instead of 'tail' to avoid substring re-reading when scrolling
   # This reduces visual updates and flickering
   draw_log
@@ -213,7 +221,7 @@ list_select() {
   hline
 
   local i
-  for i in $(seq 1 "$account_count"); do
+  for ((i=1; i<=account_count; i++)); do
     local id="${account_ids[$i]}"
     local alias="${account_aliases[$i]}"
     local info; info=$(get_status "$id")
@@ -291,17 +299,15 @@ interactive_monitor() {
   stty -icanon -echo min 0 time 0 2>/dev/null
   printf '\033[?25l'
 
-  local last_log_lines=-1
   local last_log_tail=""
-  local last_status_time=0
   local render_cooldown=0
   local poll_timeout=2    # Wait 2 seconds for keyboard input before checking again
+  local idle_iters=0      # Iteration counter (replaces date +%s — no subprocess)
+  local status_interval   # Approx 60s: recalculated when poll_timeout changes
 
   while true; do
     local id="${account_ids[$current_index]}"
     local log_file="${ACCOUNTS_DIR}/${id}/logs/twm.log"
-    local now; now=$(date +%s 2>/dev/null || echo 0)
-    local age=$((now - last_status_time))
 
     # Reset state when exiting interactive functions (follow_mode, list_select, send_command)
     # or when first run (force_render already set to 1 at startup)
@@ -318,21 +324,30 @@ interactive_monitor() {
       poll_timeout=2   # Normal polling speed
     fi
 
+    # Status interval: approx 60s (30 iters × 2s  or  12 iters × 5s)
+    status_interval=$(( 60 / (poll_timeout > 0 ? poll_timeout : 1) ))
+
+    # Increment idle counter; force render every ~60s without spawning date
+    idle_iters=$((idle_iters + 1))
+    if [ "$idle_iters" -ge "$status_interval" ]; then
+      idle_iters=0
+      force_render=1
+    fi
+
     # Get last line of log — detects meaningful changes (new action/event)
-    # Trim trailing whitespace/newlines to avoid false change detection
+    # Trim trailing whitespace using bash extglob — no sed subprocess
     local cur_tail=""
     if [ -f "$log_file" ]; then
       cur_tail=$(tail -1 "$log_file" 2>/dev/null)
-      # Remove trailing whitespace for accurate comparison (use sed instead of complex expansion)
-      cur_tail=$(printf '%s' "$cur_tail" | sed 's/[[:space:]]*$//')
+      cur_tail="${cur_tail%%+([[:space:]])}"
     fi
 
-    # Re-render when: last line changed, forced, or 60s status interval
+    # Re-render when: last line changed, forced, or status interval
     # Add cooldown to prevent excessive renders even if logs change frequently
-    if [ "$render_cooldown" -eq 0 ] && ([ "$cur_tail" != "$last_log_tail" ] || [ "$force_render" -eq 1 ] || [ "$age" -ge 60 ]); then
-      render
+    if [ "$render_cooldown" -eq 0 ] && ([ "$cur_tail" != "$last_log_tail" ] || [ "$force_render" -eq 1 ]); then
+      render "$cur_tail"
       last_log_tail="$cur_tail"
-      last_status_time="$now"
+      idle_iters=0
       force_render=0
       render_cooldown=3   # cooldown: 3 seconds before next allowed render
     fi
@@ -382,7 +397,8 @@ show_status() {
   require_jq
   [ -f "$INDEX_FILE" ] || fatal "missing $INDEX_FILE"
   printf '\n %-6s %-12s %-8s %-8s %s\n' "ID" "Status" "Mode" "PID" "Alias"
-  printf ' %s\n' "$(printf '─%.0s' $(seq 1 55))"
+  local sep; sep=$(printf '%55s' '' | tr ' ' '─')
+  printf ' %s\n' "$sep"
   while IFS=$'\t' read -r id alias; do
     IFS='|' read -r state pid mode <<< "$(get_status "$id")"
     local sfmt; sfmt=$(state_fmt "$state")

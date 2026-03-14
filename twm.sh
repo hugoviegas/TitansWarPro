@@ -68,11 +68,11 @@ cd ~/twm || exit
 #/functions
 twm_start() {
     # Determine which action to start based on the RUN variable
-    if echo "$RUN" | grep -q -E '[-]cv'; then
+    if [[ "$RUN" =~ [-]cv ]]; then
         cave_start  # Start the cave function if in cave mode
-    elif echo "$RUN" | grep -q -E '[-]cl'; then
+    elif [[ "$RUN" =~ [-]cl ]]; then
         twm_play  # Start the main game loop if in clan mode
-    elif echo "$RUN" | grep -q -E '[-]boot'; then
+    elif [[ "$RUN" =~ [-]boot ]]; then
         twm_play  # Start the main game loop if in boot mode
     else
         twm_play  # Default action is to start the main game loop
@@ -138,6 +138,6 @@ messages_info
 
 # Main loop to continuously start the game based on current mode
 while true; do
-    #sleep 1s  # Wait for one second between iterations
+    sleep 1s  # Safety floor — prevents instant spin if twm_start exits early
     twm_start  # Call the twm_start function to determine next action
 done

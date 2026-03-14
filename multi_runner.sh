@@ -142,6 +142,7 @@ ACCOUNT_ALIAS=$alias_literal
 AUTO_RESTART=$autorestart_literal
 ACCOUNT_LABEL=$id_literal
 child_pid=""
+restart_delay=5
 trap 'if [ -n "\$child_pid" ]; then kill "\$child_pid" 2>/dev/null; wait "\$child_pid" 2>/dev/null || true; fi; exit 0' INT TERM
 while true; do
   cd "\$BASE_DIR" || exit 1
@@ -155,7 +156,9 @@ while true; do
   if [ "\$AUTO_RESTART" != "true" ]; then
     exit "\$exit_code"
   fi
-  sleep 5
+  # Exponential backoff: 5s → 10s → 20s → 40s → 60s max (resets on long uptime)
+  sleep "\$restart_delay"
+  restart_delay=\$(( restart_delay * 2 > 60 ? 60 : restart_delay * 2 ))
 done
 EOF
 
