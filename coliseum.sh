@@ -128,14 +128,14 @@ coliseum_debug() {
     } > "$debug_file"
 
     # ── Terminal: pre-battle config panel ────────────────────────────────
-    printf '\n%b\n' "  ${GOLD_BLACK}╔══════════════════════════════════════╗${COLOR_RESET}"
-    printf '%b\n' "  ${GOLD_BLACK}║     COLISEUM  DEBUG  MODE  ⚔️         ║${COLOR_RESET}"
-    printf '%b\n' "  ${GOLD_BLACK}╠══════════════════════════════════════╣${COLOR_RESET}"
-    printf "%b\n" "  ${GOLD_BLACK}║ LA: ${LA}s  HPER: ${HPER}%  RPER: ${RPER}%        ║${COLOR_RESET}"
+    printf "\n  ${GOLD_BLACK}╔══════════════════════════════════════╗${COLOR_RESET}\n"
+    printf "  ${GOLD_BLACK}║     COLISEUM  DEBUG  MODE  ⚔️         ║${COLOR_RESET}\n"
+    printf "  ${GOLD_BLACK}╠══════════════════════════════════════╣${COLOR_RESET}\n"
+    printf "  ${GOLD_BLACK}║ LA: %-5.1f  HPER: %-3d%%  RPER: %-3d%%         ║${COLOR_RESET}\n" "$LA" "$HPER" "$RPER"
     local _wr=0
     [ "$cl_total_matches" -gt 0 ] && _wr=$(awk -v w="$cl_wins" -v t="$cl_total_matches" 'BEGIN{printf"%.0f",w/t*100}')
-    printf "%b\n" "  ${GOLD_BLACK}║ Stats: ${GREEN_BLACK}W:${cl_wins}${GOLD_BLACK} ${RED_BLACK}L:${cl_losses}${GOLD_BLACK} (${_wr}%)  ${GREEN_BLACK}Streak:${cl_current_win_streak}${GOLD_BLACK}${COLOR_RESET}"
-    printf '%b\n' "  ${GOLD_BLACK}╚══════════════════════════════════════╝${COLOR_RESET}"
+    printf "  ${GOLD_BLACK}║ Stats: ${GREEN_BLACK}W:%-3d${GOLD_BLACK} ${RED_BLACK}L:%-3d${GOLD_BLACK} (%-2d%%)  ${GREEN_BLACK}Streak:%-3d${GOLD_BLACK} ║${COLOR_RESET}\n" "$cl_wins" "$cl_losses" "$_wr" "$cl_current_win_streak"
+    printf "  ${GOLD_BLACK}╚══════════════════════════════════════╝${COLOR_RESET}\n"
 
     # ── Get max HP from /train ────────────────────────────────────────────
     (
@@ -147,7 +147,7 @@ coliseum_debug() {
     time_exit 20
     local _dbg_maxhp
     _dbg_maxhp=$(cat "$full_ram" 2>/dev/null)
-    printf "%b\n" "  ${GRAY_BLACK}Max HP: ${_dbg_maxhp:-?}${COLOR_RESET}"
+    printf "  ${GRAY_BLACK}Max HP: %-6d${COLOR_RESET}\n" "$_dbg_maxhp"
     printf '\n--- MAX HP ---\nMax HP: %s\n' "$_dbg_maxhp" >> "$debug_file"
 
     # Set graphics to 0 for clean HTML
@@ -465,17 +465,19 @@ coliseum_debug() {
             && _dbg_grass_st="${GREEN_BLACK}READY${COLOR_RESET}" \
             || _dbg_grass_st="${GRAY_BLACK}USED${COLOR_RESET}"
 
-        printf "\n%b\n" "  ${GOLD_BLACK}══ DEBUG BATTLE ${_dbg_min}m${_dbg_sec}s (loop #${_dbg_loop}) ══${COLOR_RESET}"
-        printf "%b" "  ${_dbg_hcol}HP: ${_dbg_USH:-?}/${_dbg_maxhp:-?}${COLOR_RESET} [${_dbg_bar}] ${_dbg_hp_pct}%\n"
-        printf "%b\n" "  ${GRAY_BLACK}VS: %-16s  ENH: %-8s  Team:[%s]${COLOR_RESET}" "${_dbg_opponent:-?}" "${_dbg_ENH:-?}" "${_dbg_team:-?}"
-        printf "%b\n" "  ${GRAY_BLACK}────────────────────────────────${COLOR_RESET}"
-        printf "%b\n" "  ${_dbg_action_label}"
-        printf "%b\n" "  ${GRAY_BLACK}LA:${LA}s  HPER:${HPER}%  RPER:${RPER}%  Fails:${_dbg_la_failures}${COLOR_RESET}"
-        printf "%b\n" "  ${GRAY_BLACK}────────────────────────────────${COLOR_RESET}"
-        printf "%b\n" "  ${GREEN_BLACK}ATK:${_dbg_atks}  RND:${_dbg_atkrnds}  DODGE:${_dbg_dodges}  HEAL:${_dbg_heals}${COLOR_RESET}"
-        printf "%b\n" "  🪨 Stone:${_dbg_stone_st}  🌿 Grass:${_dbg_grass_st}"
-        printf "%b" "  ${GRAY_BLACK}─── GAME LOG ─── ${COLOR_RESET}\n"
-        w3m -dump -T text/html "$src_ram" 2>/dev/null | tail -n 3 | sed 's/^/  /'
+        printf "\n  ${GOLD_BLACK}══ DEBUG BATTLE ${_dbg_min}m${_dbg_sec}s (loop #${_dbg_loop}) ══${COLOR_RESET}\n"
+        printf "  ${_dbg_hcol}HP: %-5d/%-5d${COLOR_RESET} [${_dbg_bar}] %-3d%%\n" "$_dbg_USH" "$_dbg_maxhp" "$_dbg_hp_pct"
+        printf "  ${GRAY_BLACK}VS: %-16s  ENH: %-8d  Team:[%d]${COLOR_RESET}\n" "${_dbg_opponent:-?}" "$_dbg_ENH" "$_dbg_team"
+        printf "  ${GRAY_BLACK}────────────────────────────────${COLOR_RESET}\n"
+        printf "  ${_dbg_action_label}\n"
+        printf "  ${GRAY_BLACK}LA: %-4.1f  HPER: %-2d%%  RPER: %-2d%%  Fails: %-2d${COLOR_RESET}\n" "$LA" "$HPER" "$RPER" "$_dbg_la_failures"
+        printf "  ${GRAY_BLACK}────────────────────────────────${COLOR_RESET}\n"
+        printf "  ${GREEN_BLACK}ATK: %-3d  RND: %-3d  DODGE: %-3d  HEAL: %-3d${COLOR_RESET}\n" "$_dbg_atks" "$_dbg_atkrnds" "$_dbg_dodges" "$_dbg_heals"
+        printf "  🪨 Stone: ${_dbg_stone_st}  🌿 Grass: ${_dbg_grass_st}\n"
+        printf "  ${GRAY_BLACK}─── GAME LOG ───${COLOR_RESET}\n"
+        w3m -dump -T text/html "$src_ram" 2>/dev/null | tail -n 3 | while IFS= read -r logline; do
+            printf "  ${GRAY_BLACK}%-30s${COLOR_RESET}\n" "$logline"
+        done
     done
 
     # ── Post-battle ───────────────────────────────────────────────────────
@@ -495,23 +497,23 @@ coliseum_debug() {
     fi
 
     # ── Terminal post-match display ───────────────────────────────────────
-    printf '\n'
-    printf '%b\n' "  ${GOLD_BLACK}╔══════════════════════════════════════╗${COLOR_RESET}"
+    printf "\n"
+    printf "  ${GOLD_BLACK}╔══════════════════════════════════════╗${COLOR_RESET}\n"
     if [ "$_dbg_result" = "WIN" ]; then
-        printf '%b\n' "  ${GREEN_BLACK}║     ✅  VICTORY!                     ║${COLOR_RESET}"
+        printf "  ${GREEN_BLACK}║     ✅  VICTORY!                     ║${COLOR_RESET}\n"
     elif [ "$_dbg_result" = "LOSS" ]; then
-        printf '%b\n' "  ${RED_BLACK}║     ❌  DEFEAT                       ║${COLOR_RESET}"
+        printf "  ${RED_BLACK}║     ❌  DEFEAT                       ║${COLOR_RESET}\n"
     else
-        printf '%b\n' "  ${GOLD_BLACK}║     ❓  RESULT UNKNOWN               ║${COLOR_RESET}"
+        printf "  ${GOLD_BLACK}║     ❓  RESULT UNKNOWN               ║${COLOR_RESET}\n"
     fi
-    printf '%b\n' "  ${GOLD_BLACK}╠══════════════════════════════════════╣${COLOR_RESET}"
-    printf "%b\n" "  ${GOLD_BLACK}║ Duration: ${_dbg_dmin}m${_dbg_dsec}s  |  Loops: %-5d      ║${COLOR_RESET}" "$_dbg_loop"
-    printf "%b\n" "  ${GOLD_BLACK}║ ATK:${GREEN_BLACK}${_dbg_atks}${GOLD_BLACK}  RND:${GREEN_BLACK}${_dbg_atkrnds}${GOLD_BLACK}  DODGE:${GREEN_BLACK}${_dbg_dodges}${GOLD_BLACK}  HEAL:${GREEN_BLACK}${_dbg_heals}${GOLD_BLACK} ║${COLOR_RESET}"
-    printf "%b\n" "  ${GOLD_BLACK}║ ATK Fails:${RED_BLACK}${_dbg_la_failures}${GOLD_BLACK}  LA Start:${COLISEUM_LA:-5}  LA End:${LA} ║${COLOR_RESET}"
-    printf '%b\n' "  ${GOLD_BLACK}╠══════════════════════════════════════╣${COLOR_RESET}"
-    printf '%b\n' "  ${GRAY_BLACK}║ Debug file:                          ║${COLOR_RESET}"
-    printf "%b\n" "  ${GRAY_BLACK}║ %-36s ║${COLOR_RESET}" "$debug_file"
-    printf '%b\n' "  ${GOLD_BLACK}╚══════════════════════════════════════╝${COLOR_RESET}"
+    printf "  ${GOLD_BLACK}╠══════════════════════════════════════╣${COLOR_RESET}\n"
+    printf "  ${GOLD_BLACK}║ Duration: %-3dm%-3ds  |  Loops: %-5d   ║${COLOR_RESET}\n" "$_dbg_dmin" "$_dbg_dsec" "$_dbg_loop"
+    printf "  ${GOLD_BLACK}║ ATK:${GREEN_BLACK}%-3d${GOLD_BLACK}  RND:${GREEN_BLACK}%-3d${GOLD_BLACK}  DODGE:${GREEN_BLACK}%-3d${GOLD_BLACK}  HEAL:${GREEN_BLACK}%-3d${GOLD_BLACK}  ║${COLOR_RESET}\n" "$_dbg_atks" "$_dbg_atkrnds" "$_dbg_dodges" "$_dbg_heals"
+    printf "  ${GOLD_BLACK}║ Fails:${RED_BLACK}%-2d${GOLD_BLACK}  LA: ${COLISEUM_LA:-5} → %-4.1f                   ║${COLOR_RESET}\n" "$_dbg_la_failures" "$LA"
+    printf "  ${GOLD_BLACK}╠══════════════════════════════════════╣${COLOR_RESET}\n"
+    printf "  ${GRAY_BLACK}║ Debug file:                          ║${COLOR_RESET}\n"
+    printf "  ${GRAY_BLACK}║ %-36s ║${COLOR_RESET}\n" "$debug_file"
+    printf "  ${GOLD_BLACK}╚══════════════════════════════════════╝${COLOR_RESET}\n"
 
     # ── Write battle summary to debug file ───────────────────────────────
     {
@@ -640,6 +642,10 @@ _cl_display_battle() {
     local min=$((elapsed / 60))
     local sec=$((elapsed % 60))
 
+    # Format time using printf -v
+    local current_time
+    printf -v current_time '%(%H:%M)T' -1
+
     # Adaptive state indicator
     local adp_info=""
     [ "$_cl_la_adjusted" -eq 1 ] && adp_info="${GOLD_BLACK}(adapted)${COLOR_RESET}"
@@ -652,23 +658,18 @@ _cl_display_battle() {
         && grass_st="${GREEN_BLACK}READY${COLOR_RESET}" \
         || grass_st="${GRAY_BLACK}USED${COLOR_RESET}"
 
-    # Format time using printf -v to avoid format specifier issues
-    local current_time
-    printf -v current_time '%(%H:%M)T' -1
-
-    printf '\n'
-    printf '%b\n' "  ${GOLD_BLACK}═══════ COLISEUM BATTLE ═══════${COLOR_RESET}"
-    printf "%b\n" "  ${hp_color}HP: ${USH}/${max_hp}${COLOR_RESET} [${bar}] ${hp_pct}%   ${current_time}  (${min}m${sec}s)"
-    printf "%b\n" "  ${GRAY_BLACK}VS: %-16s  ENH: %-8s  Team:[%s]${COLOR_RESET}" "${_cl_opponent:-?}" "${ENH:-?}" "${_cl_team:-?}"
-    printf "%b\n" "  ${GRAY_BLACK}──────────────────────────────${COLOR_RESET}"
-    printf "%b\n" "  ${GRAY_BLACK}LA: ${LA}s ${adp_info}${COLOR_RESET}"
-    printf "%b\n" "  ${GRAY_BLACK}HPER:${HPER}%  RPER:${RPER}%  Fails:${_cl_atk_failures}  Streak:${cl_current_win_streak}${COLOR_RESET}"
-    printf "%b\n" "  ${GRAY_BLACK}──────────────────────────────${COLOR_RESET}"
-    printf "%b\n" "  ${GREEN_BLACK}ATK:${_cl_match_atks}  RND:${_cl_match_atkrnds}  DODGE:${_cl_match_dodges}  HEAL:${_cl_match_heals}${COLOR_RESET}"
-    printf "%b\n" "  🪨 Stone:${stone_st}  🌿 Grass:${grass_st}"
-    printf "%b\n" "  ${GRAY_BLACK}────── GAME LOG ──────${COLOR_RESET}"
+    printf "\n  ${GOLD_BLACK}═══════ COLISEUM BATTLE ═══════${COLOR_RESET}\n"
+    printf "  ${hp_color}HP: %-5d/%-5d${COLOR_RESET} [${bar}] %-3d%%   ${current_time}  (${min}m${sec}s)\n" "$USH" "$max_hp" "$hp_pct"
+    printf "  ${GRAY_BLACK}VS: %-16s  ENH: %-8d  Team:[%d]${COLOR_RESET}\n" "${_cl_opponent:-?}" "$ENH" "$_cl_team"
+    printf "  ${GRAY_BLACK}──────────────────────────────${COLOR_RESET}\n"
+    printf "  ${GRAY_BLACK}LA: ${LA}s ${adp_info}${COLOR_RESET}\n"
+    printf "  ${GRAY_BLACK}HPER: %-2d%%  RPER: %-2d%%  Fails: %-2d  Streak: %-2d${COLOR_RESET}\n" "$HPER" "$RPER" "$_cl_atk_failures" "$cl_current_win_streak"
+    printf "  ${GRAY_BLACK}──────────────────────────────${COLOR_RESET}\n"
+    printf "  ${GREEN_BLACK}ATK: %-3d  RND: %-3d  DODGE: %-3d  HEAL: %-3d${COLOR_RESET}\n" "$_cl_match_atks" "$_cl_match_atkrnds" "$_cl_match_dodges" "$_cl_match_heals"
+    printf "  🪨 Stone: ${stone_st}  🌿 Grass: ${grass_st}\n"
+    printf "  ${GRAY_BLACK}────── GAME LOG ──────${COLOR_RESET}\n"
     w3m -dump -T text/html "$src_ram" 2>/dev/null | tail -n 4 | while IFS= read -r logline; do
-        printf "%b\n" "  ${GRAY_BLACK}${logline}${COLOR_RESET}"
+        printf "  ${GRAY_BLACK}%-30s${COLOR_RESET}\n" "$logline"
     done
 }
 
@@ -680,22 +681,22 @@ _cl_display_post_match() {
     [ "$cl_total_matches" -gt 0 ] && \
         wr=$(awk -v w="$cl_wins" -v t="$cl_total_matches" 'BEGIN{printf"%.0f",w/t*100}')
 
-    printf '\n'
-    printf '%b\n' "  ${GOLD_BLACK}╔══════════════════════════════════════╗${COLOR_RESET}"
+    printf "\n"
+    printf "  ${GOLD_BLACK}╔══════════════════════════════════════╗${COLOR_RESET}\n"
     if [ "$_cl_result" = "win" ]; then
-        printf '%b\n' "  ${GREEN_BLACK}║     ✅  VICTORY!                     ║${COLOR_RESET}"
+        printf "  ${GREEN_BLACK}║     ✅  VICTORY!                     ║${COLOR_RESET}\n"
     elif [ "$_cl_result" = "loss" ]; then
-        printf '%b\n' "  ${RED_BLACK}║     ❌  DEFEAT                       ║${COLOR_RESET}"
+        printf "  ${RED_BLACK}║     ❌  DEFEAT                       ║${COLOR_RESET}\n"
     else
-        printf '%b\n' "  ${GOLD_BLACK}║     ❓  RESULT UNKNOWN               ║${COLOR_RESET}"
+        printf "  ${GOLD_BLACK}║     ❓  RESULT UNKNOWN               ║${COLOR_RESET}\n"
     fi
-    printf '%b\n' "  ${GOLD_BLACK}╠══════════════════════════════════════╣${COLOR_RESET}"
-    printf "%b\n" "  ${GOLD_BLACK}║ Duration: ${min}m${sec}s  |  vs %-16s ║${COLOR_RESET}" "${_cl_opponent:-?}"
-    printf "%b\n" "  ${GOLD_BLACK}║ ATK:${GREEN_BLACK}${_cl_match_atks}${GOLD_BLACK}  RND:${GREEN_BLACK}${_cl_match_atkrnds}${GOLD_BLACK}  DODGE:${GREEN_BLACK}${_cl_match_dodges}${GOLD_BLACK}  HEAL:${GREEN_BLACK}${_cl_match_heals}${GOLD_BLACK} ║${COLOR_RESET}"
-    printf "%b\n" "  ${GOLD_BLACK}║ Kills:${GREEN_BLACK}${_cl_match_kills}${GOLD_BLACK}  Deaths:${RED_BLACK}${_cl_match_deaths}${GOLD_BLACK}  LA Final:${LA}   ║${COLOR_RESET}"
-    printf '%b\n' "  ${GOLD_BLACK}╠══════════════════════════════════════╣${COLOR_RESET}"
-    printf "%b\n" "  ${GOLD_BLACK}║ Session: W:${GREEN_BLACK}${cl_wins}${GOLD_BLACK} L:${RED_BLACK}${cl_losses}${GOLD_BLACK} (${wr}%)  Streak:${GREEN_BLACK}${cl_current_win_streak}${GOLD_BLACK} (best:${cl_longest_win_streak}) ║${COLOR_RESET}"
-    printf '%b\n' "  ${GOLD_BLACK}╚══════════════════════════════════════╝${COLOR_RESET}"
+    printf "  ${GOLD_BLACK}╠══════════════════════════════════════╣${COLOR_RESET}\n"
+    printf "  ${GOLD_BLACK}║ Duration: %-3dm%-3ds  |  vs %-14s  ║${COLOR_RESET}\n" "$min" "$sec" "${_cl_opponent:-?}"
+    printf "  ${GOLD_BLACK}║ ATK:${GREEN_BLACK}%-3d${GOLD_BLACK}  RND:${GREEN_BLACK}%-3d${GOLD_BLACK}  DODGE:${GREEN_BLACK}%-3d${GOLD_BLACK}  HEAL:${GREEN_BLACK}%-3d${GOLD_BLACK}  ║${COLOR_RESET}\n" "$_cl_match_atks" "$_cl_match_atkrnds" "$_cl_match_dodges" "$_cl_match_heals"
+    printf "  ${GOLD_BLACK}║ Kills:${GREEN_BLACK}%-3d${GOLD_BLACK}  Deaths:${RED_BLACK}%-3d${GOLD_BLACK}  LA Final: %-4.1f  ║${COLOR_RESET}\n" "$_cl_match_kills" "$_cl_match_deaths" "$LA"
+    printf "  ${GOLD_BLACK}╠══════════════════════════════════════╣${COLOR_RESET}\n"
+    printf "  ${GOLD_BLACK}║ W:${GREEN_BLACK}%-3d${GOLD_BLACK} L:${RED_BLACK}%-3d${GOLD_BLACK} (%-2d%%)  Streak:${GREEN_BLACK}%-3d${GOLD_BLACK}  Best:${GREEN_BLACK}%-3d${GOLD_BLACK}  ║${COLOR_RESET}\n" "$cl_wins" "$cl_losses" "$wr" "$cl_current_win_streak" "$cl_longest_win_streak"
+    printf "  ${GOLD_BLACK}╚══════════════════════════════════════╝${COLOR_RESET}\n"
 }
 
 # ============================================================================
@@ -917,13 +918,12 @@ coliseum_fight() {
     local _cf_wr=0
     [ "$cl_total_matches" -gt 0 ] && \
         _cf_wr=$(awk -v w="$cl_wins" -v t="$cl_total_matches" 'BEGIN{printf"%.0f",w/t*100}')
-    printf '\n'
-    printf '%b\n' "  ${GOLD_BLACK}╔═══════════════════════════════════╗${COLOR_RESET}"
-    printf '%b\n' "  ${GOLD_BLACK}║  ⚔️  COLISEUM  BATTLE              ║${COLOR_RESET}"
-    printf '%b\n' "  ${GOLD_BLACK}╠═══════════════════════════════════╣${COLOR_RESET}"
-    printf "%b\n" "  ${GOLD_BLACK}║  LA: ${LA}s  HPER: ${HPER}%  RPER: ${RPER}%     ║${COLOR_RESET}"
-    printf "%b\n" "  ${GOLD_BLACK}║  W:${GREEN_BLACK}%-3d${GOLD_BLACK} L:${RED_BLACK}%-3d${GOLD_BLACK} (${_cf_wr}%)  Streak:${GREEN_BLACK}%-3d${GOLD_BLACK}${COLOR_RESET}" "$cl_wins" "$cl_losses" "$cl_current_win_streak"
-    printf '%b\n' "  ${GOLD_BLACK}╚═══════════════════════════════════╝${COLOR_RESET}"
+    printf "\n  ${GOLD_BLACK}╔═══════════════════════════════════╗${COLOR_RESET}\n"
+    printf "  ${GOLD_BLACK}║  ⚔️  COLISEUM  BATTLE              ║${COLOR_RESET}\n"
+    printf "  ${GOLD_BLACK}╠═══════════════════════════════════╣${COLOR_RESET}\n"
+    printf "  ${GOLD_BLACK}║  LA: ${LA}s  HPER: ${HPER}%  RPER: ${RPER}%     ║${COLOR_RESET}\n"
+    printf "  ${GOLD_BLACK}║  W:${GREEN_BLACK}%-3d${GOLD_BLACK} L:${RED_BLACK}%-3d${GOLD_BLACK} (${_cf_wr}%)  Streak:${GREEN_BLACK}%-3d${GOLD_BLACK}  ║${COLOR_RESET}\n" "$cl_wins" "$cl_losses" "$cl_current_win_streak"
+    printf "  ${GOLD_BLACK}╚═══════════════════════════════════╝${COLOR_RESET}\n"
 
     # ── Get max HP from /train ─────────────────────────────────────
     (
@@ -937,7 +937,7 @@ coliseum_fight() {
     local _cf_maxhp
     _cf_maxhp=$(cat "$full_ram" 2>/dev/null)
     [ -n "$_cf_maxhp" ] && \
-        printf '%b\n' "  ${GRAY_BLACK}Max HP: %s${COLOR_RESET}" "$_cf_maxhp"
+        printf "  ${GRAY_BLACK}Max HP: %-6d${COLOR_RESET}\n" "$_cf_maxhp"
 
     # ── Set graphics to 0 ─────────────────────────────────────────
     (
@@ -1050,7 +1050,12 @@ coliseum_fight() {
         BREAK_LOOP=""
 
         # Announce battle start
-        printf '%b\n' "  ${GREEN_BLACK}⚔️  BATTLE vs %-16s [Team %s]${COLOR_RESET}" "${_cl_opponent:-?}" "${_cl_team:-?}"
+        printf "  ${GREEN_BLACK}⚔️  BATTLE vs %-16s [Team %d]${COLOR_RESET}\n" "${_cl_opponent:-?}" "$_cl_team"
+
+        # Reset LA to 4.5 at start of each battle (will adapt based on hits/misses)
+        LA="4.5"
+        _cl_la_adjusted=0
+        _cl_atk_successes=0
 
         # Detect opponent and adapt
         _cl_detect_opponent
