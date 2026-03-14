@@ -12,16 +12,12 @@ func_crono() {
 func_cat() {
     func_crono
 
-    # Set color based on time of day
-    if (( HOUR < 6 || HOUR >= 18 )); then
-        printf "${BLUE_BLACK}"
-    else
-        printf "${GOLD_BLACK} "
-    fi
+    # Use consistent white color — no time-based color changes that cause flicker
+    printf "${WHITE_BLACK}"
 
     cat "$TMP/msg_file"
-    printf "${WHITE_BLACK}"
- 
+    printf "${COLOR_RESET}"
+
     info() {
         printf "\n"
         # List functions defined in scripts
@@ -73,20 +69,22 @@ func_sleep() {
         # Check if the current hour is between 0 and 8 (inclusive)
         if [ "$HOUR" -lt 9 ]; then  # This covers hours 00 to 08
             coliseum_start  # Start coliseum activities
-            reset; clear  # Clear the terminal screen
+            clear  # Clear screen for coliseum
             i=60  # Set wait time to 60 seconds
             func_cat  # Call func_cat to display information
+            return
         fi
     fi
 
-    # Check if the current minute is between 29 and 30
+    # Check if the current minute is between 29 and 30 (near event time)
     if [ "$MIN" -ge 29 ] && [ "$MIN" -le 30 ]; then
-        reset; clear
-        i=15
+        clear  # Clear screen before event
+        i=15  # Shorter wait time (15s) when approaching event
         func_cat
     else
-        reset; clear
+        # Normal idle mode: minimal re-rendering to save CPU/memory
         i=60
+        # Don't clear screen during idle — just show status once and wait
         func_cat
     fi
 }
