@@ -4,6 +4,7 @@
 BASE_DIR="${HOME}/twm"
 ACCOUNTS_DIR="${BASE_DIR}/accounts"
 INDEX_FILE="${ACCOUNTS_DIR}/index.json"
+LANGUAGE="${LANGUAGE:-en}"
 
 colors() {
     BLACK_BLACK='\033[00;30m'
@@ -18,6 +19,118 @@ colors() {
     WHITE_BLACK='\033[37m'
 }
 
+# Simple translation function (key-based)
+translate() {
+    local key="$1"
+
+    case "$LANGUAGE" in
+        pt)
+            case "$key" in
+                "menu_title") echo "🐉 TITANS WAR - CONTROLE MULTI-CONTA 🐉" ;;
+                "account_mgmt") echo "GERENCIAMENTO DE CONTAS" ;;
+                "monitoring") echo "MONITORAMENTO" ;;
+                "setup_config") echo "CONFIGURAÇÃO & SETUP" ;;
+                "help_info") echo "AJUDA & INFO" ;;
+                "start_all") echo "Iniciar todas as contas ativas" ;;
+                "stop_all") echo "Parar todas as contas" ;;
+                "restart_all") echo "Reiniciar todas as contas" ;;
+                "view_status") echo "Visualizar status das contas" ;;
+                "start_single") echo "Iniciar uma conta específica" ;;
+                "stop_single") echo "Parar uma conta específica" ;;
+                "interactive_monitor") echo "Monitor interativo (alternar entre contas)" ;;
+                "view_account_logs") echo "Visualizar logs de uma conta" ;;
+                "add_account") echo "Adicionar nova conta" ;;
+                "edit_account") echo "Editar conta existente" ;;
+                "remove_account") echo "Remover conta" ;;
+                "show_guide") echo "Mostrar guia de monitoramento" ;;
+                "exit") echo "Sair" ;;
+                "select_option") echo "Selecione uma opção" ;;
+                "invalid_option") echo "Opção inválida. Tente novamente." ;;
+                "starting_accounts") echo "Iniciando todas as contas ativas..." ;;
+                "stopping_accounts") echo "Parando todas as contas..." ;;
+                "restarting_accounts") echo "Reiniciando todas as contas..." ;;
+                "account_status") echo "Status das Contas:" ;;
+                "select_account") echo "Selecione uma conta:" ;;
+                "which_account_stop") echo "Qual conta deseja parar?" ;;
+                "goodbye") echo "Até logo!" ;;
+                *) echo "$key" ;;
+            esac
+            ;;
+        *)  # English default
+            case "$key" in
+                "menu_title") echo "🐉 TITANS WAR - MULTI-RUNNER CONTROL 🐉" ;;
+                "account_mgmt") echo "ACCOUNT MANAGEMENT" ;;
+                "monitoring") echo "MONITORING" ;;
+                "setup_config") echo "SETUP & CONFIG" ;;
+                "help_info") echo "HELP & INFO" ;;
+                "start_all") echo "Start all active accounts" ;;
+                "stop_all") echo "Stop all accounts" ;;
+                "restart_all") echo "Restart all accounts" ;;
+                "view_status") echo "View account status" ;;
+                "start_single") echo "Start a specific account" ;;
+                "stop_single") echo "Stop a specific account" ;;
+                "interactive_monitor") echo "Interactive monitor (switch between accounts)" ;;
+                "view_account_logs") echo "View specific account logs" ;;
+                "add_account") echo "Add new account" ;;
+                "edit_account") echo "Edit existing account" ;;
+                "remove_account") echo "Remove account" ;;
+                "show_guide") echo "Show monitoring guide" ;;
+                "exit") echo "Exit" ;;
+                "select_option") echo "Select option" ;;
+                "invalid_option") echo "Invalid option. Try again." ;;
+                "starting_accounts") echo "Starting all active accounts..." ;;
+                "stopping_accounts") echo "Stopping all accounts..." ;;
+                "restarting_accounts") echo "Restarting all accounts..." ;;
+                "account_status") echo "Account Status:" ;;
+                "select_account") echo "Select an account:" ;;
+                "which_account_stop") echo "Which account to stop?" ;;
+                "goodbye") echo "Goodbye!" ;;
+                *) echo "$key" ;;
+            esac
+            ;;
+    esac
+}
+
+# Get list of active accounts
+get_accounts() {
+    if [ -f "$INDEX_FILE" ]; then
+        jq -r '.accounts[] | select((.active // true) == true) | .id' "$INDEX_FILE" 2>/dev/null
+    fi
+}
+
+# Interactive account selection
+select_account() {
+    local prompt="$1"
+    local accounts
+    accounts=$(get_accounts)
+
+    if [ -z "$accounts" ]; then
+        printf "${RED_BLACK}No active accounts found.${COLOR_RESET}\n"
+        return 1
+    fi
+
+    local count=0
+    declare -a account_ids
+
+    printf "\n${GREENb_BLACK}$(translate "$prompt")${COLOR_RESET}\n"
+
+    while IFS= read -r id; do
+        count=$((count + 1))
+        account_ids[$count]="$id"
+        printf "  %d) %s\n" "$count" "$id"
+    done <<< "$accounts"
+
+    printf "\n${GOLD_BLACK}Choose [1-$count]:${COLOR_RESET} "
+    read -r selection
+
+    if ! [[ "$selection" =~ ^[0-9]+$ ]] || [ "$selection" -lt 1 ] || [ "$selection" -gt "$count" ]; then
+        printf "${RED_BLACK}Invalid selection.${COLOR_RESET}\n"
+        return 1
+    fi
+
+    echo "${account_ids[$selection]}"
+}
+
 display_menu() {
     colors
     clear
@@ -25,32 +138,33 @@ display_menu() {
     printf "${BLACK_CYAN}"
     printf "╔════════════════════════════════════════════════════╗\n"
     printf "║                                                    ║\n"
-    printf "║          🐉 TITANS WAR - MULTI-RUNNER CONTROL 🐉   ║\n"
+    printf "║          $(translate "menu_title")\n"
     printf "║                                                    ║\n"
     printf "╚════════════════════════════════════════════════════╝\n"
     printf "${COLOR_RESET}\n"
 
-    printf "${GREENb_BLACK}ACCOUNT MANAGEMENT${COLOR_RESET}\n"
-    printf "  1) Start all active accounts\n"
-    printf "  2) Stop all accounts\n"
-    printf "  3) Restart all accounts\n"
-    printf "  4) View account status\n\n"
+    printf "${GREENb_BLACK}$(translate "account_mgmt")${COLOR_RESET}\n"
+    printf "  1) $(translate "start_all")\n"
+    printf "  2) $(translate "start_single")\n"
+    printf "  3) $(translate "stop_all")\n"
+    printf "  4) $(translate "stop_single")\n"
+    printf "  5) $(translate "restart_all")\n"
+    printf "  6) $(translate "view_status")\n\n"
 
-    printf "${GREENb_BLACK}MONITORING${COLOR_RESET}\n"
-    printf "  5) Interactive monitor (switch between accounts)\n"
-    printf "  6) View specific account logs\n"
-    printf "  7) View all accounts status table\n\n"
+    printf "${GREENb_BLACK}$(translate "monitoring")${COLOR_RESET}\n"
+    printf "  7) $(translate "interactive_monitor")\n"
+    printf "  8) $(translate "view_account_logs")\n\n"
 
-    printf "${GREENb_BLACK}SETUP & CONFIG${COLOR_RESET}\n"
-    printf "  8) Add new account\n"
-    printf "  9) Edit existing account\n"
-    printf "  R) Remove account\n\n"
+    printf "${GREENb_BLACK}$(translate "setup_config")${COLOR_RESET}\n"
+    printf "  9) $(translate "add_account")\n"
+    printf "  A) $(translate "edit_account")\n"
+    printf "  R) $(translate "remove_account")\n\n"
 
-    printf "${GREENb_BLACK}HELP & INFO${COLOR_RESET}\n"
-    printf "  H) Show monitoring guide\n"
-    printf "  0) Exit\n\n"
+    printf "${GREENb_BLACK}$(translate "help_info")${COLOR_RESET}\n"
+    printf "  H) $(translate "show_guide")\n"
+    printf "  0) $(translate "exit")\n\n"
 
-    printf "${GOLD_BLACK}Select option:${COLOR_RESET} "
+    printf "${GOLD_BLACK}$(translate "select_option"):${COLOR_RESET} "
 }
 
 show_guide() {
@@ -132,44 +246,52 @@ main() {
         case "$option" in
             1)
                 clear
-                printf "${BLACK_CYAN}Starting all active accounts...${COLOR_RESET}\n\n"
+                printf "${BLACK_CYAN}$(translate "starting_accounts")${COLOR_RESET}\n\n"
                 cd "$BASE_DIR" && ./multi_runner.sh start
                 read -rp "Press Enter to continue..."
                 ;;
             2)
+                account=$(select_account "select_account") || continue
                 clear
-                printf "${BLACK_CYAN}Stopping all accounts...${COLOR_RESET}\n\n"
-                cd "$BASE_DIR" && ./multi_runner.sh stop
+                printf "${BLACK_CYAN}Starting account $account...${COLOR_RESET}\n\n"
+                cd "$BASE_DIR" && ./multi_runner.sh start "$account"
                 read -rp "Press Enter to continue..."
                 ;;
             3)
                 clear
-                printf "${BLACK_CYAN}Restarting all accounts...${COLOR_RESET}\n\n"
-                cd "$BASE_DIR" && ./multi_runner.sh restart
+                printf "${BLACK_CYAN}$(translate "stopping_accounts")${COLOR_RESET}\n\n"
+                cd "$BASE_DIR" && ./multi_runner.sh stop
                 read -rp "Press Enter to continue..."
                 ;;
             4)
+                account=$(select_account "which_account_stop") || continue
                 clear
-                printf "${BLACK_CYAN}Account Status:${COLOR_RESET}\n\n"
-                cd "$BASE_DIR" && ./multi_runner.sh status
+                printf "${BLACK_CYAN}Stopping account $account...${COLOR_RESET}\n\n"
+                cd "$BASE_DIR" && ./multi_runner.sh stop "$account"
                 read -rp "Press Enter to continue..."
                 ;;
             5)
-                cd "$BASE_DIR" && ./twm_monitor.sh
-                ;;
-            6)
-                cd "$BASE_DIR" && ./twm_view.sh
-                ;;
-            7)
                 clear
-                printf "${BLACK_CYAN}All Accounts Status:${COLOR_RESET}\n\n"
-                cd "$BASE_DIR" && ./twm_monitor.sh status
+                printf "${BLACK_CYAN}$(translate "restarting_accounts")${COLOR_RESET}\n\n"
+                cd "$BASE_DIR" && ./multi_runner.sh restart
                 read -rp "Press Enter to continue..."
                 ;;
+            6)
+                clear
+                printf "${BLACK_CYAN}$(translate "account_status")${COLOR_RESET}\n\n"
+                cd "$BASE_DIR" && ./multi_runner.sh status
+                read -rp "Press Enter to continue..."
+                ;;
+            7)
+                cd "$BASE_DIR" && ./twm_monitor.sh
+                ;;
             8)
-                add_account_interactive
+                cd "$BASE_DIR" && ./twm_view.sh
                 ;;
             9)
+                add_account_interactive
+                ;;
+            a|A)
                 edit_account_interactive
                 ;;
             r|R)
@@ -180,11 +302,11 @@ main() {
                 ;;
             0)
                 clear
-                printf "${GREENb_BLACK}Goodbye!${COLOR_RESET}\n"
+                printf "${GREENb_BLACK}$(translate "goodbye")${COLOR_RESET}\n"
                 exit 0
                 ;;
             *)
-                printf "${RED_BLACK}Invalid option. Try again.${COLOR_RESET}\n"
+                printf "${RED_BLACK}$(translate "invalid_option")${COLOR_RESET}\n"
                 read -rp "Press Enter..."
                 ;;
         esac
@@ -192,3 +314,4 @@ main() {
 }
 
 main "$@"
+
