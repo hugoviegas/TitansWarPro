@@ -78,34 +78,6 @@ cd ~/twm || exit
 
 # ─── Download helpers ─────────────────────────────────────────────────────────
 
-# Download a single file; returns 0=new/updated, 1=failed, 2=unchanged
-download_file() {
-  url="$1" dest="$2"
-  tmpfile=$(mktemp /tmp/twm_XXXXXX 2>/dev/null || printf '%s' "/tmp/twm_dl_$$")
-  if ! curl "$url" -s -L -o "$tmpfile"; then
-    rm -f "$tmpfile"
-    return 1
-  fi
-  if [ -e "$dest" ] && cmp -s "$tmpfile" "$dest" 2>/dev/null; then
-    rm -f "$tmpfile"
-    return 2
-  fi
-  mv "$tmpfile" "$dest"
-  return 0
-}
-
-# Download documentation files
-download_docs() {
-  printf "\n${BLACK_CYAN}  📄 Documentation${COLOR_RESET}\n"
-  for doc in HOW_TO_MONITOR.md QUICK_START.md; do
-    if curl --silent --head --fail "${SERVER}${doc}" >/dev/null 2>&1; then
-      download_file "${SERVER}${doc}" ~/twm/"$doc"
-      printf "     ✅ %s\n" "$doc"
-    fi
-  done
-}
-
-# ─── Main sync (standard install) ─────────────────────────────────────────────
 sync_func() {
   SCRIPTS="allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh check.sh \
 clancoliseum.sh clandmg.sh clanfight.sh clanid.sh coliseum.sh crono.sh \
@@ -125,44 +97,32 @@ twm_control.sh twm_setup.sh"
     existed=false
     [ -e ~/twm/"$script" ] && existed=true
 
-    download_file "${SERVER}$script" ~/twm/"$script"
-    rc=$?
-
-    case $rc in
-      0)
-        if $existed; then
-          printf "  🔽 %s %-32s ${GREENb_BLACK}updated${COLOR_RESET}\n" "$label" "$script"
-          UPDATED=$((UPDATED + 1))
-        else
-          printf "  🆕 %s %-32s ${BLACK_YELLOW}new${COLOR_RESET}\n" "$label" "$script"
-          NEW=$((NEW + 1))
-        fi
-        ;;
-      2)
-        printf "  ✅ %s %s\n" "$label" "$script"
-        OK=$((OK + 1))
-        ;;
-      *)
-        printf "  ❌ %s %-32s ${BLACK_RED}FAILED${COLOR_RESET}\n" "$label" "$script"
-        FAILED=$((FAILED + 1))
-        ;;
-    esac
+    if curl "${SERVER}$script" -s -L -o ~/twm/"$script" 2>/dev/null; then
+      if $existed; then
+        printf "  🔽 %s %-32s ${GREENb_BLACK}updated${COLOR_RESET}\n" "$label" "$script"
+        UPDATED=$((UPDATED + 1))
+      else
+        printf "  🆕 %s %-32s ${BLACK_YELLOW}new${COLOR_RESET}\n" "$label" "$script"
+        NEW=$((NEW + 1))
+      fi
+    else
+      printf "  ⚠️  %s %-32s ${BLACK_YELLOW}skipped${COLOR_RESET}\n" "$label" "$script"
+      FAILED=$((FAILED + 1))
+    fi
   done
 
   # DOS to Unix + permissions
   find ~/twm -type f -name '*.sh' -print0 | xargs -0 sed -i 's/\r$//' 2>/dev/null
   chmod +x ~/twm/*.sh
 
-  # Account scaffold
+  # Account scaffold + docs
   mkdir -p ~/twm/accounts
-  if curl --silent --head --fail "${SERVER}accounts/index.json" >/dev/null 2>&1; then
-    curl "${SERVER}accounts/index.json" -s -L -o ~/twm/accounts/index.json || true
-  fi
+  curl "${SERVER}accounts/index.json" -s -L -o ~/twm/accounts/index.json 2>/dev/null || true
+  curl "${SERVER}HOW_TO_MONITOR.md" -s -L -o ~/twm/HOW_TO_MONITOR.md 2>/dev/null || true
+  curl "${SERVER}QUICK_START.md" -s -L -o ~/twm/QUICK_START.md 2>/dev/null || true
 
-  download_docs
-
-  printf "\n${BLACK_CYAN}  Summary: ✅ %d ok  🔽 %d updated  🆕 %d new  ❌ %d failed${COLOR_RESET}\n" \
-    "$OK" "$UPDATED" "$NEW" "$FAILED"
+  printf "\n${BLACK_CYAN}  Summary: 🔽 %d updated  🆕 %d new  ⚠️  %d skipped${COLOR_RESET}\n" \
+    "$UPDATED" "$NEW" "$FAILED"
 }
 
 # ─── Merge sync (legacy single-file install) ──────────────────────────────────
@@ -197,11 +157,9 @@ twm_monitor.sh twm_control.sh"
   chmod +x ~/twm/*.sh
 
   mkdir -p ~/twm/accounts
-  if curl --silent --head --fail "${SERVER}accounts/index.json" >/dev/null 2>&1; then
-    curl "${SERVER}accounts/index.json" -s -L -o ~/twm/accounts/index.json || true
-  fi
-
-  download_docs
+  curl "${SERVER}accounts/index.json" -s -L -o ~/twm/accounts/index.json 2>/dev/null || true
+  curl "${SERVER}HOW_TO_MONITOR.md" -s -L -o ~/twm/HOW_TO_MONITOR.md 2>/dev/null || true
+  curl "${SERVER}QUICK_START.md" -s -L -o ~/twm/QUICK_START.md 2>/dev/null || true
 }
 
 #/merge
