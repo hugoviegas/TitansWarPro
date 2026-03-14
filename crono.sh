@@ -32,10 +32,6 @@ func_cat() {
     local cmd_file="${ACCOUNT_ROOT:-$HOME/twm}/cmd_file"
 
     while true; do
-        echo_t "No battles now, waiting ${i}s" "\033[02m" "${COLOR_RESET}"
-        echo_t "Enter a command or for more info enter:" "${WHITEb_BLACK}" "info or config${COLOR_RESET}"
-
-    while true; do
 
         # Check for a queued command written by the monitor
         if [ -s "$cmd_file" ]; then

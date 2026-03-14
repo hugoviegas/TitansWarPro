@@ -164,14 +164,18 @@ request_update() {
 # Function to load configurations from the config.cfg file
 load_config() {
     # Load the initial configuration
-    CONFIG_FILE="$TMP/config.cfg"
+    # Use CONFIG_FILE set by set_account_paths() — DO NOT override it here
+    if [ -z "$CONFIG_FILE" ]; then
+        CONFIG_FILE="${ACCOUNT_CONFIG:-$HOME/twm/config.cfg}"
+    fi
+
     if [ -f "$CONFIG_FILE" ]; then
         # shellcheck source=/path/to/config.cfg
         # shellcheck disable=SC1091
         . "$CONFIG_FILE"  # Load the configuration file
     else
         echo_t "Configuration file not found. Creating config.cfg with default values."
-        
+
         # Write the config.cfg file with default values
         default_config() {
             # Define default values
@@ -208,8 +212,8 @@ load_config() {
             echo "LANGUAGE=$LANGUAGE"
             echo "ALLIES="
             } > "$CONFIG_FILE"
-        } 
-        default_config 
+        }
+        default_config
     fi
 }
 
