@@ -164,6 +164,8 @@ render() {
   printf '\033[2J\033[H'   # clear entire screen THEN cursor home (correct order)
   draw_top_bar
   draw_account_header
+  # Use 'cat' instead of 'tail' to avoid substring re-reading when scrolling
+  # This reduces visual updates and flickering
   draw_log
 }
 
@@ -293,6 +295,7 @@ interactive_monitor() {
   local last_log_tail=""
   local last_status_time=0
   local render_cooldown=0
+  local poll_timeout=2    # Wait 2 seconds for keyboard input before checking again
 
   while true; do
     local id="${account_ids[$current_index]}"
@@ -305,6 +308,14 @@ interactive_monitor() {
     if [ "$force_render" -eq 1 ]; then
       last_log_tail=""
       render_cooldown=0
+      poll_timeout=0   # Render immediately on force
+    fi
+
+    # On normal idle, increase poll timeout to reduce unnecessary cycles
+    if [ "$render_cooldown" -gt 0 ] && [ "$poll_timeout" -lt 5 ]; then
+      poll_timeout=5   # Longer wait during cooldown
+    elif [ "$render_cooldown" -eq 0 ]; then
+      poll_timeout=2   # Normal polling speed
     fi
 
     # Get last line of log — detects meaningful changes (new action/event)
@@ -323,14 +334,14 @@ interactive_monitor() {
       last_log_tail="$cur_tail"
       last_status_time="$now"
       force_render=0
-      render_cooldown=2   # cooldown: 2 seconds before next allowed render
+      render_cooldown=3   # cooldown: 3 seconds before next allowed render
     fi
 
     # Decrement cooldown
     [ "$render_cooldown" -gt 0 ] && render_cooldown=$((render_cooldown - 1))
 
-    # Poll for 1 second — immediately picks up log changes on next iteration
-    if read -t 1 -r -n 1 key 2>/dev/null; then
+    # Poll with variable timeout — longer waits during cooldown (less CPU, less visual spam)
+    if read -t "$poll_timeout" -r -n 1 key 2>/dev/null; then
       case "$key" in
         n|N)
           current_index=$((current_index % account_count + 1))
