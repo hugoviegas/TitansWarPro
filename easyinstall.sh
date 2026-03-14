@@ -169,13 +169,20 @@ else
   sync_func
 fi
 
-# ─── Shell shortcut ───────────────────────────────────────────────────────────
+# ─── Shell shortcuts ──────────────────────────────────────────────────────────
 check_if_exists() {
-  grep -q 'play-twm' "$1" 2>/dev/null
+  grep -q 'twmsetup' "$1" 2>/dev/null
 }
 
 shortcut_set() {
-  function_definition='play-twm() { $HOME/twm/play.sh "$@"; }'
+  # All shortcuts route through twm_control.sh
+  defs='
+play-twm()  { $HOME/twm/twm_control.sh "$@"; }
+twmsetup()  { $HOME/twm/twm_control.sh "$@"; }
+twmstart()  { $HOME/twm/twm_control.sh start; }
+twmstop()   { $HOME/twm/twm_control.sh stop; }
+twmview()   { $HOME/twm/twm_control.sh view; }
+'
 
   case "$(uname)" in
     "Linux")
@@ -188,17 +195,17 @@ shortcut_set() {
       fi
 
       if check_if_exists "$config_file"; then
-        printf "\n  ✅ Shortcut ${GOLD_BLACK}play-twm${COLOR_RESET} already set in %s\n" "$config_file"
+        printf "\n  ✅ Shortcuts already set in %s\n" "$config_file"
       else
-        printf '%s\n'       "$function_definition" >> "$config_file"
-        printf 'export -f play-twm\n'              >> "$config_file"
-        printf "\n  ✅ Shortcut ${GOLD_BLACK}play-twm${COLOR_RESET} added to %s\n" "$config_file"
+        printf '%s\n' "$defs" >> "$config_file"
+        printf 'export -f play-twm twmsetup twmstart twmstop twmview 2>/dev/null || true\n' >> "$config_file"
+        printf "\n  ✅ Shortcuts added to %s\n" "$config_file"
         # shellcheck disable=SC1090
         . "$config_file" 2>/dev/null || true
       fi
       ;;
     *)
-      printf "\n  ⚠️  Add manually to your shell config: %s\n" "$function_definition"
+      printf "\n  ⚠️  Add manually to your shell config:\n%s\n" "$defs"
       ;;
   esac
 }
@@ -213,11 +220,16 @@ unset APPISH
 
 # ─── Done ─────────────────────────────────────────────────────────────────────
 printf "\n${BLACK_CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${COLOR_RESET}\n"
-printf "${GREENb_BLACK}  ✅  Installation complete!${COLOR_RESET}\n"
+printf "${GREENb_BLACK}  ✅  Instalação completa / Installation complete!${COLOR_RESET}\n"
 printf "${BLACK_CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${COLOR_RESET}\n\n"
-printf "  Start bot:      ${GOLD_BLACK}play-twm${COLOR_RESET}\n"
-printf "  Coliseum:       ${GOLD_BLACK}play-twm -cl${COLOR_RESET}\n"
-printf "  Cave:           ${GOLD_BLACK}play-twm -cv${COLOR_RESET}\n"
-printf "  Multi-account:  ${GOLD_BLACK}./twm/multi_runner.sh start${COLOR_RESET}\n"
-printf "  Monitor:        ${GOLD_BLACK}./twm/twm_monitor.sh${COLOR_RESET}\n"
-printf "  Setup account:  ${GOLD_BLACK}./twm/twm_setup.sh${COLOR_RESET}\n\n"
+printf "  ${GREENb_BLACK}Painel de controle / Control panel:${COLOR_RESET}\n"
+printf "    ${GOLD_BLACK}twmsetup${COLOR_RESET}   ou   ${GOLD_BLACK}./twm/twm_control.sh${COLOR_RESET}\n\n"
+printf "  ${GREENb_BLACK}Atalhos disponíveis / Available shortcuts:${COLOR_RESET}\n"
+printf "    ${GOLD_BLACK}twmstart${COLOR_RESET}   — Iniciar todas as contas + monitor\n"
+printf "    ${GOLD_BLACK}twmstop${COLOR_RESET}    — Parar todas as contas\n"
+printf "    ${GOLD_BLACK}twmview${COLOR_RESET}    — Abrir monitor de logs\n"
+printf "    ${GOLD_BLACK}twmsetup${COLOR_RESET}   — Abrir painel de controle\n\n"
+printf "  ${GREENb_BLACK}Conta individual / Single account:${COLOR_RESET}\n"
+printf "    ${GOLD_BLACK}play.sh A1${COLOR_RESET}     — Iniciar conta A1\n"
+printf "    ${GOLD_BLACK}play.sh A1 -cv${COLOR_RESET} — Modo caverna\n\n"
+printf "  ${GREENb_BLACK}Requer novo terminal ou:${COLOR_RESET} source ~/.bashrc\n\n"

@@ -139,6 +139,33 @@ select_account() {
     echo "${account_ids[$selection]}"
 }
 
+# First-time setup: ask language once and save to control.cfg
+first_run_setup() {
+    [ -f "$CONTROL_CFG" ] && return   # Already configured, skip
+    colors
+    clear
+    printf "${BLACK_CYAN}╔═══════════════════════════════════════════╗${COLOR_RESET}\n"
+    printf "${BLACK_CYAN}║   🐉 TITANS WAR PRO — PRIMEIRO ACESSO    ║${COLOR_RESET}\n"
+    printf "${BLACK_CYAN}╚═══════════════════════════════════════════╝${COLOR_RESET}\n\n"
+    printf "Escolha o idioma / Choose language:\n\n"
+    printf "  1) Português  (padrão / default)\n"
+    printf "  2) English\n\n"
+    printf "Selecione [1-2]: "
+    read -r _lang_sel
+    case "$_lang_sel" in
+        2) LANGUAGE="en" ;;
+        *) LANGUAGE="pt" ;;
+    esac
+    printf 'LANGUAGE=%s\n' "$LANGUAGE" > "$CONTROL_CFG"
+    printf "\n${GREENb_BLACK}✅  Idioma salvo / Language saved: ${GOLD_BLACK}%s${COLOR_RESET}\n\n" "$LANGUAGE"
+    sleep 1
+}
+
+# Launch interactive monitor directly
+launch_monitor() {
+    exec "$BASE_DIR/twm_monitor.sh"
+}
+
 display_menu() {
     colors
     clear
@@ -270,6 +297,34 @@ change_language_interactive() {
 }
 
 main() {
+    colors
+
+    # CLI shortcut arguments — allows twmstart / twmstop / twmview shortcuts
+    case "${1:-}" in
+        start)
+            first_run_setup
+            clear
+            printf "${BLACK_CYAN}$(translate "starting_accounts")${COLOR_RESET}\n\n"
+            cd "$BASE_DIR" && ./multi_runner.sh start
+            sleep 2
+            launch_monitor
+            ;;
+        stop)
+            clear
+            printf "${BLACK_CYAN}$(translate "stopping_accounts")${COLOR_RESET}\n\n"
+            cd "$BASE_DIR" && ./multi_runner.sh stop
+            printf "\n${GREENb_BLACK}All accounts stopped.${COLOR_RESET}\n"
+            exit 0
+            ;;
+        view)
+            launch_monitor
+            ;;
+        *)
+            # Interactive menu mode — show first-run language prompt if needed
+            first_run_setup
+            ;;
+    esac
+
     while true; do
         display_menu
         read -r option
@@ -279,7 +334,9 @@ main() {
                 clear
                 printf "${BLACK_CYAN}$(translate "starting_accounts")${COLOR_RESET}\n\n"
                 cd "$BASE_DIR" && ./multi_runner.sh start
-                read -rp "Press Enter to continue..."
+                sleep 2
+                # Auto-switch to live monitor after launching all accounts
+                launch_monitor
                 ;;
             2)
                 account=$(select_account "select_account") || continue

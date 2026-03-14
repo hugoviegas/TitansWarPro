@@ -172,17 +172,17 @@ setup_account() {
     printf " 11)  Serbia         — rs.tiwar.net\n"
     printf " 12)  China          — cn.tiwar.net\n"
     printf " 13)  English/Global — titans-war.com\n"
-    printf "\nSelect server (1-13, default: 13): "
+    printf "\nSelect server (1-13, default: 1): "
     read -r server_num
-    [ -z "$server_num" ] && server_num=13
+    [ -z "$server_num" ] && server_num=1
 
     show_header
     printf "${GREENb_BLACK}Step 3/6 — Language${COLOR_RESET}\n\n"
     printf "  en) English  pt) Portuguese  de) German\n"
     printf "  es) Spanish  fr) French\n\n"
-    printf "Language (default: en): "
+    printf "Language (default: pt): "
     read -r language
-    [ -z "$language" ] && language="en"
+    [ -z "$language" ] && language="pt"
 
     show_header
     printf "${GREENb_BLACK}Step 4/6 — Game Allies${COLOR_RESET}\n\n"
@@ -190,15 +190,15 @@ setup_account() {
     printf "  2) Heroes only (Coliseum / King of Immortals)\n"
     printf "  3) Clan only (Altars / Clan events)\n"
     printf "  4) No allies\n\n"
-    printf "Select (1-4, default: 1): "
+    printf "Select (1-4, default: 4): "
     read -r allies_choice
-    [ -z "$allies_choice" ] && allies_choice="1"
+    [ -z "$allies_choice" ] && allies_choice="4"
 
     show_header
     printf "${GREENb_BLACK}Step 5/6 — Auto-Update${COLOR_RESET}\n\n"
-    printf "Auto-update scripts on startup? (y/n, default: y): "
+    printf "Auto-update scripts on startup? (y/n, default: n): "
     read -r auto_update
-    [ -z "$auto_update" ] && auto_update="y"
+    [ -z "$auto_update" ] && auto_update="n"
 
     show_header
     printf "${GREENb_BLACK}Step 6/6 — Game Credentials${COLOR_RESET}\n\n"
