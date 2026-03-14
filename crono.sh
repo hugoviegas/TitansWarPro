@@ -62,17 +62,17 @@ func_cat() {
         if [ -s "$cmd_file" ]; then
             cmd=$(cat "$cmd_file")
             : > "$cmd_file"
-            echo_t "Running command: $cmd" "${BLACK_GRAY}" "${COLOR_RESET}"
+            echo_t "Running command: $cmd" "${BLACK_BLACK}" "${COLOR_RESET}"
         else
             # Show prompts once per wait interval (not every second)
             if [ "$i" != "$_last_i" ]; then
-                printf_t " No battles now, waiting %ss" "${BLACK_GRAY}" "${COLOR_RESET}$i" "after" "$i"
+                printf_t " No battles now, waiting " "${BLACK_BLACK}" "${COLOR_RESET}$i s\n"
                 if [ "$_interactive" -eq 1 ]; then
                     # Interactive mode: user can type directly
-                    printf_t "Type commands start, config, stop Then press ENTER"
+                    echo_t "Type commands start, config, stop Then press ENTER"
                 else
                     # Background mode: use monitor to send commands
-                    printf_t " Use [C] to send: start, config\n"
+                    echo_t " Use [C] to send: start, config\n"
                 fi
                 _last_i="$i"
             fi
