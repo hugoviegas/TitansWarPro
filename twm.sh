@@ -9,6 +9,17 @@ fi
 colors
 cd "$HOME"/twm || exit
 
+# Global cleanup: kill all background children and exit
+twm_global_cleanup() {
+  # Kill all background processes spawned by this shell
+  # This handles all the ) </dev/null &>/dev/null & processes
+  jobs -p | xargs -r kill -9 2>/dev/null || true
+  exit 0
+}
+
+# Set up global signal handler
+trap 'twm_global_cleanup' INT TERM
+
 script_ads() {
   ads_file="${ACCOUNT_ADS_FILE:-$HOME/twm/ads_file}"
   if [ "$RUN" != '-boot' ] && [ -f "$ads_file" ] && [ -s "$ads_file" ] && [ "$(cat "$ads_file")" != "$(date +%d)" ]; then

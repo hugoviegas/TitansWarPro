@@ -53,12 +53,15 @@ echo "$$" > "$lock_file" 2>/dev/null || {
 
 kill_child() {
   if [ -n "$child_pid" ] && kill -0 "$child_pid" 2>/dev/null; then
-    kill -TERM "$child_pid" 2>/dev/null
-    # Give it 2 seconds to exit gracefully, then force kill
-    sleep 2s
+    # First, try to TERM the process group (all children)
+    kill -TERM "-$child_pid" 2>/dev/null || true
+    sleep 1s
+
+    # If still alive, force kill the process group
     if kill -0 "$child_pid" 2>/dev/null; then
-      kill -9 "$child_pid" 2>/dev/null
+      kill -9 "-$child_pid" 2>/dev/null || true
     fi
+
     wait "$child_pid" 2>/dev/null || true
   fi
   child_pid=""

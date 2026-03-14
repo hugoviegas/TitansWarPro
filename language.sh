@@ -31,8 +31,11 @@ load_translations() {
 
     if [ -f "$TRANSLATIONS_FILE" ]; then
         while IFS="|" read -r original translated; do
-            original=$(echo "$original" | xargs)
-            translated=$(echo "$translated" | xargs)
+            # Trim whitespace safely without xargs (which breaks on single quotes)
+            original="${original#"${original%%[![:space:]]*}"}"
+            original="${original%"${original##*[![:space:]]}"}"
+            translated="${translated#"${translated%%[![:space:]]*}"}"
+            translated="${translated%"${translated##*[![:space:]]}"}"
             translations["$original"]="$translated"
         done < "$TRANSLATIONS_FILE"
     fi
@@ -43,7 +46,9 @@ translate_and_cache() {
     local target_lang="$1"
     local text="$2"
 
-    text=$(echo "$text" | xargs)
+    # Trim whitespace safely without xargs
+    text="${text#"${text%%[![:space:]]*}"}"
+    text="${text%"${text##*[![:space:]]}"}"
 
     # DETECTAR SE É TEXTO DO function.sh
     is_func=""
@@ -65,7 +70,10 @@ translate_and_cache() {
     if [ "$is_func" = "yes" ]; then
         if [[ "$text" =~ ^([^[:space:]]+-)[[:space:]]*(.*)$ ]]; then
     prefix="${BASH_REMATCH[1]} "
-    rest="$(echo "${BASH_REMATCH[2]}" | xargs)"
+    # Trim the rest safely
+    rest="${BASH_REMATCH[2]}"
+    rest="${rest#"${rest%%[![:space:]]*}"}"
+    rest="${rest%"${rest##*[![:space:]]}"}"
         fi
     fi
 

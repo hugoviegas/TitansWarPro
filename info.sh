@@ -252,8 +252,11 @@ player_stats() {
     AGILITY=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n '3s/: //p')
     PROTECTION=$(grep -o -E ': [0-9]+' "$TMP"/SRC | sed -n '4s/: //p')
 
-    # Trim whitespace and ensure that STRENGTH only contains numbers
-    PLAYER_STRENGTH=$(echo "$STRENGTH" | xargs)
+    # Trim whitespace safely without xargs (which breaks on single quotes)
+    # Remove leading/trailing whitespace from STRENGTH
+    PLAYER_STRENGTH="${STRENGTH#"${STRENGTH%%[![:space:]]*}"}"
+    PLAYER_STRENGTH="${PLAYER_STRENGTH%"${PLAYER_STRENGTH##*[![:space:]]}"}"
+    # Ensure that STRENGTH only contains numbers
     PLAYER_STRENGTH=${PLAYER_STRENGTH//[^0-9]/}
 
     echo "$PLAYER_STRENGTH"
