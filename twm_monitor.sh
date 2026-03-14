@@ -149,8 +149,11 @@ draw_log() {
   local log_lines=$((TERM_LINES - 6))
   [ "$log_lines" -lt 4 ] && log_lines=4
 
+  # Ensure we don't overflow terminal height - leave space for potential prompts
+  log_lines=$((log_lines - 1))
+
   if [ -f "$log_file" ]; then
-    tail -"$log_lines" "$log_file"
+    tail -n "$log_lines" "$log_file" 2>/dev/null | cat
   else
     printf '\033[0;33m  Waiting for log file: %s\033[0m\n' "$log_file"
   fi
@@ -158,7 +161,7 @@ draw_log() {
 
 render() {
   update_term_size
-  printf '\033[H\033[J'   # cursor home + clear screen
+  printf '\033[2J\033[H'   # clear entire screen THEN cursor home (correct order)
   draw_top_bar
   draw_account_header
   draw_log
@@ -289,6 +292,7 @@ interactive_monitor() {
   local last_log_lines=-1
   local last_log_tail=""
   local last_status_time=0
+  local render_cooldown=0
 
   while true; do
     local id="${account_ids[$current_index]}"
@@ -300,19 +304,30 @@ interactive_monitor() {
     # or when first run (force_render already set to 1 at startup)
     if [ "$force_render" -eq 1 ]; then
       last_log_tail=""
+      render_cooldown=0
     fi
 
     # Get last line of log — detects meaningful changes (new action/event)
+    # Trim trailing whitespace/newlines to avoid false change detection
     local cur_tail=""
-    [ -f "$log_file" ] && cur_tail=$(tail -1 "$log_file" 2>/dev/null)
+    if [ -f "$log_file" ]; then
+      cur_tail=$(tail -1 "$log_file" 2>/dev/null)
+      # Remove trailing whitespace/newlines for accurate comparison
+      cur_tail="${cur_tail%"${cur_tail##*[![:space:]]}"}
+    fi
 
     # Re-render when: last line changed, forced, or 60s status interval
-    if [ "$cur_tail" != "$last_log_tail" ] || [ "$force_render" -eq 1 ] || [ "$age" -ge 60 ]; then
+    # Add cooldown to prevent excessive renders even if logs change frequently
+    if [ "$render_cooldown" -eq 0 ] && ([ "$cur_tail" != "$last_log_tail" ] || [ "$force_render" -eq 1 ] || [ "$age" -ge 60 ]); then
       render
       last_log_tail="$cur_tail"
       last_status_time="$now"
       force_render=0
+      render_cooldown=2   # cooldown: 2 seconds before next allowed render
     fi
+
+    # Decrement cooldown
+    [ "$render_cooldown" -gt 0 ] && render_cooldown=$((render_cooldown - 1))
 
     # Poll for 1 second — immediately picks up log changes on next iteration
     if read -t 1 -r -n 1 key 2>/dev/null; then
