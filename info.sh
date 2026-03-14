@@ -10,6 +10,7 @@ colors() {
     BLACK_PINK='\033[01;35m\033[01;07m'  # Bold pink text with inverted colors
     BLACK_RED='\033[01;31m\033[01;07m'    # Bold red text with inverted colors
     BLACK_YELLOW='\033[00;33m\033[01;07m' # Bold yellow text with inverted colors
+    GRAY_BLACK='\033[02;37m'         # Dim gray text on default background
     CYAN_BLACK='\033[04;36m\033[02;04m'   # Underlined cyan text with dim background
     CYAN_CYAN='\033[01;36m\033[08;07m'     # Bright cyan text on dark background
     BLUE_BLACK='\033[0;34m'                # Blue text on default background
@@ -35,7 +36,7 @@ script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="Hugo Viegas"
     collaborator="Alessandro Almeida"
-    versionNum="3.10.08" # to change the version number every time has an update!!!!!!!!!!!!!!
+    versionNum="3.10.09" # to change the version number every time has an update!
 
 for i in $colors; do
 clear
