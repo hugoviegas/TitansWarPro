@@ -1,6 +1,5 @@
 #!/bin/bash
-# First-time setup wizard for adding/configuring a new account
-# This script walks through interactive setup instead of having twm.sh ask questions later
+# Account setup wizard: add, edit, or remove accounts for the multi-account system.
 
 BASE_DIR="${HOME}/twm"
 ACCOUNTS_DIR="${BASE_DIR}/accounts"
@@ -12,43 +11,49 @@ colors() {
     GREEN_BLACK='\033[32m'
     GREENb_BLACK='\033[1;32m'
     RED_BLACK='\033[0;31m'
+    BLACK_RED='\033[01;31m\033[01;07m'
+    BLACK_YELLOW='\033[00;33m\033[01;07m'
     COLOR_RESET='\033[00m'
 }
 
 require_jq() {
-  if ! command -v jq >/dev/null 2>&1; then
-    echo "jq is required to manage accounts/index.json" >&2
-    exit 1
-  fi
-}
-
-fatal() {
-  echo "twm_setup: $*" >&2
-  exit 1
+    if ! command -v jq >/dev/null 2>&1; then
+        printf "jq is required to manage accounts/index.json\n" >&2
+        exit 1
+    fi
 }
 
 show_header() {
-  colors
-  clear
-  printf "${BLACK_CYAN}"
-  printf "╔════════════════════════════════════════════════════╗\n"
-  printf "║          🐉 TITANS WAR - ACCOUNT SETUP 🐉          ║\n"
-  printf "╚════════════════════════════════════════════════════╝\n"
-  printf "${COLOR_RESET}\n"
+    colors
+    clear
+    printf "${BLACK_CYAN}"
+    printf "╔════════════════════════════════════════════════════╗\n"
+    printf "║          🐉 TITANS WAR - ACCOUNT SETUP 🐉          ║\n"
+    printf "╚════════════════════════════════════════════════════╝\n"
+    printf "${COLOR_RESET}\n"
+}
+
+# Collect a password with * masking into $password
+collect_password() {
+    password=""
+    printf "Password: "
+    read -rs password
+    printf "\n"
 }
 
 create_account_config() {
-  local account_root="$1"
-  local language="$2"
-  local allies="$3"
+    local account_root="$1"
+    local language="$2"
+    local allies="$3"
+    local auto_update="${4:-y}"
 
-  mkdir -p "$account_root"
+    mkdir -p "$account_root"
 
-  cat > "$account_root/config.cfg" <<EOF
+    cat > "$account_root/config.cfg" <<EOF
 FUNC_check_rewards=y
 FUNC_use_elixir=n
 FUNC_coliseum=y
-FUNC_AUTO_UPDATE=y
+FUNC_AUTO_UPDATE=$auto_update
 FUNC_play_league=999
 FUNC_clan_figth=y
 SCRIPT_PAUSED=n
@@ -57,166 +62,296 @@ ALLIES=$allies
 UPDATE_CHANNEL=master
 EOF
 
-  chmod 600 "$account_root/config.cfg"
-  echo "✅ Config created: $account_root/config.cfg"
+    chmod 600 "$account_root/config.cfg"
+}
+
+save_credentials() {
+    local account_dir="$1"
+    local server_num="$2"
+    local username="$3"
+    local password="$4"
+    local tmp_path="$account_dir/tmp/.$server_num"
+    mkdir -p "$tmp_path"
+    printf "login=%s&pass=%s" "$username" "$password" | base64 -w 0 > "$tmp_path/cript_file"
+    chmod 600 "$tmp_path/cript_file"
+}
+
+update_index() {
+    local account_id="$1" alias="$2" server_num="$3" language="$4"
+    require_jq
+    if [ -f "$INDEX_FILE" ]; then
+        jq --arg id "$account_id" \
+           --arg alias "$alias" \
+           --arg ur "$server_num" \
+           --arg lang "$language" \
+           '.accounts += [{"id":$id,"alias":$alias,"ur":$ur,"language":$lang,"runMode":"-boot","active":true,"autoRestart":true}]' \
+           "$INDEX_FILE" > "${INDEX_FILE}.tmp" && mv "${INDEX_FILE}.tmp" "$INDEX_FILE"
+    else
+        jq -n \
+           --arg id "$account_id" \
+           --arg alias "$alias" \
+           --arg ur "$server_num" \
+           --arg lang "$language" \
+           '{"version":1,"defaultAccount":$id,"accounts":[{"id":$id,"alias":$alias,"ur":$ur,"language":$lang,"runMode":"-boot","active":true,"autoRestart":true}]}' \
+           > "$INDEX_FILE"
+    fi
 }
 
 setup_account() {
-  show_header
+    show_header
 
-  printf "${GREENb_BLACK}Step 1: Account Information${COLOR_RESET}\n\n"
+    printf "${GREENb_BLACK}Step 1/6 — Account Information${COLOR_RESET}\n\n"
+    printf "Account ID (e.g., A1, A2): "
+    read -r account_id
+    [ -z "$account_id" ] && { printf "Cancelled.\n"; exit 0; }
 
-  printf "Account ID (e.g., A1, A2, MyAccount): "
-  read -r account_id
-  [ -z "$account_id" ] && { printf "Cancelled.\n"; exit 0; }
+    printf "Account Alias/Display Name (e.g., Player1): "
+    read -r alias
+    [ -z "$alias" ] && alias="$account_id"
 
-  printf "Account Alias/Display Name (e.g., Player1): "
-  read -r alias
-  [ -z "$alias" ] && alias="$account_id"
+    show_header
+    printf "${GREENb_BLACK}Step 2/6 — Game Server${COLOR_RESET}\n\n"
+    printf "  1)  Brasil         — furiadetigas.net\n"
+    printf "  2)  Germany        — titanen.mobi\n"
+    printf "  3)  Spain          — guerradetibitanes.net\n"
+    printf "  4)  France         — tiwar.fr\n"
+    printf "  5)  India          — in.tiwar.net\n"
+    printf "  6)  Indonesia      — tiwar-id.net\n"
+    printf "  7)  Italy          — guerraditiani.net\n"
+    printf "  8)  Poland         — tiwar.pl\n"
+    printf "  9)  Romania        — tiwar.ro\n"
+    printf " 10)  Russia         — tiwar.ru\n"
+    printf " 11)  Serbia         — rs.tiwar.net\n"
+    printf " 12)  China          — cn.tiwar.net\n"
+    printf " 13)  English/Global — titans-war.com\n"
+    printf "\nSelect server (1-13, default: 13): "
+    read -r server_num
+    [ -z "$server_num" ] && server_num=13
 
-  printf "\n${GREENb_BLACK}Step 2: Game Server${COLOR_RESET}\n\n"
-  printf "Available servers:\n"
-  printf "  1) Brasil (furiadetigas.net)\n"
-  printf "  2) Germany (titanen.mobi)\n"
-  printf "  3) Spain (guerradetibitanes.net)\n"
-  printf "  4) France (tiwar.fr)\n"
-  printf "  5) India (in.tiwar.net)\n"
-  printf "  6) Indonesia (tiwar-id.net)\n"
-  printf "  7) Italy (guerraditiani.net)\n"
-  printf "  8) Poland (Wojna Tytanów)\n"
-  printf "  9) Romania (Războiul Titanilor)\n"
-  printf " 10) Russia (Битва Титанов)\n"
-  printf " 11) Serbia (Rat Titana)\n"
-  printf " 12) China (泰坦之战)\n"
-  printf " 13) English/Global (titans-war.com)\n"
+    show_header
+    printf "${GREENb_BLACK}Step 3/6 — Language${COLOR_RESET}\n\n"
+    printf "  en) English  pt) Portuguese  de) German\n"
+    printf "  es) Spanish  fr) French\n\n"
+    printf "Language (default: en): "
+    read -r language
+    [ -z "$language" ] && language="en"
 
-  printf "\nSelect server (1-13): "
-  read -r server_num
-  [ -z "$server_num" ] && server_num=13
+    show_header
+    printf "${GREENb_BLACK}Step 4/6 — Game Allies${COLOR_RESET}\n\n"
+    printf "  1) All battles (Heroes + Clan)\n"
+    printf "  2) Heroes only (Coliseum / King of Immortals)\n"
+    printf "  3) Clan only (Altars / Clan events)\n"
+    printf "  4) No allies\n\n"
+    printf "Select (1-4, default: 1): "
+    read -r allies_choice
+    [ -z "$allies_choice" ] && allies_choice="1"
 
-  printf "\n${GREENb_BLACK}Step 3: Language${COLOR_RESET}\n\n"
-  printf "Select language:\n"
-  printf "  en) English\n"
-  printf "  pt) Portuguese\n"
-  printf "  de) German\n"
-  printf "  es) Spanish\n"
-  printf "  fr) French\n"
+    show_header
+    printf "${GREENb_BLACK}Step 5/6 — Auto-Update${COLOR_RESET}\n\n"
+    printf "Auto-update scripts on startup? (y/n, default: y): "
+    read -r auto_update
+    [ -z "$auto_update" ] && auto_update="y"
 
-  printf "Language (default: en): "
-  read -r language
-  [ -z "$language" ] && language="en"
+    show_header
+    printf "${GREENb_BLACK}Step 6/6 — Game Credentials${COLOR_RESET}\n\n"
+    printf "Enter your game username and password.\n"
+    printf "These are stored locally (base64 encoded) and used to auto-login.\n\n"
+    printf "Username: "
+    read -r username
+    collect_password
 
-  printf "\n${GREENb_BLACK}Step 4: Game Allies${COLOR_RESET}\n\n"
-  printf "Which allies to use in battles?\n"
-  printf "  1) All battles (Heroes + Clan)\n"
-  printf "  2) Heroes only (Coliseum/King of Immortals)\n"
-  printf "  3) Clan only (Altars/Clan events)\n"
-  printf "  4) No allies\n"
+    # Create directories
+    mkdir -p "$ACCOUNTS_DIR/$account_id/tmp"
+    mkdir -p "$ACCOUNTS_DIR/$account_id/logs"
+    mkdir -p "$ACCOUNTS_DIR/$account_id/w3m"
 
-  printf "Select (1-4, default: 1): "
-  read -r allies_choice
-  [ -z "$allies_choice" ] && allies_choice="1"
+    # Write config
+    create_account_config "$ACCOUNTS_DIR/$account_id" "$language" "$allies_choice" "$auto_update"
+    printf "✅ Config created\n"
 
-  printf "\n${GREENb_BLACK}Step 5: Auto-Update${COLOR_RESET}\n\n"
-  printf "Auto-update scripts? (y/n, default: y): "
-  read -r auto_update
-  [ -z "$auto_update" ] && auto_update="y"
+    # Write server selection
+    printf "%s\n" "$server_num" > "$ACCOUNTS_DIR/$account_id/ur_file"
+    printf -- "-boot\n" > "$ACCOUNTS_DIR/$account_id/runmode_file"
 
-  # Create directories
-  mkdir -p "$ACCOUNTS_DIR/$account_id/tmp"
-  mkdir -p "$ACCOUNTS_DIR/$account_id/logs"
-  mkdir -p "$ACCOUNTS_DIR/$account_id/w3m"
+    # Write credentials to cript_file (so first run auto-logs in)
+    if [ -n "$username" ] && [ -n "$password" ]; then
+        save_credentials "$ACCOUNTS_DIR/$account_id" "$server_num" "$username" "$password"
+        printf "✅ Credentials saved\n"
+    fi
 
-  # Create config
-  create_account_config "$ACCOUNTS_DIR/$account_id" "$language" "$allies_choice"
+    # Update index.json
+    update_index "$account_id" "$alias" "$server_num" "$language"
+    printf "✅ index.json updated\n"
 
-  # Set ur_file (server selection)
-  echo "$server_num" > "$ACCOUNTS_DIR/$account_id/ur_file"
-  echo "-boot" > "$ACCOUNTS_DIR/$account_id/runmode_file"
-
-  # Update or create index.json
-  if [ -f "$INDEX_FILE" ]; then
-    require_jq
-    # Add new account to existing index
-    jq --arg id "$account_id" \
-       --arg alias "$alias" \
-       --arg ur "$server_num" \
-       '.accounts += [{
-         "id": $id,
-         "alias": $alias,
-         "ur": $ur,
-         "language": "'$language'",
-         "runMode": "-boot",
-         "active": true,
-         "autoRestart": true
-       }]' "$INDEX_FILE" > "${INDEX_FILE}.tmp"
-    mv "${INDEX_FILE}.tmp" "$INDEX_FILE"
-  else
-    require_jq
-    # Create new index.json
-    jq -n \
-       --arg id "$account_id" \
-       --arg alias "$alias" \
-       --arg ur "$server_num" \
-       '{
-         "version": 1,
-         "defaultAccount": $id,
-         "accounts": [{
-           "id": $id,
-           "alias": $alias,
-           "ur": $ur,
-           "language": "'$language'",
-           "runMode": "-boot",
-           "active": true,
-           "autoRestart": true
-         }]
-       }' > "$INDEX_FILE"
-  fi
-
-  show_header
-  printf "${GREENb_BLACK}✅ Account Created Successfully!${COLOR_RESET}\n\n"
-  printf "Account ID:     ${GOLD_BLACK}$account_id${COLOR_RESET}\n"
-  printf "Alias:          ${GOLD_BLACK}$alias${COLOR_RESET}\n"
-  printf "Server:         ${GOLD_BLACK}$server_num${COLOR_RESET}\n"
-  printf "Language:       ${GOLD_BLACK}$language${COLOR_RESET}\n"
-  printf "Allies:         ${GOLD_BLACK}$allies_choice${COLOR_RESET}\n\n"
-
-  printf "Next steps:\n"
-  printf "1. You'll need to login on first run\n"
-  printf "2. Enter your game username and password when prompted\n"
-  printf "3. Select which allies to use (if not already set)\n\n"
-
-  printf "To run this account:\n"
-  printf "  ${GOLD_BLACK}./multi_runner.sh start${COLOR_RESET}           # Run all accounts\n"
-  printf "  ${GOLD_BLACK}./twm_control.sh${COLOR_RESET}                  # Management menu\n"
-  printf "  ${GOLD_BLACK}./twm_monitor.sh${COLOR_RESET}                  # Monitor logs\n\n"
-
-  read -p "Press Enter to exit..."
+    show_header
+    printf "${GREENb_BLACK}✅  Account created successfully!${COLOR_RESET}\n\n"
+    printf "  Account ID : ${GOLD_BLACK}%s${COLOR_RESET}\n" "$account_id"
+    printf "  Alias      : ${GOLD_BLACK}%s${COLOR_RESET}\n" "$alias"
+    printf "  Server     : ${GOLD_BLACK}%s${COLOR_RESET}\n" "$server_num"
+    printf "  Language   : ${GOLD_BLACK}%s${COLOR_RESET}\n" "$language"
+    printf "  Allies     : ${GOLD_BLACK}%s${COLOR_RESET}\n" "$allies_choice"
+    printf "  Auto-update: ${GOLD_BLACK}%s${COLOR_RESET}\n\n" "$auto_update"
+    printf "Run:\n"
+    printf "  ${GOLD_BLACK}./multi_runner.sh start${COLOR_RESET}   — launch all accounts\n"
+    printf "  ${GOLD_BLACK}./play.sh${COLOR_RESET}                 — launch this account\n"
+    printf "  ${GOLD_BLACK}./twm_monitor.sh${COLOR_RESET}          — monitor logs\n\n"
+    read -rp "Press Enter to exit..."
 }
 
 list_accounts() {
-  show_header
+    require_jq
+    if [ ! -f "$INDEX_FILE" ]; then
+        printf "No accounts configured yet.\n"
+        return 1
+    fi
+    jq -r '.accounts[] | "  \(.id)  \(.alias)  (server: \(.ur))"' "$INDEX_FILE"
+    return 0
+}
 
-  require_jq
-  if [ ! -f "$INDEX_FILE" ]; then
-    printf "No accounts configured yet.\n"
-    return
-  fi
+remove_account() {
+    show_header
+    printf "${GREENb_BLACK}Remove Account${COLOR_RESET}\n\n"
+    if ! list_accounts; then
+        read -rp "Press Enter..."
+        return
+    fi
 
-  printf "${GREENb_BLACK}Existing Accounts:${COLOR_RESET}\n\n"
-  jq -r '.accounts[] | "\(.id) - \(.alias) (Server: \(.ur))"' "$INDEX_FILE"
-  printf "\n"
+    printf "\nAccount ID to remove (or Enter to cancel): "
+    read -r target_id
+    [ -z "$target_id" ] && { printf "Cancelled.\n"; return; }
+
+    printf "\n${BLACK_RED}WARNING: All data for account '%s' will be deleted.${COLOR_RESET}\n" "$target_id"
+    printf "Type ${GOLD_BLACK}yes${COLOR_RESET} to confirm: "
+    read -r confirm
+    [ "$confirm" != "yes" ] && { printf "Cancelled.\n"; read -rp "Press Enter..."; return; }
+
+    require_jq
+    jq --arg id "$target_id" 'del(.accounts[] | select(.id == $id))' \
+        "$INDEX_FILE" > "${INDEX_FILE}.tmp" && mv "${INDEX_FILE}.tmp" "$INDEX_FILE"
+    printf "✅ Removed from index.json\n"
+
+    if [ -d "$ACCOUNTS_DIR/$target_id" ]; then
+        rm -rf "$ACCOUNTS_DIR/$target_id"
+        printf "✅ Deleted %s\n" "$ACCOUNTS_DIR/$target_id"
+    fi
+
+    printf "\n${GREENb_BLACK}Account '%s' removed.${COLOR_RESET}\n" "$target_id"
+    read -rp "Press Enter..."
+}
+
+edit_account() {
+    show_header
+    printf "${GREENb_BLACK}Edit Account${COLOR_RESET}\n\n"
+    if ! list_accounts; then
+        read -rp "Press Enter..."
+        return
+    fi
+
+    printf "\nAccount ID to edit (or Enter to cancel): "
+    read -r target_id
+    [ -z "$target_id" ] && { printf "Cancelled.\n"; return; }
+
+    account_dir="$ACCOUNTS_DIR/$target_id"
+    config_file="$account_dir/config.cfg"
+
+    if [ ! -d "$account_dir" ]; then
+        printf "${BLACK_RED}Account directory not found: %s${COLOR_RESET}\n" "$account_dir"
+        read -rp "Press Enter..."
+        return
+    fi
+
+    while true; do
+        show_header
+        printf "${GREENb_BLACK}Editing: ${GOLD_BLACK}%s${COLOR_RESET}\n\n" "$target_id"
+
+        # Show current values
+        server_num=$(cat "$account_dir/ur_file" 2>/dev/null || printf "?")
+        lang=$(grep '^LANGUAGE=' "$config_file" 2>/dev/null | cut -d= -f2)
+        allies=$(grep '^ALLIES=' "$config_file" 2>/dev/null | cut -d= -f2)
+        au=$(grep '^FUNC_AUTO_UPDATE=' "$config_file" 2>/dev/null | cut -d= -f2)
+
+        printf "  Current: server=${GOLD_BLACK}%s${COLOR_RESET}  lang=${GOLD_BLACK}%s${COLOR_RESET}  allies=${GOLD_BLACK}%s${COLOR_RESET}  auto-update=${GOLD_BLACK}%s${COLOR_RESET}\n\n" \
+            "$server_num" "$lang" "$allies" "$au"
+
+        printf "  1) Change username/password\n"
+        printf "  2) Change server\n"
+        printf "  3) Change language\n"
+        printf "  4) Change allies (1-4)\n"
+        printf "  5) Toggle auto-update (y/n)\n"
+        printf "  0) Back\n\n"
+        printf "Select (0-5): "
+        read -r edit_opt
+
+        case "$edit_opt" in
+            1)
+                printf "New username: "
+                read -r new_user
+                collect_password
+                new_pass="$password"
+                if [ -n "$new_user" ] && [ -n "$new_pass" ]; then
+                    save_credentials "$account_dir" "$server_num" "$new_user" "$new_pass"
+                    printf "✅ Credentials updated.\n"
+                else
+                    printf "❌ Skipped (empty input).\n"
+                fi
+                read -rp "Press Enter..."
+                ;;
+            2)
+                printf "New server (1-13): "
+                read -r new_server
+                if [ -n "$new_server" ]; then
+                    printf "%s\n" "$new_server" > "$account_dir/ur_file"
+                    # Update index.json server field
+                    require_jq
+                    jq --arg id "$target_id" --arg ur "$new_server" \
+                        '(.accounts[] | select(.id == $id)).ur = $ur' \
+                        "$INDEX_FILE" > "${INDEX_FILE}.tmp" && mv "${INDEX_FILE}.tmp" "$INDEX_FILE"
+                    printf "✅ Server updated to %s.\n" "$new_server"
+                fi
+                read -rp "Press Enter..."
+                ;;
+            3)
+                printf "New language (en/pt/de/es/fr): "
+                read -r new_lang
+                if [ -n "$new_lang" ]; then
+                    sed -i "s/^LANGUAGE=.*/LANGUAGE=$new_lang/" "$config_file"
+                    printf "✅ Language updated to %s.\n" "$new_lang"
+                fi
+                read -rp "Press Enter..."
+                ;;
+            4)
+                printf "New allies (1-4): "
+                read -r new_allies
+                if [ -n "$new_allies" ]; then
+                    sed -i "s/^ALLIES=.*/ALLIES=$new_allies/" "$config_file"
+                    # Also clear allies files so they are re-computed on next run
+                    rm -f "$account_dir/tmp/."*"/allies.txt" "$account_dir/tmp/."*"/callies.txt" 2>/dev/null
+                    printf "✅ Allies updated to %s.\n" "$new_allies"
+                fi
+                read -rp "Press Enter..."
+                ;;
+            5)
+                printf "Auto-update (y/n): "
+                read -r new_au
+                if [ -n "$new_au" ]; then
+                    sed -i "s/^FUNC_AUTO_UPDATE=.*/FUNC_AUTO_UPDATE=$new_au/" "$config_file"
+                    printf "✅ Auto-update set to %s.\n" "$new_au"
+                fi
+                read -rp "Press Enter..."
+                ;;
+            0) return ;;
+            *) printf "Invalid option.\n"; read -rp "Press Enter..." ;;
+        esac
+    done
 }
 
 main() {
-  case "${1:-}" in
-    list)
-      list_accounts
-      ;;
-    *)
-      setup_account
-      ;;
-  esac
+    case "${1:-}" in
+        remove) remove_account ;;
+        edit)   edit_account ;;
+        list)   list_accounts ;;
+        *)      setup_account ;;
+    esac
 }
 
 main "$@"

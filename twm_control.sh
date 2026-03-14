@@ -41,14 +41,16 @@ display_menu() {
     printf "  6) View specific account logs\n"
     printf "  7) View all accounts status table\n\n"
 
-    printf "${GREENb_BLACK}ADD NEW ACCOUNT${COLOR_RESET}\n"
-    printf "  8) Add new account to index.json\n\n"
+    printf "${GREENb_BLACK}SETUP & CONFIG${COLOR_RESET}\n"
+    printf "  8) Add new account\n"
+    printf "  9) Edit existing account\n"
+    printf "  R) Remove account\n\n"
 
     printf "${GREENb_BLACK}HELP & INFO${COLOR_RESET}\n"
-    printf "  9) Show monitoring guide\n"
+    printf "  H) Show monitoring guide\n"
     printf "  0) Exit\n\n"
 
-    printf "${GOLD_BLACK}Select option (0-9):${COLOR_RESET} "
+    printf "${GOLD_BLACK}Select option:${COLOR_RESET} "
 }
 
 show_guide() {
@@ -102,14 +104,23 @@ EOF
 }
 
 add_account_interactive() {
-    if [ ! -x "$BASE_DIR/twm_setup.sh" ]; then
-      printf "Setting up wizard...\n"
-    fi
-
     cd "$BASE_DIR" && ./twm_setup.sh || {
-      printf "${RED_BLACK}Setup wizard failed or was cancelled.${COLOR_RESET}\n"
-      read -p "Press Enter..."
-      return
+        printf "${RED_BLACK}Setup wizard failed or was cancelled.${COLOR_RESET}\n"
+        read -rp "Press Enter..."
+    }
+}
+
+edit_account_interactive() {
+    cd "$BASE_DIR" && ./twm_setup.sh edit || {
+        printf "${RED_BLACK}Edit wizard failed or was cancelled.${COLOR_RESET}\n"
+        read -rp "Press Enter..."
+    }
+}
+
+remove_account_interactive() {
+    cd "$BASE_DIR" && ./twm_setup.sh remove || {
+        printf "${RED_BLACK}Remove failed or was cancelled.${COLOR_RESET}\n"
+        read -rp "Press Enter..."
     }
 }
 
@@ -123,25 +134,25 @@ main() {
                 clear
                 printf "${BLACK_CYAN}Starting all active accounts...${COLOR_RESET}\n\n"
                 cd "$BASE_DIR" && ./multi_runner.sh start
-                read -p "Press Enter to continue..."
+                read -rp "Press Enter to continue..."
                 ;;
             2)
                 clear
                 printf "${BLACK_CYAN}Stopping all accounts...${COLOR_RESET}\n\n"
                 cd "$BASE_DIR" && ./multi_runner.sh stop
-                read -p "Press Enter to continue..."
+                read -rp "Press Enter to continue..."
                 ;;
             3)
                 clear
                 printf "${BLACK_CYAN}Restarting all accounts...${COLOR_RESET}\n\n"
                 cd "$BASE_DIR" && ./multi_runner.sh restart
-                read -p "Press Enter to continue..."
+                read -rp "Press Enter to continue..."
                 ;;
             4)
                 clear
                 printf "${BLACK_CYAN}Account Status:${COLOR_RESET}\n\n"
                 cd "$BASE_DIR" && ./multi_runner.sh status
-                read -p "Press Enter to continue..."
+                read -rp "Press Enter to continue..."
                 ;;
             5)
                 cd "$BASE_DIR" && ./twm_monitor.sh
@@ -153,12 +164,18 @@ main() {
                 clear
                 printf "${BLACK_CYAN}All Accounts Status:${COLOR_RESET}\n\n"
                 cd "$BASE_DIR" && ./twm_monitor.sh status
-                read -p "Press Enter to continue..."
+                read -rp "Press Enter to continue..."
                 ;;
             8)
                 add_account_interactive
                 ;;
             9)
+                edit_account_interactive
+                ;;
+            r|R)
+                remove_account_interactive
+                ;;
+            h|H)
                 show_guide
                 ;;
             0)
@@ -168,7 +185,7 @@ main() {
                 ;;
             *)
                 printf "${RED_BLACK}Invalid option. Try again.${COLOR_RESET}\n"
-                read -p "Press Enter..."
+                read -rp "Press Enter..."
                 ;;
         esac
     done

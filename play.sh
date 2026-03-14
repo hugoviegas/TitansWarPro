@@ -10,6 +10,19 @@ run_file="${ACCOUNT_RUN_FILE:-$HOME/twm/runmode_file}"
 child_pid=""
 should_exit=0
 
+# When running play.sh directly (not via multi_runner.sh), ACCOUNT_ID is unset.
+# Without it, requer_func looks for config/ur_file in $HOME/twm/ instead of
+# $HOME/twm/accounts/<ID>/, causing repeated setup prompts.
+# Auto-detect it from index.json so the correct account config path is used.
+if [ -z "$ACCOUNT_ID" ] && command -v jq >/dev/null 2>&1; then
+  _idx="$HOME/twm/accounts/index.json"
+  if [ -f "$_idx" ]; then
+    ACCOUNT_ID=$(jq -r '(.defaultAccount // .accounts[0].id // empty)' "$_idx" 2>/dev/null)
+    [ -n "$ACCOUNT_ID" ] && export ACCOUNT_ID
+  fi
+  unset _idx
+fi
+
 # Kills only the child twm.sh we previously spawned, not every instance
 kill_child() {
   if [ -n "$child_pid" ] && kill -0 "$child_pid" 2>/dev/null; then
