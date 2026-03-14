@@ -106,21 +106,18 @@ draw_top_bar() {
     local alias="${account_aliases[$i]}"
     local info; info=$(get_status "$id")
     local state; state="${info%%|*}"
-    local mode;  mode="${info##*|}"
 
     case "$state" in
       RUNNING) dot='\033[1;32m●\033[0m' ;;
-      DEAD)    dot='\033[1;33m◉\033[0m' ;;
-      *)       dot='\033[1;31m○\033[0m' ;;
+      DEAD)    dot='\033[1;33m●\033[0m' ;;
+      *)       dot='\033[1;31m●\033[0m' ;;
     esac
 
     # Highlight the currently selected account
     if [ "$i" -eq "$current_index" ]; then
-      printf "%b \033[1;37m%-5s\033[0m \033[0;37m%-10s %-6s\033[0m  " \
-        "$dot" "$id" "$alias" "$mode"
+      printf "%b \033[1;37m%-12s\033[0m  " "$dot" "$alias"
     else
-      printf "%b \033[0;37m%-5s %-10s %-6s\033[0m  " \
-        "$dot" "$id" "$alias" "$mode"
+      printf "%b \033[0;37m%-12s\033[0m  " "$dot" "$alias"
     fi
   done
   printf '\n'
@@ -133,27 +130,27 @@ draw_account_header() {
   local alias="${account_aliases[$current_index]}"
   local info; info=$(get_status "$id")
   local state; state="${info%%|*}"
-  local pid;   pid="${info#*|}"; pid="${pid%|*}"
   local mode;  mode="${info##*|}"
-  local sfmt;  sfmt=$(state_fmt "$state")
 
-  # Extract timestamp from the already-read tail line (no extra subprocess)
-  local last_ts=""
-  if [ -n "$passed_tail" ] && [[ "$passed_tail" =~ ^([0-9]{4}-[0-9]{2}-[0-9]{2}\ [0-9]{2}:[0-9]{2}:[0-9]{2}) ]]; then
-    last_ts=" | last: \033[0;37m${BASH_REMATCH[1]}\033[0m"
-  fi
+  # Status indicator: green circle for RUNNING, red for others
+  case "$state" in
+    RUNNING) status_dot='\033[1;32m●\033[0m' ;;
+    DEAD)    status_dot='\033[1;33m●\033[0m' ;;
+    *)       status_dot='\033[1;31m●\033[0m' ;;
+  esac
 
-  printf " \033[1;33m▶ %s\033[0m \033[0;37m(%s)\033[0m  %b  pid:\033[1;33m%s\033[0m  mode:\033[1;33m%s\033[0m%b  \033[0;36m[%d/%d]\033[0m\n" \
-    "$alias" "$id" "$sfmt" "$pid" "$mode" "$last_ts" "$current_index" "$account_count"
-  printf " \033[0;36m [N]ext [P]rev [F]ollow [L]ist [C]md [R]efresh [Q]uit  [1-9] jump\033[0m\n"
+  # Simplified header: status dot, alias, mode
+  printf " %b \033[1;33m%-12s\033[0m  mode:\033[0;36m%s\033[0m\n" \
+    "$status_dot" "$alias" "$mode"
+  printf " \033[0;36m[N]ext [P]rev [F]ollow [L]ist [C]md [R]efresh [Q]uit  [1-9] jump\033[0m\n"
   hline
 }
 
 draw_log() {
   local id="${account_ids[$current_index]}"
   local log_file="${ACCOUNTS_DIR}/${id}/logs/twm.log"
-  # Header: 3 lines (top bar) + 3 lines (account header) = 6 fixed lines
-  local log_lines=$((TERM_LINES - 6))
+  # Header: hline(1) + top_bar(3) + hline(1) + account_header(2) + hline(1) = 8 lines
+  local log_lines=$((TERM_LINES - 8))
   [ "$log_lines" -lt 4 ] && log_lines=4
 
   # Ensure we don't overflow terminal height - leave space for potential prompts
@@ -169,7 +166,6 @@ draw_log() {
 render() {
   local cur_tail="${1:-}"
   update_term_size
-  clear  # Explicit clear to prevent terminal pollution
   printf '\033[2J\033[H'   # clear entire screen THEN cursor home (correct order)
   draw_top_bar
   draw_account_header "$cur_tail"
