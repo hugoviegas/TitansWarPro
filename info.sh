@@ -34,7 +34,7 @@ w3mc() {
 script_slogan() {
     colors="10 8 2 1 3 6 7"
     author="Hugo Viegas"
-    #collaborator="collaborator: @_hviegas"
+    collaborator="Alessandro Almeida"
     versionNum="3.10.02" # to change the version number every time has an update!!!!!!
 
 for i in $colors; do
@@ -63,6 +63,7 @@ printf "\033[1;38;5;${i}m
 ╚═╝     ╚═╝  ╚═╝ ╚═════╝ 
 "
 printf "\033[1;38;5;${i}mMod author: ${author}\n\033[02m"
+printf "\033[1;38;5;${i}mCollaborator: ${collaborator}\n\033[02m"
 printf "Version: ${versionNum}${COLOR_RESET}\n"
 sleep 0.2s
 done

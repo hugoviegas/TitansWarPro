@@ -5,35 +5,49 @@ update_config() {
     local key="$1"      # Name of the configuration to be changed
     local value="$2"    # New value for the configuration
 
+    # If CONFIG_FILE does not exist, create it (safer behavior)
+    if [ ! -f "$CONFIG_FILE" ]; then
+        echo_t "Configuration file not found. Creating new..."
+        touch "$CONFIG_FILE"
+    fi
+
     load_config  # Ensure CONFIG_FILE is defined
 
-    # Check if the key exists in the config.cfg file
+    # If the key exists in the config file, update it.
+    # Otherwise add it to the end (keeps compatibility with older configs).
     if grep -q "^${key}=" "$CONFIG_FILE"; then
         # Update the value in config.cfg using sed for substitution
         sed -i "s/^${key}=.*/${key}=${value}/" "$CONFIG_FILE"
         echo_t "Configuration $key updated to $value."
     else
-        echo_t "Configuration $key not found in the config.cfg file."
-        return 1  # Return an error to indicate failure
+        # Add new key if it didn't exist
+        echo "${key}=${value}" >> "$CONFIG_FILE"
+        echo_t "Added new configuration key $key with value $value."
     fi
 }
 
 # Function to request key and value, and call update_config with validation
 request_update() {
-    local key value success=1  # Initialize success with 1 (failure)
+    local key value success=1
 
     while [ "$success" -ne 0 ]; do
-        # Instructions for the user
-        echo_t "  Macro settings, list of changes to modify type the command number" "${BLACK_GREEN}" "${COLOR_RESET}" "before" "⚙️"
+        echo_t "  Macro settings, list of options to modify, type the command number" "${BLACK_GREEN}" "${COLOR_RESET}" "before" "⚙️"
         echo " "
-        echo_t "1- Collect relics. Current value: " "" "$FUNC_check_rewards"
-        echo_t "2- Use elixir. Current value: " "" "$FUNC_use_elixir"
-        echo_t "3- Auto update. Current value: " "" "$FUNC_AUTO_UPDATE"
-        echo_t "4- Get to top in league. Current value: " "" "$FUNC_play_league"
-    echo_t "5- Change language. Current value: " "" "$LANGUAGE"
-    echo_t "6- Change allies. Current value: " "" "$ALLIES"
-    echo_t "7- Update channel. Current value: " "" "$UPDATE_CHANNEL"
+        # NOTE: menu lines are prefixed with __FUNC__ so translate.sh preserves prefixes for function.sh text
+        echo_t "__FUNC__ 1- Collect relics. Current value: " "" "$FUNC_check_rewards"
+        echo_t "__FUNC__ 2- Use elixir. Current value: " "" "$FUNC_use_elixir"
+        echo_t "__FUNC__ 3- Auto update. Current value: " "" "$FUNC_AUTO_UPDATE"
+        echo_t "__FUNC__ 4- Get to top in league. Current value: " "" "$FUNC_play_league"
+        echo_t "__FUNC__ 5- Change language. Current value: " "" "$LANGUAGE"
+        echo_t "__FUNC__ 6- Change allies. Current value: " "" "$ALLIES"
+        echo_t "__FUNC__ 7- Collect mission rewards. Current value: " "" "$FUNC_collect_mission_rewards"
+        echo_t "__FUNC__ 8- Pause mission rewards on weekends. Current value: " "" "$FUNC_pause_weekends"
+        echo_t "__FUNC__ 9- Complete events. Current value: " "" "$FUNC_auto_events"
+        echo_t "__FUNC__ A- Complete clan missions. Current value: " "" "$FUNC_clan_missions"
+        echo_t "__FUNC__ B- Enable clan statue automatically. Current value: " "" "$FUNC_clan_statue"
+        echo_t "__FUNC__ C- Use gold to collect 3 ores in the cave. Current value: " "" "$FUNC_cave_boost"
         echo_t "Press *'ENTER'* to exit configuration update mode." "" "" "after" "↩️"
+
         read -r -n 1 key
 
         case $key in
@@ -59,7 +73,7 @@ request_update() {
                         set_config "FUNC_play_league" "$value"
                         break
                     else
-                        echo_t "Invalid input. Please enter a number between 1 and 999: " "" "" "after" "❌"
+                        echo_t "Invalid input. Enter a number between 1 and 999:" "" "" "after" "❌"
                     fi
                 done
                 key="FUNC_play_league"
@@ -72,20 +86,17 @@ request_update() {
                 continue
                 ;;
             (6|allies)
-                echo_t "Do you want to change the your allies for battle? (y or n):"
+                echo_t "Do you want to change your allies for battle? (y or n):"
                 while true; do
                     read -r -n 1 value
-                    echo  # To break the line after input
-                    if [[ $value =~ ^[yYnN]$ ]]; then
-                        break
-                    else
-                    echo_t "Invalid input. Please enter 'y' or 'n':"  "" "" "before" "❌"
-                    fi
+                    echo
+                    [[ $value =~ ^[yYnN]$ ]] && break
+                    echo_t "Invalid input. Enter 'y' or 'n':" "" "" "before" "❌"
                 done
                 if [ "$value" = "n" ]; then
                     continue
                 else
-                    set_config "ALLIES" ""  # Clear allies configuration
+                    set_config "ALLIES" ""
                     key="ALLIES"
                     : > "$TMP/allies.txt"
                     : > "$TMP/callies.txt"
@@ -93,29 +104,29 @@ request_update() {
                 fi
                 break
                 ;;
-            (7|channel|update-channel)
-                echo_t "Select update channel: 1-Master, 2-Beta, 3-Beta2" "" ""
-                read -r value
-                case $value in
-                    (1|master|Master)
-                        set_config "UPDATE_CHANNEL" "master"
-                        UPDATE_CHANNEL="master"
-                        ;;
-                    (2|beta|Beta)
-                        set_config "UPDATE_CHANNEL" "beta"
-                        UPDATE_CHANNEL="beta"
-                        ;;
-                    (3|beta2|Beta2)
-                        set_config "UPDATE_CHANNEL" "beta2"
-                        UPDATE_CHANNEL="beta2"
-                        ;;
-                    (*)
-                        echo_t "Invalid channel option." "" "" "before" "❌"
-                        continue
-                        ;;
-                esac
-                echo_t "Update channel configured!" "" "" "before" "✅"
-                continue
+            (7|mission-rewards)
+                echo_t "Do you want to collect mission rewards automatically? (y or n):"
+                key="FUNC_collect_mission_rewards"
+                ;;
+            (8|pause-weekends)
+                echo_t "Do you want to automatically pause mission rewards on weekends? (y or n):"
+                key="FUNC_pause_weekends"
+                ;;
+            (9|auto-events)
+                echo_t "Do you want to run special events? (y or n):"
+                key="FUNC_auto_events"
+                ;;
+            (a|A|auto-clanquests)
+                echo_t "Do you want to complete the clan missions? (y or n):"
+                key="FUNC_clan_missions"
+                ;;
+            (b|B|auto-clan-statue)
+                echo_t "Do you want to enable clan statue automatically? (y or n):"
+                key="FUNC_clan_statue"
+                ;;
+            (c|C|auto-cave-boost)
+                echo_t "Do you want to use gold to collect 3 ores in the cave? (y or n):"
+                key="FUNC_cave_boost"
                 ;;
             (exit|*)
                 echo_t "Exiting configuration update mode."
@@ -124,82 +135,62 @@ request_update() {
                 ;;
         esac
 
-        # If a valid key was chosen, validate input for value
-        if [[ $key != "FUNC_check_rewards" && $key != "FUNC_use_elixir" && $key != "FUNC_AUTO_UPDATE" ]]; then
-            continue
-        fi
+        # If a valid key was chosen and it's a FUNC_ flag, validate input for y/n
+        if [[ $key == FUNC_* ]]; then
+            while true; do
+                read -r -n 1 value
+                echo  # break line after input
+                if [[ $value =~ ^[yYnN]$ ]]; then
+                    break
+                else
+                    echo_t "Invalid input. Please enter 'y' or 'n':"  "" "" "before" "❌"
+                fi
+            done
 
-        while true; do
-            read -r -n 1 value
-            echo  # To break the line after input
-            if [[ $value =~ ^[yYnN]$ ]]; then
-                break
+            # Update the configuration (will add key if missing)
+            update_config "$key" "$value"
+            success=$?
+            if [ "$success" -ne 0 ]; then
+                echo_t "Invalid key. Please try again." "" "" "before" "❌"
             else
-                echo_t "Invalid input. Please enter 'y' or 'n':"  "" "" "before" "❌"
+                echo_t "Configuration updated successfully!" "" "" "before" "✅"
+                config
+                break
             fi
-        done
-
-        # Call the configuration update function and capture the status
-        update_config "$key" "$value"
-        success=$? # Capture the status of the update
-
-        # Check if there was a failure and notify the user
-        if [ "$success" -ne 0 ]; then
-            echo_t "Invalid key. Please try again." "" "" "before" "❌"
-            #rm -f "$CONFIG_FILE"  # Remove the config file to reset the configuration
-            #load_config  # Reload the configuration after the reset
-        else
-            echo_t "Configuration updated successfully!"   "" "" "before" "✅"
-            config
-            break
         fi
     done
 }
 
 # Function to load configurations from the config.cfg file
 load_config() {
-    if [ -n "$ACCOUNT_CONFIG" ]; then
-        CONFIG_FILE="$ACCOUNT_CONFIG"
-    elif [ -z "$CONFIG_FILE" ] && [ -n "$TMP" ]; then
-        CONFIG_FILE="$TMP/config.cfg"
-    fi
-
-    if [ -z "$CONFIG_FILE" ]; then
-        echo_t "Configuration path is undefined." "${BLACK_RED}" "${COLOR_RESET}" "before" "⚠️"
-        return 1
-    fi
-
-    CONFIG_DIR=$(dirname "$CONFIG_FILE")
-    mkdir -p "$CONFIG_DIR"
-
+    # Load the initial configuration
+    CONFIG_FILE="$TMP/config.cfg"
     if [ -f "$CONFIG_FILE" ]; then
         # shellcheck source=/path/to/config.cfg
         # shellcheck disable=SC1091
         . "$CONFIG_FILE"  # Load the configuration file
-        if [ -z "$UPDATE_CHANNEL" ]; then
-            UPDATE_CHANNEL="master"
-            grep -v '^UPDATE_CHANNEL=' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" 2>/dev/null || true
-            mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
-            echo "UPDATE_CHANNEL=$UPDATE_CHANNEL" >> "$CONFIG_FILE"
-        fi
     else
         echo_t "Configuration file not found. Creating config.cfg with default values."
         
         # Write the config.cfg file with default values
         default_config() {
             # Define default values
-            FUNC_check_rewards="y"
+            FUNC_check_rewards="n"
             FUNC_use_elixir="n"
             FUNC_coliseum="y"
             FUNC_AUTO_UPDATE="y"
             FUNC_play_league=999
             FUNC_clan_figth="y"
+            FUNC_collect_mission_rewards="n"
+            FUNC_pause_weekends="n"
+            FUNC_auto_events="y"
+            FUNC_clan_missions="n"
+            FUNC_clan_statue="y"
+            FUNC_cave_boost="y"
             LANGUAGE="en"
-            UPDATE_CHANNEL="master"
             ALLIES=""
             SCRIPT_PAUSED="n"
 
-            
             {
             echo "FUNC_check_rewards=$FUNC_check_rewards"
             echo "FUNC_use_elixir=$FUNC_use_elixir"
@@ -207,15 +198,19 @@ load_config() {
             echo "FUNC_AUTO_UPDATE=$FUNC_AUTO_UPDATE"
             echo "FUNC_play_league=$FUNC_play_league"
             echo "FUNC_clan_figth=$FUNC_clan_figth"
+            echo "FUNC_collect_mission_rewards=$FUNC_collect_mission_rewards"
+            echo "FUNC_pause_weekends=$FUNC_pause_weekends"
+            echo "FUNC_auto_events=$FUNC_auto_events"
+            echo "FUNC_clan_missions=$FUNC_clan_missions"
+            echo "FUNC_clan_statue=$FUNC_clan_statue"
+            echo "FUNC_cave_boost=$FUNC_cave_boost"
             echo "SCRIPT_PAUSED=$SCRIPT_PAUSED"
             echo "LANGUAGE=$LANGUAGE"
             echo "ALLIES="
-            echo "UPDATE_CHANNEL=$UPDATE_CHANNEL"
             } > "$CONFIG_FILE"
         } 
         default_config 
     fi
-    unset CONFIG_DIR
 }
 
 # Function to get the configuration from file and return the value
@@ -257,12 +252,40 @@ config() {
     
             # If EXIT_CONFIG is "s", exit the main loop
         else
-            echo_t "Exiting configuration mode..." "${BLACK_RED}" "${COLOR_RESET}\n" "before" "🛑"
+            echo_t "Exiting configuration update mode..." "${BLACK_RED}" "${COLOR_RESET}\n" "before" "🛑"
             EXIT_CONFIG="n"  # Reset the exit signal for next use
             sleep 1s # Interval before restarting the loop
             break
         fi          
     done
+}
+
+# Automatically pause or resume mission rewards based on day of the week
+pause_missions_weekend() {
+    if [ "$FUNC_pause_weekends" = "n" ]; then
+        return
+    fi
+
+    local current_day current_hour
+    current_day=$(date +%u)   # 1=Mon ... 7=Sun
+    current_hour=$(date +%H)
+
+    CONFIG_FILE="$TMP/config.cfg"
+    [ -f "$CONFIG_FILE" ] || return
+
+    # Disable mission rewards during weekend
+    if [ "$current_day" -eq 6 ] || [ "$current_day" -eq 7 ]; then
+        sed -i "s/^FUNC_collect_mission_rewards=.*/FUNC_collect_mission_rewards=n/" "$CONFIG_FILE"
+        echo_t "Mission rewards collection paused for the weekend." "${BLACK_RED}" "${COLOR_RESET}" "after" "⏸️"
+        return
+    fi
+
+    # Re-enable mission rewards Monday at 00:00
+    if [ "$current_day" -eq 1 ] && [ "$current_hour" -eq 0 ]; then
+        sed -i "s/^FUNC_collect_mission_rewards=.*/FUNC_collect_mission_rewards=y/" "$CONFIG_FILE"
+        echo_t "Mission rewards collection reactivated automatically." "${BLACK_GREEN}" "${COLOR_RESET}" "after" "✅"
+        return
+    fi
 }
 
 testColour() {
@@ -277,7 +300,10 @@ testColour() {
    echo -e "${CYAN_CYAN}CYAN_CYAN${COLOR_RESET}\n"
    echo -e "${GOLD_BLACK}GOLD_BLACK${COLOR_RESET}\n"
    echo -e "${GREEN_BLACK}GREEN_BLACK${COLOR_RESET}\n"
+   echo -e "${PURPLEi_BLACK}PURPLEi_BLACK${COLOR_RESET}\n"
+   echo -e "${PURPLEis_BLACK}PURPLEis_BLACK${COLOR_RESET}\n"
    echo -e "${WHITE_BLACK}WHITE_BLACK${COLOR_RESET}\n"
+   echo -e "${WHITEb_BLACK}WHITEb_BLACK${COLOR_RESET}\n"
    echo -e "${RED_BLACK}RED_BLACK${COLOR_RESET}\n"
    echo -e "${BLUE_BLACK}BLUE_BLACK${COLOR_RESET}\n"
    sleep 30s
