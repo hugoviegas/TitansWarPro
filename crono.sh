@@ -27,6 +27,13 @@ func_cat() {
     # is running (arena, cave, coliseum, etc), you cannot send commands until
     # the event completes and returns to idle.
     #
+    # Signal handler for graceful interrupt of sleep/read
+    _interrupt_func_cat() {
+        printf "\033[01;31m\n$(translate "Stopping macro")...\033[0m\n"
+        exit 0
+    }
+    trap '_interrupt_func_cat' INT TERM
+
     func_crono
 
     # Reset all attributes before content — ensures dim mode from func_crono doesn't bleed

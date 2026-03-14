@@ -28,12 +28,37 @@ fi
 export ACCOUNT_ID="$1"
 RUN="${2:--boot}"
 run_file="${ACCOUNT_RUN_FILE:-$HOME/twm/accounts/$ACCOUNT_ID/runmode_file}"
+lock_file="$HOME/twm/accounts/$ACCOUNT_ID/.play.lock"
 child_pid=""
 should_exit=0
 
+# Check if another instance is already running
+if [ -f "$lock_file" ]; then
+  existing_pid=$(cat "$lock_file" 2>/dev/null)
+  if kill -0 "$existing_pid" 2>/dev/null; then
+    printf '\033[01;31mError: Account %s is already running (PID %s)\033[0m\n' "$ACCOUNT_ID" "$existing_pid"
+    printf 'To stop it: kill %s\n' "$existing_pid"
+    exit 1
+  else
+    # Stale lock file, remove it
+    rm -f "$lock_file" 2>/dev/null
+  fi
+fi
+
+# Create lock file
+echo "$$" > "$lock_file" 2>/dev/null || {
+  printf 'Error: Cannot write lock file to %s\n' "$(dirname "$lock_file")"
+  exit 1
+}
+
 kill_child() {
   if [ -n "$child_pid" ] && kill -0 "$child_pid" 2>/dev/null; then
-    kill -9 "$child_pid" 2>/dev/null
+    kill -TERM "$child_pid" 2>/dev/null
+    # Give it 2 seconds to exit gracefully, then force kill
+    sleep 2s
+    if kill -0 "$child_pid" 2>/dev/null; then
+      kill -9 "$child_pid" 2>/dev/null
+    fi
     wait "$child_pid" 2>/dev/null || true
   fi
   child_pid=""
@@ -42,10 +67,11 @@ kill_child() {
 cleanup() {
   should_exit=1
   kill_child
+  rm -f "$lock_file" 2>/dev/null
   exit 0
 }
 
-trap 'cleanup' INT TERM
+trap 'cleanup' INT TERM EXIT
 
 while [ "$should_exit" -eq 0 ]; do
   kill_child
