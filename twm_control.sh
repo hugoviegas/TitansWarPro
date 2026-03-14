@@ -375,20 +375,27 @@ update_script_interactive() {
 
     # Check if update.sh itself needs updating
     printf "\n${BLACK_CYAN}$(translate "update_check")${COLOR_RESET}\n"
-    if [ -f "$BASE_DIR/update.sh" ]; then
+    local update_script="$HOME/update.sh"
+    if [ ! -f "$update_script" ]; then
+        # Fallback to ~/twm/ in case it's there
+        update_script="$BASE_DIR/update.sh"
+    fi
+
+    if [ -f "$update_script" ]; then
         # Check if there's a newer version on the repository
         local remote_size=$(curl -s -I "https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh" 2>/dev/null | grep -i "content-length" | awk '{print $2}' | tr -d '\r')
-        local local_size=$(wc -c <"$BASE_DIR/update.sh" 2>/dev/null || echo "0")
+        local local_size=$(wc -c <"$update_script" 2>/dev/null || echo "0")
 
         if [ -n "$remote_size" ] && [ "$remote_size" != "$local_size" ]; then
             printf "  📥 Updating update.sh itself...\n"
-            curl -s "https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh" -o "$BASE_DIR/update.sh.tmp" 2>/dev/null
-            if [ -f "$BASE_DIR/update.sh.tmp" ] && [ -s "$BASE_DIR/update.sh.tmp" ]; then
-                mv "$BASE_DIR/update.sh.tmp" "$BASE_DIR/update.sh"
-                chmod +x "$BASE_DIR/update.sh"
+            curl -s "https://raw.githubusercontent.com/hugoviegas/TitansWarPro/master/update.sh" -o "$HOME/update.sh.tmp" 2>/dev/null
+            if [ -f "$HOME/update.sh.tmp" ] && [ -s "$HOME/update.sh.tmp" ]; then
+                mv "$HOME/update.sh.tmp" "$HOME/update.sh"
+                chmod +x "$HOME/update.sh"
+                update_script="$HOME/update.sh"
                 printf "  ✅ update.sh updated\n"
             else
-                rm -f "$BASE_DIR/update.sh.tmp"
+                rm -f "$HOME/update.sh.tmp"
                 printf "  ⚠️  Could not update update.sh, proceeding with existing version\n"
             fi
         else
@@ -400,12 +407,12 @@ update_script_interactive() {
     printf "\n${BLACK_CYAN}$(translate "update_running")${COLOR_RESET}\n"
     printf "Updating from ${GOLD_BLACK}${branch_name}${COLOR_RESET} branch...\n\n"
 
-    if [ -f "$BASE_DIR/update.sh" ]; then
+    if [ -f "$update_script" ]; then
         # Run update.sh with selected branch (pass the branch number as argument)
-        cd "$BASE_DIR" && bash ./update.sh "$branch_num" 2>&1 | head -50
+        bash "$update_script" "$branch_num" 2>&1 | head -50
         printf "\n${GREENb_BLACK}$(translate "update_complete")${COLOR_RESET}\n"
     else
-        printf "${RED_BLACK}Error: update.sh not found${COLOR_RESET}\n"
+        printf "${RED_BLACK}Error: update.sh not found (checked: \$HOME/update.sh and \$BASE_DIR/update.sh)${COLOR_RESET}\n"
     fi
 
     sleep 1
