@@ -36,6 +36,8 @@ coliseum_debug() {
     full_ram=$(mktemp -p "$dir_ram" debug.XXXXXX)
     local tmp_ram
     tmp_ram=$(mktemp -d -t twmdbg.XXXXXX)
+    local _dbg_battle_history
+    _dbg_battle_history=$(mktemp -p "$dir_ram" history.XXXXXX)
     cp -r "$TMP"/* "$tmp_ram" 2>/dev/null
     cd "$tmp_ram" || return 1
 
@@ -317,6 +319,16 @@ coliseum_debug() {
 
         _dbg_loop=$(( _dbg_loop + 1 ))
 
+        # Save battle history every 3 loops for later extraction
+        if [ $(( _dbg_loop % 3 )) -eq 0 ]; then
+            {
+                printf '[Loop %d] %s\n' "$_dbg_loop" "$(date +'%H:%M:%S')"
+                w3m -dump -T text/html "$src_ram" 2>/dev/null | \
+                    sed -n '/A batalha já começou/,/Fuja da batalha/p' | \
+                    grep -E 'Você |assassinou|perdeu|\[.*\] '
+            } >> "$_dbg_battle_history"
+        fi
+
         # Detect battle end
         if ! grep -q '/coliseum/dodge/' "$src_ram" 2>/dev/null; then
             _dbg_BREAK=1
@@ -540,8 +552,9 @@ coliseum_debug() {
     printf "  ${GOLD_BLACK}╠══════════════════════════════════════════════════════════╣${COLOR_RESET}\n"
     printf "  ${GRAY_BLACK}║ LEARNING ATTACK (LA):${COLOR_RESET}\n"
     printf "  ${GRAY_BLACK}║   Start: ${COLISEUM_LA:-5}s  |  End: ${LA}s${COLOR_RESET}\n"
-    local _dbg_page_fails=$(echo "$_dbg_rend" | grep -c "Você perdeu" 2>/dev/null || echo "0")
-    printf "  ${GRAY_BLACK}║   Fails: ${RED_BLACK}%-2d${GRAY_BLACK}  |  Page 'Você perdeu': ${RED_BLACK}%-2d${GRAY_BLACK}  (actual fails detected)${COLOR_RESET}\n" "$_dbg_la_failures" "$_dbg_page_fails"
+    local _dbg_captured_fails=$(grep -c "perdeu" "$_dbg_battle_history" 2>/dev/null || echo "0")
+    local _dbg_captured_kills=$(grep -c "assassinou" "$_dbg_battle_history" 2>/dev/null || echo "0")
+    printf "  ${GRAY_BLACK}║   Fails Detected: ${RED_BLACK}%-2d${GRAY_BLACK}  |  Kills: ${GREEN_BLACK}%-2d${GRAY_BLACK}  (from battle log)${COLOR_RESET}\n" "$_dbg_captured_fails" "$_dbg_captured_kills"
     printf "  ${GRAY_BLACK}║   HPER: ${HPER}%%  |  RPER: ${RPER}%%${COLOR_RESET}\n"
     printf "  ${GOLD_BLACK}╠══════════════════════════════════════════════════════════╣${COLOR_RESET}\n"
     printf "  ${GRAY_BLACK}║ Debug file: ${GOLD_BLACK}%-46s${GRAY_BLACK}║${COLOR_RESET}\n" "${debug_file##*/}"
@@ -563,19 +576,24 @@ coliseum_debug() {
         printf 'HPER Final:%s  RPER Final:%s\n' "$HPER" "$RPER"
         printf 'Stone used:%s  Grass used:%s\n' "$_dbg_stone_used" "$_dbg_grass_used"
 
-        printf '\n--- BATTLE HISTORY (from page render) ---\n'
-        echo "$_dbg_rend" | sed -n '/Os participantes:/,/\[user\]/p' | \
-            grep -E '^\[0\]|\[1\]|\[rip\]|^Você ' | head -n 50
+        printf '\n--- BATTLE HISTORY (captured during battle) ---\n'
+        if [ -f "$_dbg_battle_history" ] && [ -s "$_dbg_battle_history" ]; then
+            cat "$_dbg_battle_history"
+        else
+            printf '(no history captured)\n'
+        fi
 
         local _dbg_real_fails
-        _dbg_real_fails=$(echo "$_dbg_rend" | grep -c "Você perdeu" 2>/dev/null || echo "0")
+        _dbg_real_fails=$(grep -c "perdeu" "$_dbg_battle_history" 2>/dev/null || echo "0")
+        local _dbg_real_kills
+        _dbg_real_kills=$(grep -c "assassinou" "$_dbg_battle_history" 2>/dev/null || echo "0")
         printf '\n--- ATTACK ANALYSIS ---\n'
         printf 'Você perdeu (fails detected): %d\n' "$_dbg_real_fails"
-        printf 'Você assassinou (kills): %d\n' "$(echo "$_dbg_rend" | grep -c "Você assassinou" 2>/dev/null || echo "0")"
+        printf 'Você assassinou (kills): %d\n' "$_dbg_real_kills"
     } >> "$debug_file"
 
     # ── Cleanup ───────────────────────────────────────────────────────────
-    rm -f "$src_ram" "$full_ram"
+    rm -f "$src_ram" "$full_ram" "$_dbg_battle_history"
     cd - >/dev/null 2>&1
     rm -rf "$tmp_ram"
     unset _dbg_page _dbg_action _dbg_extract
