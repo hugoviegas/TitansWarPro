@@ -21,12 +21,14 @@
 ### What is King of the Immortals?
 
 A **2-phase raid battle**:
+
 - **Phase 1 (KING)**: Attack the King with special `kingatk/` link until its HP drops to 2% or dies
 - **Phase 2 (PVP)**: After king dies, fight other players with `atk/` link (coliseum-style)
 
 ### Battle Window
 
 Scheduled at: **12:25-29**, **16:25-29**, **22:25-29** (game time)
+
 - `king_start()` detects window time and prepares
 - Waits until exactly 12:25 (or 16:25, 22:25), then enters battle
 - Calls `king_debug()` to run the full battle logic
@@ -70,6 +72,7 @@ _kd_KINGATK=$(grep -o -E '/king/kingatk/[?]r[=][0-9]+' "$src_ram" | head -1)
 ### Token Format
 
 All links have a random token: `?r=XXXXXXXX` (random number)
+
 - **Purpose**: CSRF protection + session validation
 - New token generated after EVERY action
 - **Old r=0 bug**: If hero died, game sent `r=0` (invalid token) - revive would fail silently
@@ -82,11 +85,11 @@ All links have a random token: `?r=XXXXXXXX` (random number)
 
 Check which **links are present**:
 
-| Phase | KINGATK Present? | ATK Present? | Meaning |
-|-------|------------------|-------------|---------|
-| KING  | ✅ YES | ❌ NO | King still alive, can use kingatk |
-| PVP   | ❌ NO | ✅ YES | King dead, only regular attack available |
-| DEAD  | ❌ NO | ❌ NO | Hero dead (need UNRIP) or battle ended |
+| Phase | KINGATK Present? | ATK Present? | Meaning                                  |
+| ----- | ---------------- | ------------ | ---------------------------------------- |
+| KING  | ✅ YES           | ❌ NO        | King still alive, can use kingatk        |
+| PVP   | ❌ NO            | ✅ YES       | King dead, only regular attack available |
+| DEAD  | ❌ NO            | ❌ NO        | Hero dead (need UNRIP) or battle ended   |
 
 ### OLD vs NEW Detection Logic
 
@@ -102,6 +105,7 @@ done
 ```
 
 **PROBLEM**: If king dies BEFORE hero enters the battle, `kingatk/` never appears → **timeout after 60-90s**
+
 - Happens when: another player kills king, hero enters afterwards
 - Result: Battle-end message appears, but bot still waiting
 
@@ -117,6 +121,7 @@ done
 ```
 
 **FIX**: Accepts both signals:
+
 - `kingatk/` = **KING phase** (king alive)
 - `dodge/` = **ANY phase** (battle active - hero can at least dodge)
 - Either one means battle is live and we can proceed
@@ -158,6 +163,7 @@ _kd_UNRIP=$(grep -o -E '/king/unrip/[^A-Za-z0-9_]r[^A-Za-z0-9_][0-9]+' "$src_ram
 ```
 
 **UNRIP Bug**: Pattern allowed `r=0` (invalid token for revive)
+
 ```
 /king/unrip/?r=0         ← Matched! But useless (game ignores)
 /king/unrip/?r=1773603   ← Also matched, valid token
@@ -222,6 +228,7 @@ _kd_UNRIP=$(grep -o -E '/king/unrip/[?]r[=][1-9][0-9]+' "$src_ram" | head -1)
 ```
 
 **Result**: Only valid UNRIP tokens extracted
+
 ```
 /king/unrip/?r=0         ← NOT matched (filtered out)
 /king/unrip/?r=1773603   ← Matched! Valid token
@@ -250,6 +257,7 @@ fi
 ```
 
 **Key Difference**:
+
 - Checks UNRIP BEFORE exiting
 - Revives hero if possible, then loops again
 - Only exits when battle truly ended (no links AND no revive)
@@ -260,13 +268,13 @@ fi
 
 ### Fixed Bugs
 
-| # | Component | OLD Behavior | NEW Behavior | Impact |
-|-|-|-|-|-|
-| 1 | Wait condition | Only checks `kingatk/` | Checks `dodge/` OR `kingatk/` | Doesn't timeout if king dies before entry |
-| 2 | Double-entry | Ignores `$TMP/SRC` from `king_start`, always reenters | Reuses `$TMP/SRC` if battle already live | Avoids double /king/enterGame calls |
-| 3 | UNRIP token filter | Matches `r=0` (invalid) + valid tokens | Only matches valid tokens `r=[1-9]...` | Revive works reliably |
-| 4 | Battle-end check | Immediate exit if no dodge/kingatk | Extract → check UNRIP → revive if possible → exit only when truly over | Hero death properly handled |
-| 5 | Time calls | Used `$(date +%s)` forks (6+ per iteration) | Uses `printf -v '%(%s)T' -1` (builtin) | Reduced fork overhead by ~85% |
+| #   | Component          | OLD Behavior                                          | NEW Behavior                                                           | Impact                                    |
+| --- | ------------------ | ----------------------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------- |
+| 1   | Wait condition     | Only checks `kingatk/`                                | Checks `dodge/` OR `kingatk/`                                          | Doesn't timeout if king dies before entry |
+| 2   | Double-entry       | Ignores `$TMP/SRC` from `king_start`, always reenters | Reuses `$TMP/SRC` if battle already live                               | Avoids double /king/enterGame calls       |
+| 3   | UNRIP token filter | Matches `r=0` (invalid) + valid tokens                | Only matches valid tokens `r=[1-9]...`                                 | Revive works reliably                     |
+| 4   | Battle-end check   | Immediate exit if no dodge/kingatk                    | Extract → check UNRIP → revive if possible → exit only when truly over | Hero death properly handled               |
+| 5   | Time calls         | Used `$(date +%s)` forks (6+ per iteration)           | Uses `printf -v '%(%s)T' -1` (builtin)                                 | Reduced fork overhead by ~85%             |
 
 ### Code Changes (Detailed)
 
@@ -314,7 +322,7 @@ fi
 
 ---
 
-#### Change #3: _kd_extract - UNRIP filter (line 115)
+#### Change #3: \_kd_extract - UNRIP filter (line 115)
 
 ```bash
 # OLD
@@ -381,11 +389,13 @@ printf -v _kd_battle_start '%(%s)T' -1
 ### Fix #1: King Already Dead Scenario
 
 **Situation**:
+
 - Battle window opens (12:25)
 - Another player kills the King
 - Our bot enters and sees: NO `kingatk/` link, BUT `dodge/` link is present
 
 **OLD Behavior**:
+
 ```
 Wait for kingatk/ ← Never arrives!
 Timeout after 60-90s
@@ -394,6 +404,7 @@ Timeout after 60-90s
 ```
 
 **NEW Behavior**:
+
 ```
 Wait for dodge/ OR kingatk/ ← Sees dodge/ immediately!
 → Enters battle in PVP phase
@@ -406,11 +417,13 @@ Wait for dodge/ OR kingatk/ ← Sees dodge/ immediately!
 ### Fix #2: Double-Entry Corruption
 
 **Situation**:
+
 - `king_start()` enters game, saves page to `$TMP/SRC`
 - Calls `king_debug()`
 - `king_debug()` doesn't know about `$TMP/SRC`, so it calls `/king/enterGame` AGAIN
 
 **OLD Behavior**:
+
 ```
 king_start calls /king/enterGame #1 → saves to $TMP/SRC
     ↓
@@ -421,6 +434,7 @@ or corrupt the battle state
 ```
 
 **NEW Behavior**:
+
 ```
 king_start calls /king/enterGame #1 → saves to $TMP/SRC
     ↓
@@ -438,6 +452,7 @@ If not live → only then call /king/enterGame
 **Situation**: Hero dies during the wait-for-battle loop (before main battle started)
 
 **OLD Behavior**:
+
 ```
 Wait loop checks for kingatk/
     ↓
@@ -449,6 +464,7 @@ Wait loop doesn't have UNRIP handling
 ```
 
 **NEW Behavior**:
+
 ```
 Wait loop also checks for UNRIP (with valid r token filter)
     ↓
@@ -460,6 +476,7 @@ Continues waiting for battle links, now with alive hero
 ```
 
 Code (lines 192-196):
+
 ```bash
 # Handle UNRIP if hero is dead (valid r token, not r=0)
 local _kd_unrip_wait
@@ -476,6 +493,7 @@ fi
 **Situation**: Hero dies during main loop, UNRIP available
 
 **OLD Behavior**:
+
 ```
 Main loop extracts values
     ↓
@@ -488,6 +506,7 @@ TRUE (hero dead, no action links) → BREAK
 ```
 
 **NEW Behavior**:
+
 ```
 Main loop extracts values
     ↓
@@ -510,6 +529,7 @@ TRUE (hero dead)
 **Setup**: Running 2 accounts simultaneously (Account A = Team 0, Account B = Team 1)
 
 **Timeline**:
+
 ```
 12:25:00 - Account A: king_start() enters game #1
 12:25:05 - Account B: king_start() enters game #2
@@ -524,6 +544,7 @@ RESULT: Account A fails silently, Account B dominates
 ### The Solution (After Fixes)
 
 **Timeline**:
+
 ```
 12:25:00 - Account A: king_start() waits for dodge/ OR kingatk/
 12:25:05 - Account B: king_start() waits for dodge/ OR kingatk/
@@ -540,14 +561,14 @@ RESULT: Both accounts proceed correctly
 
 ## Summary Table: What Changed
 
-| Component | OLD | NEW | Why |
-|-----------|-----|-----|-----|
-| **Wait condition** | `grep -q 'king/kingatk/'` | `grep -q 'king/kingatk/\|king/dodge/'` | Dual signal detection |
-| **Entry check** | Always enter | Check `$TMP/SRC` first, skip if live | Avoid double-entry |
-| **UNRIP filter** | `[0-9]+` | `[1-9][0-9]+` | Block invalid r=0 tokens |
-| **Battle-end logic** | Immediate break | Extract → check UNRIP → revive if needed → break conditionally | Proper death handling |
-| **Time calls** | `$(date +%s)` | `printf -v '%(%s)T' -1` | Performance (no fork) |
-| **UNRIP in wait loop** | Not checked | Checked & used | Handle death during wait |
+| Component              | OLD                       | NEW                                                            | Why                      |
+| ---------------------- | ------------------------- | -------------------------------------------------------------- | ------------------------ |
+| **Wait condition**     | `grep -q 'king/kingatk/'` | `grep -q 'king/kingatk/\|king/dodge/'`                         | Dual signal detection    |
+| **Entry check**        | Always enter              | Check `$TMP/SRC` first, skip if live                           | Avoid double-entry       |
+| **UNRIP filter**       | `[0-9]+`                  | `[1-9][0-9]+`                                                  | Block invalid r=0 tokens |
+| **Battle-end logic**   | Immediate break           | Extract → check UNRIP → revive if needed → break conditionally | Proper death handling    |
+| **Time calls**         | `$(date +%s)`             | `printf -v '%(%s)T' -1`                                        | Performance (no fork)    |
+| **UNRIP in wait loop** | Not checked               | Checked & used                                                 | Handle death during wait |
 
 ---
 

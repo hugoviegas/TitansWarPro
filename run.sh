@@ -62,7 +62,8 @@ twm_play() {
 
         # King of the Immortals (12:30, 16:30, 22:30) — starts at :25 window
         (12:2[5-9]|16:2[5-9]|22:2[5-9])
-            king_start
+            #king_start             #inactive while tests 
+            king_start_debug
             start
             ;;
 
