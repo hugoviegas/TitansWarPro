@@ -63,7 +63,15 @@ func_cat() {
     # Track last time check to detect event transitions during idle
     local _last_time_check="${HOUR}:${MIN}"
 
+    # Flag to exit when hour/minute changes (schedule time reached)
+    local _schedule_changed=0
+
     while true; do
+
+        # If schedule changed (hour/minute), exit func_cat to return to main loop
+        if [ $_schedule_changed -eq 1 ]; then
+            break
+        fi
 
         # Check for a queued command written by the monitor
         if [ -s "$cmd_file" ]; then
@@ -93,6 +101,7 @@ func_cat() {
             else
                 # Background mode: sleep in short intervals and check cmd_file frequently
                 # This allows commands sent by monitor to execute within ~1 second instead of up to 60s
+                # CRITICAL: Also watch for time changes (hour/minute) to detect scheduled events!
                 local _sleep_count=0
                 while [ $_sleep_count -lt "$i" ]; do
                     # Check if a command was queued
@@ -102,10 +111,11 @@ func_cat() {
                         break
                     fi
 
-                    # Check if time changed (new event may be due) — break to re-evaluate
+                    # Check if time changed (new event may be due) — set flag to exit func_cat
                     printf -v _current_time '%(%H:%M)T' -1
                     if [ "$_current_time" != "$_last_time_check" ]; then
                         cmd=""
+                        _schedule_changed=1  # Signal to exit main while loop when we break here
                         break
                     fi
 
@@ -131,6 +141,10 @@ func_cat() {
                 ;;
             "")
                 # Empty command (timeout in interactive, or normal idle after sleep in background)
+                # If schedule changed, break outer while loop
+                if [ $_schedule_changed -eq 1 ]; then
+                    break  # CRITICAL: Exit func_cat when schedule time is reached
+                fi
                 # Don't execute anything, just continue waiting
                 continue
                 ;;
