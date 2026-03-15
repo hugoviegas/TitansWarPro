@@ -19,8 +19,8 @@ _kg_fetch() {
     (
         w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
             -debug -dump_source "${URL}${url_path}" \
-            -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
-    ) </dev/null &>/dev/null &
+            -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram" 2>/dev/null
+    ) &
     time_exit 17
 }
 
@@ -113,9 +113,12 @@ king_debug() {
         _kd_STONE=$(grep -o -E '/king/stone/[?]r[=][0-9]+' "$src_ram")
         _kd_HEAL=$(grep -o -E '/king/heal/[?]r[=][0-9]+' "$src_ram")
         _kd_UNRIP=$(grep -o -E '/king/unrip/[^A-Za-z0-9_]r[^A-Za-z0-9_][0-9]+' "$src_ram")
-        _kd_USER=$(grep -o -E '([[:upper:]][[:lower:]]{0,15}( [[:upper:]][[:lower:]]{0,13})?)[[:space:]][^[:alnum:][:space:]]' "$src_ram" | sed -n 's, [<]s,,;s, ,_,;2p')
-        _kd_RHP=$(awk -v ush="${_kd_USH:-0}" -v rper="$RPER" 'BEGIN { printf "%.0f", ush * rper / 100 + ush }')
-        _kd_HLHP=$(awk -v ush="${_kd_maxhp:-0}" -v hper="$HPER" 'BEGIN { printf "%.0f", ush * hper / 100 }')
+        _kd_USER=$(grep -o -E '([[:upper:]][[:lower:]]{0,15}( [[:upper:]][[:lower:]]{0,13})?)[[:space:]][^[:alnum:][:space:]]' "$src_ram" | sed -n 's,<[^>]*>,,g; s, ,_,;2p')
+        # Recalculate thresholds (refresh on each extract to handle HP changes)
+        if [ -n "${_kd_USH:-}" ]; then
+            _kd_RHP=$(awk -v ush="$_kd_USH" -v rper="$RPER" 'BEGIN { printf "%.0f", ush * (1 + rper / 100) }')
+            _kd_HLHP=$(awk -v ush="${_kd_maxhp:-1}" -v hper="$HPER" 'BEGIN { printf "%.0f", ush * hper / 100 }')
+        fi
         [ -n "$_kd_USER" ] && _kd_opponent="$_kd_USER"
     }
 
@@ -231,7 +234,7 @@ king_debug() {
     local _kd_stone_used=0
     local _kd_heals=0 _kd_dodges=0 _kd_atks=0 _kd_atkrnds=0 _kd_kingatks=0
     local _kd_la_failures=0 _kd_la_successes=0 _kd_la_adjusted=0
-    local _kd_loop=0 _kd_BREAK=0
+    local _kd_loop=0
     local _kd_king_dead=0
     local _kd_king_kill=0  # 1 = we got the kill
     local _kd_phase="KING"  # KING or PVP
@@ -242,9 +245,9 @@ king_debug() {
     LA="4.5"
 
     # ── Main battle loop ─────────────────────────────────────────────────
-    while [ "$_kd_BREAK" -eq 0 ]; do
+    while true; do
         local _kd_now
-        _kd_now=$(date +%s)
+        printf -v _kd_now '%(%s)T' -1
         local _kd_elapsed=$(( _kd_now - _kd_battle_start ))
         local _kd_min=$(( _kd_elapsed / 60 ))
         local _kd_sec=$(( _kd_elapsed % 60 ))
@@ -260,11 +263,13 @@ king_debug() {
         # Save full page dump at loop 10
         if [ "$_kd_loop" -eq 10 ]; then
             local _kd_loop10_file="${debug_dir}/king_debug_${debug_ts}_LOOP10_FULL_PAGE.txt"
+            local _kd_now_fmt
+            printf -v _kd_now_fmt '%(%Y-%m-%d %H:%M:%S)T' -1
             {
                 printf '============================================================\n'
                 printf '=  FULL PAGE DUMP AT LOOP 10\n'
                 printf '============================================================\n'
-                printf 'Timestamp: %s\n' "$(date +'%Y-%m-%d %H:%M:%S')"
+                printf 'Timestamp: %s\n' "$_kd_now_fmt"
                 printf 'Loop: %d  |  Battle elapsed: %dm%ds  |  Phase: %s\n\n' \
                     "$_kd_loop" "$_kd_min" "$_kd_sec" "$_kd_phase"
                 printf '\n--- RENDERED HTML (w3m dump) ---\n'
@@ -278,9 +283,11 @@ king_debug() {
         # History capture every 3 loops
         if [ $(( _kd_loop % 3 )) -eq 0 ]; then
             local _kd_page_render
+            local _kd_hist_fmt
+            printf -v _kd_hist_fmt '%(%H:%M:%S)T' -1
             _kd_page_render=$(w3m -dump -T text/html "$src_ram" 2>/dev/null)
             {
-                printf '[Loop %d] %s Phase:%s\n' "$_kd_loop" "$(date +'%H:%M:%S')" "$_kd_phase"
+                printf '[Loop %d] %s Phase:%s\n' "$_kd_loop" "$_kd_hist_fmt" "$_kd_phase"
                 echo "$_kd_page_render" | sed -n '/^Os participantes:/,/^A batalha já começou!/p' | \
                     grep -v '^$' | grep -v 'Os participantes:' | grep -v 'A batalha já começou'
             } >> "$_kd_battle_history"
@@ -337,7 +344,6 @@ king_debug() {
                     _kd_extract
                     _kd_action_label="💀 UNRIP (revived)"
                 else
-                    _kd_BREAK=1
                     _kd_action_label="🏁 BATTLE END (no actions available)"
                     _kd_action "$_kd_action_label" "$_kd_hp_before" "$_kd_enh_before" \
                               "$LA" "$_kd_USH" "$_kd_ENH"
@@ -352,7 +358,7 @@ king_debug() {
         if [ "$_kd_phase" = "KING" ]; then
 
             # ── Priority 0: HEAL (survival first) ────────────────────────
-            if awk -v ush="${_kd_USH:-0}" -v hlhp="$_kd_HLHP" 'BEGIN { exit !(ush+0 < hlhp+0) }' && \
+            if [ "${_kd_USH:-0}" -lt "$_kd_HLHP" ] && \
                [ "$_kd_tsh" -gt 90 ] && [ "$_kd_tsh" -lt 300 ] && [ -n "$_kd_HEAL" ]; then
                 _kg_fetch "$_kd_HEAL"
                 _kd_extract; _kd_last_heal=$_kd_now; _kd_last_atk=$_kd_now
@@ -362,7 +368,7 @@ king_debug() {
             # ── Priority 1: DODGE ────────────────────────────────────────
             elif ! grep -q 'txt smpl grey' "$src_ram" 2>/dev/null && \
                  [ "$_kd_tsd" -gt 20 ] && [ "$_kd_tsd" -lt 300 ] && \
-                 awk -v ush="$_kd_USH" -v old="$_kd_OLDHP" 'BEGIN { exit !(ush+0 < old+0) }' && \
+                 [ "$_kd_USH" -lt "$_kd_OLDHP" ] && \
                  [ -n "$_kd_DODGE" ]; then
                 _kg_fetch "$_kd_DODGE"
                 _kd_extract; _kd_OLDHP="$_kd_USH"; _kd_last_dodge=$_kd_now; _kd_last_atk=$_kd_now
@@ -371,7 +377,7 @@ king_debug() {
 
             # ── Priority 2: STONE when King HP% < 25 ────────────────────
             elif [ "$_kd_stone_used" -eq 0 ] && [ -n "$_kd_STONE" ] && \
-                 awk -v enh="${_kd_ENH:-100}" 'BEGIN { exit !(enh+0 < 25) }'; then
+                 [ "${_kd_ENH:-100}" -lt 25 ]; then
                 _kg_fetch "$_kd_STONE"
                 _kd_extract; _kd_stone_used=1; _kd_last_atk=$_kd_now
                 _kd_action_label="💪 STONE (King HP%:${_kd_enh_before}<25)"
@@ -383,7 +389,7 @@ king_debug() {
                 local _kd_king_hp="${_kd_ENH:-100}"
 
                 # Strategy: Attack while HP > 10%, pause between 10-2%, attack at <= 2%
-                if awk -v khp="$_kd_king_hp" 'BEGIN { exit !(khp+0 > 10) }'; then
+                if [ "$_kd_king_hp" -gt 10 ]; then
                     # King HP > 10% -> ATTACK FREELY
                     _kd_king_wait=0
                     _kg_fetch "$_kd_KINGATK"
@@ -391,7 +397,7 @@ king_debug() {
                     _kd_kingatks=$(( _kd_kingatks + 1 ))
                     _kd_action_label="👑 KINGATK (HP%:${_kd_king_hp}->${_kd_ENH})"
 
-                elif awk -v khp="$_kd_king_hp" 'BEGIN { exit !(khp+0 <= 2) }'; then
+                elif [ "$_kd_king_hp" -le 2 ]; then
                     # King HP <= 2% -> ATTACK FOR THE KILL!
                     _kd_king_wait=0
                     _kg_fetch "$_kd_KINGATK"
@@ -421,7 +427,7 @@ king_debug() {
         # ======================================================================
         else
             # ── Priority 0: HEAL ─────────────────────────────────────────
-            if awk -v ush="${_kd_USH:-0}" -v hlhp="$_kd_HLHP" 'BEGIN { exit !(ush+0 < hlhp+0) }' && \
+            if [ "${_kd_USH:-0}" -lt "$_kd_HLHP" ] && \
                [ "$_kd_tsh" -gt 90 ] && [ "$_kd_tsh" -lt 300 ] && [ -n "$_kd_HEAL" ]; then
                 _kg_fetch "$_kd_HEAL"
                 _kd_extract; _kd_last_heal=$_kd_now; _kd_last_atk=$_kd_now
@@ -431,7 +437,7 @@ king_debug() {
             # ── Priority 1: DODGE ────────────────────────────────────────
             elif ! grep -q 'txt smpl grey' "$src_ram" 2>/dev/null && \
                  [ "$_kd_tsd" -gt 20 ] && [ "$_kd_tsd" -lt 300 ] && \
-                 awk -v ush="$_kd_USH" -v old="$_kd_OLDHP" 'BEGIN { exit !(ush+0 < old+0) }' && \
+                 [ "$_kd_USH" -lt "$_kd_OLDHP" ] && \
                  [ -n "$_kd_DODGE" ]; then
                 _kg_fetch "$_kd_DODGE"
                 _kd_extract; _kd_OLDHP="$_kd_USH"; _kd_last_dodge=$_kd_now; _kd_last_atk=$_kd_now
@@ -498,7 +504,6 @@ king_debug() {
                     _kd_extract
                     _kd_action_label="🔄 REFRESH + 💀 UNRIP"
                 elif [ -z "$_kd_KINGATK" ] && [ -z "$_kd_ATK" ] && [ -z "$_kd_UNRIP" ]; then
-                    _kd_BREAK=1
                     _kd_action_label="🏁 BATTLE END"
                     _kd_action "$_kd_action_label" "$_kd_hp_before" "$_kd_enh_before" \
                               "$LA" "$_kd_USH" "$_kd_ENH"
@@ -524,8 +529,8 @@ king_debug() {
         for (( _kd_j=0; _kd_j<_kd_bfill; _kd_j++ )); do _kd_bar+="█"; done
         for (( _kd_j=0; _kd_j<(16-_kd_bfill); _kd_j++ )); do _kd_bar+="░"; done
         local _kd_hcol
-        if [ "$_kd_hp_pct" -gt 60 ] 2>/dev/null; then _kd_hcol="$GREEN_BLACK"
-        elif [ "$_kd_hp_pct" -gt 30 ] 2>/dev/null; then _kd_hcol="$GOLD_BLACK"
+        if [ "$_kd_hp_pct" -gt 60 ]; then _kd_hcol="$GREEN_BLACK"
+        elif [ "$_kd_hp_pct" -gt 30 ]; then _kd_hcol="$GOLD_BLACK"
         else _kd_hcol="$RED_BLACK"; fi
 
         local _kd_stone_st
