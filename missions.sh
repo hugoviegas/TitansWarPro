@@ -339,6 +339,16 @@ _mission_alchemy() {
 # Respects: FUNC_do_missions (y/n) | FUNC_pause_weekends (y/n)
 # Ignored IDs: 4 (Eu preciso de ouro!), 8 (Ouro segredo), 12 (Ajude o Clã!)
 # ============================================================================
+# Função auxiliar para verificar timeout (deve ser definida fora de do_missions)
+_check_timeout() {
+    local elapsed=$(( $(date +%s) - mission_start ))
+    if [ "$elapsed" -gt "$mission_timeout" ]; then
+        echo_t "Mission timeout exceeded, stopping" "${RED_BLACK}" "${COLOR_RESET}" "after" "⏱️"
+        return 1
+    fi
+    return 0
+}
+
 do_missions() {
     [ "${FUNC_do_missions:-n}" != "y" ] && return
 
@@ -350,21 +360,10 @@ do_missions() {
     echo_t "Doing Missions" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "📜"
 
     # Timeout global para do_missions (30 minutos máximo)
-    local mission_timeout=1800
-    local mission_start
+    mission_timeout=1800
     mission_start=$(date +%s)
 
     fetch_page "/quest/" || { echo_t "ERROR: Cannot access /quest/" "${RED_BLACK}" "${COLOR_RESET}" "after" "❌"; return 1; }
-
-    # Função auxiliar para verificar timeout
-    local _check_timeout() {
-        local elapsed=$(( $(date +%s) - mission_start ))
-        if [ "$elapsed" -gt "$mission_timeout" ]; then
-            echo_t "Mission timeout exceeded, stopping" "${RED_BLACK}" "${COLOR_RESET}" "after" "⏱️"
-            return 1
-        fi
-        return 0
-    }
 
     # ── Lutador (ID 6) + Lutador lendário (ID 7) ──────────────
     _check_timeout || return 0
