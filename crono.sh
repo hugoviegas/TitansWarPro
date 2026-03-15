@@ -13,6 +13,9 @@ func_crono() {
 
 # Global flag to track if we've already shown idle status (reduce spam)
 declare -g _last_i=-1
+# Global cache for msg_file display deduplication
+declare -g _last_msg_hash=""
+declare -g _last_display_epoch=0
 
 func_cat() {
     # Idle loop handler. Waits for user commands or events.
@@ -44,16 +47,32 @@ func_cat() {
     # Reset all attributes before content — ensures dim mode from func_crono doesn't bleed
     printf "\033[0m"
 
-    # Only clear screen if in fully interactive mode (connected to real terminal on both stdin and stdout)
-    # If running in background (stdout redirected to log), don't clear to preserve monitor header
-    if [ -t 1 ]; then
-        # stdout is terminal → interactive play.sh, safe to clear
-        printf "\033[2J\033[H"
+    # Only refresh msg_file when content actually changed OR 5+ minutes since last display.
+    # Without this guard, msg_file (player info) would spam the terminal every ~61 seconds
+    # even when data hasn't changed — wasting CPU and polluting the log/terminal.
+    local _now_epoch _msg_hash
+    printf -v _now_epoch '%(%s)T' -1
+    if [[ -s "$TMP/msg_file" ]]; then
+        _msg_hash=$(sha256sum "$TMP/msg_file" 2>/dev/null | awk '{print $1}')
+    else
+        _msg_hash=""
     fi
 
-    # Read file without forking cat — bash $(<file) reads directly, no subprocess
-    [[ -s "$TMP/msg_file" ]] && printf '%s\n' "$(<"$TMP/msg_file")"
-    printf "\033[0m"
+    if [ "$_msg_hash" != "$_last_msg_hash" ] || [ "$(( _now_epoch - _last_display_epoch ))" -ge 300 ]; then
+        # Only clear screen if in fully interactive mode (connected to real terminal on both stdin and stdout)
+        # If running in background (stdout redirected to log), don't clear to preserve monitor header
+        if [ -t 1 ]; then
+            # stdout is terminal → interactive play.sh, safe to clear
+            printf "\033[2J\033[H"
+        fi
+
+        # Read file without forking cat — bash $(<file) reads directly, no subprocess
+        [[ -s "$TMP/msg_file" ]] && printf '%s\n' "$(<"$TMP/msg_file")"
+        printf "\033[0m"
+
+        _last_msg_hash="$_msg_hash"
+        _last_display_epoch="$_now_epoch"
+    fi
 
     local cmd_file="${ACCOUNT_ROOT:-$HOME/twm}/cmd_file"
 
