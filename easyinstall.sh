@@ -84,7 +84,7 @@ sync_func() {
   SCRIPTS="allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh check.sh \
 clancoliseum.sh clandmg.sh clanfight.sh clanid.sh coliseum.sh crono.sh \
 flagfight.sh function.sh king.sh language.sh league.sh loginlogoff.sh \
-play.sh requeriments.sh run.sh svproxy.sh specialevent.sh trade.sh twm.sh \
+missions.sh play.sh requeriments.sh run.sh svproxy.sh specialevent.sh trade.sh twm.sh \
 undying.sh update_check.sh multi_runner.sh twm_view.sh twm_monitor.sh \
 twm_control.sh twm_setup.sh"
 
@@ -154,7 +154,7 @@ sync_func_other() {
   SCRIPTS="requeriments.sh svproxy.sh loginlogoff.sh crono.sh check.sh run.sh \
 clanid.sh allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh \
 clancoliseum.sh clandungeon.sh clandmg.sh clanfight.sh coliseum.sh \
-flagfight.sh function.sh king.sh language.sh league.sh specialevent.sh \
+flagfight.sh function.sh king.sh language.sh league.sh missions.sh specialevent.sh \
 trade.sh undying.sh update_check.sh multi_runner.sh twm_view.sh \
 twm_monitor.sh twm_control.sh"
 

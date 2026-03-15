@@ -71,6 +71,7 @@ cd ~/twm || exit
 . allies.sh
 . svproxy.sh
 . check.sh
+. missions.sh
 . league.sh
 . specialevent.sh
 . function.sh
