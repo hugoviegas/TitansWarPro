@@ -184,6 +184,61 @@ first_run_setup() {
     printf 'LANGUAGE=%s\n' "$LANGUAGE" > "$CONTROL_CFG"
     printf "\n${GREENb_BLACK}✅  Idioma salvo / Language saved: ${GOLD_BLACK}%s${COLOR_RESET}\n\n" "$LANGUAGE"
     sleep 1
+    show_welcome
+}
+
+# Welcome screen on first run
+show_welcome() {
+    clear
+    less -R <<'EOF'
+╔════════════════════════════════════════════════════════════════╗
+║     🐉 Bem-vindo ao TITANS WAR PRO / Welcome to TWM PRO  🐉   ║
+╚════════════════════════════════════════════════════════════════╝
+
+GETTING STARTED — 3 EASY STEPS:
+
+1. Start your accounts:
+   Menu option 1 (Start all) or 2 (Start single account)
+   OR terminal: ./multi_runner.sh start
+
+2. Open the monitor to watch:
+   Menu option 7 (Interactive monitor)
+   OR terminal: ./twm_monitor.sh
+
+3. Interact with any account:
+   Press [F] to follow (attach to full session)
+   Press Ctrl+B D to detach and return to monitor
+   Press Ctrl+B S to switch between sessions
+
+STOP ACCOUNTS ANYTIME:
+   Menu option 3/4 (Stop all/single)
+   OR terminal: ./multi_runner.sh stop
+   OR inside session: Ctrl+C
+
+HELP & DOCUMENTATION:
+   Menu option H (Show guide) for detailed commands
+   Terminal: ./twm_monitor.sh help
+
+KEYBOARD SHORTCUTS IN MONITOR:
+   [N] / [P]   - Next / Previous account
+   [F]         - Follow (full interact with session)
+   [L]         - List accounts
+   [C]         - Send command
+   [R]         - Refresh
+   [Q]         - Quit (accounts keep running)
+   [1-9]       - Jump to account
+
+TMUX INSIDE FOLLOW MODE:
+   Ctrl+B d    - Detach from session
+   Ctrl+B s    - Session list (choose with ↑↓ + Enter)
+   Ctrl+B (    - Previous session
+   Ctrl+B )    - Next session
+   Ctrl+C      - Stop macro (play.sh intercepts gracefully)
+
+ALL SET! Your TWM setup is ready.
+Press any key to continue to the menu...
+EOF
+    read -r -n 1 </dev/tty 2>/dev/null || true
 }
 
 # Launch interactive monitor directly
@@ -194,6 +249,17 @@ launch_monitor() {
 display_menu() {
     colors
     clear
+
+    # Show tmux status if available
+    if command -v tmux >/dev/null 2>&1; then
+        local active_sessions
+        active_sessions=$(tmux list-sessions 2>/dev/null | grep -c '^twm_' || echo 0)
+        printf "${BLACK_CYAN}✓ tmux available${COLOR_RESET}  "
+        printf "${GREENb_BLACK}$active_sessions active session(s)${COLOR_RESET}\n\n"
+    else
+        printf "${RED_BLACK}✗ tmux NOT installed${COLOR_RESET} - using legacy mode (nohup)\n"
+        printf "${GOLD_BLACK}Install:${COLOR_RESET} sudo apt install tmux\n\n"
+    fi
 
     printf "${BLACK_CYAN}"
     printf "╔════════════════════════════════════════════════════╗\n"
@@ -238,6 +304,18 @@ show_guide() {
     printf "${COLOR_RESET}\n"
 
     less -R <<'EOF'
+QUICK START — 3 STEPS:
+
+1. Start all accounts:
+   ./multi_runner.sh start
+
+2. Open monitor to watch:
+   ./twm_monitor.sh
+
+3. Press [F] to interact with account, Ctrl+B D to detach
+
+───────────────────────────────────────────────────────────────
+
 VIEWING LOGS:
 
 1. Interactive Monitor (Recommended):
@@ -247,10 +325,12 @@ VIEWING LOGS:
    - Real-time status and content
    - [F] Follow: attach to tmux session (full interactivity)
        → Ctrl+B D to detach and return to monitor
+       → Ctrl+B s to switch between sessions
+       → Ctrl+B ( / ) to navigate sessions
 
 2. Simple Log Viewer / Session Attach:
-   ./twm_view.sh
-   - Interactive menu or specific account ID
+   ./twm_view.sh              # Interactive menu
+   ./twm_view.sh A1           # Direct attach to account A1
    - Attaches to tmux session when available (Ctrl+B D to detach)
    - Falls back to log tail if tmux unavailable
 
@@ -258,31 +338,70 @@ VIEWING LOGS:
    ./multi_runner.sh status
    ./twm_monitor.sh status
 
+STOPPING ACCOUNTS:
+
+Single account:
+  ./multi_runner.sh stop A1        # Stop only A1
+
+Multiple specific accounts:
+  ./multi_runner.sh stop A1 A2     # Stop A1 and A2
+
+All accounts:
+  ./multi_runner.sh stop           # Stop all
+
+Inside a session (Ctrl+C):
+  Ctrl+C in any tmux session       # play.sh intercepts, cleans up, exits
+
+Direct tmux kill (force):
+  tmux kill-session -t twm_A1      # Force kill session
+
 RUNNING MULTIPLE ACCOUNTS:
 
 1. Install tmux (recommended for full interactivity):
    sudo apt install tmux   # Linux/WSL
    pkg install tmux        # Termux/Android
+
 2. Configure accounts/index.json with multiple entries
+
 3. Run: ./multi_runner.sh start
    - With tmux: each account gets its own tmux session
    - Without tmux: legacy nohup/log mode
+
 4. Monitor with: ./twm_monitor.sh
 
 Each account gets isolated:
 - Cookies: ~/twm/accounts/<ID>/w3m/
 - Temp files: ~/twm/accounts/<ID>/tmp/
 - Logs: ~/twm/accounts/<ID>/logs/
+- Config: ~/twm/accounts/<ID>/config.cfg
 
-QUICK COMMANDS:
+TMUX NAVIGATION (when in Follow mode [F]):
+
+  Ctrl+B d        Detach from current session → back to monitor
+  Ctrl+B s        Session list (select with ↑↓ + Enter)
+  Ctrl+B (        Previous session
+  Ctrl+B )        Next session
+  Ctrl+B c        Create new window (optional)
+  Ctrl+B l        Last session
+  Ctrl+C          Stop macro (play.sh will trap it)
+
+QUICK COMMANDS (Terminal):
 
   ./multi_runner.sh start             # Start all active accounts
   ./multi_runner.sh start A1          # Start only account A1
+  ./multi_runner.sh stop              # Stop all accounts
   ./multi_runner.sh stop A1 A2        # Stop specific accounts
   ./multi_runner.sh status            # Show status table
+
   ./twm_monitor.sh                    # Interactive monitor
+  ./twm_monitor.sh status             # Show status (non-interactive)
+
   ./twm_view.sh A1                    # Attach to / view account A1
+  ./twm_view.sh                       # Menu to select account
+
   tmux attach -t twm_A1               # Direct tmux attach to A1
+  tmux list-sessions                  # List all tmux sessions
+  tmux kill-session -t twm_A1         # Force kill session
 
 Press 'q' to exit this help.
 EOF
