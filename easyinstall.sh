@@ -87,27 +87,49 @@ undying.sh update_check.sh multi_runner.sh twm_view.sh twm_monitor.sh \
 twm_control.sh twm_setup.sh"
 
   NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
-  LEN=0 UPDATED=0 NEW=0 OK=0 FAILED=0
+  LEN=0 UPDATED=0 NEW=0 OK=0 FAILED=0 UNCHANGED=0
 
-  printf "${BLACK_CYAN}  ⬇  Downloading scripts...${COLOR_RESET}\n\n"
+  printf "${BLACK_CYAN}  ⬇  Smart sync (comparing hashes)...${COLOR_RESET}\n\n"
 
   for script in $SCRIPTS; do
     LEN=$((LEN + 1))
     label=$(printf "[%02d/%02d]" "$LEN" "$NUM_SCRIPTS")
-    existed=false
-    [ -e ~/twm/"$script" ] && existed=true
+    local_file="$HOME/twm/$script"
+    temp_file="$local_file.tmp.$$"
 
-    if curl "${SERVER}$script" -s -L -o ~/twm/"$script" 2>/dev/null; then
-      if $existed; then
-        printf "  🔽 %s %-32s ${GREENb_BLACK}updated${COLOR_RESET}\n" "$label" "$script"
-        UPDATED=$((UPDATED + 1))
-      else
+    if [ ! -e "$local_file" ]; then
+      # New file — download unconditionally
+      if curl "${SERVER}$script" -s -L -o "$local_file" 2>/dev/null; then
         printf "  🆕 %s %-32s ${BLACK_YELLOW}new${COLOR_RESET}\n" "$label" "$script"
         NEW=$((NEW + 1))
+      else
+        printf "  ⚠️  %s %-32s ${BLACK_YELLOW}skipped${COLOR_RESET}\n" "$label" "$script"
+        FAILED=$((FAILED + 1))
       fi
     else
-      printf "  ⚠️  %s %-32s ${BLACK_YELLOW}skipped${COLOR_RESET}\n" "$label" "$script"
-      FAILED=$((FAILED + 1))
+      # File exists — download to temp and compare hashes
+      if curl "${SERVER}$script" -s -L -o "$temp_file" 2>/dev/null; then
+        # Get hashes for comparison
+        local_hash=$(sha256sum "$local_file" 2>/dev/null | awk '{print $1}')
+        remote_hash=$(sha256sum "$temp_file" 2>/dev/null | awk '{print $1}')
+
+        if [ "$remote_hash" = "$local_hash" ]; then
+          # Content is identical — file is current
+          rm -f "$temp_file"
+          printf "  ✅ %s %-32s ${GRAY_BLACK}unchanged${COLOR_RESET}\n" "$label" "$script"
+          UNCHANGED=$((UNCHANGED + 1))
+        else
+          # Content differs — replace with new version
+          mv "$temp_file" "$local_file"
+          printf "  🔽 %s %-32s ${GREENb_BLACK}updated${COLOR_RESET}\n" "$label" "$script"
+          UPDATED=$((UPDATED + 1))
+        fi
+      else
+        # Download failed
+        rm -f "$temp_file"
+        printf "  ⚠️  %s %-32s ${BLACK_YELLOW}skipped${COLOR_RESET}\n" "$label" "$script"
+        FAILED=$((FAILED + 1))
+      fi
     fi
   done
 
@@ -121,8 +143,8 @@ twm_control.sh twm_setup.sh"
   curl "${SERVER}HOW_TO_MONITOR.md" -s -L -o ~/twm/HOW_TO_MONITOR.md 2>/dev/null || true
   curl "${SERVER}QUICK_START.md" -s -L -o ~/twm/QUICK_START.md 2>/dev/null || true
 
-  printf "\n${BLACK_CYAN}  Summary: 🔽 %d updated  🆕 %d new  ⚠️  %d skipped${COLOR_RESET}\n" \
-    "$UPDATED" "$NEW" "$FAILED"
+  printf "\n${BLACK_CYAN}  Summary: 🔽 %d updated  🆕 %d new  ✅ %d unchanged  ⚠️  %d skipped${COLOR_RESET}\n" \
+    "$UPDATED" "$NEW" "$UNCHANGED" "$FAILED"
 }
 
 # ─── Merge sync (legacy single-file install) ──────────────────────────────────
