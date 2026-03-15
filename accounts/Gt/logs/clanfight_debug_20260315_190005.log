@@ -1,0 +1,295 @@
+ClanFight Debug Log - 2026-03-15 19:00:05
+Server: furiadetitas.net  Account: Re
+
+--- CONFIG ---
+LA=4s  HPER=48%  RPER=15%
+
+--- MAX HP ---
+Max HP: 30134
+
+============================================================
+=  STATE: ENTER FIGHT
+============================================================
+Timestamp: 2026-03-15 19:00:09
+
+--- W3M RENDERED DUMP ---
+hp 3013404:53
+[1] Retired hp 30134
+[1] Bkhw Wanteds (7)
+[0] Viiniiciin hp 52653
+[0] Fireblades (2)
+●
+-2797
+EsquivarAtacarTroca o alvo[potio]Esmalte heráldico[stone]Pedra
++35% dano[herb]Erva
+-35% dano
+[1] Aliados: 6 | [0][1] Inimigos: 6
+Você acertar [0] Viiniiciin por 2797
+Você usou [3p] Fúria de Titã
+Bóreas Retired
+lvl 86 | g 60'181 | s 339,3M
+
+Fuja da batalha
+
+--- ACTION LINKS ---
+ATK:    /clanfight/attack/?r=1773612008
+ATKRND: /clanfight/attackrandom/?r=1773612008
+DODGE:  /clanfight/dodge/?r=1773612008
+HEAL:   /clanfight/heal/?r=1773612008
+GRASS:  /clanfight/grass/?r=1773612008
+
+--- HP VALUES ---
+Player HP: 30134
+Enemy HP%: 52653
+
+--- MARKERS ---
+dodge:1  grey:0  rip:0
+
+--- KEYWORD SEARCH ---
+
+============================================================
+=  BATTLE START
+============================================================
+Timestamp: 2026-03-15 19:00:10
+Opponent: Fireblades  Team: [1]  MaxHP: 30134  EnemyHP: 52653
+
+--- ACTION LOG ---
+TIME       #    ACTION                                 HP_before→after ENH_before→after
+──────────────────────────────────────────────────────────────────────────
+[19:00:11] #1 | 🎲 ATKRND (ENH:52653→58676)
+       HP: 30134→30134  ENH: 52653→58676  LA:4s  HPER:48%  RPER:15%
+[19:00:14] #2 | 🔄 REFRESH
+       HP: 30134→30134  ENH: 58676→58676  LA:4s  HPER:48%  RPER:15%
+[19:00:16] #3 | 🎲 ATKRND (ENH:58676→55596)
+       HP: 30134→30134  ENH: 58676→55596  LA:4s  HPER:48%  RPER:15%
+[19:00:19] #4 | 🔄 REFRESH
+       HP: 30134→30134  ENH: 55596→52254  LA:4s  HPER:48%  RPER:15%
+[19:00:21] #5 | 🎲 ATKRND (ENH:52254→61006)
+       HP: 30134→30134  ENH: 52254→61006  LA:4s  HPER:48%  RPER:15%
+[19:00:24] #6 | 🔄 REFRESH
+       HP: 30134→30134  ENH: 61006→61006  LA:4s  HPER:48%  RPER:15%
+[19:00:26] #7 | 🎲 ATKRND (ENH:61006→87554)
+       HP: 30134→30134  ENH: 61006→87554  LA:4s  HPER:48%  RPER:15%
+[19:00:29] #8 | 🔄 REFRESH
+       HP: 30134→30134  ENH: 87554→87554  LA:4s  HPER:48%  RPER:15%
+[19:00:31] #9 | 🎲 ATKRND (ENH:87554→57576)
+       HP: 30134→30134  ENH: 87554→57576  LA:4s  HPER:48%  RPER:15%
+[19:00:34] #10 | 🔄 REFRESH
+       HP: 30134→30134  ENH: 57576→54246  LA:4s  HPER:48%  RPER:15%
+[19:00:36] #11 | 🎲 ATKRND (ENH:54246→72122)
+       HP: 30134→30134  ENH: 54246→72122  LA:4s  HPER:48%  RPER:15%
+[19:00:39] #12 | 🔄 REFRESH
+       HP: 30134→30134  ENH: 72122→72122  LA:4s  HPER:48%  RPER:15%
+[19:00:41] #13 | 🎲 ATKRND (ENH:72122→72122)
+       HP: 30134→30134  ENH: 72122→72122  LA:4s  HPER:48%  RPER:15%
+[19:00:43] #14 | 🔄 REFRESH
+       HP: 30134→30134  ENH: 72122→72122  LA:4s  HPER:48%  RPER:15%
+[19:00:46] #15 | 🎲 ATKRND (ENH:72122→49244)
+       HP: 30134→30134  ENH: 72122→49244  LA:4s  HPER:48%  RPER:15%
+[19:00:48] #16 | 🔄 REFRESH
+       HP: 30134→30134  ENH: 49244→49244  LA:4s  HPER:48%  RPER:15%
+[19:00:51] #17 | 🎲 ATKRND (ENH:49244→11493)
+       HP: 30134→30134  ENH: 49244→11493  LA:4s  HPER:48%  RPER:15%
+[19:00:55] #18 | 🔄 REFRESH
+       HP: 30134→30134  ENH: 11493→11493  LA:4s  HPER:48%  RPER:15%
+[19:00:57] #19 | ⚔️ ATK → MISS ❌ (LA→4.2s)
+       HP: 30134→30134  ENH: 11493→4877  LA:4.2s  HPER:48%  RPER:15%
+[19:01:00] #20 | 🔄 REFRESH
+       HP: 30134→30134  ENH: 4877→4877  LA:4.2s  HPER:48%  RPER:15%
+[19:01:05] #21 | ⚔️ ATK → HIT ✓ (ENH:4877→5023)
+       HP: 30134→30134  ENH: 4877→5023  LA:4.2s  HPER:48%  RPER:15%
+[19:01:08] #22 | ⚔️ ATK → HIT ✓ (ENH:5023→4702)
+       HP: 30134→30134  ENH: 5023→4702  LA:4.2s  HPER:48%  RPER:15%
+[19:01:11] #23 | 🔄 REFRESH
+       HP: 30134→30134  ENH: 4702→9879  LA:4.2s  HPER:48%  RPER:15%
+[19:01:14] #24 | ⚔️ ATK → HIT ✓ (ENH:9879→4130)
+       HP: 30134→22418  ENH: 9879→4130  LA:4.2s  HPER:48%  RPER:15%
+[19:01:15] #25 | 🛡️ DODGE
+       HP: 22418→22418  ENH: 4130→4130  LA:4.2s  HPER:48%  RPER:15%
+[19:01:18] #26 | 🔄 REFRESH
+       HP: 22418→22418  ENH: 4130→299  LA:4.2s  HPER:48%  RPER:15%
+[19:01:21] #27 | ⚔️ ATK → MISS ❌ (LA→4.4s)
+       HP: 22418→22418  ENH: 299→75517  LA:4.4s  HPER:48%  RPER:15%
+[19:01:23] #28 | 🔄 REFRESH
+       HP: 22418→22418  ENH: 75517→71807  LA:4.4s  HPER:48%  RPER:15%
+[19:01:25] #29 | 🎲 ATKRND (ENH:71807→67277)
+       HP: 22418→22418  ENH: 71807→67277  LA:4.4s  HPER:48%  RPER:15%
+[19:01:28] #30 | 🔄 REFRESH
+       HP: 22418→17500  ENH: 67277→67277  LA:4.4s  HPER:48%  RPER:15%
+[19:01:30] #31 | 🎲 ATKRND (ENH:67277→65260)
+       HP: 17500→17500  ENH: 67277→65260  LA:4.4s  HPER:48%  RPER:15%
+[19:01:33] #32 | 🔄 REFRESH
+       HP: 17500→11050  ENH: 65260→64328  LA:4.4s  HPER:48%  RPER:15%
+[19:01:37] #33 | 💚 HEAL + 🌿 GRASS
+       HP: 11050→30134  ENH: 64328→63480  LA:4.4s  HPER:48%  RPER:15%
+[19:01:39] #34 | 🔄 REFRESH
+       HP: 30134→30134  ENH: 63480→63480  LA:4.4s  HPER:48%  RPER:15%
+[19:01:41] #35 | 🎲 ATKRND (ENH:63480→52068)
+       HP: 30134→21669  ENH: 63480→52068  LA:4.4s  HPER:48%  RPER:15%
+[19:01:43] #36 | 🛡️ DODGE
+       HP: 21669→21669  ENH: 52068→49654  LA:4.4s  HPER:48%  RPER:15%
+[19:01:46] #37 | 🔄 REFRESH
+       HP: 21669→21669  ENH: 49654→44449  LA:4.4s  HPER:48%  RPER:15%
+[19:01:48] #38 | 🎲 ATKRND (ENH:44449→28953)
+       HP: 21669→21669  ENH: 44449→28953  LA:4.4s  HPER:48%  RPER:15%
+[19:01:51] #39 | 🔄 REFRESH
+       HP: 21669→21669  ENH: 28953→28953  LA:4.4s  HPER:48%  RPER:15%
+[19:01:52] #40 | 🎲 ATKRND (ENH:28953→31739)
+       HP: 21669→21669  ENH: 28953→31739  LA:4.4s  HPER:48%  RPER:15%
+[19:01:55] #41 | 🔄 REFRESH
+       HP: 21669→21669  ENH: 31739→27314  LA:4.4s  HPER:48%  RPER:15%
+[19:01:57] #42 | 🎲 ATKRND (ENH:27314→26669)
+       HP: 21669→21669  ENH: 27314→26669  LA:4.4s  HPER:48%  RPER:15%
+[19:02:00] #43 | 🔄 REFRESH
+       HP: 21669→21669  ENH: 26669→26669  LA:4.4s  HPER:48%  RPER:15%
+[19:02:02] #44 | 🎲 ATKRND (ENH:26669→25919)
+       HP: 21669→21669  ENH: 26669→25919  LA:4.4s  HPER:48%  RPER:15%
+[19:02:05] #45 | 🔄 REFRESH
+       HP: 21669→21669  ENH: 25919→25919  LA:4.4s  HPER:48%  RPER:15%
+[19:02:07] #46 | 🎲 ATKRND (ENH:25919→62591)
+       HP: 21669→21669  ENH: 25919→62591  LA:4.4s  HPER:48%  RPER:15%
+[19:02:10] #47 | 🔄 REFRESH
+       HP: 21669→21669  ENH: 62591→62591  LA:4.4s  HPER:48%  RPER:15%
+[19:02:12] #48 | 🎲 ATKRND (ENH:62591→60906)
+       HP: 21669→21669  ENH: 62591→60906  LA:4.4s  HPER:48%  RPER:15%
+[19:02:15] #49 | 🔄 REFRESH
+       HP: 21669→21669  ENH: 60906→60167  LA:4.4s  HPER:48%  RPER:15%
+[19:02:17] #50 | 🎲 ATKRND (ENH:60167→75633)
+       HP: 21669→10785  ENH: 60167→75633  LA:4.4s  HPER:48%  RPER:15%
+[19:02:19] #51 | 🛡️ DODGE
+       HP: 10785→10785  ENH: 75633→73690  LA:4.4s  HPER:48%  RPER:15%
+[19:02:22] #52 | 🔄 REFRESH
+       HP: 10785→10785  ENH: 73690→69811  LA:4.4s  HPER:48%  RPER:15%
+[19:02:24] #53 | 🎲 ATKRND (ENH:69811→65611)
+       HP: 10785→10785  ENH: 69811→65611  LA:4.4s  HPER:48%  RPER:15%
+[19:02:27] #54 | 🔄 REFRESH
+       HP: 10785→10785  ENH: 65611→65611  LA:4.4s  HPER:48%  RPER:15%
+[19:02:29] #55 | 🎲 ATKRND (ENH:65611→58638)
+       HP: 10785→10785  ENH: 65611→58638  LA:4.4s  HPER:48%  RPER:15%
+[19:02:32] #56 | 🔄 REFRESH
+       HP: 10785→10785  ENH: 58638→58638  LA:4.4s  HPER:48%  RPER:15%
+[19:02:34] #57 | 🎲 ATKRND (ENH:58638→47166)
+       HP: 10785→10785  ENH: 58638→47166  LA:4.4s  HPER:48%  RPER:15%
+[19:02:37] #58 | 🔄 REFRESH
+       HP: 10785→10785  ENH: 47166→44927  LA:4.4s  HPER:48%  RPER:15%
+[19:02:39] #59 | 🎲 ATKRND (ENH:44927→54943)
+       HP: 10785→-  ENH: 44927→54943  LA:4.4s  HPER:48%  RPER:15%
+[19:02:42] #60 | 🛡️ DODGE
+       HP: →50455  ENH: 54943→-  LA:4.4s  HPER:48%  RPER:15%
+[19:02:45] #61 | 🔄 REFRESH
+       HP: 50455→43211  ENH: →-  LA:4.4s  HPER:48%  RPER:15%
+
+============================================================
+=  STATE: POST-BATTLE
+============================================================
+Timestamp: 2026-03-15 19:02:46
+
+--- W3M RENDERED DUMP ---
+hp 28840 | mp 117202:18
+Espere até o fim da batalha
+[clan] 3 clãs na batalha e [0][1] 5 titãs
+Atualizar
+           [1] Hviegas hp 43211
+          [1] Percy Br hp 5398
+            [1] Razzor hp 5255
+           [1] Retired Morto na batalha
+  [1] Kimberlly Wanted Morto na batalha
+       [1] Claire Bkhw Morto na batalha
+        [1] Gohan Teen Morto na batalha
+[rip] [1] Stella Oct assassinou Você
+[1] Stella Oct acertar Você por 13208 crítico
+[4p] Anel da Fúria fortalecido por 2539
+Você usou [3] Posição defensiva
+[1] Stella Oct usou [5] Turbilhão
+[1] Stella Oct usou [icon] Contra ataque
+[1] Razzor acertar [1] Lobinho Dx por 1118 crítico
+[4] Anel da Fúria fortalecido por 232
+[1] Lobinho Dx usou [5] Posição defensiva
+[1] Percy Br acertar [1] Lobinho Dx por 1121
+[1] Lobinho Dx usou [5] Armadura mais forte
+Você acertar [1] Lobinho Dx por 1698 crítico
+[1] Razzor acertar [1] Stella Oct por 1025
+[1] Razzor usou [icon] Contra ataque
+[1] Stella Oct usou esquivar
+[1] Lobinho Dx acertar [1] Stella Oct por 1054 crítico
+[1] Stella Oct usou [4p] Posição defensiva
+Você acertar [1] Stella Oct por 1472 crítico
+[3] Anel da Fúria fortalecido por 335
+[1] Razzor acertar [1] Stella Oct por 530
+[1] Stella Oct usou [4] Armadura mais forte
+[1] Hviegas acertar [1] Stella Oct por 2509 crítico
+[5] Anel da Fúria fortalecido por 339
+[1] Hviegas usou [5] Turbilhão
+[1] Lobinho Dx acertar [1] Stella Oct por 2462 crítico
+Você acertar [1] Stella Oct por 615
+[1] Razzor acertar [1] Stella Oct por 204
+[1] Lobinho Dx acertar [1] Stella Oct por 2451 crítico
+[1] Hviegas acertar [1] Stella Oct por 930 crítico
+[1] Stella Oct usou [4p] Posição defensiva
+[user]Meu Herói
+[user]Meu Clã
+[arrow]Página principal
+Bóreas RetiredConfigurações
+lvl 86 | g 60'181 | s 339,3M
+Oferta especial! Bonus de Ouro! (+)
+Tempo de sobra: 1 dia
+
+Fórum | Conversar | Classificação
+Comentários feed
+Apoio e Informação
+0,018 seg, 19:02:43 | Online: 176
+Overmobile © 2026, 18+
+
+
+--- ACTION LINKS ---
+ATK:    
+ATKRND: 
+DODGE:  
+HEAL:   
+GRASS:  
+
+--- HP VALUES ---
+Player HP: 43211
+Enemy HP%: 
+
+--- MARKERS ---
+dodge:0  grey:0  rip:0
+
+--- KEYWORD SEARCH ---
+
+============================================================
+=  BATTLE SUMMARY
+============================================================
+Result: unknown
+Duration: 2m 36s  |  Loops: 62
+ATK:3  RND:23  DODGE:4  HEAL:1  Grass:1
+ATK Fails:2  LA Start:4  LA End:4.4
+
+--- BATTLE HISTORY (captured during battle) ---
+[Loop 3] 19:00:15
+[Loop 6] 19:00:22
+[Loop 9] 19:00:30
+[Loop 12] 19:00:37
+[Loop 15] 19:00:45
+[Loop 18] 19:00:52
+[Loop 21] 19:01:03
+[Loop 24] 19:01:12
+[Loop 27] 19:01:19
+[Loop 30] 19:01:26
+[Loop 33] 19:01:34
+[Loop 36] 19:01:42
+[Loop 39] 19:01:49
+[Loop 42] 19:01:56
+[Loop 45] 19:02:03
+[Loop 48] 19:02:11
+[Loop 51] 19:02:18
+[Loop 54] 19:02:25
+[Loop 57] 19:02:33
+[Loop 60] 19:02:41
+
+--- ATTACK ANALYSIS ---
+Você perdeu (fails detected): 0
+Você assassinou (kills): 0
+
+--- DEBUG ARTIFACTS ---
+Full page dump at Loop 10: clanfight_debug_20260315_190005_LOOP10_FULL_PAGE.txt
