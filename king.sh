@@ -112,7 +112,7 @@ king_debug() {
         _kd_DODGE=$(grep -o -E '/king/dodge/[?]r[=][0-9]+' "$src_ram")
         _kd_STONE=$(grep -o -E '/king/stone/[?]r[=][0-9]+' "$src_ram")
         _kd_HEAL=$(grep -o -E '/king/heal/[?]r[=][0-9]+' "$src_ram")
-        _kd_UNRIP=$(grep -o -E '/king/unrip/[^A-Za-z0-9_]r[^A-Za-z0-9_][0-9]+' "$src_ram")
+        _kd_UNRIP=$(grep -o -E '/king/unrip/[?]r[=][1-9][0-9]+' "$src_ram" | head -1)
         _kd_USER=$(grep -o -E '([[:upper:]][[:lower:]]{0,15}( [[:upper:]][[:lower:]]{0,13})?)[[:space:]][^[:alnum:][:space:]]' "$src_ram" | sed -n 's,<[^>]*>,,g; s, ,_,;2p')
         # Recalculate thresholds (refresh on each extract to handle HP changes)
         if [ -n "${_kd_USH:-}" ]; then
@@ -155,50 +155,67 @@ king_debug() {
     (
         w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
             -debug "$URL/settings/graphics/0" \
-            -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >>"$src_ram"
-    ) </dev/null &>/dev/null &
+            -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >/dev/null 2>&1
+    ) &
     time_exit 17
 
-    # ── Enter game ───────────────────────────────────────────────────────
-    printf "  ${GOLD_BLACK}👑 Entering King of the Immortals...${COLOR_RESET}\n"
-    _kg_fetch "/king/enterGame"
-    _kd_page "STATE: ENTER GAME"
+    # ── Use existing SRC if king_start already entered the battle ────────
+    # king_start fetches enterGame and saves to $TMP/SRC before calling king_debug.
+    # Reuse that page to avoid double-entry into the battle.
+    cp "$TMP/SRC" "$src_ram" 2>/dev/null
 
-    # Get access link for waiting
-    local _kd_access
-    _kd_access=$(sed 's/href=/\n/g' "$src_ram" | grep '/king/' | head -n 1 | awk -F"[']" '{ print $2 }')
-    [ -z "$_kd_access" ] && _kd_access="/king"
+    if grep -q 'king/dodge/\|king/kingatk/' "$src_ram" 2>/dev/null; then
+        printf "  ${GOLD_BLACK}👑 Battle already live (from king_start entry)${COLOR_RESET}\n"
+        _kd_page "STATE: ENTER (from king_start SRC)"
+    else
+        # Enter fresh if not already in battle
+        printf "  ${GOLD_BLACK}👑 Entering King of the Immortals...${COLOR_RESET}\n"
+        _kg_fetch "/king/enterGame"
+        _kd_page "STATE: ENTER GAME"
 
-    # ── Wait for battle start (kingatk link = battle is live) ────────────
-    printf "  ${GOLD_BLACK}😴 Waiting for battle to start...${COLOR_RESET}\n"
-    local _kd_wait_start
-    _kd_wait_start=$(date +%s)
-    local _kd_wait_n=0
-    until grep -q 'king/kingatk/' "$src_ram" 2>/dev/null || \
-          [ $(( $(date +%s) - _kd_wait_start )) -gt 60 ]; do
-        local _kd_welapsed=$(( $(date +%s) - _kd_wait_start ))
-        printf "\r\033[K  ${GOLD_BLACK}⏳ Waiting... [%02ds]${COLOR_RESET}" "$_kd_welapsed"
-        _kd_access=$(sed 's/href=/\n/g' "$src_ram" | grep '/king/' | head -n 1 | awk -F"[']" '{ print $2 }')
-        [ -z "$_kd_access" ] && _kd_access="/king"
-        _kg_fetch "$_kd_access"
-        _kd_wait_n=$(( _kd_wait_n + 1 ))
-        _kd_page "STATE: WAITING (poll #${_kd_wait_n})"
-        sleep 2s
-    done
-    printf '\n'
+        # ── Wait for battle to become live ──────────────────────────────
+        # Battle is live when dodge/ OR kingatk/ link is present.
+        # dodge/  = PvP phase (king already dead or battle in progress)
+        # kingatk/ = King phase (king still alive)
+        printf "  ${GOLD_BLACK}😴 Waiting for battle to start...${COLOR_RESET}\n"
+        local _kd_wait_start _kd_wait_now
+        printf -v _kd_wait_start '%(%s)T' -1
+        local _kd_wait_n=0
+        until grep -q 'king/dodge/\|king/kingatk/' "$src_ram" 2>/dev/null; do
+            printf -v _kd_wait_now '%(%s)T' -1
+            local _kd_welapsed=$(( _kd_wait_now - _kd_wait_start ))
+            if [ "$_kd_welapsed" -gt 90 ]; then
+                break
+            fi
+            printf "\r\033[K  ${GOLD_BLACK}⏳ Waiting... [%02ds]${COLOR_RESET}" "$_kd_welapsed"
 
-    if ! grep -q 'king/kingatk/' "$src_ram" 2>/dev/null; then
-        printf "%b\n" "  ${RED_BLACK}(Timeout: battle did not start within 60s)${COLOR_RESET}"
-        printf '\n(Timeout waiting for battle)\n' >> "$debug_file"
-        rm -f "$src_ram" "$full_ram" "$_kd_battle_history"
-        cd - >/dev/null 2>&1; rm -rf "$tmp_ram"
-        unset _kd_page _kd_action _kd_extract
-        return 1
+            # Handle UNRIP if hero is dead (valid r token, not r=0)
+            local _kd_unrip_wait
+            _kd_unrip_wait=$(grep -o -E '/king/unrip/[?]r[=][1-9][0-9]+' "$src_ram" 2>/dev/null | head -1)
+            if [ -n "$_kd_unrip_wait" ]; then
+                _kg_fetch "$_kd_unrip_wait"
+            else
+                _kg_fetch "/king"
+            fi
+            _kd_wait_n=$(( _kd_wait_n + 1 ))
+            _kd_page "STATE: WAITING (poll #${_kd_wait_n})"
+            sleep 2s
+        done
+        printf '\n'
+
+        if ! grep -q 'king/dodge/\|king/kingatk/' "$src_ram" 2>/dev/null; then
+            printf "%b\n" "  ${RED_BLACK}(Timeout: battle did not start within 90s)${COLOR_RESET}"
+            printf '\n(Timeout waiting for battle)\n' >> "$debug_file"
+            rm -f "$src_ram" "$full_ram" "$_kd_battle_history"
+            cd - >/dev/null 2>&1; rm -rf "$tmp_ram"
+            unset _kd_page _kd_action _kd_extract
+            return 1
+        fi
     fi
 
     # ── Battle started ───────────────────────────────────────────────────
     local _kd_battle_start
-    _kd_battle_start=$(date +%s)
+    printf -v _kd_battle_start '%(%s)T' -1
     _kd_extract
 
     # Detect team
@@ -335,18 +352,30 @@ king_debug() {
             fi
         fi
 
-        # ── Detect battle end: no dodge link = game over ─────────────────
-        if [ -z "$_kd_KINGATK" ] && [ -z "$_kd_ATK" ] && [ -z "$_kd_UNRIP" ]; then
-            # Could be dead (unrip needed) or battle ended
-            _kg_fetch "/king"
-            _kd_extract
-            if [ -z "$_kd_KINGATK" ] && [ -z "$_kd_ATK" ]; then
+        # ── Detect battle end / hero dead (original logic: dodge = battle live) ─
+        # If no dodge AND no kingatk: hero is dead or battle ended
+        if [ -z "$_kd_DODGE" ] && [ -z "$_kd_KINGATK" ]; then
+            if [ -n "$_kd_UNRIP" ]; then
+                # Hero dead - revive and restart loop iteration
+                _kg_fetch "$_kd_UNRIP"
+                _kd_extract
+                _kd_action "💀 UNRIP (revived)" "$_kd_hp_before" "$_kd_enh_before" \
+                           "$LA" "$_kd_USH" "$_kd_ENH"
+                continue
+            else
+                # Confirm by re-fetching /king before giving up
+                _kg_fetch "/king"
+                _kd_extract
                 if [ -n "$_kd_UNRIP" ]; then
+                    # Got unrip after refresh - revive
                     _kg_fetch "$_kd_UNRIP"
                     _kd_extract
-                    _kd_action_label="💀 UNRIP (revived)"
-                else
-                    _kd_action_label="🏁 BATTLE END (no actions available)"
+                    _kd_action "💀 UNRIP (after refresh)" "$_kd_hp_before" "$_kd_enh_before" \
+                               "$LA" "$_kd_USH" "$_kd_ENH"
+                    continue
+                elif [ -z "$_kd_DODGE" ] && [ -z "$_kd_KINGATK" ]; then
+                    # Still no battle links after refresh - battle over
+                    _kd_action_label="🏁 BATTLE END"
                     _kd_action "$_kd_action_label" "$_kd_hp_before" "$_kd_enh_before" \
                               "$LA" "$_kd_USH" "$_kd_ENH"
                     break
@@ -499,19 +528,7 @@ king_debug() {
             else
                 _kg_fetch "/king"
                 _kd_extract
-                # Check unrip
-                if [ -z "$_kd_KINGATK" ] && [ -z "$_kd_ATK" ] && [ -n "$_kd_UNRIP" ]; then
-                    _kg_fetch "$_kd_UNRIP"
-                    _kd_extract
-                    _kd_action_label="🔄 REFRESH + 💀 UNRIP"
-                elif [ -z "$_kd_KINGATK" ] && [ -z "$_kd_ATK" ] && [ -z "$_kd_UNRIP" ]; then
-                    _kd_action_label="🏁 BATTLE END"
-                    _kd_action "$_kd_action_label" "$_kd_hp_before" "$_kd_enh_before" \
-                              "$LA" "$_kd_USH" "$_kd_ENH"
-                    break
-                else
-                    _kd_action_label="🔄 REFRESH [PVP]"
-                fi
+                _kd_action_label="🔄 REFRESH [PVP]"
                 sleep 1s
             fi
         fi
@@ -593,7 +610,8 @@ king_debug() {
     done
 
     # ── Post-battle ──────────────────────────────────────────────────────
-    local _kd_dur=$(( $(date +%s) - _kd_battle_start ))
+    local _kd_end; printf -v _kd_end '%(%s)T' -1
+    local _kd_dur=$(( _kd_end - _kd_battle_start ))
     local _kd_dmin=$(( _kd_dur / 60 )) _kd_dsec=$(( _kd_dur % 60 ))
 
     _kd_page "STATE: POST-BATTLE"
@@ -750,7 +768,7 @@ king_start() {
         grep -o -E '(/[a-z]+(/[a-z]+/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+|/))' "$TMP"/SRC | sed -n '1p' >ACCESS 2>/dev/null
         printf " 👣 Entering...\n$(cat ACCESS)\n"
         printf " 😴 Waiting...\n"
-        cat < "$TMP"/SRC | grep -o 'king/kingatk/' >EXIT 2>/dev/null
+        cat < "$TMP"/SRC | grep -o 'king/kingatk/\|king/dodge/' >EXIT 2>/dev/null
         local BREAK=$(( $(date +%s) + 30 ))
         until [ -s "EXIT" ] || [ "$(date +%s)" -gt "$BREAK" ]; do
             printf " 💤\t...\n$(cat ACCESS)\n"
@@ -761,7 +779,7 @@ king_start() {
             ) </dev/null &>/dev/null &
             time_exit 17
             cat < "$TMP"/SRC | sed 's/href=/\n/g' | grep '/king/' | head -n 1 | awk -F"[']" '{ print $2 }' >ACCESS 2>/dev/null
-            cat < "$TMP"/SRC | grep -o 'king/kingatk/' >EXIT 2>/dev/null
+            cat < "$TMP"/SRC | grep -o 'king/kingatk/\|king/dodge/' >EXIT 2>/dev/null
             sleep 2
         done
         king_debug
