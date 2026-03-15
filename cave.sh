@@ -125,9 +125,8 @@ check_cave_keypress() {
 
 bottom_info(){
     echo -e "${GREENb_BLACK}🧡 HP $NOWHP - ${HPPER}% | 🔷 MP $NOWMP - ${MPPER}%${COLOR_RESET}" > "$TMP"/bottom_file
-    printf " 👷‍♂️${ACC} | $(w3m -dump -T text/html $TMP/SRC | grep -o -E '(g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' | sed 's/g/🪙 g/g;s/s/🥈 s/g') \n" >> "$TMP/bottom_file"
+    printf " 👷‍♂️${ACC} | $(w3m -dump -T text/html $TMP/SRC | grep -o -E '(g [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1} \| s [0-9]{1,3}[^0-9]{0,1}[0-9]{0,3}[A-Za-z]{0,1})' | sed 's/g/🪙 g/g;s/s/🥈 s/g') | 🔨 Actions: ${action_count} \n" >> "$TMP/bottom_file"
     echo_t " ~ Press [x] to exit" >> "$TMP/bottom_file"
-    # printf "\n" >> "$TMP/bottom_file"
     cat "$TMP/bottom_file"
 }
 
@@ -143,16 +142,39 @@ cave_start() {
 
   set_cave_limits
 
-  while [[ "$RUN" =~ [-]cv ]]; do
+  # Global timeout (2 hours max)
+  local cave_start_time=$(date +%s)
+  local cave_max_duration=7200  # 2 hours in seconds
+  local action_count=0
 
-      local CAVE=$(grep -o -E '/cave/(gather|down|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+  while [[ "$RUN" =~ [-]cv ]]; do
+      # Check global timeout every iteration
+      local elapsed=$(( $(date +%s) - cave_start_time ))
+      if [ "$elapsed" -gt "$cave_max_duration" ]; then
+          echo_t "Cave session timeout (${elapsed}s / ${cave_max_duration}s) - exiting" "${BLACK_RED}" "${COLOR_RESET}" "after" "⏰"
+          break
+      fi
+
+      local CAVE=$(grep -o -E '/cave/(gather|down|attack|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
       local RESULT=$(echo "$CAVE" | cut -d'/' -f3)
 
       # Validar se encontrou um link de ação
-      if [ -z "$CAVE" ]; then
-          echo_t "No cave action found. Fetching page again..." "${GRAY_BLACK}" "${COLOR_RESET}" "after" "⏳"
+      local retry_count=0
+      local max_retries=5
+
+      while [ -z "$CAVE" ] && [ $retry_count -lt $max_retries ]; do
+          retry_count=$((retry_count + 1))
+          echo_t "No cave action found (attempt ${retry_count}/${max_retries}). Retrying..." "${GRAY_BLACK}" "${COLOR_RESET}" "after" "⏳"
+          sleep 2s
           fetch_page "/cave/"
-          continue
+          CAVE=$(grep -o -E '/cave/(gather|down|attack|runaway|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
+          RESULT=$(echo "$CAVE" | cut -d'/' -f3)
+      done
+
+      # Se ainda não encontrou após retentativas, saiar
+      if [ -z "$CAVE" ]; then
+          echo_t "Failed to find cave action after ${max_retries} attempts. Exiting." "${RED_BLACK}" "${COLOR_RESET}" "after" "❌"
+          break
       fi
 
       local RESOURCES=$(grep -o -E 'res/[0-9]+\.png' "$TMP/SRC" | sed 's/res\///;s/.png//')
@@ -210,6 +232,8 @@ cave_start() {
         ;;
         gather*) echo_t "Start mining" "" "" "after" "⛏️";;
         speedUp*) echo_t "Speeding up mining" "" "" "after" "⚡";;
+        attack*) echo_t "Attacking monster" "" "" "after" "⚔️";;
+        runaway*) echo_t "Running from monster" "" "" "after" "💨";;
       esac
 
       # soma o valor gasto em prata
@@ -217,6 +241,7 @@ cave_start() {
         SILVER_SPENT_TOTAL=$(( SILVER_SPENT_TOTAL + SPEEDUP_SILVER_COST ))
       fi
 
+      action_count=$((action_count + 1))
       bottom_info
       fetch_page "/cave/"
 
@@ -225,6 +250,10 @@ cave_start() {
       unset ACCESS1 ACCESS2 ACTION DOWN MEGA
     done
   echo -e "${GREEN_BLACK}Cave Done ✅${COLOR_RESET}\n"
+  echo_t "Session Summary" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "📊"
+  echo_t "  Total actions performed: ${action_count}" "" "" "after" "🔨"
+  echo_t "  Gold spent: ${GOLD_SPENT_TOTAL}/${CAVE_GOLD_LIMIT}" "" "" "after" "🪙"
+  echo_t "  Silver spent: ${SILVER_SPENT_TOTAL}/${CAVE_SILVER_LIMIT}" "" "" "after" "🥈"
   run_file="${ACCOUNT_RUN_FILE:-$HOME/twm/runmode_file}"
   echo "-boot" > "$run_file"  # Change the run mode and save to a file
   restart_script
