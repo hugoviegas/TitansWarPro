@@ -17,7 +17,7 @@
 #  ID 10  → Altares antigos        — altars_fight (entrar e lutar)
 #  ID 11  → Gladiador             — coliseum_fight x3
 #  ID 12  → Ajude o seu Clã!      — IGNORAR (compra 500 ouro para clã)
-#  ID 13  → Alquimia              — 2 elixires bem-sucedidos
+#  ID 13  → Alquimia              — usar 1 elixir do inventário (/inv/chest/)
 #  ID 16  → Torneio               — só coletar (career já roda antes)
 # ============================================================================
 
@@ -280,58 +280,62 @@ _mission_cave() {
     checkQuest 5 end
 }
 
-# ── Alquimia — 2 elixires com sucesso (ID 13) ────────────────────────────
+# ── Alquimia — usar 1 elixir do inventário (ID 13) ───────────────────────
 _mission_alchemy() {
-    echo_t "  Alchemy (2 successful elixirs)" "${GOLD_BLACK}" "${COLOR_RESET}" "before" "⚗️"
+    echo_t "  Alquimia (usar elixir)" "${GOLD_BLACK}" "${COLOR_RESET}" "before" "⚗️"
 
-    # Combinar com missão de clã de elixir se disponível
-    if checkQuest 7 apply; then
-        echo_t "   Clan elixir mission combined" "${GRAY_BLACK}" "${COLOR_RESET}" "after" "🔱"
+    # Pegar link da missão a partir da página /quest/ já em $TMP/SRC
+    local quest_link
+    quest_link=$(grep -o -E "/inv/chest/\?quest_t=quest&quest_id=13&qz=[a-f0-9]+" "$TMP/SRC" | head -n1)
+
+    if [ -z "$quest_link" ]; then
+        echo_t "  Alchemy mission not available" "${GRAY_BLACK}" "${COLOR_RESET}" "after" "⏳"
+        return
     fi
 
-    local successes=0
-    local attempts=0
-    local max_attempts=5  # 5 tentativas para garantir 2 sucessos (80% por tentativa)
+    # Abrir a página de inventário da missão
+    fetch_page "$quest_link"
 
-    while [ "$successes" -lt 2 ] && [ "$attempts" -lt "$max_attempts" ]; do
-        fetch_page "/lab/alchemy/"
+    if [ ! -s "$TMP/SRC" ]; then
+        echo_t "  Error fetching alchemy mission page" "${RED_BLACK}" "${COLOR_RESET}" "after" "❌"
+        return 1
+    fi
 
-        # Escolhe elixir aleatório (1-4)
-        local elixir
-        elixir=$(shuf -i 1-4 -n 1)
-        fetch_page "/lab/alchemy/${elixir}/"
+    # Encontrar o use link do elixir com maior quantidade
+    # Para cada use link, busca a última ocorrência de "N pc" antes dele no HTML
+    # (funciona mesmo que o HTML esteja todo em uma única linha)
+    local use_links html_content best_link best_qty
+    best_qty=0
+    html_content=$(cat "$TMP/SRC")
+    use_links=$(grep -o -E '/inv/chest/use/[0-9]+/1/\?r=[0-9]+' "$TMP/SRC")
 
-        local make
-        make=$(grep -o -E "/lab/alchemy/${elixir}/makePotion[?]r=[0-9]+" "$TMP/SRC" | head -n1)
-
-        if [ -n "$make" ]; then
-            fetch_page "$make"
-            sleep 1s
-            # Segunda confirmação (mesmo padrão de clanElixirQuest)
-            make=$(grep -o -E "/lab/alchemy/${elixir}/makePotion[?]r=[0-9]+" "$TMP/SRC" | head -n1)
-            [ -n "$make" ] && fetch_page "$make"
-            sleep 1s
-
-            # Verificar sucesso: página de falha contém padrões específicos
-            local result_text
-            result_text=$(w3m -dump -T text/html "$TMP/SRC" 2>/dev/null | head -n 20)
-
-            if echo "$result_text" | grep -q -i -E '(falhou|failed|sem recursos|not enough|má sorte)'; then
-                echo_t "   Elixir ${elixir} failed, retrying..." "${GRAY_BLACK}" "${COLOR_RESET}" "after" "❌"
-            else
-                successes=$((successes + 1))
-                echo_t "   Elixir ${elixir} success (${successes}/2)" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅"
-            fi
-        else
-            echo_t "   No elixir resources available" "${GRAY_BLACK}" "${COLOR_RESET}" "after" "⚠️"
-            break
+    while IFS= read -r link; do
+        [ -z "$link" ] && continue
+        local before_link qty
+        # Pega tudo que aparece antes deste link no HTML
+        before_link="${html_content%%"${link}"*}"
+        # Extrai a última quantidade "N pc" antes do link
+        qty=$(echo "$before_link" | grep -o -E '[0-9]+[[:space:]]*pc' | tail -1 | grep -o -E '^[0-9]+')
+        qty=${qty:-0}
+        if [ "$qty" -gt "$best_qty" ]; then
+            best_qty="$qty"
+            best_link="$link"
         fi
+    done <<< "$use_links"
 
-        attempts=$((attempts + 1))
-    done
+    # Fallback: usa o primeiro elixir encontrado se não detectou quantidade
+    [ -z "$best_link" ] && best_link=$(echo "$use_links" | head -n1)
 
-    # Finalizar missão de clã se foi aplicada
-    [ "$successes" -ge 1 ] && checkQuest 7 end
+    if [ -z "$best_link" ]; then
+        echo_t "  No elixirs available to use" "${GRAY_BLACK}" "${COLOR_RESET}" "after" "⚠️"
+        return
+    fi
+
+    echo_t "   Using elixir (qty: ${best_qty})" "${GRAY_BLACK}" "${COLOR_RESET}" "before" "⚗️"
+    fetch_page "$best_link"
+    sleep 1s
+
+    echo_t "  Elixir used!" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅"
 }
 
 # ============================================================================
