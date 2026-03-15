@@ -103,9 +103,13 @@ start_account_tmux() {
   ensure_account_dirs "$account_root"
   write_account_config "$account_id" "$account_ur" "$account_runmode"
 
+  # CLEANUP: Kill any existing tmux session for this account (stale/zombie sessions)
   if tmux has-session -t "$sname" 2>/dev/null; then
-    echo "[${account_id}] already running (tmux session: $sname)"
-    return
+    echo "[${account_id}] Cleaning up stale session: $sname"
+    tmux send-keys -t "$sname" C-c 2>/dev/null || true
+    sleep 1
+    tmux kill-session -t "$sname" 2>/dev/null || true
+    sleep 1
   fi
 
   # Build the run command (inline env + play.sh + account id)

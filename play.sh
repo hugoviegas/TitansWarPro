@@ -35,7 +35,26 @@ should_exit=0
 # Check if another instance is already running
 if [ -f "$lock_file" ]; then
   existing_pid=$(cat "$lock_file" 2>/dev/null)
+  is_stale=1  # Assume stale until proven otherwise
+
+  # Check if PID is running
   if kill -0 "$existing_pid" 2>/dev/null; then
+    # Process exists — check if it's really a valid play.sh session or just an orphan
+    is_stale=0
+
+    # If tmux is available, verify the session still exists
+    if command -v tmux >/dev/null 2>&1; then
+      session_name="twm_${ACCOUNT_ID}"
+      # If we expect a tmux session but it doesn't exist, the PID is indeed stale
+      if ! tmux has-session -t "$session_name" 2>/dev/null; then
+        # Process exists but session doesn't — clean stale PID and allow restart
+        is_stale=1
+      fi
+    fi
+  fi
+
+  if [ "$is_stale" -eq 0 ]; then
+    # Process is genuinely running
     printf '\033[01;31mError: Account %s is already running (PID %s)\033[0m\n' "$ACCOUNT_ID" "$existing_pid"
     printf 'To stop it: kill %s\n' "$existing_pid"
     exit 1
