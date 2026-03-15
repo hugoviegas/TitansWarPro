@@ -91,32 +91,43 @@ LEN=0
 # Loop through each script and handle downloading/updating
 for script in $SCRIPTS; do
     LEN=$((LEN + 1))
-    printf "Checking $LEN/$NUM_SCRIPTS $script\n"
+    label=$(printf "[%02d/%02d]" "$LEN" "$NUM_SCRIPTS")
+    local_file="$HOME/twm/$script"
+    temp_file="$local_file.tmp.$$"
 
-    # Get the size of the remote script
-    remote_count=$(curl "${SERVER}${script}" -s -L | wc -c)
-
-    # Get the size of the local script if it exists, otherwise set to 1 (to indicate it does not exist)
-    if [ -e ~/twm/"$script" ]; then
-        local_count=$(wc -c <"$script")
+    if [ ! -e "$local_file" ]; then
+        # New file — download unconditionally
+        if curl "${SERVER}${script}" -s -L -o "$local_file" 2>/dev/null; then
+            printf "  🆕 %s %-32s ${BLACK_YELLOW}new${COLOR_RESET}\n" "$label" "$script"
+        else
+            printf "  ⚠️  %s %-32s ${BLACK_YELLOW}skipped${COLOR_RESET}\n" "$label" "$script"
+        fi
     else
-        local_count=1
+        # File exists — download to temp and compare hashes
+        if curl "${SERVER}${script}" -s -L -o "$temp_file" 2>/dev/null; then
+            # Get hashes for comparison
+            local_hash=$(sha256sum "$local_file" 2>/dev/null | awk '{print $1}')
+            remote_hash=$(sha256sum "$temp_file" 2>/dev/null | awk '{print $1}')
+
+            if [ "$remote_hash" = "$local_hash" ]; then
+                # Content is identical — file is current
+                rm -f "$temp_file"
+                printf "  ✅ %s %-32s ${BLACK_CYAN}unchanged${COLOR_RESET}\n" "$label" "$script"
+            else
+                # Content differs — replace with new version
+                mv "$temp_file" "$local_file"
+                printf "  🔽 %s %-32s ${BLACK_GREEN}updated${COLOR_RESET}\n" "$label" "$script"
+            fi
+        else
+            # Download failed
+            rm -f "$temp_file"
+            printf "  ⚠️  %s %-32s ${BLACK_YELLOW}skipped${COLOR_RESET}\n" "$label" "$script"
+        fi
     fi
 
-    # Compare remote and local script sizes to determine action
-    if [ -e ~/twm/"$script" ] && [ "$remote_count" -eq "$local_count" ]; then
-        printf "✅ ${BLACK_CYAN}Updated $script${COLOR_RESET}\n"
-    elif [ -e ~/twm/"$script" ] && [ "$remote_count" -ne "$local_count" ]; then
-        printf "🔁 ${BLACK_GREEN}Updating $script${COLOR_RESET}\n"
-        curl "${SERVER}${script}" -s -L >"$script"  # Update existing script with new content
-    else
-        printf "🔽 ${BLACK_YELLOW}Downloading $script${COLOR_RESET}\n"
-        curl "${SERVER}${script}" -s -L -O  # Download new script if it doesn't exist locally
-    fi
+    chmod +x "$local_file"  # Make the script executable
+    cp "$local_file" "$HOME/$script" 2>/dev/null  # Copy script to user's home directory (if applicable)
 
-    chmod +x "$script"  # Make the script executable
-    cp "$script" "$HOME/$script" 2>/dev/null  # Copy script to user's home directory (if applicable)
-    
     sleep 0.1s  # Brief pause between downloads for stability
 done
 

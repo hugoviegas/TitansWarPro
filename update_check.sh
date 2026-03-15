@@ -42,20 +42,32 @@ update() {
 
   # Verifica cada script
   for script in "${SCRIPTS[@]}"; do
-    # Obtém o tamanho do arquivo remoto
-    remote_count=$(curl -s -L "${SERVER}${script}" | wc -c)
+    local_file="$HOME/twm/$script"
+    temp_file="$local_file.tmp.$$"
 
-    # Obtém o tamanho do arquivo local, se existir
-    if [ -e "$HOME/twm/$script" ]; then
-      local_count=$(wc -c <"$HOME/twm/$script")
+    # Download to temp file
+    if ! curl -s -L "${SERVER}${script}" -o "$temp_file" 2>/dev/null; then
+      rm -f "$temp_file"
+      continue
+    fi
+
+    # Check if local file exists
+    if [ ! -e "$local_file" ]; then
+      # New file to download
+      files_to_update+=("$script")
     else
-      local_count=0
+      # Compare hashes
+      local_hash=$(sha256sum "$local_file" 2>/dev/null | awk '{print $1}')
+      remote_hash=$(sha256sum "$temp_file" 2>/dev/null | awk '{print $1}')
+
+      if [ "$remote_hash" != "$local_hash" ]; then
+        # Content differs — update needed
+        files_to_update+=("$script")
+      fi
     fi
 
-    # Compara os tamanhos dos arquivos
-    if [ "$local_count" -ne "$remote_count" ]; then
-      files_to_update+=("$script")  # Adiciona à lista de arquivos a serem atualizados
-    fi
+    # Clean up temp file
+    rm -f "$temp_file"
   done
 while true; do
   # Pergunta ao usuário se deseja atualizar
@@ -75,8 +87,38 @@ while true; do
       
       if [[ "$choice" == "s" || "$choice" == "S" || "$choice" == "y" || "$choice" == "Y" ]]; then
         for file in "${files_to_update[@]}"; do
-          curl -s -L "${SERVER}${file}" -o "$HOME/twm/$file"
-          echo_t " Updated: " "" "" "after" " ${file} ✅"
+          local_file="$HOME/twm/$file"
+          temp_file="$local_file.tmp.$$"
+
+          # Download to temp file
+          if curl -s -L "${SERVER}${file}" -o "$temp_file" 2>/dev/null; then
+            # Compare hashes if local file exists
+            if [ -e "$local_file" ]; then
+              local_hash=$(sha256sum "$local_file" 2>/dev/null | awk '{print $1}')
+              remote_hash=$(sha256sum "$temp_file" 2>/dev/null | awk '{print $1}')
+
+              if [ "$remote_hash" = "$local_hash" ]; then
+                # File unchanged
+                rm -f "$temp_file"
+                echo_t " ✅ ${file} (unchanged)" "" "" "after"
+              else
+                # Update with new version
+                mv "$temp_file" "$local_file"
+                echo_t " 🔽 Updated: ${file} ✅" "" "" "after"
+              fi
+            else
+              # New file
+              mv "$temp_file" "$local_file"
+              echo_t " 🆕 ${file} (new)" "" "" "after"
+            fi
+
+            # Make executable
+            chmod +x "$local_file"
+          else
+            # Download failed
+            rm -f "$temp_file"
+            echo_t " ⚠️  ${file} (download failed)" "" "" "after"
+          fi
         done
       else
         echo_t "Update canceled."
