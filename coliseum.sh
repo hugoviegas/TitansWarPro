@@ -776,6 +776,17 @@ _cl_display_battle() {
         while IFS= read -r logline; do
             printf "  ${GRAY_BLACK}%s${COLOR_RESET}\n" "$logline"
         done
+
+    printf "  ${GRAY_BLACK}────── BATTLE LOG ──────${COLOR_RESET}\n"
+    local _cl_page_render
+    _cl_page_render=$(w3m -dump -T text/html "$src_ram" 2>/dev/null)
+    echo "$_cl_page_render" | sed -n '/^Os participantes:/,/^A batalha já começou!/p' | \
+        grep -v '^$' | grep -v 'Os participantes:' | grep -v 'A batalha já começou' | \
+        sed 's|\[0\]|🔴|g; s|\[1\]|🔵|g; s|\[rip\]|💀|g; s|assassinou|💥|; s|perdeu|❌|; s|Você acertar|✓|; s|Você usou|⚡|' | \
+        tail -n 8 | \
+        while IFS= read -r logline; do
+            printf "  ${GRAY_BLACK}%s${COLOR_RESET}\n" "$logline"
+        done
 }
 
 _cl_display_post_match() {
@@ -804,6 +815,9 @@ _cl_display_post_match() {
     printf "  ${GRAY_BLACK}║ ACTIONS:${COLOR_RESET}\n"
     printf "  ${GRAY_BLACK}║   ATK:${GREEN_BLACK}%-3d${GRAY_BLACK}  RND:${GREEN_BLACK}%-3d${GRAY_BLACK}  DODGE:${GREEN_BLACK}%-3d${GRAY_BLACK}  HEAL:${GREEN_BLACK}%-3d${GRAY_BLACK}                    ║${COLOR_RESET}\n" "$_cl_match_atks" "$_cl_match_atkrnds" "$_cl_match_dodges" "$_cl_match_heals"
     printf "  ${GRAY_BLACK}║   Kills:${GREEN_BLACK}%-3d${GRAY_BLACK}  Deaths:${RED_BLACK}%-3d${GRAY_BLACK}  LA Final: ${LA}s${GRAY_BLACK}                 ║${COLOR_RESET}\n" "$_cl_match_kills" "$_cl_match_deaths"
+    local _cl_captured_fails=$(grep -c "perdeu" "$_cl_battle_history" 2>/dev/null || echo "0")
+    local _cl_captured_kills=$(grep -c "assassinou" "$_cl_battle_history" 2>/dev/null || echo "0")
+    printf "  ${GRAY_BLACK}║   Fails from log:${RED_BLACK}%-2d${GRAY_BLACK}  |  Kills from log:${GREEN_BLACK}%-2d${GRAY_BLACK}  ║${COLOR_RESET}\n" "$_cl_captured_fails" "$_cl_captured_kills"
     printf "  ${GOLD_BLACK}╠══════════════════════════════════════════════════════════╣${COLOR_RESET}\n"
     printf "  ${GRAY_BLACK}║ CUMULATIVE STATS:${COLOR_RESET}\n"
     printf "  ${GRAY_BLACK}║   W:${GREEN_BLACK}%-3d${GRAY_BLACK}  L:${RED_BLACK}%-3d${GRAY_BLACK}  (%-2d%%)  Streak:${GREEN_BLACK}%-3d${GRAY_BLACK}  Best:${GREEN_BLACK}%-3d${GRAY_BLACK}  ║${COLOR_RESET}\n" "$cl_wins" "$cl_losses" "$wr" "$cl_current_win_streak" "$cl_longest_win_streak"
@@ -1004,6 +1018,7 @@ coliseum_fight() {
     src_ram=$(mktemp -p "$dir_ram" data.XXXXXX)
     full_ram=$(mktemp -p "$dir_ram" data.XXXXXX)
     tmp_ram=$(mktemp -d -t twmdir.XXXXXX)
+    _cl_battle_history=$(mktemp -p "$dir_ram" history.XXXXXX)
     cp -r "$TMP"/* "$tmp_ram"
     cd "$tmp_ram" || exit
 
@@ -1183,6 +1198,18 @@ coliseum_fight() {
 
             _cl_loop_count=$((_cl_loop_count + 1))
 
+            # Save battle history every 3 loops for later extraction
+            if [ $((_cl_loop_count % 3)) -eq 0 ]; then
+                local _cl_page_render
+                _cl_page_render=$(w3m -dump -T text/html "$src_ram" 2>/dev/null)
+
+                {
+                    printf '[Loop %d] %s\n' "$_cl_loop_count" "$(date +'%H:%M:%S')"
+                    echo "$_cl_page_render" | sed -n '/^Os participantes:/,/^A batalha já começou!/p' | \
+                        grep -v '^$' | grep -v 'Os participantes:' | grep -v 'A batalha já começou'
+                } >> "$_cl_battle_history"
+            fi
+
             # Periodic adaptive adjustments (every 5 loops)
             if [ $((_cl_loop_count % 5)) -eq 0 ]; then
                 _cl_adapt_hper
@@ -1306,7 +1333,7 @@ coliseum_fight() {
         # LA is NOT saved to config - always resets to 4.5 at next battle start
 
         # ── Cleanup ────────────────────────────────────────────────
-        rm -f "$src_ram" "$full_ram"
+        rm -f "$src_ram" "$full_ram" "$_cl_battle_history"
         rm -rf "$tmp_ram"
         unset last_heal last_dodge last_atk USH ENH USER ATK ATKRND DODGE HEAL STONE GRASS BREAK_LOOP cl_access
         unset _cl_match_heals _cl_match_dodges _cl_match_atks _cl_match_atkrnds
