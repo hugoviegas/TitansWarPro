@@ -164,7 +164,11 @@ while true; do
   if [ "\$AUTO_RESTART" != "true" ]; then
     exit "\$exit_code"
   fi
-  # Exponential backoff: 5s → 10s → 20s → 40s → 60s max (resets on long uptime)
+  # exit code 0 = clean scheduled restart (restart_script() in run.sh) → restart quickly
+  # Non-zero and unexpected = actual crash → apply exponential backoff
+  if [ "\$exit_code" -eq 0 ]; then
+    restart_delay=5
+  fi
   sleep "\$restart_delay"
   restart_delay=\$(( restart_delay * 2 > 60 ? 60 : restart_delay * 2 ))
 done

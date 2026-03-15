@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Supervisor for a single account.
 # Usage:  play.sh <ACCOUNT_ID> [run_mode]
 #   play.sh A1          → normal boot mode for account A1
@@ -53,13 +53,17 @@ echo "$$" > "$lock_file" 2>/dev/null || {
 
 kill_child() {
   if [ -n "$child_pid" ] && kill -0 "$child_pid" 2>/dev/null; then
-    # First, try to TERM the process group (all children)
+    # Signal the process group (kills all children in the group)
     kill -TERM "-$child_pid" 2>/dev/null || true
+    # Always also send direct TERM — fallback when no separate process group exists
+    # (non-interactive shells don't create a new process group for background jobs)
+    kill -TERM "$child_pid" 2>/dev/null || true
     sleep 1s
 
-    # If still alive, force kill the process group
+    # If still alive, force kill both group and direct process
     if kill -0 "$child_pid" 2>/dev/null; then
       kill -9 "-$child_pid" 2>/dev/null || true
+      kill -9 "$child_pid" 2>/dev/null || true
     fi
 
     wait "$child_pid" 2>/dev/null || true

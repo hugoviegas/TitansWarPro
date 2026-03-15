@@ -99,16 +99,24 @@ requer_func() {
 			esac
     }
 
-	# Função para encerrar o script
+	# Terminate only the current account's play.sh — NOT all accounts
 	terminate_script() {
             echo_t "Terminating script..."
-            pidf=$(pgrep -f "sh.*twm/play.sh")
-			while [ -n "$pidf" ]; do
-					kill -9 "$pidf" 2>/dev/null
-					pidf=$(pgrep -f "sh.*twm/play.sh")
-					sleep 1
-			done
-			kill -9 $$ 2>/dev/null
+            # Use the account's lock file to find the correct play.sh PID.
+            # Using pgrep without ACCOUNT_ID would kill ALL accounts simultaneously.
+            local _lock="${ACCOUNT_ROOT:-$HOME/twm/accounts/${ACCOUNT_ID:-A1}}/.play.lock"
+            local _pidf=""
+            if [ -f "$_lock" ]; then
+                _pidf=$(cat "$_lock" 2>/dev/null)
+            fi
+            # Fallback: search by account ID in process args
+            if [ -z "$_pidf" ] && [ -n "${ACCOUNT_ID:-}" ]; then
+                _pidf=$(pgrep -f "play\.sh[[:space:]]*${ACCOUNT_ID}" 2>/dev/null | head -1)
+            fi
+            if [ -n "$_pidf" ]; then
+                kill -9 "$_pidf" 2>/dev/null
+            fi
+            kill -9 $$ 2>/dev/null
 	}
 
 	# Função principal do menu

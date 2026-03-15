@@ -21,8 +21,8 @@ twm_play() {
         (00:[0-5]5|01:[0-5]5|02:[0-5]5|03:[0-5]5)
             coliseum_fight
             ;;
-        # Scheduled events every half hour during the day
-        (00:00|00:30|01:00|01:30|02:00|02:30|03:00|03:30|04:00|04:30|05:00|05:30|06:00|06:30|07:00|07:30|08:00|08:30|09:00|11:30|12:00|13:00|13:30|14:30|15:30|17:00|17:30|18:00|18:30|19:30|20:00|20:30|23:00)
+        # Scheduled events every half hour — ALL :00 and :30 slots covered
+        (00:00|00:30|01:00|01:30|02:00|02:30|03:00|03:30|04:00|04:30|05:00|05:30|06:00|06:30|07:00|07:30|08:00|08:30|09:00|09:30|10:00|10:30|11:00|11:30|12:00|13:00|13:30|14:00|14:30|15:00|15:30|16:00|16:30|17:00|17:30|18:00|18:30|19:00|19:30|20:00|20:30|21:00|21:30|22:00|22:30|23:00)
             start
             ;;
         (23:30)
@@ -31,41 +31,42 @@ twm_play() {
                 update
             fi
             ;;
-        
+
         # Valley of the Immortals (09:55, 15:55, 21:55)
         (09:5[5-9]|15:5[5-9]|21:5[5-9])
             undying_start
             start
             ;;
-        
-        # Flag Fight (10:15 to 16:15)
+
+        # Flag Fight (10:10 to 16:14)
         (10:1[0-4]|16:1[0-4])
-            flagfight_start            
+            flagfight_start
+            start
             ;;
-        
-        # Clan coliseum (10:28 to 15:58)
+
+        # Clan coliseum (10:28 to 14:59)
         (10:2[8-9]|14:5[8-9])
             if [ -n "$CLD" ]; then
                 clancoliseum_start
             fi
             start
             ;;
-        
-        # Clan tournament (11 to 19)
+
+        # Clan tournament (10:55 to 18:59)
         (10:5[5-9]|18:5[5-9])
             if [ -n "$CLD" ]; then
                 clanfight_start
             fi
             start
             ;;
-        
-        # King of the Immortals (12:30, 16:30, 22:30)
+
+        # King of the Immortals (12:30, 16:30, 22:30) — starts at :25 window
         (12:2[5-9]|16:2[5-9]|22:2[5-9])
             king_start
             start
             ;;
-        
-        # Ancient Altars (13 to 21)
+
+        # Ancient Altars (13:55, 20:55)
         (13:5[5-9]|20:5[5-9])
             if [ -n "$CLD" ]; then
                 altars_start
@@ -73,7 +74,7 @@ twm_play() {
             start
             ;;
 
-        # Clan damage event at 09:30 and 21:30; additional logic can be added here if needed.
+        # Clan damage event at 09:30 and 21:30 — starts at :25 window
         (09:2[5-9]|21:2[5-9])
             specialEvent
             start

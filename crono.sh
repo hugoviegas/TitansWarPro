@@ -32,6 +32,11 @@ func_cat() {
         printf "\033[01;31m\n$(translate "Stopping macro")...\033[0m\n"
         exit 0
     }
+    # Save current trap before overriding so we can restore it when func_cat exits.
+    # Without this, twm_global_cleanup (which kills background w3m jobs) would never
+    # run because func_cat permanently replaces the INT/TERM handler for the session.
+    local _prev_trap
+    _prev_trap=$(trap -p INT | sed "s/trap -- '//;s/' INT//")
     trap '_interrupt_func_cat' INT TERM
 
     func_crono
@@ -157,16 +162,18 @@ func_cat() {
 
         # Only execute if cmd is not empty
         if [ -n "$cmd" ]; then
+            # Use per-account error file to avoid race condition in multi-account mode
+            local _cmd_err="${TMP:-/tmp}/cmd_error.txt"
             # Try to execute the command; show error if it fails
-            if ! $cmd 2>/tmp/cmd_error.txt; then
+            if ! $cmd 2>"$_cmd_err"; then
                 # Command failed — show error message
-                if [ -s /tmp/cmd_error.txt ]; then
-                    printf "\033[01;31mError executing '${cmd}': $(cat /tmp/cmd_error.txt | head -1)\033[0m\n"
+                if [ -s "$_cmd_err" ]; then
+                    printf "\033[01;31mError executing '${cmd}': $(head -1 "$_cmd_err")\033[0m\n"
                 else
                     printf "\033[01;31mCommand not found or failed: ${cmd}\033[0m\n"
                     printf "\033[02mAvailable: config, requer_func, stop\033[0m\n"
                 fi
-                rm -f /tmp/cmd_error.txt
+                rm -f "$_cmd_err"
             fi
         fi
 
@@ -181,6 +188,14 @@ func_cat() {
             break  # Exit func_cat for other commands
         fi
     done
+
+    # Restore original trap so twm_global_cleanup remains active for the rest of the session.
+    # This ensures background w3m jobs get killed properly when signals are received.
+    if [ -n "$_prev_trap" ]; then
+        trap "$_prev_trap" INT TERM
+    else
+        trap - INT TERM
+    fi
 }
 
 func_sleep() {
