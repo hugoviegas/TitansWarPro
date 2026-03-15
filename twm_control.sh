@@ -131,30 +131,37 @@ select_account() {
     accounts=$(get_accounts)
 
     if [ -z "$accounts" ]; then
-        printf "${RED_BLACK}No active accounts found.${COLOR_RESET}\n"
+        printf "${RED_BLACK}No active accounts found.${COLOR_RESET}\n" >&2
         return 1
     fi
 
     local count=0
     declare -a account_ids
 
-    printf "\n${GREENb_BLACK}$(translate "$prompt")${COLOR_RESET}\n"
+    # Display menu on stderr to keep stdout clean
+    printf "\n${GREENb_BLACK}$(translate "$prompt")${COLOR_RESET}\n" >&2
 
     while IFS= read -r id; do
         count=$((count + 1))
         account_ids[$count]="$id"
-        printf "  %d) %s\n" "$count" "$id"
+        printf "  %d) %s\n" "$count" "$id" >&2
     done <<< "$accounts"
 
-    printf "\n${GOLD_BLACK}Choose [1-$count]:${COLOR_RESET} "
-    read -r selection
-
-    if ! [[ "$selection" =~ ^[0-9]+$ ]] || [ "$selection" -lt 1 ] || [ "$selection" -gt "$count" ]; then
-        printf "${RED_BLACK}Invalid selection.${COLOR_RESET}\n"
+    # Prompt and read from original stdin (should still work in subshell)
+    printf "\n${GOLD_BLACK}Choose [1-$count]:${COLOR_RESET} " >&2
+    if ! read -r -t 30 selection; then
+        printf "${RED_BLACK}Selection timeout or read failed.${COLOR_RESET}\n" >&2
         return 1
     fi
 
-    echo "${account_ids[$selection]}"
+    # Validate: must be numeric and in valid range
+    if ! [[ "$selection" =~ ^[0-9]+$ ]] || [ "$selection" -lt 1 ] || [ "$selection" -gt "$count" ]; then
+        printf "${RED_BLACK}Invalid selection: $selection${COLOR_RESET}\n" >&2
+        return 1
+    fi
+
+    # Return account ID on stdout (cleanly, no extra newlines from echo)
+    printf '%s\n' "${account_ids[$selection]}"
 }
 
 # First-time setup: ask language once and save to control.cfg
@@ -463,11 +470,12 @@ main() {
                 ;;
             2)
                 account=$(select_account "select_account") || continue
+                [ -n "$account" ] || continue
                 clear
                 printf "${BLACK_CYAN}Starting account $account...${COLOR_RESET}\n\n"
                 cd "$BASE_DIR" && ./multi_runner.sh start "$account"
                 read -rp "Press Enter to continue..."
-                ;;
+;;
             3)
                 clear
                 printf "${BLACK_CYAN}$(translate "stopping_accounts")${COLOR_RESET}\n\n"
@@ -476,11 +484,12 @@ main() {
                 ;;
             4)
                 account=$(select_account "which_account_stop") || continue
+                [ -n "$account" ] || continue
                 clear
                 printf "${BLACK_CYAN}Stopping account $account...${COLOR_RESET}\n\n"
                 cd "$BASE_DIR" && ./multi_runner.sh stop "$account"
                 read -rp "Press Enter to continue..."
-                ;;
+;;
             5)
                 clear
                 printf "${BLACK_CYAN}$(translate "restarting_accounts")${COLOR_RESET}\n\n"
