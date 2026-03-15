@@ -319,6 +319,23 @@ coliseum_debug() {
 
         _dbg_loop=$(( _dbg_loop + 1 ))
 
+        # Save full page dump at loop 10 for detailed analysis
+        if [ "$_dbg_loop" -eq 10 ]; then
+            local _dbg_loop10_file="${debug_dir}/coliseum_debug_${debug_ts}_LOOP10_FULL_PAGE.txt"
+            {
+                printf '============================================================\n'
+                printf '=  FULL PAGE DUMP AT LOOP 10\n'
+                printf '============================================================\n'
+                printf 'Timestamp: %s\n' "$(date +'%Y-%m-%d %H:%M:%S')"
+                printf 'Loop: %d  |  Battle elapsed: %dm%ds\n\n' "$_dbg_loop" "$_dbg_min" "$_dbg_sec"
+                printf '--- RENDERED HTML (w3m dump) ---\n'
+                w3m -dump -T text/html "$src_ram" 2>/dev/null
+                printf '\n--- RAW HTML SOURCE (first 3000 chars) ---\n'
+                head -c 3000 "$src_ram" 2>/dev/null
+            } > "$_dbg_loop10_file"
+            printf "  ${GRAY_BLACK}[Loop 10 page saved: %s]${COLOR_RESET}\n" "$_dbg_loop10_file" >&2
+        fi
+
         # Save battle history every 3 loops for later extraction
         if [ $(( _dbg_loop % 3 )) -eq 0 ]; then
             {
@@ -558,6 +575,7 @@ coliseum_debug() {
     printf "  ${GRAY_BLACK}║   HPER: ${HPER}%%  |  RPER: ${RPER}%%${COLOR_RESET}\n"
     printf "  ${GOLD_BLACK}╠══════════════════════════════════════════════════════════╣${COLOR_RESET}\n"
     printf "  ${GRAY_BLACK}║ Debug file: ${GOLD_BLACK}%-46s${GRAY_BLACK}║${COLOR_RESET}\n" "${debug_file##*/}"
+    printf "  ${GRAY_BLACK}║ Loop 10 page: ${GOLD_BLACK}coliseum_debug_*_LOOP10_FULL_PAGE.txt${GRAY_BLACK} ║${COLOR_RESET}\n"
     printf "  ${GOLD_BLACK}╚══════════════════════════════════════════════════════════╝${COLOR_RESET}\n"
     printf "\n  ${GRAY_BLACK}(closing in 10 seconds...)${COLOR_RESET}\n"
     sleep 10s
@@ -590,6 +608,9 @@ coliseum_debug() {
         printf '\n--- ATTACK ANALYSIS ---\n'
         printf 'Você perdeu (fails detected): %d\n' "$_dbg_real_fails"
         printf 'Você assassinou (kills): %d\n' "$_dbg_real_kills"
+        printf '\n--- DEBUG ARTIFACTS ---\n'
+        printf 'Full page dump at Loop 10: coliseum_debug_%s_LOOP10_FULL_PAGE.txt\n' "$debug_ts"
+        printf '(Check this file to find exact locations of attack history, status messages, etc)\n'
     } >> "$debug_file"
 
     # ── Cleanup ───────────────────────────────────────────────────────────
