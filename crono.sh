@@ -55,8 +55,9 @@ func_cat() {
     # the event completes and returns to idle.
     #
     # Signal handler for graceful interrupt of sleep/read
+    # shellcheck disable=SC2329
     _interrupt_func_cat() {
-        printf "\033[01;31m\n$(translate "Stopping macro")...\033[0m\n"
+        printf_t "Stopping macro..." "${RED_BLACK}" "${COLOR_RESET}\n"
         exit 0
     }
     # Save current trap before overriding so we can restore it when func_cat exits.
