@@ -354,10 +354,6 @@ _check_timeout() {
 }
 
 do_missions() {
-    if _missions_is_weekend; then
-        echo_t "Missions skipped (weekend)" "${BLACK_RED}" "${COLOR_RESET}" "after" "⏸️"
-        return
-    fi
 
     echo_t "Doing Missions" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "📜"
 
