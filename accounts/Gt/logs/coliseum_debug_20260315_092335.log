@@ -1,0 +1,623 @@
+Coliseum Debug Log - 2026-03-15 09:23:35
+Server: furiadetitas.net  Account: Gt
+
+--- CONFIG ---
+LA=5.6s  HPER=38%  RPER=5%
+COLISEUM_LA=5.6  COLISEUM_HPER=38  COLISEUM_RPER=5
+
+--- CUMULATIVE STATS ---
+Total:6  W:2  L:0  Streak:2 (best:2)
+
+--- MAX HP ---
+Max HP: 24916
+
+============================================================
+=  STATE: LOBBY
+============================================================
+Timestamp: 2026-03-15 09:23:38
+
+--- W3M RENDERED DUMP ---
+[mail] | hp 19310 | mp 328
+Luta, alcançar novas classes, obter recompensa!
+Entrar na Fila
+[2]             [1] [1] [1] [1] [1]
+                [1] [1] [0]
+  Sua classe                       Seu alvo
+Está lugar 4 na avaliação!
+[1] Classificação no Coliseu [str] Melhorias de combate
+Melhorias de combate a aumentar o seu poder de ataque e defesa
+[2hit] Torneio Coliseum! [2hit]
+Skulls: [skull] 75 de 125
+Recolha 25 crânios e participar no desenho de 5000 moedas de ouro!
+Recolha 125 crânios e participar no desenho de 7500 moedas de ouro!
+Se você coletar 250 crânios, você vai participar no desenho de 10000 moedas de
+ouro!
+Tempo restante até o final do torneio 3 dias!
+detalhes
+[1] Mate os inimigos [1]
+Recompensa para a primeira vitória é 20 vezes maior!
+Próxima missão estará disponível em 14 h 36 min
+
+  • Ranks: Por 3 vitórias consecutivas, você recebe uma [1] estrela adicional
+  • Crânios são dados a partir do Rank 23 e apenas para as primeiras 15
+    batalhas
+
+[user]Meu Herói
+[user]Meu Clã
+[arrow]Página principal
+Bóreas Gohan TeenConfigurações
+lvl 79 | g 30'378 | s 58,5M
+Oferta especial! Bonus de Ouro! (+)
+Tempo de sobra: 1 dia
+
+Fórum | Conversar | Classificação
+Comentários feed
+Apoio e Informação
+0,013 seg, 09:23:38 | Online: 161
+Overmobile © 2026, 18+
+
+
+--- EXTRACTED LINKS ---
+/coliseum/enterFight/?r=69489368
+/coliseum/rangs
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/rangs
+/coliseum/merchant
+/coliseum/stars
+
+--- ACTION LINKS ---
+ATK:    
+ATKRND: 
+DODGE:  
+HEAL:   
+STONE:    grey:
+GRASS:    grey:
+
+--- HP VALUES ---
+Player HP: 
+Enemy HP:  
+
+--- MARKERS ---
+dodge:0  end_fight:0  grey:0  rip:0
+
+--- KEYWORD SEARCH ---
+Recompensa para a primeira vitória é 20 vezes maior!
+  • Ranks: Por 3 vitórias consecutivas, você recebe uma [1] estrela adicional
+
+============================================================
+=  STATE: ENTER FIGHT
+============================================================
+Timestamp: 2026-03-15 09:23:40
+
+--- W3M RENDERED DUMP ---
+[mail] | hp 19311 | mp 328
+Luta, alcançar novas classes, obter recompensa!
+[0][1] Titãs na fila: 1 de 5
+Atualizar
+Deixe cauda
+[2]             [1] [1] [1] [1] [1]
+                [1] [1] [0]
+  Sua classe                       Seu alvo
+Está lugar 4 na avaliação!
+[1] Classificação no Coliseu [str] Melhorias de combate
+Melhorias de combate a aumentar o seu poder de ataque e defesa
+[2hit] Torneio Coliseum! [2hit]
+Skulls: [skull] 75 de 125
+Recolha 25 crânios e participar no desenho de 5000 moedas de ouro!
+Recolha 125 crânios e participar no desenho de 7500 moedas de ouro!
+Se você coletar 250 crânios, você vai participar no desenho de 10000 moedas de
+ouro!
+Tempo restante até o final do torneio 3 dias!
+detalhes
+[1] Mate os inimigos [1]
+Recompensa para a primeira vitória é 20 vezes maior!
+Próxima missão estará disponível em 14 h 36 min
+
+  • Ranks: Por 3 vitórias consecutivas, você recebe uma [1] estrela adicional
+  • Crânios são dados a partir do Rank 23 e apenas para as primeiras 15
+    batalhas
+
+[user]Meu Herói
+[user]Meu Clã
+[arrow]Página principal
+Bóreas Gohan TeenConfigurações
+lvl 79 | g 30'378 | s 58,5M
+Oferta especial! Bonus de Ouro! (+)
+Tempo de sobra: 1 dia
+
+Fórum | Conversar | Classificação
+Comentários feed
+Apoio e Informação
+0,015 seg, 09:23:39 | Online: 161
+Overmobile © 2026, 18+
+
+
+--- EXTRACTED LINKS ---
+/coliseum/enterFight
+/coliseum/leaveFight/?r=55208284
+/coliseum/rangs
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/rangs
+/coliseum/merchant
+/coliseum/stars
+
+--- ACTION LINKS ---
+ATK:    
+ATKRND: 
+DODGE:  
+HEAL:   
+STONE:    grey:
+GRASS:    grey:
+
+--- HP VALUES ---
+Player HP: 
+Enemy HP:  
+
+--- MARKERS ---
+dodge:0  end_fight:0  grey:0  rip:0
+
+--- KEYWORD SEARCH ---
+Recompensa para a primeira vitória é 20 vezes maior!
+  • Ranks: Por 3 vitórias consecutivas, você recebe uma [1] estrela adicional
+
+============================================================
+=  STATE: WAITING (poll #1)
+============================================================
+Timestamp: 2026-03-15 09:23:42
+
+--- W3M RENDERED DUMP ---
+[mail] | hp 19314 | mp 330
+Luta, alcançar novas classes, obter recompensa!
+[0][1] Titãs na fila: 1 de 5
+Atualizar
+Deixe cauda
+[2]             [1] [1] [1] [1] [1]
+                [1] [1] [0]
+  Sua classe                       Seu alvo
+Está lugar 4 na avaliação!
+[1] Classificação no Coliseu [str] Melhorias de combate
+Melhorias de combate a aumentar o seu poder de ataque e defesa
+[2hit] Torneio Coliseum! [2hit]
+Skulls: [skull] 75 de 125
+Recolha 25 crânios e participar no desenho de 5000 moedas de ouro!
+Recolha 125 crânios e participar no desenho de 7500 moedas de ouro!
+Se você coletar 250 crânios, você vai participar no desenho de 10000 moedas de
+ouro!
+Tempo restante até o final do torneio 3 dias!
+detalhes
+[1] Mate os inimigos [1]
+Recompensa para a primeira vitória é 20 vezes maior!
+Próxima missão estará disponível em 14 h 36 min
+
+  • Ranks: Por 3 vitórias consecutivas, você recebe uma [1] estrela adicional
+  • Crânios são dados a partir do Rank 23 e apenas para as primeiras 15
+    batalhas
+
+[user]Meu Herói
+[user]Meu Clã
+[arrow]Página principal
+Bóreas Gohan TeenConfigurações
+lvl 79 | g 30'378 | s 58,5M
+Oferta especial! Bonus de Ouro! (+)
+Tempo de sobra: 1 dia
+
+Fórum | Conversar | Classificação
+Comentários feed
+Apoio e Informação
+0,013 seg, 09:23:42 | Online: 161
+Overmobile © 2026, 18+
+
+
+--- EXTRACTED LINKS ---
+/coliseum/leaveFight/?r=55208284
+/coliseum/rangs
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/rangs
+/coliseum/merchant
+/coliseum/stars
+
+--- ACTION LINKS ---
+ATK:    
+ATKRND: 
+DODGE:  
+HEAL:   
+STONE:    grey:
+GRASS:    grey:
+
+--- HP VALUES ---
+Player HP: 
+Enemy HP:  
+
+--- MARKERS ---
+dodge:0  end_fight:0  grey:0  rip:0
+
+--- KEYWORD SEARCH ---
+Recompensa para a primeira vitória é 20 vezes maior!
+  • Ranks: Por 3 vitórias consecutivas, você recebe uma [1] estrela adicional
+
+============================================================
+=  STATE: WAITING (poll #2)
+============================================================
+Timestamp: 2026-03-15 09:23:48
+
+--- W3M RENDERED DUMP ---
+[mail] | hp 19320 | mp 333
+Luta, alcançar novas classes, obter recompensa!
+[0][1] Titãs na fila: 3 de 5
+Atualizar
+Deixe cauda
+[2]             [1] [1] [1] [1] [1]
+                [1] [1] [0]
+  Sua classe                       Seu alvo
+Está lugar 4 na avaliação!
+[1] Classificação no Coliseu [str] Melhorias de combate
+Melhorias de combate a aumentar o seu poder de ataque e defesa
+[2hit] Torneio Coliseum! [2hit]
+Skulls: [skull] 75 de 125
+Recolha 25 crânios e participar no desenho de 5000 moedas de ouro!
+Recolha 125 crânios e participar no desenho de 7500 moedas de ouro!
+Se você coletar 250 crânios, você vai participar no desenho de 10000 moedas de
+ouro!
+Tempo restante até o final do torneio 3 dias!
+detalhes
+[1] Mate os inimigos [1]
+Recompensa para a primeira vitória é 20 vezes maior!
+Próxima missão estará disponível em 14 h 36 min
+
+  • Ranks: Por 3 vitórias consecutivas, você recebe uma [1] estrela adicional
+  • Crânios são dados a partir do Rank 23 e apenas para as primeiras 15
+    batalhas
+
+[user]Meu Herói
+[user]Meu Clã
+[arrow]Página principal
+Bóreas Gohan TeenConfigurações
+lvl 79 | g 30'378 | s 58,5M
+Oferta especial! Bonus de Ouro! (+)
+Tempo de sobra: 1 dia
+
+Fórum | Conversar | Classificação
+Comentários feed
+Apoio e Informação
+0,014 seg, 09:23:47 | Online: 161
+Overmobile © 2026, 18+
+
+
+--- EXTRACTED LINKS ---
+/coliseum/leaveFight/?r=55208284
+/coliseum/rangs
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/rangs
+/coliseum/merchant
+/coliseum/stars
+
+--- ACTION LINKS ---
+ATK:    
+ATKRND: 
+DODGE:  
+HEAL:   
+STONE:    grey:
+GRASS:    grey:
+
+--- HP VALUES ---
+Player HP: 
+Enemy HP:  
+
+--- MARKERS ---
+dodge:0  end_fight:0  grey:0  rip:0
+
+--- KEYWORD SEARCH ---
+Recompensa para a primeira vitória é 20 vezes maior!
+  • Ranks: Por 3 vitórias consecutivas, você recebe uma [1] estrela adicional
+
+============================================================
+=  STATE: WAITING (poll #3)
+============================================================
+Timestamp: 2026-03-15 09:23:53
+
+--- W3M RENDERED DUMP ---
+[mail] | hp 19326 | mp 336
+Luta, alcançar novas classes, obter recompensa!
+[0][1] Titãs na fila: 4 de 5
+Atualizar
+Deixe cauda
+[2]             [1] [1] [1] [1] [1]
+                [1] [1] [0]
+  Sua classe                       Seu alvo
+Está lugar 4 na avaliação!
+[1] Classificação no Coliseu [str] Melhorias de combate
+Melhorias de combate a aumentar o seu poder de ataque e defesa
+[2hit] Torneio Coliseum! [2hit]
+Skulls: [skull] 75 de 125
+Recolha 25 crânios e participar no desenho de 5000 moedas de ouro!
+Recolha 125 crânios e participar no desenho de 7500 moedas de ouro!
+Se você coletar 250 crânios, você vai participar no desenho de 10000 moedas de
+ouro!
+Tempo restante até o final do torneio 3 dias!
+detalhes
+[1] Mate os inimigos [1]
+Recompensa para a primeira vitória é 20 vezes maior!
+Próxima missão estará disponível em 14 h 36 min
+
+  • Ranks: Por 3 vitórias consecutivas, você recebe uma [1] estrela adicional
+  • Crânios são dados a partir do Rank 23 e apenas para as primeiras 15
+    batalhas
+
+[user]Meu Herói
+[user]Meu Clã
+[arrow]Página principal
+Bóreas Gohan TeenConfigurações
+lvl 79 | g 30'378 | s 58,5M
+Oferta especial! Bonus de Ouro! (+)
+Tempo de sobra: 1 dia
+
+Fórum | Conversar | Classificação
+Comentários feed
+Apoio e Informação
+0,013 seg, 09:23:52 | Online: 161
+Overmobile © 2026, 18+
+
+
+--- EXTRACTED LINKS ---
+/coliseum/leaveFight/?r=55208284
+/coliseum/rangs
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/stars
+/coliseum/rangs
+/coliseum/merchant
+/coliseum/stars
+
+--- ACTION LINKS ---
+ATK:    
+ATKRND: 
+DODGE:  
+HEAL:   
+STONE:    grey:
+GRASS:    grey:
+
+--- HP VALUES ---
+Player HP: 
+Enemy HP:  
+
+--- MARKERS ---
+dodge:0  end_fight:0  grey:0  rip:0
+
+--- KEYWORD SEARCH ---
+Recompensa para a primeira vitória é 20 vezes maior!
+  • Ranks: Por 3 vitórias consecutivas, você recebe uma [1] estrela adicional
+
+============================================================
+=  STATE: WAITING (poll #4)
+============================================================
+Timestamp: 2026-03-15 09:23:58
+
+--- W3M RENDERED DUMP ---
+hp 2491604:59
+[1] Gohan Teen hp 24916
+[0] Renan Uchira hp 16522
+EsquivarAtacarTroca o alvo[potio]Esmalte heráldico[stone]Pedra
++35% dano[herb]Erva
+-35% dano
+Os participantes: [health] 24916, [0] 13380, [1] 13044, [0] 16522, [0] 16184
+A batalha já começou!
+Bóreas Gohan Teen
+lvl 79 | g 30'378 | s 58,5M
+
+Fuja da batalha
+
+--- EXTRACTED LINKS ---
+/coliseum/dodge/?r=55208284
+/coliseum/atk/?r=55208284
+/coliseum/atkrnd/?r=55208284
+/coliseum/heal/?r=55208284
+/coliseum/stone/?r=55208284
+/coliseum/grass/?r=55208284
+
+--- ACTION LINKS ---
+ATK:    /coliseum/atk/?r=55208284
+ATKRND: /coliseum/atkrnd/?r=55208284
+DODGE:  /coliseum/dodge/?r=55208284
+HEAL:   /coliseum/heal/?r=55208284
+STONE:  /coliseum/stone/?r=55208284  grey:
+GRASS:  /coliseum/grass/?r=55208284  grey:
+
+--- HP VALUES ---
+Player HP: 24916
+Enemy HP:  16522
+
+--- MARKERS ---
+dodge:1  end_fight:0  grey:0  rip:0
+
+--- KEYWORD SEARCH ---
+
+============================================================
+=  BATTLE START
+============================================================
+Timestamp: 2026-03-15 09:24:03
+Opponent: Renan_Uchira  Team: [1]  MaxHP: 24916  EnemyHP: 16522
+
+--- ACTION LOG ---
+TIME       #    ACTION                                 HP_before→after ENH_before→after
+──────────────────────────────────────────────────────────────────────────
+[09:24:04] #1 | 🪨 STONE (+35% dmg)
+       HP: 24916→22421  ENH: 16522→10579  LA:4.5s  HPER:38%  RPER:5%
+[09:24:05] #2 | 🛡️ DODGE
+       HP: 22421→22421  ENH: 10579→10579  LA:4.5s  HPER:38%  RPER:5%
+[09:24:08] #3 | 🔄 REFRESH
+       HP: 22421→22421  ENH: 10579→10579  LA:4.5s  HPER:38%  RPER:5%
+[09:24:09] #4 | ⚔️ ATK → MISS ❌ (LA→4.7s)
+       HP: 22421→22421  ENH: 10579→8994  LA:4.7s  HPER:38%  RPER:5%
+[09:24:12] #5 | 🔄 REFRESH
+       HP: 22421→22421  ENH: 8994→8994  LA:4.7s  HPER:38%  RPER:5%
+[09:24:14] #6 | ⚔️ ATK → MISS ❌ (LA→4.9s)
+       HP: 22421→22421  ENH: 8994→7072  LA:4.9s  HPER:38%  RPER:5%
+[09:24:16] #7 | 🔄 REFRESH
+       HP: 22421→21549  ENH: 7072→5659  LA:4.9s  HPER:38%  RPER:5%
+[09:24:18] #8 | ⚔️ ATK → MISS ❌ (LA→5.1s)
+       HP: 21549→21549  ENH: 5659→1533  LA:5.1s  HPER:38%  RPER:5%
+[09:24:21] #9 | 🔄 REFRESH
+       HP: 21549→21549  ENH: 1533→12421  LA:5.1s  HPER:38%  RPER:5%
+[09:24:23] #10 | 🔄 REFRESH
+       HP: 21549→21549  ENH: 12421→8810  LA:5.1s  HPER:38%  RPER:5%
+[09:24:25] #11 | ⚔️ ATK → HIT ✓ (ENH:8810→6936)
+       HP: 21549→19990  ENH: 8810→6936  LA:5.1s  HPER:38%  RPER:5%
+[09:24:26] #12 | 🛡️ DODGE
+       HP: 19990→19990  ENH: 6936→6936  LA:5.1s  HPER:38%  RPER:5%
+[09:24:29] #13 | 🔄 REFRESH
+       HP: 19990→19990  ENH: 6936→6936  LA:5.1s  HPER:38%  RPER:5%
+[09:24:31] #14 | 🔄 REFRESH
+       HP: 19990→18155  ENH: 6936→4458  LA:5.1s  HPER:38%  RPER:5%
+[09:24:33] #15 | ⚔️ ATK → MISS ❌ (LA→5.3s)
+       HP: 18155→18155  ENH: 4458→9480  LA:5.3s  HPER:38%  RPER:5%
+[09:24:36] #16 | 🔄 REFRESH
+       HP: 18155→18155  ENH: 9480→9480  LA:5.3s  HPER:38%  RPER:5%
+[09:24:38] #17 | 🔄 REFRESH
+       HP: 18155→18155  ENH: 9480→9480  LA:5.3s  HPER:38%  RPER:5%
+[09:24:40] #18 | ⚔️ ATK → HIT ✓ (ENH:9480→3562)
+       HP: 18155→16295  ENH: 9480→3562  LA:5.3s  HPER:38%  RPER:5%
+[09:24:43] #19 | 🔄 REFRESH
+       HP: 16295→16295  ENH: 3562→3562  LA:5.3s  HPER:38%  RPER:5%
+[09:24:45] #20 | 🔄 REFRESH
+       HP: 16295→16295  ENH: 3562→3562  LA:5.3s  HPER:38%  RPER:5%
+[09:24:47] #21 | ⚔️ ATK → HIT ✓ (ENH:3562→0)
+       HP: 16295→16295  ENH: 3562→0  LA:5.3s  HPER:38%  RPER:5%
+[09:24:48] #22 | 🛡️ DODGE
+       HP: 16295→14555  ENH: 0→7229  LA:5.3s  HPER:38%  RPER:5%
+[09:24:51] #23 | 🔄 REFRESH
+       HP: 14555→14555  ENH: 7229→7229  LA:5.3s  HPER:38%  RPER:5%
+[09:24:53] #24 | 🔄 REFRESH
+       HP: 14555→14555  ENH: 7229→7229  LA:5.3s  HPER:38%  RPER:5%
+[09:24:55] #25 | ⚔️ ATK → MISS ❌ (LA→5.5s)
+       HP: 14555→14555  ENH: 7229→2980  LA:5.5s  HPER:38%  RPER:5%
+[09:24:58] #26 | 🔄 REFRESH
+       HP: 14555→14555  ENH: 2980→2980  LA:5.5s  HPER:38%  RPER:5%
+[09:25:00] #27 | 🔄 REFRESH
+       HP: 14555→12479  ENH: 2980→2980  LA:5.5s  HPER:38%  RPER:5%
+[09:25:02] #28 | ⚔️ ATK → MISS ❌ (LA→5.7s)
+       HP: 12479→3701
+2980  ENH: 2980→-  LA:5.7s  HPER:38%  RPER:5%
+
+============================================================
+=  STATE: POST-BATTLE (end_fight)
+============================================================
+Timestamp: 2026-03-15 09:25:03
+
+--- W3M RENDERED DUMP ---
+[mail] | hp 19406 | mp 37603:56
+Espere até o fim da batalha
+[0][1] 2 titãs na batalha
+Atualizar Acabar com a luta
+[0] Kenay                                hp 3701
+[0] Alex Boss                            hp 2980
+[1] Gohan Teen                           Morto na
+                                         batalha
+[1] Chefe Bk                             Morto na
+                                         batalha
+[0] Renan Uchira                         Morto na
+                                         batalha
+[rip] Você deixou a luta
+[0] Alex Boss acertar Você por 1252 crítico
+[0] Kenay acertar Você por 824
+Você acertar [0] Alex Boss por 2858 crítico
+Você usou [3] Turbilhão
+[0] Kenay acertar [0] Alex Boss por 1391 crítico
+Você perdeu
+Você usou esquivar
+[0] Alex Boss acertar Você por 947
+[0] Kenay acertar Você por 793
+[rip] Você assassinou [1] Chefe Bk
+Você acertar [1] Chefe Bk por 4811 crítico
+[3p] Anel da Fúria fortalecido por 803
+Você acertar [1] Chefe Bk por 4347 crítico
+[3p] Anel da Fúria fortalecido por 726
+Você usou [3] Turbilhão
+[0] Alex Boss acertar Você por 956
+[1] Chefe Bk acertar Você por 904
+[0] Kenay acertar [1] Chefe Bk por 1571 crítico
+[0] Kenay usou [2p] Turbilhão
+Você acertar [1] Chefe Bk por 3564 crítico
+[1] Chefe Bk usou elixir
+[0] Alex Boss acertar [1] Chefe Bk por 1563 crítico
+[0] Alex Boss usou [2p] Turbilhão
+[1] Chefe Bk acertar Você por 1835 crítico
+[0] Kenay acertar [1] Chefe Bk por 915
+Você perdeu
+Você usou esquivar
+Você acertar [1] Chefe Bk por 2895
+[0] Alex Boss acertar Você por 812
+[user]Meu Herói
+[user]Meu Clã
+[arrow]Página principal
+Bóreas Gohan TeenConfigurações
+lvl 79 | g 30'378 | s 58,5M
+Oferta especial! Bonus de Ouro! (+)
+Tempo de sobra: 1 dia
+
+Fórum | Conversar | Classificação
+Comentários feed
+Apoio e Informação
+0,019 seg, 09:25:01 | Online: 162
+Overmobile © 2026, 18+
+
+
+--- EXTRACTED LINKS ---
+/coliseum/atk
+
+--- ACTION LINKS ---
+ATK:    
+ATKRND: 
+DODGE:  
+HEAL:   
+STONE:    grey:
+GRASS:    grey:
+
+--- HP VALUES ---
+Player HP: 3701
+2980
+Enemy HP:  
+
+--- MARKERS ---
+dodge:0  end_fight:1  grey:0  rip:0
+
+--- KEYWORD SEARCH ---
+Você perdeu
+Você perdeu
+
+============================================================
+=  BATTLE SUMMARY
+============================================================
+Result: unknown
+Duration: 1m 1s  |  Loops: 29
+ATK:3  RND:0  DODGE:3  HEAL:0
+ATK Fails:6  LA Start:5.6  LA End:5.7
+HPER Final:38  RPER Final:5
+Stone used:1  Grass used:0

@@ -522,6 +522,8 @@ coliseum_debug() {
     printf "  ${GOLD_BLACK}║ Duration: %-3dm%-3ds  |  Loops: %-5d   ║${COLOR_RESET}\n" "$_dbg_dmin" "$_dbg_dsec" "$_dbg_loop"
     printf "  ${GOLD_BLACK}║ ATK:${GREEN_BLACK}%-3d${GOLD_BLACK}  RND:${GREEN_BLACK}%-3d${GOLD_BLACK}  DODGE:${GREEN_BLACK}%-3d${GOLD_BLACK}  HEAL:${GREEN_BLACK}%-3d${GOLD_BLACK}  ║${COLOR_RESET}\n" "$_dbg_atks" "$_dbg_atkrnds" "$_dbg_dodges" "$_dbg_heals"
     printf "  ${GOLD_BLACK}║ Fails:${RED_BLACK}%-2d${GOLD_BLACK}  LA: ${COLISEUM_LA:-5} → %-4s                   ║${COLOR_RESET}\n" "$_dbg_la_failures" "$LA"
+    local _dbg_page_fails=$(echo "$_dbg_rend" | grep -c "Você perdeu" 2>/dev/null || echo "0")
+    printf "  ${GOLD_BLACK}║ Page 'Você perdeu': %-2d (actual fails)        ║${COLOR_RESET}\n" "$_dbg_page_fails"
     printf "  ${GOLD_BLACK}╠══════════════════════════════════════╣${COLOR_RESET}\n"
     printf "  ${GRAY_BLACK}║ Debug file:                          ║${COLOR_RESET}\n"
     printf "  ${GRAY_BLACK}║ %-36s ║${COLOR_RESET}\n" "$debug_file"
@@ -540,6 +542,16 @@ coliseum_debug() {
             "$_dbg_la_failures" "${COLISEUM_LA:-5}" "$LA"
         printf 'HPER Final:%s  RPER Final:%s\n' "$HPER" "$RPER"
         printf 'Stone used:%s  Grass used:%s\n' "$_dbg_stone_used" "$_dbg_grass_used"
+
+        printf '\n--- BATTLE HISTORY (from page render) ---\n'
+        echo "$_dbg_rend" | sed -n '/Os participantes:/,/\[user\]/p' | \
+            grep -E '^\[0\]|\[1\]|\[rip\]|^Você ' | head -n 50
+
+        local _dbg_real_fails
+        _dbg_real_fails=$(echo "$_dbg_rend" | grep -c "Você perdeu" 2>/dev/null || echo "0")
+        printf '\n--- ATTACK ANALYSIS ---\n'
+        printf 'Você perdeu (fails detected): %d\n' "$_dbg_real_fails"
+        printf 'Você assassinou (kills): %d\n' "$(echo "$_dbg_rend" | grep -c "Você assassinou" 2>/dev/null || echo "0")"
     } >> "$debug_file"
 
     # ── Cleanup ───────────────────────────────────────────────────────────
