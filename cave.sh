@@ -134,12 +134,26 @@ bottom_info(){
 cave_start() {
   clan_id
   fetch_page "/cave/"
+
+  # Ensure RUN is set to cave mode, otherwise set it
+  if [[ ! "$RUN" =~ [-]cv ]]; then
+    echo_t "Setting cave mode..." "" "" "before" "🔧"
+    RUN="-cv"
+  fi
+
   set_cave_limits
 
   while [[ "$RUN" =~ [-]cv ]]; do
 
       local CAVE=$(grep -o -E '/cave/(gather|down|speedUp)/[?]r[=][0-9]+' "$TMP"/SRC | sed -n '1p')
       local RESULT=$(echo "$CAVE" | cut -d'/' -f3)
+
+      # Validar se encontrou um link de ação
+      if [ -z "$CAVE" ]; then
+          echo_t "No cave action found. Fetching page again..." "${GRAY_BLACK}" "${COLOR_RESET}" "after" "⏳"
+          fetch_page "/cave/"
+          continue
+      fi
 
       local RESOURCES=$(grep -o -E 'res/[0-9]+\.png' "$TMP/SRC" | sed 's/res\///;s/.png//')
       local MINERALS_FOUND=$(echo "$RESOURCES" | grep -E '^[1-5]$' | wc -l)
@@ -208,9 +222,6 @@ cave_start() {
 
       check_cave_limits
 
-      if awk -v smodplay="$RUN" -v rmodplay="-cv" 'BEGIN { exit !(smodplay != rmodplay) }'; then
-        echo -e "\nYou can run ./twm/play.sh -cv"
-      fi
       unset ACCESS1 ACCESS2 ACTION DOWN MEGA
     done
   echo -e "${GREEN_BLACK}Cave Done ✅${COLOR_RESET}\n"
