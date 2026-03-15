@@ -108,13 +108,14 @@ start_account_tmux() {
     return
   fi
 
-  # Build shell command with required env vars
-  local launch_cmd
-  launch_cmd="export ACCOUNT_ID=$(printf '%q' "$account_id")"
-  [ -n "$account_timezone" ] && launch_cmd="$launch_cmd; export TZ=$(printf '%q' "$account_timezone")"
-  launch_cmd="$launch_cmd; exec $(printf '%q' "$BASE_DIR/play.sh")"
+  # Build the run command (inline env + play.sh + account id)
+  local run_cmd="ACCOUNT_ID=$(printf '%q' "$account_id")"
+  [ -n "$account_timezone" ] && run_cmd="TZ=$(printf '%q' "$account_timezone") $run_cmd"
+  run_cmd="$run_cmd $(printf '%q' "$BASE_DIR/play.sh") $(printf '%q' "$account_id")"
 
-  tmux new-session -d -s "$sname" -x 220 -y 50 bash -c "$launch_cmd"
+  # Create the tmux session with a plain shell, then send the run command
+  tmux new-session -d -s "$sname" -x 220 -y 50
+  tmux send-keys -t "$sname" "$run_cmd" Enter
   echo "[${account_id}] started (tmux session: $sname)"
 }
 

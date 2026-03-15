@@ -89,8 +89,28 @@ view_logs() {
   alias=$(jq -r ".accounts[] | select(.id == \"$account_id\") | (.alias // .id)" "$INDEX_FILE" 2>/dev/null || echo "$account_id")
 
   if command -v tmux >/dev/null 2>&1 && tmux has-session -t "$sname" 2>/dev/null; then
+    # Show navigation instructions before attaching
+    clear
+    local sep="──────────────────────────────────────────────────────"
+    printf " \033[1;36m%s\033[0m\n" "$sep"
+    printf " Conectando em / Attaching to: \033[1;33m%s\033[0m  \033[0;37m(%s)\033[0m\n" "$alias" "$sname"
+    printf " \033[1;36m%s\033[0m\n" "$sep"
+    printf " \033[1;32mCtrl+B d\033[0m  Desanexar / Detach  →  voltar ao terminal / return\n"
+    printf " \033[1;32mCtrl+B s\033[0m  Listar sessões / Session list  (↑↓ + Enter p/ trocar/switch)\n"
+    printf " \033[1;32mCtrl+B (\033[0m  Sessão anterior / Previous session\n"
+    printf " \033[1;32mCtrl+B )\033[0m  Próxima sessão / Next session\n"
+    printf " \033[1;36m%s\033[0m\n" "$sep"
+
+    # List all active twm sessions
+    local sessions
+    sessions=$(tmux list-sessions -F '  #{session_name}' 2>/dev/null | grep '  twm_' | tr '\n' '   ' || true)
+    [ -n "$sessions" ] && printf " Sessões ativas / Active sessions: \033[0;36m%s\033[0m\n" "$sessions"
+    printf " \033[1;36m%s\033[0m\n" "$sep"
+    printf " \033[0;37m[qualquer tecla / any key para continuar, auto 2s]\033[0m "
+    read -r -n 1 -s -t 2 </dev/tty 2>/dev/null || true
+    printf "\n\n"
+
     # Attach to the live tmux session — full interactive access
-    echo "Attaching to session $sname (Ctrl+B D to detach)..."
     tmux attach-session -t "$sname"
   else
     # Fallback: tail log file

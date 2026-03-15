@@ -203,6 +203,27 @@ follow_mode() {
     # Full interactive attach — user gets the exact same experience as running play.sh directly
     stty "$tty_state" 2>/dev/null
     printf '\033[?25h'
+    clear
+
+    # Navigation instructions
+    hline
+    printf " Conectando em / Attaching to: \033[1;33m%s\033[0m  \033[0;37m(%s)\033[0m\n" "$alias" "$sname"
+    hline
+    printf " \033[1;32mCtrl+B d\033[0m  Desanexar / Detach  →  voltar ao monitor / return to monitor\n"
+    printf " \033[1;32mCtrl+B s\033[0m  Listar sessões / Session list  (↑↓ + Enter p/ trocar/switch)\n"
+    printf " \033[1;32mCtrl+B (\033[0m  Sessão anterior / Previous session\n"
+    printf " \033[1;32mCtrl+B )\033[0m  Próxima sessão / Next session\n"
+    hline
+
+    # List all active twm sessions
+    local sessions
+    sessions=$(tmux list-sessions -F '  #{session_name}' 2>/dev/null | grep '  twm_' | tr '\n' '   ' || true)
+    [ -n "$sessions" ] && printf " Sessões ativas / Active sessions: \033[0;36m%s\033[0m\n" "$sessions"
+    hline
+    printf " \033[0;37m[qualquer tecla / any key para continuar, auto 2s]\033[0m "
+    read -r -n 1 -s -t 2 </dev/tty 2>/dev/null || true
+    printf "\n"
+
     # Attach to the tmux session; Ctrl+B D detaches and returns here
     tmux attach-session -t "$sname"
     # Restore monitor raw mode after detach
