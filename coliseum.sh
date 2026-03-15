@@ -338,11 +338,13 @@ coliseum_debug() {
 
         # Save battle history every 3 loops for later extraction
         if [ $(( _dbg_loop % 3 )) -eq 0 ]; then
+            local _dbg_page_render
+            _dbg_page_render=$(w3m -dump -T text/html "$src_ram" 2>/dev/null)
+
             {
                 printf '[Loop %d] %s\n' "$_dbg_loop" "$(date +'%H:%M:%S')"
-                w3m -dump -T text/html "$src_ram" 2>/dev/null | \
-                    sed -n '/A batalha já começou/,/Fuja da batalha/p' | \
-                    grep -E 'Você |assassinou|perdeu|\[.*\] '
+                echo "$_dbg_page_render" | sed -n '/^Os participantes:/,/^A batalha já começou!/p' | \
+                    grep -v '^$' | grep -v 'Os participantes:' | grep -v 'A batalha já começou'
             } >> "$_dbg_battle_history"
         fi
 
@@ -527,6 +529,17 @@ coliseum_debug() {
         w3m -dump -T text/html "$src_ram" 2>/dev/null | \
             grep "Os participantes:" | \
             sed 's|\[0\]|🔴|g; s|\[1\]|🔵|g; s|\[health\]|🧡|g' | \
+            while IFS= read -r logline; do
+                printf "  ${GRAY_BLACK}%s${COLOR_RESET}\n" "$logline"
+            done
+
+        printf "  ${GRAY_BLACK}─── BATTLE LOG ───${COLOR_RESET}\n"
+        local _dbg_page_render
+        _dbg_page_render=$(w3m -dump -T text/html "$src_ram" 2>/dev/null)
+        echo "$_dbg_page_render" | sed -n '/^Os participantes:/,/^A batalha já começou!/p' | \
+            grep -v '^$' | grep -v 'Os participantes:' | grep -v 'A batalha já começou' | \
+            sed 's|\[0\]|🔴|g; s|\[1\]|🔵|g; s|\[rip\]|💀|g; s|assassinou|💥|; s|perdeu|❌|; s|Você acertar|✓|; s|Você usou|⚡|' | \
+            tail -n 8 | \
             while IFS= read -r logline; do
                 printf "  ${GRAY_BLACK}%s${COLOR_RESET}\n" "$logline"
             done
