@@ -2,13 +2,34 @@
 # shellcheck disable=SC2317
 func_crono() {
     # Use bash printf builtin for time — no date/sed subprocess forks
-    local h m
+    local h m _time_str
     printf -v h '%(%H)T' -1
     printf -v m '%(%M)T' -1
     # Set global HOUR/MIN as plain integers (no leading zeros) for func_sleep arithmetic
     HOUR=$((10#$h))
     MIN=$((10#$m))
-    printf " \033[02m%s ⏰ %s:%s\033[0m\n" "$URL" "$h" "$m"
+
+    # Only update display when the minute actually changes.
+    # This prevents the clock from printing a NEW LINE every ~61s cycle.
+    _time_str="${h}:${m}"
+    [ "$_time_str" = "$_last_displayed_min" ] && return
+    _last_displayed_min="$_time_str"
+
+    # Background mode (multi_runner / log file): do not print to stdout.
+    # Log files should stay clean; scheduling is handled by the inner sleep loop.
+    [ -t 1 ] || return
+
+    if [ "$_display_initialized" -eq 1 ]; then
+        # Idle screen is set up: update the clock line in-place.
+        # \0337 = save cursor | \033[1;1H = row 1 col 1 | \033[2K = erase line
+        # \0338 = restore cursor — user stays at original position (no scroll/jump)
+        printf "\0337\033[1;1H\033[2K \033[02m%s ⏰ %s:%s\033[0m\0338" \
+            "$URL" "$h" "$m"
+    else
+        # Initial display (screen was just cleared, cursor is at top-left).
+        # Print normally so the clock occupies line 1.
+        printf " \033[02m%s ⏰ %s:%s\033[0m\n" "$URL" "$h" "$m"
+    fi
 }
 
 # Global flag to track if we've already shown idle status (reduce spam)
@@ -16,6 +37,9 @@ declare -g _last_i=-1
 # Global cache for msg_file display deduplication
 declare -g _last_msg_hash=""
 declare -g _last_display_epoch=0
+# Global clock in-place update state
+declare -g _last_displayed_min=""   # last HH:MM printed — skip if unchanged
+declare -g _display_initialized=0   # 1 = idle layout active, clock is on line 1
 
 func_cat() {
     # Idle loop handler. Waits for user commands or events.
@@ -42,14 +66,7 @@ func_cat() {
     _prev_trap=$(trap -p INT | sed "s/trap -- '//;s/' INT//")
     trap '_interrupt_func_cat' INT TERM
 
-    func_crono
-
-    # Reset all attributes before content — ensures dim mode from func_crono doesn't bleed
-    printf "\033[0m"
-
-    # Only refresh msg_file when content actually changed OR 5+ minutes since last display.
-    # Without this guard, msg_file (player info) would spam the terminal every ~61 seconds
-    # even when data hasn't changed — wasting CPU and polluting the log/terminal.
+    # Compute msg_file hash to detect content changes (avoids unconditional reprints)
     local _now_epoch _msg_hash
     printf -v _now_epoch '%(%s)T' -1
     if [[ -s "$TMP/msg_file" ]]; then
@@ -59,19 +76,25 @@ func_cat() {
     fi
 
     if [ "$_msg_hash" != "$_last_msg_hash" ] || [ "$(( _now_epoch - _last_display_epoch ))" -ge 300 ]; then
-        # Only clear screen if in fully interactive mode (connected to real terminal on both stdin and stdout)
-        # If running in background (stdout redirected to log), don't clear to preserve monitor header
+        # Content changed or 5+ minutes elapsed: full screen repaint.
         if [ -t 1 ]; then
-            # stdout is terminal → interactive play.sh, safe to clear
-            printf "\033[2J\033[H"
+            printf "\033[2J\033[H"  # clear entire screen, cursor to top-left
+            _display_initialized=0  # force func_crono to print normally (not ANSI-update)
         fi
-
-        # Read file without forking cat — bash $(<file) reads directly, no subprocess
+        _last_displayed_min=""       # force clock reprint even if minute is same
+        func_crono                   # print clock on line 1 (initial layout)
+        printf "\033[0m"
+        # Print player info below the clock line
         [[ -s "$TMP/msg_file" ]] && printf '%s\n' "$(<"$TMP/msg_file")"
         printf "\033[0m"
-
         _last_msg_hash="$_msg_hash"
         _last_display_epoch="$_now_epoch"
+        _display_initialized=1       # idle layout established: clock on line 1, content below
+    else
+        # Content unchanged: only update the clock line if the minute changed.
+        # func_crono handles the ANSI in-place update of line 1 internally.
+        func_crono
+        printf "\033[0m"
     fi
 
     local cmd_file="${ACCOUNT_ROOT:-$HOME/twm}/cmd_file"
@@ -227,7 +250,6 @@ func_sleep() {
         # Check if the current hour is between 0 and 8 (inclusive)
         if [ "$HOUR" -lt 9 ]; then  # This covers hours 00 to 08
             coliseum_start  # Start coliseum activities
-            [ -t 1 ] && clear  # Clear screen only if interactive (not background/monitor)
             i=60  # Set wait time to 60 seconds
             func_cat  # Call func_cat to display information
             return
@@ -236,13 +258,11 @@ func_sleep() {
 
     # Check if the current minute is between 29 and 30 (near event time)
     if [ "$MIN" -ge 29 ] && [ "$MIN" -le 30 ]; then
-        [ -t 1 ] && clear  # Clear screen only if interactive (not background/monitor)
         i=15  # Shorter wait time (15s) when approaching event
         func_cat
     else
         # Normal idle mode: minimal re-rendering to save CPU/memory
         i=60
-        # Don't clear screen during idle — just show status once and wait
         func_cat
     fi
 }
@@ -270,7 +290,6 @@ start() {
         clanQuests
     fi
 
-    messages_info            # Display messages information 
-    func_crono               # Display current time again 
+    messages_info            # Display messages information
     func_sleep               # Call sleep function to manage timing 
 }
