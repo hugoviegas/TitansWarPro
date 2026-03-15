@@ -46,11 +46,12 @@ request_update() {
         echo_t "__FUNC__ 10- Complete clan missions. Current value: " "" "$FUNC_clan_missions"
         echo_t "__FUNC__ 11- Enable clan statue automatically. Current value: " "" "$FUNC_clan_statue"
         echo_t "__FUNC__ 12- Use gold to collect 3 ores in the cave. Current value: " "" "$FUNC_cave_boost"
-        echo_t "__FUNC__ 13- Reset config to defaults. Current value: " "" "Reset"
-        echo_t "__FUNC__ 14- Coliseum attack interval (seconds). Current value: " "" "${COLISEUM_LA:-5}"
-        echo_t "__FUNC__ 15- Coliseum heal threshold (%). Current value: " "" "${COLISEUM_HPER:-38}"
-        echo_t "__FUNC__ 16- Coliseum random atk threshold (%). Current value: " "" "${COLISEUM_RPER:-5}"
-        echo_t "__FUNC__ 17- Do missions when available. Current value: " "" "$FUNC_do_missions"
+        echo_t "__FUNC__ 13- Coliseum attack interval (seconds). Current value: " "" "${COLISEUM_LA:-5}"
+        echo_t "__FUNC__ 14- Coliseum heal threshold (%). Current value: " "" "${COLISEUM_HPER:-38}"
+        echo_t "__FUNC__ 15- Coliseum random atk threshold (%). Current value: " "" "${COLISEUM_RPER:-5}"
+        echo_t "__FUNC__ 16- Do missions when available. Current value: " "" "$FUNC_do_missions"
+        echo_t "__FUNC__ 17- Update channel (branch). Current value: " "" "$UPDATE_CHANNEL"
+        echo_t "__FUNC__ 99- Reset config to defaults."
         echo_t "Press *'ENTER'* to exit configuration update mode." "" "" "after" "↩️"
 
         read -r -n 2 key
@@ -91,23 +92,20 @@ request_update() {
                 continue
                 ;;
             (6|allies)
-                echo_t "Do you want to change your allies for battle? (y or n):"
+                echo_t "Select number of allies (1-4):"
                 while true; do
                     read -r -n 1 value
                     echo
-                    [[ $value =~ ^[yYnN]$ ]] && break
-                    echo_t "Invalid input. Enter 'y' or 'n':" "" "" "before" "❌"
+                    if [[ $value =~ ^[1-4]$ ]]; then
+                        update_config "ALLIES" "$value"
+                        ALLIES="$value"
+                        echo_t "Allies updated to ${value}!" "" "" "before" "✅"
+                        break
+                    else
+                        echo_t "Invalid input. Enter a number between 1 and 4:" "" "" "before" "❌"
+                    fi
                 done
-                if [ "$value" = "n" ]; then
-                    continue
-                else
-                    set_config "ALLIES" ""
-                    key="ALLIES"
-                    : > "$TMP/allies.txt"
-                    : > "$TMP/callies.txt"
-                    conf_allies
-                fi
-                break
+                continue
                 ;;
             (7|mission-rewards)
                 echo_t "Do you want to collect mission rewards automatically? (y or n):"
@@ -133,21 +131,7 @@ request_update() {
                 echo_t "Do you want to use gold to collect 3 ores in the cave? (y or n):"
                 key="FUNC_cave_boost"
                 ;;
-            (13|reset)
-                echo_t "Are you sure you want to reset to default settings? (y or n):"
-                while true; do
-                    read -r -n 1 value
-                    echo
-                    [[ $value =~ ^[yYnN]$ ]] && break
-                    echo_t "Invalid input. Enter 'y' or 'n':" "" "" "before" "❌"
-                done
-                if [ "$value" = "y" ]; then
-                    reset_config_to_defaults
-                    echo_t "Configuration reset to defaults successfully!" "" "" "before" "✅"
-                fi
-                continue
-                ;;
-            (14)
+            (13)
                 echo_t "Enter coliseum attack interval in seconds (e.g. 5 or 4.5, min 2, max 15):"
                 while true; do
                     read -r value
@@ -163,7 +147,7 @@ request_update() {
                 done
                 continue
                 ;;
-            (15)
+            (14)
                 echo_t "Enter coliseum heal threshold % (e.g. 38, min 10, max 80):"
                 while true; do
                     read -r value
@@ -178,7 +162,7 @@ request_update() {
                 done
                 continue
                 ;;
-            (16)
+            (15)
                 echo_t "Enter coliseum random attack threshold % (e.g. 5, min 1, max 50):"
                 while true; do
                     read -r value
@@ -193,9 +177,52 @@ request_update() {
                 done
                 continue
                 ;;
-            (17|do-missions)
+            (16|do-missions)
                 echo_t "Do you want to run missions when available? (y or n):"
                 key="FUNC_do_missions"
+                ;;
+            (17|update-channel)
+                echo_t "Select update channel/branch:"
+                echo_t "  1) Master (stable)"
+                echo_t "  2) Beta"
+                echo_t "  3) Beta2"
+                while true; do
+                    read -r -n 1 value
+                    echo
+                    case "$value" in
+                        1) update_config "UPDATE_CHANNEL" "master"
+                           UPDATE_CHANNEL="master"
+                           echo_t "Update channel set to Master" "" "" "before" "✅"
+                           break
+                           ;;
+                        2) update_config "UPDATE_CHANNEL" "beta"
+                           UPDATE_CHANNEL="beta"
+                           echo_t "Update channel set to Beta" "" "" "before" "✅"
+                           break
+                           ;;
+                        3) update_config "UPDATE_CHANNEL" "beta2"
+                           UPDATE_CHANNEL="beta2"
+                           echo_t "Update channel set to Beta2" "" "" "before" "✅"
+                           break
+                           ;;
+                        *) echo_t "Invalid input. Enter 1, 2, or 3:" "" "" "before" "❌" ;;
+                    esac
+                done
+                continue
+                ;;
+            (99|reset)
+                echo_t "Are you sure you want to reset to default settings? (y or n):"
+                while true; do
+                    read -r -n 1 value
+                    echo
+                    [[ $value =~ ^[yYnN]$ ]] && break
+                    echo_t "Invalid input. Enter 'y' or 'n':" "" "" "before" "❌"
+                done
+                if [ "$value" = "y" ]; then
+                    reset_config_to_defaults
+                    echo_t "Configuration reset to defaults successfully!" "" "" "before" "✅"
+                fi
+                continue
                 ;;
             ('')
                 # Empty input (ENTER key) — exit config and return to crono run
@@ -276,7 +303,7 @@ reset_config_to_defaults() {
     LANGUAGE="pt"
     ALLIES="4"
     UPDATE_CHANNEL="master"
-    COLISEUM_LA=5
+    COLISEUM_LA=4.5
     COLISEUM_HPER=38
     COLISEUM_RPER=5
 

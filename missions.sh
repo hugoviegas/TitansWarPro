@@ -102,15 +102,20 @@ _mission_dump_page() {
 
     fetch_page "$page"
 
+    # Verificar se o arquivo foi baixado
+    if [ ! -s "$TMP/SRC" ]; then
+        echo "ERROR: Failed to fetch $page" >> "$log_file"
+        return 1
+    fi
+
     {
         echo "--- LINKS (href) ---"
-        grep -o -E "href='[^']+'" "$TMP/SRC" | sort -u
+        timeout 5 grep -o -E "href='[^']+'" "$TMP/SRC" 2>/dev/null | sort -u || echo "TIMEOUT: grep links"
         echo ""
-        echo "--- TEXT RENDER ---"
-        w3m -dump -T text/html "$TMP/SRC" 2>/dev/null
-        echo ""
-        echo "--- HTML SOURCE ---"
-        cat "$TMP/SRC"
+        echo "--- FILE SIZE ---"
+        wc -c < "$TMP/SRC"
+        echo "--- TEXT RENDER (first 100 lines) ---"
+        timeout 5 w3m -dump -T text/html "$TMP/SRC" 2>/dev/null | head -n 100 || echo "TIMEOUT: w3m render"
         echo ""
     } >> "$log_file"
 }
@@ -125,6 +130,7 @@ mission_debug() {
     local debug_file="${debug_dir}/mission_debug_${debug_ts}.log"
 
     echo_t "Mission Debug" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "📜"
+    echo_t "This will take ~2 minutes (4 pages × 17s each)..." "${GRAY_BLACK}" "${COLOR_RESET}" "before" "⏱️"
 
     : > "$debug_file"
     {
@@ -135,12 +141,16 @@ mission_debug() {
 
     # Páginas a inspecionar
     local pages=("/quest/" "/arena/" "/league/" "/lab/alchemy/")
+    local page_count=0
     for page in "${pages[@]}"; do
-        echo_t "  Fetching ${page}" "${GRAY_BLACK}" "${COLOR_RESET}" "before" "🔍"
+        page_count=$((page_count + 1))
+        echo_t "  [${page_count}/4] Fetching ${page}" "${GRAY_BLACK}" "${COLOR_RESET}" "before" "🔍"
         _mission_dump_page "$page" "$debug_file"
+        [ $? -eq 0 ] && echo_t "    OK" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅" || echo_t "    FAILED" "${RED_BLACK}" "${COLOR_RESET}" "after" "❌"
     done
 
     # Análise de estado a partir da página /quest/ (já está em $TMP/SRC após último fetch)
+    echo_t "  Analyzing mission states..." "${GRAY_BLACK}" "${COLOR_RESET}" "before" "📊"
     fetch_page "/quest/"
 
     # Exibe e salva análise no log
@@ -156,6 +166,10 @@ mission_debug() {
     fi
 
     echo_t "Debug saved: $debug_file" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅"
+    echo ""
+    echo_t "You can view the full debug log with:" "${GRAY_BLACK}" "${COLOR_RESET}" "before" "📖"
+    echo "  tail -f $debug_file"
+    echo ""
     echo "$debug_file"
 }
 
@@ -335,45 +349,67 @@ do_missions() {
 
     echo_t "Doing Missions" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "📜"
 
-    fetch_page "/quest/"
+    # Timeout global para do_missions (30 minutos máximo)
+    local mission_timeout=1800
+    local mission_start
+    mission_start=$(date +%s)
+
+    fetch_page "/quest/" || { echo_t "ERROR: Cannot access /quest/" "${RED_BLACK}" "${COLOR_RESET}" "after" "❌"; return 1; }
+
+    # Função auxiliar para verificar timeout
+    local _check_timeout() {
+        local elapsed=$(( $(date +%s) - mission_start ))
+        if [ "$elapsed" -gt "$mission_timeout" ]; then
+            echo_t "Mission timeout exceeded, stopping" "${RED_BLACK}" "${COLOR_RESET}" "after" "⏱️"
+            return 1
+        fi
+        return 0
+    }
 
     # ── Lutador (ID 6) + Lutador lendário (ID 7) ──────────────
+    _check_timeout || return 0
     if grep -q "quest_id=6" "$TMP/SRC" || grep -q "quest_id=7" "$TMP/SRC"; then
         _mission_league
         fetch_page "/quest/"
     fi
 
     # ── Campanha (ID 5) ────────────────────────────────────────
+    _check_timeout || return 0
     if grep -q "quest_id=5" "$TMP/SRC"; then
         _mission_campaign
         fetch_page "/quest/"
     fi
 
     # ── Altares antigos (ID 10) ────────────────────────────────
+    _check_timeout || return 0
     if grep -q "quest_id=10" "$TMP/SRC"; then
         _mission_altars
         fetch_page "/quest/"
     fi
 
     # ── Gladiador (ID 11) ──────────────────────────────────────
+    _check_timeout || return 0
     if grep -q "quest_id=11" "$TMP/SRC"; then
         _mission_coliseum
         fetch_page "/quest/"
     fi
 
     # ── Busca de recursos (ID 2) ──────────────────────────────
+    _check_timeout || return 0
     if grep -q "quest_id=2" "$TMP/SRC"; then
         _mission_cave
         fetch_page "/quest/"
     fi
 
     # ── Alquimia (ID 13) ───────────────────────────────────────
+    _check_timeout || return 0
     if grep -q "quest_id=13" "$TMP/SRC"; then
         _mission_alchemy
         fetch_page "/quest/"
     fi
 
     # ── Coletar todas as recompensas disponíveis ───────────────
+    _check_timeout || return 0
     _mission_collect_rewards
 
     echo_t "Missions done" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
