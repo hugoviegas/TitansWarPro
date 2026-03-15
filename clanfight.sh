@@ -202,6 +202,7 @@ clanfight_debug () {
     time_exit 20
     local _cfdbg_maxhp
     _cfdbg_maxhp=$(cat "$full_ram" 2>/dev/null)
+    [ -z "$_cfdbg_maxhp" ] && _cfdbg_maxhp=$(cat FULL 2>/dev/null)
     printf "  ${GRAY_BLACK}Max HP: %-6d${COLOR_RESET}\n" "$_cfdbg_maxhp"
     printf '\n--- MAX HP ---\nMax HP: %s\n' "$_cfdbg_maxhp" >> "$debug_file"
 
@@ -326,7 +327,7 @@ clanfight_debug () {
                 printf '============================================================\n'
                 printf 'Timestamp: %s\n' "$(date +'%Y-%m-%d %H:%M:%S')"
                 printf 'Loop: %d  |  Battle elapsed: %dm%ds\n\n' "$_cfdbg_loop" "$_cfdbg_min" "$_cfdbg_sec"
-                printf '--- RENDERED HTML (w3m dump) ---\n'
+                printf '\n--- RENDERED HTML (w3m dump) ---\n'
                 w3m -dump -T text/html "$src_ram" 2>/dev/null
                 printf '\n--- RAW HTML SOURCE (first 3000 chars) ---\n'
                 head -c 3000 "$src_ram" 2>/dev/null

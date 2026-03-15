@@ -1,0 +1,63 @@
+============================================================
+=  FULL PAGE DUMP AT LOOP 10
+============================================================
+Timestamp: 2026-03-15 11:00:35
+Loop: 10  |  Battle elapsed: 0m24s
+
+hp 2491604:29
+[1] Gohan Teen hp 24916
+[1] Bkhw Wanteds (7)
+[0] Sky Clown hp 0
+[0] Killer Clowns (1)
+[rip]
+-1475
+EsquivarAtacarTroca o alvo[potio]Esmalte heráldico[stone]Pedra
++35% dano[herb]Erva
+-35% dano
+[1] Aliados: 6 | [0][1] Inimigos: 4
+[rip] Você assassinou [0] Sky Clown
+Você acertar [0] Sky Clown por 1475
+[1] Branco Ren acertar [0] Sky Clown por 6958 crítico
+[1] Branco Ren usou [icon] Duplo golpe
+[1] Branco Ren acertar [0] Sky Clown por 7255 crítico
+[4] Anel da Fúria fortalecido por 297
+Você acertar [0] Sky Clown por 2437
+Você usou [3] Fúria de Titã
+Você usou [icon] Duplo golpe
+Você acertar [0] Sky Clown por 1382
+[1] Retired acertar [1] Cachorro Louco por 425
+[1] Percy Br acertar [1] Cachorro Louco por 652 crítico
+[1] Cachorro Louco usou [5] Posição defensiva
+Você acertar [1] Cachorro Louco por 505
+[1] Branco Ren usou esquivar
+[1] Hviegas acertar [1] Branco Ren por 1630 crítico
+Você acertar [1] Branco Ren por 926 crítico
+[1] Percy Br acertar [1] Cachorro Louco por 894 crítico
+[1] Cachorro Louco usou [5] Posição defensiva
+[1] Percy Br usou [5] Turbilhão
+[1] Retired acertar [1] Cachorro Louco por 441 crítico
+[1] Cachorro Louco usou [5] Posição defensiva
+Você acertar [1] Cachorro Louco por 434
+Bóreas Gohan Teen
+lvl 79 | g 30'386 | s 58,6M
+
+Fuja da batalha
+
+--- RAW HTML SOURCE (first 3000 chars) ---
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC '-//WAPFORUM//DTD XHTML Mobile 1.0//EN' 'http://www.wapforum.org/DTD/xhtml-mobile10.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<meta http-equiv='content-type' content='text/html; charset=UTF-8'/>
+<title>Torneio dos Clãs</title>
+
+<meta name='author' content='Maxsimus & Tera'/>
+<meta name='keywords' content='furia de titãs, titãs, furia, jogo, online, guerra, móvel, MMORPG' /> 
+<meta name='viewport' content='width=device-width,maximum-scale=1.0,initial-scale=1.0,user-scalable=no'/><meta name='format-detection' content='telephone=no'/>
+<meta name='theme-color' content='#000000'/>
+<link rel='stylesheet' type='text/css' href='/css/main.css?107c'/>
+<link rel='manifest' href='/manifest.webmanifest'>
+<link rel='apple-touch-icon' href='/apple-touch-icon.png'>
+<link rel='icon' href='/favicon.ico?2' type='image/x-icon'/>
+<link rel='shortcut icon' href='/favicon.ico?2' type='image/x-icon'/>
+<link rel='canonical' href='/clanfight/attack/'/></head><body style='-webkit-text-size-adjust:none;'><div id='topdiv'><div class='main' style='word-wrap:break-word;'><span style='text-shadow:none;'></span><div class='head  cntr' style='position:relative;'><span><img src='/images/icon/health.png' alt='hp'/> <span class='white'>24916</span></span><span name='timer' style='position:absolute; right:4px;'>04:29</span><div class='clr'></div></div><div class='exp_bar'><div class='progress_life' style='width:100%'></div></div><div class='center'><div class='rght mlr5 mt5'><div class='fl left w50'><img src='/images/icon/race/1.png' alt=''/> Gohan Teen <span class='nwr'><img src='/images/icon/health.png' alt='hp'/> 24916</span><br/><img src='/images/icon/clan/1.png' alt=''/> Bkhw Wanteds (7)</div><img src='/images/icon/race/0.png' alt=''/> Sky Clown <span class='nwr'><img src='/images/icon/health.png' alt='hp'/>&nbsp;0</span><br/><img src='/images/icon/clan/0.png' alt=''/> Killer Clowns (1)<div class='clr'></div></div><div class='block_fight ct'><div class='bf_left'><div class='bf_right'><div class='unit_slot' style='background-image:url("/manekenimage/0/0/m/562/339/508/565/510/511/576/577/1324812338.w?6&png&bg=alpha&flip=left&b=&bc=836");'><div class='fprg'><div class='rate fl' style='width:100%;'></div></div></div><div class='unit_slot s_enemy' style='background-image:url("/manekenimage/0/0/f/522/523/524/525/526/527/528/529/1825019704.w?6&bg=ct&flip=right&b=&bc=578");'><div class='bf_rip'><img src='/images/icon/rip.png' alt=''/></div><div class='bf_info_r red'>-1475</div></div></div></div></div><div class='fight_buttons'><a class='nbtn b_green' href='/clanfight/dodge/?r=1773583232'><span class='lbl'><span class='txt smpl'>Esquivar</span></span></a><a class='nbtn b_red btn-attack-cd' href='/clanfight/attack/?r=1773583232'><span class='lbl'><span class='txt smpl'>Atacar</span></span></a><a class='nbtn b_grey' href='/clanfight/attackrandom/?r=1773583232'><span class='lbl'><span class='txt sm
