@@ -283,12 +283,13 @@ user_agent() {
     agent_library="${ACCOUNT_USER_AGENT_STORE:-$agent_store/userAgent.txt}"
     fallback_library="$HOME/twm/userAgent.txt"
 
-    # Verifica se o arquivo de User-Agent já existe e tem conteúdo
-    if [ -f "$agent_mode_file" ] && [ -s "$agent_mode_file" ]; then
+    # Read AGENT_MODE from config (set by load_config), fallback to file (legacy), or default to 2 (random)
+    if [ -n "${AGENT_MODE:-}" ]; then
+        UA="$AGENT_MODE"
+    elif [ -f "$agent_mode_file" ] && [ -s "$agent_mode_file" ]; then
         UA=$(cat "$agent_mode_file")
     else
-        echo_t "Set up User-Agent [1 to 2]:"
-        read -r UA
+        UA=2  # Default: random agent
     fi
 
     case $UA in
@@ -311,7 +312,8 @@ user_agent() {
             clear
             xdg-open "$(echo "aHR0cHM6Ly93d3cud2hhdHNteXVhLmluZm8=" | base64 -d)" >/dev/null 2>&1
             echo "0" > "$agent_mode_file"
-            read -r UA
+            # Previously this asked user for input; now we auto-fallback to random (option 2)
+            UA=2
             echo "$UA" > "$TMP/userAgent.txt"
 
             if [ ! -e "$TMP/userAgent.txt" ] || [ -z "$UA" ]; then
