@@ -13,12 +13,14 @@ The missions system has been fully implemented and committed. It provides:
 ### 1. Enable Mission Automation in Your Config
 
 Run the configuration menu:
+
 ```bash
 ACCOUNT_ID=Gt play.sh Gt
 # In the config menu, select option 16 and set it to 'y'
 ```
 
 Or manually add to your account config:
+
 ```bash
 echo "FUNC_do_missions=y" >> ~/twm/accounts/Gt/config.cfg
 ```
@@ -26,6 +28,7 @@ echo "FUNC_do_missions=y" >> ~/twm/accounts/Gt/config.cfg
 ### 2. Run Mission Debug (Optional)
 
 To inspect current mission states:
+
 ```bash
 cd ~/TitansWarPro
 ACCOUNT_ID=Gt bash missions.sh
@@ -33,6 +36,7 @@ mission_debug
 ```
 
 This will:
+
 - Fetch 4 pages: /quest/, /arena/, /league/, /lab/alchemy/
 - Analyze mission states (RESGATAR, DISPONÍVEL, TIMER, IGNORED)
 - Save detailed log to: `accounts/Gt/logs/mission_debug_YYYYMMDD_HHMMSS.log`
@@ -44,6 +48,7 @@ ACCOUNT_ID=Gt play.sh Gt
 ```
 
 The bot will automatically:
+
 - Check for available missions during the game loop
 - Execute missions in order: League → Campaign → Altars → Coliseum → Cave → Alchemy
 - Collect mission rewards
@@ -52,12 +57,14 @@ The bot will automatically:
 ## Supported Missions (14 total)
 
 ### Auto-Complete Missions (no action needed)
+
 - ID 1: Só ganha! (10 consecutive arena wins)
 - ID 3: Missões do Sábio
 - ID 9: Eu quero sangue! (Undying valley)
 - ID 16: Torneio
 
 ### Action-Required Missions
+
 - ID 2: Busca de recursos (2 cave digs) via cave_routine
 - ID 5: Campanha (3 battles) via campaign_func
 - ID 6: Lutador (10 league fights) via league_play
@@ -67,6 +74,7 @@ The bot will automatically:
 - ID 13: Alquimia (2 successful potions)
 
 ### Ignored Missions (gold purchase)
+
 - ID 4: Eu preciso de ouro!
 - ID 8: Ouro segredo
 - ID 12: Ajude o seu Clã!
@@ -90,6 +98,7 @@ The bot will automatically:
 ## Test the System
 
 To verify everything works, use the helper script:
+
 ```bash
 cd ~/TitansWarPro
 bash test_missions.sh
