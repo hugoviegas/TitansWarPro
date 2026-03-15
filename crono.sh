@@ -144,8 +144,26 @@ func_cat() {
             # - Interactive terminal (stdin is real): read blocks waiting for user
             # - Background mode (stdin=/dev/null): check cmd_file frequently instead of long sleep
             if [ "$_interactive" -eq 1 ]; then
-                # Interactive: user can type commands, returns immediately on Enter
-                read -r -t "$i" cmd || cmd=""
+                # Interactive: user can type commands, but also check for time changes every second
+                # This ensures scheduled events don't get missed if the minute changes during idle wait
+                local _read_count=0
+                cmd=""
+                while [ $_read_count -lt "$i" ]; do
+                    # Check if time changed (hour/minute) — set flag to exit func_cat
+                    printf -v _current_time '%(%H:%M)T' -1
+                    if [ "$_current_time" != "$_last_time_check" ]; then
+                        _schedule_changed=1  # Signal to exit main while loop
+                        break
+                    fi
+
+                    # Try to read with 1-second timeout (fast response to user input)
+                    if read -r -t 1 cmd 2>/dev/null; then
+                        # User entered a command — break to process it
+                        break
+                    fi
+                    cmd=""  # Clear cmd on timeout
+                    _read_count=$((++_read_count))
+                done
             else
                 # Background mode: sleep in short intervals and check cmd_file frequently
                 # This allows commands sent by monitor to execute within ~1 second instead of up to 60s
