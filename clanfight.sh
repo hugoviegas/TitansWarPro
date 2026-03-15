@@ -203,6 +203,7 @@ clanfight_debug () {
     local _cfdbg_maxhp
     _cfdbg_maxhp=$(cat "$full_ram" 2>/dev/null)
     [ -z "$_cfdbg_maxhp" ] && _cfdbg_maxhp=$(cat FULL 2>/dev/null)
+    [ -z "$_cfdbg_maxhp" ] && _cfdbg_maxhp="30000"  # Fallback if extraction failed
     printf "  ${GRAY_BLACK}Max HP: %-6d${COLOR_RESET}\n" "$_cfdbg_maxhp"
     printf '\n--- MAX HP ---\nMax HP: %s\n' "$_cfdbg_maxhp" >> "$debug_file"
 
@@ -210,7 +211,7 @@ clanfight_debug () {
     (
         w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
             -debug "$URL/settings/graphics/0" \
-            -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >>"$src_ram"
+            -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >/dev/null 2>&1
     ) </dev/null &>/dev/null &
     time_exit 17
 
@@ -233,11 +234,13 @@ clanfight_debug () {
     # ── Wait for battle (dodge link = battle is live) ─────────────────────
     printf "  ${GOLD_BLACK}😴 Waiting for battle to start...${COLOR_RESET}\n"
     local _cfdbg_wait_start
-    _cfdbg_wait_start=$(date +%s)
+    printf -v _cfdbg_wait_start '%(%s)T' -1
     local _cfdbg_wait_n=0
-    until grep -q '/clanfight/dodge/' "$src_ram" 2>/dev/null || \
-          [ $(( $(date +%s) - _cfdbg_wait_start )) -gt 60 ]; do
-        local _cfdbg_welapsed=$(( $(date +%s) - _cfdbg_wait_start ))
+    until grep -q '/clanfight/dodge/' "$src_ram" 2>/dev/null; do
+        local _cfdbg_wait_now
+        printf -v _cfdbg_wait_now '%(%s)T' -1
+        local _cfdbg_welapsed=$(( _cfdbg_wait_now - _cfdbg_wait_start ))
+        if [ "$_cfdbg_welapsed" -gt 60 ]; then break; fi
         printf "\r\033[K  ${GOLD_BLACK}⏳ Waiting... [%02ds]${COLOR_RESET}" "$_cfdbg_welapsed"
         local _cfdbg_access
         _cfdbg_access=$(grep -o -E '(/clanfight(/[a-z]+/[^A-Za-z0-9]r[^A-Za-z0-9][0-9]+|/))' "$src_ram" | sed -n '1p')
@@ -265,7 +268,7 @@ clanfight_debug () {
 
     # ── Battle started ────────────────────────────────────────────────────
     local _cfdbg_battle_start
-    _cfdbg_battle_start=$(date +%s)
+    printf -v _cfdbg_battle_start '%(%s)T' -1
     _cfdbg_extract
 
     local _cfdbg_team=""
@@ -305,7 +308,7 @@ clanfight_debug () {
     # ── Main battle loop ─────────────────────────────────────────────────
     while [ "$_cfdbg_BREAK" -eq 0 ]; do
         local _cfdbg_now
-        _cfdbg_now=$(date +%s)
+        printf -v _cfdbg_now '%(%s)T' -1
         local _cfdbg_elapsed=$(( _cfdbg_now - _cfdbg_battle_start ))
         local _cfdbg_min=$(( _cfdbg_elapsed / 60 ))
         local _cfdbg_sec=$(( _cfdbg_elapsed % 60 ))
@@ -325,7 +328,7 @@ clanfight_debug () {
                 printf '============================================================\n'
                 printf '=  FULL PAGE DUMP AT LOOP 10\n'
                 printf '============================================================\n'
-                printf 'Timestamp: %s\n' "$(date +'%Y-%m-%d %H:%M:%S')"
+                printf 'Timestamp: %(%Y-%m-%d %H:%M:%S)T\n' -1
                 printf 'Loop: %d  |  Battle elapsed: %dm%ds\n\n' "$_cfdbg_loop" "$_cfdbg_min" "$_cfdbg_sec"
                 printf '\n--- RENDERED HTML (w3m dump) ---\n'
                 w3m -dump -T text/html "$src_ram" 2>/dev/null
@@ -338,15 +341,37 @@ clanfight_debug () {
         # History capture every 3 loops
         if [ $(( _cfdbg_loop % 3 )) -eq 0 ]; then
             local _cfdbg_page_render
+            local _cfdbg_hist_fmt
+            printf -v _cfdbg_hist_fmt '%(%H:%M:%S)T' -1
             _cfdbg_page_render=$(w3m -dump -T text/html "$src_ram" 2>/dev/null)
             {
-                printf '[Loop %d] %s\n' "$_cfdbg_loop" "$(date +'%H:%M:%S')"
+                printf '[Loop %d] %s\n' "$_cfdbg_loop" "$_cfdbg_hist_fmt"
                 echo "$_cfdbg_page_render" | sed -n '/^Os participantes:/,/^A batalha já começou!/p' | \
                     grep -v '^$' | grep -v 'Os participantes:' | grep -v 'A batalha já começou'
             } >> "$_cfdbg_battle_history"
         fi
 
-        # Detect battle end
+        # ── Extract values ──────────────────────────────────────────────────
+        _cfdbg_extract
+
+        # ── Detect hero death and revive (UNRIP) ─────────────────────────
+        local _cfdbg_UNRIP
+        _cfdbg_UNRIP=$(grep -o -E '/clanfight/unrip/[?]r[=][1-9][0-9]+' "$src_ram" 2>/dev/null | head -1)
+        if [ -n "$_cfdbg_UNRIP" ] && [ "${_cfdbg_USH:-0}" -le 0 ]; then
+            # Hero dead - revive and restart loop iteration
+            (
+                w3mc -cookie -o http_proxy="$PROXY" -o accept_encoding=UTF-8 \
+                    -debug -dump_source "${URL}${_cfdbg_UNRIP}" \
+                    -o user_agent="$(shuf -n1 "$TMP"/userAgent.txt)" >"$src_ram"
+            ) </dev/null &>/dev/null &
+            time_exit 17
+            _cfdbg_extract
+            _cfdbg_action "💀 UNRIP" "$_cfdbg_hp_before" "$_cfdbg_enh_before" \
+                          "$_cfdbg_USH" "$_cfdbg_ENH"
+            continue
+        fi
+
+        # ── Detect battle end (no dodge link) ────────────────────────────
         if ! grep -q '/clanfight/dodge/' "$src_ram" 2>/dev/null; then
             _cfdbg_BREAK=1; break
         fi
@@ -456,8 +481,8 @@ clanfight_debug () {
 
         # ── Terminal display ─────────────────────────────────────────────
         local _cfdbg_hp_pct
-        _cfdbg_hp_pct=$(awk -v c="${_cfdbg_USH:-0}" -v m="${_cfdbg_maxhp:-1}" \
-                        'BEGIN { v=c/m*100; if(v>100)v=100; if(v<0)v=0; printf "%.0f", v }')
+        _cfdbg_hp_pct=$(awk -v c="${_cfdbg_USH:-0}" -v m="${_cfdbg_maxhp:-30000}" \
+                        'BEGIN { m=(m+0>0)?m:30000; v=c/m*100; if(v<0)v=0; if(v>100)v=100; printf "%.0f", v }')
         local _cfdbg_bfill
         _cfdbg_bfill=$(awk -v p="$_cfdbg_hp_pct" 'BEGIN { v=int(p*16/100); if(v<0)v=0; if(v>16)v=16; print v }')
         local _cfdbg_bar="" _cfdbg_j
@@ -503,7 +528,8 @@ clanfight_debug () {
     done
 
     # ── Post-battle ──────────────────────────────────────────────────────
-    local _cfdbg_dur=$(( $(date +%s) - _cfdbg_battle_start ))
+    local _cfdbg_end; printf -v _cfdbg_end '%(%s)T' -1
+    local _cfdbg_dur=$(( _cfdbg_end - _cfdbg_battle_start ))
     local _cfdbg_dmin=$(( _cfdbg_dur / 60 )) _cfdbg_dsec=$(( _cfdbg_dur % 60 ))
     _cfdbg_page "STATE: POST-BATTLE"
 
