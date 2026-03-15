@@ -37,6 +37,7 @@ if [ -d /data/data/com.termux/files/usr/share/doc ]; then
   printf "${BLACK_CYAN}  Checking Termux packages...${COLOR_RESET}\n"
   command -v w3m  >/dev/null 2>&1 || pkg install w3m -y
   command -v jq   >/dev/null 2>&1 || pkg install jq -y
+  command -v tmux >/dev/null 2>&1 || pkg install tmux -y
   [ -d /data/data/com.termux/files/usr/share/doc/coreutils ] || pkg install coreutils ncurses-utils -y
   [ -d /data/data/com.termux/files/usr/share/doc/termux-api ] || pkg install termux-api -y
   [ -d /data/data/com.termux/files/usr/share/doc/procps    ] || pkg install procps ncurses-utils -y
@@ -54,6 +55,7 @@ if uname | grep -q -i "cygwin"; then
   [ -e "${LS}/coreutils"    ] || apt-cyg install coreutils -y
   [ -e "${LS}/procps"       ] || apt-cyg install procps -y
   [ -e "${LS}/jq"           ] || apt-cyg install jq -y
+  [ -e "${LS}/tmux"         ] || apt-cyg install tmux -y
   unset LS
 fi
 
@@ -61,15 +63,15 @@ fi
 APPISH=$(uname -a | grep -o "\-ish")
 if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = '-ish' ]; then
   printf "${BLACK_CYAN}Install the necessary packages for Alpine on app ISh (iPhone):${COLOR_RESET}\n"
-  printf "  apk update\n  apk add curl; apk add w3m; apk add coreutils; apk add --no-cache tzdata\n\n"
+  printf "  apk update\n  apk add curl; apk add w3m; apk add tmux; apk add coreutils; apk add --no-cache tzdata\n\n"
   sleep 5s
 elif [ "$APPISH" != '-ish' ] && uname -m | grep -q -E '(aarch64|armhf|armv7|mips64)' && [ ! -d /data/data/com.termux ]; then
   printf "${BLACK_CYAN}Install the necessary packages for Alpine on app UserLAnd (Android):${COLOR_RESET}\n"
-  printf "  apk update\n  sudo apk add curl; sudo apk add w3m; sudo apk add coreutils; sudo apk add --no-cache tzdata\n\n"
+  printf "  apk update\n  sudo apk add curl; sudo apk add w3m; sudo apk add tmux; sudo apk add coreutils; sudo apk add --no-cache tzdata\n\n"
   sleep 5s
 elif [ "$APPISH" != '-ish' ] && uname -m | grep -q -E "(ppc64le|riscv64|s390x|x86|x86_64)" && [ ! -d /data/data/com.termux ]; then
   printf "${BLACK_CYAN}Install required packages for Linux or Windows WSL:${COLOR_RESET}\n"
-  printf "  sudo apt update\n  sudo apt install curl coreutils ncurses-term procps w3m jq -y\n"
+  printf "  sudo apt update\n  sudo apt install curl coreutils ncurses-term procps w3m jq tmux -y\n"
   sleep 5s
 fi
 unset APPISH

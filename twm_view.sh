@@ -10,11 +10,15 @@ usage() {
   cat <<'EOF'
 Usage: ./twm_view.sh [account_id]
 
-View real-time logs from a specific account runner.
+Attach to a running account session for full interactive access.
+If tmux is installed and the account is running, attaches to its tmux session.
+Otherwise falls back to a live log tail.
 
 Examples:
-  ./twm_view.sh A1          # View logs for account A1
+  ./twm_view.sh A1          # View/attach to account A1
   ./twm_view.sh             # Interactive menu to select account
+  Ctrl+B D                  # Detach from session (tmux mode)
+  Ctrl+C                    # Exit log viewer (fallback mode)
 EOF
 }
 
@@ -73,14 +77,10 @@ view_logs() {
   local account_id="$1"
   local account_root="${ACCOUNTS_DIR}/${account_id}"
   local log_file="${account_root}/logs/twm.log"
+  local sname="twm_${account_id}"
 
   if [ ! -d "$account_root" ]; then
     fatal "Account '$account_id' not found"
-  fi
-
-  if [ ! -f "$log_file" ]; then
-    echo "Creating log file: $log_file"
-    touch "$log_file"
   fi
 
   # Get account alias for display
@@ -88,14 +88,25 @@ view_logs() {
   local alias
   alias=$(jq -r ".accounts[] | select(.id == \"$account_id\") | (.alias // .id)" "$INDEX_FILE" 2>/dev/null || echo "$account_id")
 
-  clear
-  printf "\033[1;36m╔══════════════════════════════════════╗\033[0m\n"
-  printf "\033[1;36m║  TWM Log Viewer - Account: \033[1;33m%-18s\033[1;36m║\033[0m\n" "$alias"
-  printf "\033[1;36m║  (Press Ctrl+C to exit)              \033[0m║\033[0m\n"
-  printf "\033[1;36m╚══════════════════════════════════════╝\033[0m\n"
-  echo ""
+  if command -v tmux >/dev/null 2>&1 && tmux has-session -t "$sname" 2>/dev/null; then
+    # Attach to the live tmux session — full interactive access
+    echo "Attaching to session $sname (Ctrl+B D to detach)..."
+    tmux attach-session -t "$sname"
+  else
+    # Fallback: tail log file
+    if [ ! -f "$log_file" ]; then
+      echo "Creating log file: $log_file"
+      touch "$log_file"
+    fi
 
-  tail -f "$log_file"
+    clear
+    printf "\033[1;36m╔══════════════════════════════════════╗\033[0m\n"
+    printf "\033[1;36m║  TWM Log Viewer - Account: \033[1;33m%-18s\033[1;36m║\033[0m\n" "$alias"
+    printf "\033[1;36m║  (Press Ctrl+C to exit)              \033[0m║\033[0m\n"
+    printf "\033[1;36m╚══════════════════════════════════════╝\033[0m\n"
+    echo ""
+    tail -f "$log_file"
+  fi
 }
 
 main() {

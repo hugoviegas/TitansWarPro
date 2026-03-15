@@ -43,12 +43,16 @@ get_status() {
   local id="$1"
   local pid_file="${PID_DIR}/${id}.pid"
   local run_file="${ACCOUNTS_DIR}/${id}/runmode_file"
+  local sname="twm_${id}"
   local state="STOPPED" pid="-" mode="-"
   if [ -f "$run_file" ]; then
     mode=$(tr -d '\r\n' < "$run_file" 2>/dev/null)
     [ -n "$mode" ] || mode="-"
   fi
-  if [ -f "$pid_file" ]; then
+  if command -v tmux >/dev/null 2>&1 && tmux has-session -t "$sname" 2>/dev/null; then
+    state="RUNNING"
+    pid="tmux"
+  elif [ -f "$pid_file" ]; then
     pid=$(cat "$pid_file" 2>/dev/null || echo "-")
     kill -0 "$pid" 2>/dev/null && state="RUNNING" || state="DEAD"
   fi
@@ -149,18 +153,18 @@ draw_account_header() {
 draw_log() {
   local id="${account_ids[$current_index]}"
   local log_file="${ACCOUNTS_DIR}/${id}/logs/twm.log"
+  local sname="twm_${id}"
   # Header: hline(1) + top_bar(3) + hline(1) + account_header(2) + hline(1) = 8 lines
   local log_lines=$((TERM_LINES - 8))
   [ "$log_lines" -lt 4 ] && log_lines=4
-
-  # Ensure we don't overflow terminal height - leave space for potential prompts
   log_lines=$((log_lines - 1))
 
-  if [ -f "$log_file" ]; then
-    # Strip cursor-movement and screen-clear escape codes before displaying.
-    # Macro scripts write `clear` to stdout which ends up in the log as ESC[H ESC[2J.
-    # If these codes reach the monitor's terminal during draw_log, they destroy the header.
-    # SGR color codes (ending in 'm') are deliberately preserved so log colors still show.
+  if command -v tmux >/dev/null 2>&1 && tmux has-session -t "$sname" 2>/dev/null; then
+    # Capture pane content from the live tmux session
+    tmux capture-pane -t "$sname" -p -S "-${log_lines}" 2>/dev/null \
+      | sed $'s/\033\[[0-9;]*[HJKfABCDEFGST]//g; s/\033c//g'
+  elif [ -f "$log_file" ]; then
+    # Fallback: read from log file (legacy nohup mode)
     tail -n "$log_lines" "$log_file" 2>/dev/null \
       | sed $'s/\033\[[0-9;]*[HJKfABCDEFGST]//g; s/\033c//g'
   else
@@ -189,10 +193,28 @@ render() {
   draw_log
 }
 
-# ── follow mode (live tail -f with command input) ────────────────────────────────────────────────
+# ── follow mode ──────────────────────────────────────────────────────────────
 follow_mode() {
   local id="${account_ids[$current_index]}"
   local alias="${account_aliases[$current_index]}"
+  local sname="twm_${id}"
+
+  if command -v tmux >/dev/null 2>&1 && tmux has-session -t "$sname" 2>/dev/null; then
+    # Full interactive attach — user gets the exact same experience as running play.sh directly
+    stty "$tty_state" 2>/dev/null
+    printf '\033[?25h'
+    # Attach to the tmux session; Ctrl+B D detaches and returns here
+    tmux attach-session -t "$sname"
+    # Restore monitor raw mode after detach
+    _restore_raw_mode
+  else
+    _follow_mode_legacy "$id" "$alias"
+  fi
+}
+
+# Legacy follow mode: tail -f with command input (used when tmux unavailable or account stopped)
+_follow_mode_legacy() {
+  local id="$1" alias="$2"
   local log_file="${ACCOUNTS_DIR}/${id}/logs/twm.log"
 
   # Restore normal terminal for readable streaming output
@@ -265,9 +287,14 @@ list_select() {
     local mode;  mode="${info##*|}"
     local log_file="${ACCOUNTS_DIR}/${id}/logs/twm.log"
     local sfmt;  sfmt=$(state_fmt "$state")
-    # Last log line as context
+    # Last line as context — use tmux pane if available, else log file
     local last=""
-    [ -f "$log_file" ] && last=$(tail -1 "$log_file" 2>/dev/null | cut -c1-"$((TERM_COLS - 5))")
+    local sname_i="twm_${id}"
+    if command -v tmux >/dev/null 2>&1 && tmux has-session -t "$sname_i" 2>/dev/null; then
+      last=$(tmux capture-pane -t "$sname_i" -p 2>/dev/null | grep -v '^[[:space:]]*$' | tail -1 2>/dev/null | cut -c1-"$((TERM_COLS - 5))")
+    elif [ -f "$log_file" ]; then
+      last=$(tail -1 "$log_file" 2>/dev/null | cut -c1-"$((TERM_COLS - 5))")
+    fi
 
     printf " \033[1;33m%d)\033[0m %-10s %-8s %b  pid:%-8s mode:%s\n" \
       "$i" "$alias" "$id" "$sfmt" "$pid" "$mode"
@@ -295,13 +322,18 @@ send_command() {
 
   local id="${account_ids[$current_index]}"
   local alias="${account_aliases[$current_index]}"
+  local sname="twm_${id}"
   local cmd_file="${ACCOUNTS_DIR}/${id}/cmd_file"
 
   update_term_size
   printf '\033[H\033[J'
   hline
   printf " \033[1;36mSend Command to: \033[1;33m%s \033[0;37m(%s)\033[0m\n" "$alias" "$id"
-  printf " \033[0;37mThe command runs on the macro's next idle cycle.\033[0m\n"
+  if command -v tmux >/dev/null 2>&1 && tmux has-session -t "$sname" 2>/dev/null; then
+    printf " \033[0;37mThe command will be sent directly to the session.\033[0m\n"
+  else
+    printf " \033[0;37mThe command runs on the macro's next idle cycle.\033[0m\n"
+  fi
   hline
   printf ' Command (Enter to cancel): '
 
@@ -309,8 +341,13 @@ send_command() {
   read -r cmd
 
   if [ -n "$cmd" ]; then
-    printf '%s\n' "$cmd" > "$cmd_file"
-    printf '\033[1;32m  ✓ Queued: %s\033[0m\n' "$cmd"
+    if command -v tmux >/dev/null 2>&1 && tmux has-session -t "$sname" 2>/dev/null; then
+      tmux send-keys -t "$sname" "$cmd" Enter
+      printf '\033[1;32m  ✓ Sent to session: %s\033[0m\n' "$cmd"
+    else
+      printf '%s\n' "$cmd" > "$cmd_file"
+      printf '\033[1;32m  ✓ Queued: %s\033[0m\n' "$cmd"
+    fi
     sleep 0.5
   else
     printf '\033[0;33m  Cancelled\033[0m\n'
@@ -369,13 +406,16 @@ interactive_monitor() {
       force_render=1
     fi
 
-    # Get last line of log — detects meaningful changes (new action/event)
+    # Get last line — detects meaningful changes (new action/event)
+    # Use tmux capture-pane if available, else fall back to log file
     # Trim trailing whitespace using bash extglob — no sed subprocess
-    local cur_tail=""
-    if [ -f "$log_file" ]; then
+    local cur_tail="" sname="twm_${id}"
+    if command -v tmux >/dev/null 2>&1 && tmux has-session -t "$sname" 2>/dev/null; then
+      cur_tail=$(tmux capture-pane -t "$sname" -p 2>/dev/null | grep -v '^[[:space:]]*$' | tail -1 2>/dev/null)
+    elif [ -f "$log_file" ]; then
       cur_tail=$(tail -1 "$log_file" 2>/dev/null)
-      cur_tail="${cur_tail%%+([[:space:]])}"
     fi
+    cur_tail="${cur_tail%%+([[:space:]])}"
 
     # Re-render when: last line changed, forced, or status interval
     # Add cooldown to prevent excessive renders even if logs change frequently
@@ -451,7 +491,8 @@ usage() {
   printf '    help        This message\n\n'
   printf '  Keys in monitor:\n'
   printf '    N / P       Next / Previous account\n'
-  printf '    F           Follow live (tail -f)  ← Ctrl+C to return\n'
+  printf '    F           Follow (attach to session)  ← Ctrl+B D to detach\n'
+  printf '                (Legacy mode: tail -f  ← Ctrl+C to return)\n'
   printf '    L           Account list (select by number)\n'
   printf '    C           Send command to macro (runs on next idle cycle)\n'
   printf '    R           Force refresh\n'

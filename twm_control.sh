@@ -244,12 +244,15 @@ VIEWING LOGS:
    ./twm_monitor.sh
    - Navigate with [N]ext, [P]revious, [L]ist
    - Select account by number in list view
-   - Real-time status and logs
+   - Real-time status and content
+   - [F] Follow: attach to tmux session (full interactivity)
+       → Ctrl+B D to detach and return to monitor
 
-2. Simple Log Viewer:
+2. Simple Log Viewer / Session Attach:
    ./twm_view.sh
    - Interactive menu or specific account ID
-   - Continuous log streaming
+   - Attaches to tmux session when available (Ctrl+B D to detach)
+   - Falls back to log tail if tmux unavailable
 
 3. Status Tables:
    ./multi_runner.sh status
@@ -257,9 +260,14 @@ VIEWING LOGS:
 
 RUNNING MULTIPLE ACCOUNTS:
 
-1. Configure accounts/index.json with multiple entries
-2. Run: ./multi_runner.sh start
-3. Monitor with: ./twm_monitor.sh
+1. Install tmux (recommended for full interactivity):
+   sudo apt install tmux   # Linux/WSL
+   pkg install tmux        # Termux/Android
+2. Configure accounts/index.json with multiple entries
+3. Run: ./multi_runner.sh start
+   - With tmux: each account gets its own tmux session
+   - Without tmux: legacy nohup/log mode
+4. Monitor with: ./twm_monitor.sh
 
 Each account gets isolated:
 - Cookies: ~/twm/accounts/<ID>/w3m/
@@ -269,11 +277,12 @@ Each account gets isolated:
 QUICK COMMANDS:
 
   ./multi_runner.sh start             # Start all active accounts
+  ./multi_runner.sh start A1          # Start only account A1
   ./multi_runner.sh stop A1 A2        # Stop specific accounts
   ./multi_runner.sh status            # Show status table
   ./twm_monitor.sh                    # Interactive monitor
-  ./twm_view.sh A1                    # View logs for A1
-  tail -f ~/twm/accounts/A1/logs/twm.log  # Direct log access
+  ./twm_view.sh A1                    # Attach to / view account A1
+  tmux attach -t twm_A1               # Direct tmux attach to A1
 
 Press 'q' to exit this help.
 EOF
