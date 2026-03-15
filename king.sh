@@ -245,7 +245,9 @@ king_debug() {
     LA="4.5"
 
     # ── Main battle loop ─────────────────────────────────────────────────
-    while true; do
+    # shellcheck disable=SC1073
+    # shellcheck disable=SC1061
+    while :; do
         local _kd_now
         printf -v _kd_now '%(%s)T' -1
         local _kd_elapsed=$(( _kd_now - _kd_battle_start ))
@@ -376,8 +378,7 @@ king_debug() {
                 _kd_action_label="🛡️ DODGE"
 
             # ── Priority 2: STONE when King HP% < 25 ────────────────────
-            elif [ "$_kd_stone_used" -eq 0 ] && [ -n "$_kd_STONE" ] && \
-                 [ "${_kd_ENH:-100}" -lt 25 ]; then
+            elif [ "$_kd_stone_used" -eq 0 ] && [ -n "$_kd_STONE" ] && [ "${_kd_ENH:-100}" -lt 25 ]; then
                 _kg_fetch "$_kd_STONE"
                 _kd_extract; _kd_stone_used=1; _kd_last_atk=$_kd_now
                 _kd_action_label="💪 STONE (King HP%:${_kd_enh_before}<25)"
@@ -534,9 +535,7 @@ king_debug() {
         else _kd_hcol="$RED_BLACK"; fi
 
         local _kd_stone_st
-        [ "$_kd_stone_used" -eq 0 ] \
-            && _kd_stone_st="${GREEN_BLACK}READY${COLOR_RESET}" \
-            || _kd_stone_st="${GRAY_BLACK}USED${COLOR_RESET}"
+        [ "$_kd_stone_used" -eq 0 ] && _kd_stone_st="${GREEN_BLACK}READY${COLOR_RESET}" || _kd_stone_st="${GRAY_BLACK}USED${COLOR_RESET}"
 
         # Phase-specific header
         local _kd_phase_display
