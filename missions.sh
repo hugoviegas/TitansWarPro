@@ -3,10 +3,91 @@
 # ============================================================================
 # MISSIONS SYSTEM - TitansWarPro
 # ============================================================================
-# Handles player missions: debug, execution and reward collection
+# Quest IDs confirmed from debug 2026-03-15 (furiadetitas.net):
+#
+#  ID  1  → Só ganha!             — só coletar (10 vitórias seguidas arena)
+#  ID  2  → Busca de recursos      — cave_routine (2 pesquisas)
+#  ID  3  → Missões do Sábio      — só coletar (completa automaticamente)
+#  ID  4  → Eu preciso de ouro!   — IGNORAR (compra 100 ouro)
+#  ID  5  → Campanha              — campaign_func (luta 3x)
+#  ID  6  → Lutador               — league_play (10 lutas)
+#  ID  7  → Lutador lendário      — league_play (5 vitórias)
+#  ID  8  → Ouro segredo          — IGNORAR (compra 500 ouro)
+#  ID  9  → Eu quero sangue!      — só coletar (vale dos imortais)
+#  ID 10  → Altares antigos        — altars_fight (entrar e lutar)
+#  ID 11  → Gladiador             — coliseum_fight x3
+#  ID 12  → Ajude o seu Clã!      — IGNORAR (compra 500 ouro para clã)
+#  ID 13  → Alquimia              — 2 elixires bem-sucedidos
+#  ID 16  → Torneio               — só coletar (career já roda antes)
 # ============================================================================
 
-# ── HELPER: Fetch page and append HTML + text dump to a debug log ─────────
+# ── Verificação de fim de semana ──────────────────────────────────────────
+_missions_is_weekend() {
+    [ "${FUNC_pause_weekends:-y}" = "y" ] || return 1
+    local d
+    d=$(date +%u)  # 1=Seg ... 7=Dom
+    [ "$d" -eq 6 ] || [ "$d" -eq 7 ]
+}
+
+# ── Helper: coleta de recompensas com verificação de weekend ─────────────
+_mission_collect_rewards() {
+    if _missions_is_weekend; then
+        echo_t "Mission rewards skipped (weekend pause)" "${BLACK_RED}" "${COLOR_RESET}" "after" "⏸️"
+        return
+    fi
+
+    fetch_page "/quest/"
+
+    local collected=0
+    for i in {0..16}; do
+        local click
+        click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p')
+        if [ -n "$click" ]; then
+            fetch_page "$click"
+            echo_t "  Mission ${i} reward collected" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅"
+            collected=$((collected + 1))
+        fi
+    done
+
+    [ "$collected" -eq 0 ] && echo_t "No mission rewards ready" "${GRAY_BLACK}" "${COLOR_RESET}" "after" "📭"
+}
+
+# ── Helper: análise do estado das missões (usado no debug) ────────────────
+_mission_analyze_state() {
+    local src_file="${1:-$TMP/SRC}"
+
+    printf "\n=== MISSION STATE ANALYSIS ===\n"
+
+    # Missões com IDs conhecidos
+    # Formato: "ID:Nome:Ignorar?"
+    local known_missions="1:So_ganha:no 2:Busca_de_recursos:no 3:Missoes_do_Sabio:no \
+4:Eu_preciso_de_ouro:IGNORE 5:Campanha:no 6:Lutador:no 7:Lutador_lendario:no \
+8:Ouro_segredo:IGNORE 9:Eu_quero_sangue:no 10:Altares_antigos:no 11:Gladiador:no \
+12:Ajude_o_Cla:IGNORE 13:Alquimia:no 16:Torneio:no"
+
+    for entry in $known_missions; do
+        local id name ignore
+        id="${entry%%:*}"
+        name="$(echo "$entry" | cut -d: -f2)"
+        ignore="$(echo "$entry" | cut -d: -f3)"
+
+        if grep -q "/quest/end/${id}[?]r=" "$src_file" 2>/dev/null; then
+            printf "  [ID %2d] %-22s → ⭐ RESGATAR\n" "$id" "$name"
+        elif grep -q "quest_id=${id}&" "$src_file" 2>/dev/null; then
+            if [ "$ignore" = "IGNORE" ]; then
+                printf "  [ID %2d] %-22s → 🚫 DISPONÍVEL (ignorar)\n" "$id" "$name"
+            else
+                printf "  [ID %2d] %-22s → ▶️  DISPONÍVEL\n" "$id" "$name"
+            fi
+        else
+            printf "  [ID %2d] %-22s → ⏳ TIMER/LOCK\n" "$id" "$name"
+        fi
+    done
+
+    printf "===========================\n"
+}
+
+# ── Helper: dump de página para o log de debug ───────────────────────────
 _mission_dump_page() {
     local page="$1"
     local log_file="$2"
@@ -35,8 +116,7 @@ _mission_dump_page() {
 }
 
 # ============================================================================
-# MISSION DEBUG — reads quest, arena, league and alchemy pages
-# Run once manually to inspect which quest IDs map to which activities
+# MISSION DEBUG — lê páginas de missões e analisa estado de cada uma
 # ============================================================================
 mission_debug() {
     local debug_dir="${ACCOUNT_LOGS:-$TMP}"
@@ -50,54 +130,251 @@ mission_debug() {
     {
         echo "MISSION DEBUG — $(date)"
         echo "Account: ${ACC:-unknown} | URL: ${URL}"
+        echo ""
     } >> "$debug_file"
 
-    # Pages to inspect
+    # Páginas a inspecionar
     local pages=("/quest/" "/arena/" "/league/" "/lab/alchemy/")
-
     for page in "${pages[@]}"; do
         echo_t "  Fetching ${page}" "${GRAY_BLACK}" "${COLOR_RESET}" "before" "🔍"
         _mission_dump_page "$page" "$debug_file"
     done
+
+    # Análise de estado a partir da página /quest/ (já está em $TMP/SRC após último fetch)
+    fetch_page "/quest/"
+
+    # Exibe e salva análise no log
+    _mission_analyze_state "$TMP/SRC" | tee -a "$debug_file"
+
+    # Status de fim de semana
+    if _missions_is_weekend; then
+        echo_t "  Weekend: reward collection PAUSED" "${BLACK_RED}" "${COLOR_RESET}" "after" "⏸️"
+        printf "  [WEEKEND] Coleta pausada — fim de semana\n" >> "$debug_file"
+    else
+        echo_t "  Weekend: reward collection ACTIVE" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅"
+        printf "  [WEEKEND] Coleta ATIVA\n" >> "$debug_file"
+    fi
 
     echo_t "Debug saved: $debug_file" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅"
     echo "$debug_file"
 }
 
 # ============================================================================
-# DO MISSIONS — execute available player missions then collect rewards
-# Respects FUNC_do_missions and weekend pause (FUNC_pause_weekends)
-# 3 missions cannot be automated and are ignored (to be defined after debug)
+# SUB-ROTINAS DE MISSÃO
 # ============================================================================
-do_missions() {
-    if [ "${FUNC_do_missions:-n}" != "y" ]; then
-        return
+
+# ── Altares antigos (ID 10) ───────────────────────────────────────────────
+_mission_altars() {
+    echo_t "  Altares antigos" "${GOLD_BLACK}" "${COLOR_RESET}" "before" "🏛️"
+
+    # Fechar resultado anterior, se existir, e entrar na luta
+    fetch_page "/altars/?close=reward"
+
+    local enter
+    enter=$(grep -o -E '/altars/enterFight/[?]r=[0-9]+' "$TMP/SRC" | head -n1)
+    [ -z "$enter" ] && enter="/altars/enterFight"
+
+    fetch_page "$enter"
+
+    # Aguardar link de combate (mesma lógica do altars_start)
+    local BREAK=$(( $(date +%s) + 30 ))
+    until grep -q -o 'altars/dodge/' "$TMP/SRC" || [ "$(date +%s)" -gt "$BREAK" ]; do
+        fetch_page "/altars"
+        sleep 2s
+    done
+
+    # Iniciar batalha
+    altars_fight
+}
+
+# ── Campanha ──────────────────────────────────────────────────────────────
+_mission_campaign() {
+    echo_t "  Campaign" "${GOLD_BLACK}" "${COLOR_RESET}" "before" "⛺"
+
+    fetch_page "/campaign/"
+    if grep -q -E '/campaign/(go|fight|attack)/[?]r[=][0-9]+' "$TMP/SRC"; then
+        campaign_func
+    else
+        echo_t "  Campaign not available yet" "${GRAY_BLACK}" "${COLOR_RESET}" "after" "⏳"
+    fi
+}
+
+# ── League — Lutador (ID 6) + Lutador lendário (ID 7) ────────────────────
+_mission_league() {
+    echo_t "  League Missions" "${GOLD_BLACK}" "${COLOR_RESET}" "before" "🏆"
+
+    # Pré-restaurar lutas se necessário (máximo 2 vezes)
+    local refills=0
+    local max_refills=2
+
+    fetch_page "/league/"
+    local avail
+    avail=$(grep -o -E 'Lutas disponiveis: <b>[0-9]+</b>' "$TMP/SRC" | grep -o '[0-9]*</b>' | tr -cd '0-9')
+    avail=${avail:-0}
+
+    while [ "${avail:-0}" -eq 0 ] && [ "$refills" -lt "$max_refills" ]; do
+        local refresh
+        refresh=$(grep -o -E '/league/refreshFights/[?]r=[0-9]+' "$TMP/SRC" | head -n1)
+        if [ -n "$refresh" ]; then
+            fetch_page "$refresh"
+            refills=$((refills + 1))
+            echo_t "   League fights restored (${refills}/${max_refills})" "${GRAY_BLACK}" "${COLOR_RESET}" "after" "🔄"
+            fetch_page "/league/"
+            avail=$(grep -o -E 'Lutas disponiveis: <b>[0-9]+</b>' "$TMP/SRC" | grep -o '[0-9]*</b>' | tr -cd '0-9')
+            avail=${avail:-0}
+        else
+            break
+        fi
+    done
+
+    # league_play já combina missões de clã (checkQuest 1/2 apply+end internamente)
+    league_play
+}
+
+# ── Gladiador — 3 batalhas no coliseu (ID 11) ────────────────────────────
+_mission_coliseum() {
+    echo_t "  Gladiador (Coliseum x3)" "${GOLD_BLACK}" "${COLOR_RESET}" "before" "⚔️"
+
+    local fights=0
+    local target=3
+
+    while [ "$fights" -lt "$target" ]; do
+        fetch_page "/quest/"
+        # Parar se a missão não está mais disponível (concluída ou outro estado)
+        if ! grep -q "quest_id=11" "$TMP/SRC"; then
+            break
+        fi
+
+        coliseum_fight
+        fights=$((fights + 1))
+        echo_t "   Coliseum fight ${fights}/${target}" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅"
+        sleep 2s
+    done
+}
+
+# ── Busca de recursos — 2 pesquisas na caverna (ID 2) ──────────────────────
+_mission_cave() {
+    echo_t "  Cave Resources (2 searches)" "${GOLD_BLACK}" "${COLOR_RESET}" "before" "🪨"
+
+    # Combinar com missão de clã de caverna se disponível
+    if checkQuest 5 apply; then
+        echo_t "   Clan cave mission combined" "${GRAY_BLACK}" "${COLOR_RESET}" "after" "🔱"
     fi
 
-    # Respect weekend pause setting (reuses the same flag as mission rewards)
-    if [ "${FUNC_pause_weekends:-y}" = "y" ]; then
-        local current_day
-        current_day=$(date +%u)  # 1=Mon ... 7=Sun
-        if [ "$current_day" -eq 6 ] || [ "$current_day" -eq 7 ]; then
-            echo_t "Missions paused for the weekend" "${BLACK_RED}" "${COLOR_RESET}" "after" "⏸️"
-            return
+    cave_routine
+
+    checkQuest 5 end
+}
+
+# ── Alquimia — 2 elixires com sucesso (ID 13) ────────────────────────────
+_mission_alchemy() {
+    echo_t "  Alchemy (2 successful elixirs)" "${GOLD_BLACK}" "${COLOR_RESET}" "before" "⚗️"
+
+    # Combinar com missão de clã de elixir se disponível
+    if checkQuest 7 apply; then
+        echo_t "   Clan elixir mission combined" "${GRAY_BLACK}" "${COLOR_RESET}" "after" "🔱"
+    fi
+
+    local successes=0
+    local attempts=0
+    local max_attempts=5  # 5 tentativas para garantir 2 sucessos (80% por tentativa)
+
+    while [ "$successes" -lt 2 ] && [ "$attempts" -lt "$max_attempts" ]; do
+        fetch_page "/lab/alchemy/"
+
+        # Escolhe elixir aleatório (1-4)
+        local elixir
+        elixir=$(shuf -i 1-4 -n 1)
+        fetch_page "/lab/alchemy/${elixir}/"
+
+        local make
+        make=$(grep -o -E "/lab/alchemy/${elixir}/makePotion[?]r=[0-9]+" "$TMP/SRC" | head -n1)
+
+        if [ -n "$make" ]; then
+            fetch_page "$make"
+            sleep 1s
+            # Segunda confirmação (mesmo padrão de clanElixirQuest)
+            make=$(grep -o -E "/lab/alchemy/${elixir}/makePotion[?]r=[0-9]+" "$TMP/SRC" | head -n1)
+            [ -n "$make" ] && fetch_page "$make"
+            sleep 1s
+
+            # Verificar sucesso: página de falha contém padrões específicos
+            local result_text
+            result_text=$(w3m -dump -T text/html "$TMP/SRC" 2>/dev/null | head -n 20)
+
+            if echo "$result_text" | grep -q -i -E '(falhou|failed|sem recursos|not enough|má sorte)'; then
+                echo_t "   Elixir ${elixir} failed, retrying..." "${GRAY_BLACK}" "${COLOR_RESET}" "after" "❌"
+            else
+                successes=$((successes + 1))
+                echo_t "   Elixir ${elixir} success (${successes}/2)" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅"
+            fi
+        else
+            echo_t "   No elixir resources available" "${GRAY_BLACK}" "${COLOR_RESET}" "after" "⚠️"
+            break
         fi
+
+        attempts=$((attempts + 1))
+    done
+
+    # Finalizar missão de clã se foi aplicada
+    [ "$successes" -ge 1 ] && checkQuest 7 end
+}
+
+# ============================================================================
+# DO MISSIONS — executa missões disponíveis e coleta recompensas
+# Respects: FUNC_do_missions (y/n) | FUNC_pause_weekends (y/n)
+# Ignored IDs: 4 (Eu preciso de ouro!), 8 (Ouro segredo), 12 (Ajude o Clã!)
+# ============================================================================
+do_missions() {
+    [ "${FUNC_do_missions:-n}" != "y" ] && return
+
+    if _missions_is_weekend; then
+        echo_t "Missions skipped (weekend)" "${BLACK_RED}" "${COLOR_RESET}" "after" "⏸️"
+        return
     fi
 
     echo_t "Doing Missions" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "📜"
 
     fetch_page "/quest/"
 
-    # ── Mission execution will be implemented after debug analysis ──
-    # Placeholder: collect any missions already completed
-    for i in {0..16}; do
-        local click
-        click=$(grep -o -E "/quest/end/${i}[?]r=[0-9]+" "$TMP/SRC" | sed -n '1p')
-        if [ -n "$click" ]; then
-            fetch_page "$click"
-            echo_t " Mission ${i} reward collected" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
-        fi
-    done
+    # ── Lutador (ID 6) + Lutador lendário (ID 7) ──────────────
+    if grep -q "quest_id=6" "$TMP/SRC" || grep -q "quest_id=7" "$TMP/SRC"; then
+        _mission_league
+        fetch_page "/quest/"
+    fi
+
+    # ── Campanha (ID 5) ────────────────────────────────────────
+    if grep -q "quest_id=5" "$TMP/SRC"; then
+        _mission_campaign
+        fetch_page "/quest/"
+    fi
+
+    # ── Altares antigos (ID 10) ────────────────────────────────
+    if grep -q "quest_id=10" "$TMP/SRC"; then
+        _mission_altars
+        fetch_page "/quest/"
+    fi
+
+    # ── Gladiador (ID 11) ──────────────────────────────────────
+    if grep -q "quest_id=11" "$TMP/SRC"; then
+        _mission_coliseum
+        fetch_page "/quest/"
+    fi
+
+    # ── Busca de recursos (ID 2) ──────────────────────────────
+    if grep -q "quest_id=2" "$TMP/SRC"; then
+        _mission_cave
+        fetch_page "/quest/"
+    fi
+
+    # ── Alquimia (ID 13) ───────────────────────────────────────
+    if grep -q "quest_id=13" "$TMP/SRC"; then
+        _mission_alchemy
+        fetch_page "/quest/"
+    fi
+
+    # ── Coletar todas as recompensas disponíveis ───────────────
+    _mission_collect_rewards
 
     echo_t "Missions done" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅\n"
 }
