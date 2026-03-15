@@ -21,7 +21,7 @@
 #  ID 16  → Torneio               — só coletar (career já roda antes)
 # ============================================================================
 
-# ── Verificação de fim de semana ──────────────────────────────────────────
+# ── Verificação de fim de semana (pausa coleta de recompensas apenas) ─────
 _missions_is_weekend() {
     [ "${FUNC_pause_weekends:-y}" = "y" ] || return 1
     local d
@@ -29,7 +29,7 @@ _missions_is_weekend() {
     [ "$d" -eq 6 ] || [ "$d" -eq 7 ]
 }
 
-# ── Helper: coleta de recompensas com verificação de weekend ─────────────
+# ── Helper: coleta de recompensas (respeitando pausa de weekend) ──────────
 _mission_collect_rewards() {
     if _missions_is_weekend; then
         echo_t "Mission rewards skipped (weekend pause)" "${BLACK_RED}" "${COLOR_RESET}" "after" "⏸️"
@@ -339,8 +339,8 @@ _mission_alchemy() {
 }
 
 # ============================================================================
-# DO MISSIONS — executa missões disponíveis e coleta recompensas
-# Respects: FUNC_do_missions (y/n) | FUNC_pause_weekends (y/n)
+# DO MISSIONS — executa missões disponíveis (automático, sempre)
+# Respects: FUNC_pause_weekends (y/n) para coleta de recompensas apenas
 # Ignored IDs: 4 (Eu preciso de ouro!), 8 (Ouro segredo), 12 (Ajude o Clã!)
 # ============================================================================
 # Função auxiliar para verificar timeout (deve ser definida fora de do_missions)
@@ -354,8 +354,6 @@ _check_timeout() {
 }
 
 do_missions() {
-    [ "${FUNC_do_missions:-n}" != "y" ] && return
-
     if _missions_is_weekend; then
         echo_t "Missions skipped (weekend)" "${BLACK_RED}" "${COLOR_RESET}" "after" "⏸️"
         return

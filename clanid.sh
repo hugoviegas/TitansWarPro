@@ -181,7 +181,7 @@ clanElixirQuest() {
   fetch_page "/lab/alchemy/$i/"
   # Search for the potion-making link /lab/alchemy/1/makePotion?r=42378359
   click=$(grep -o -E "/lab/alchemy/$i/makePotion[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p')
-  
+
   # If a link is found, fetch the page to make the potion
   if [ -n "$click" ]; then
     case $i in
@@ -192,17 +192,27 @@ clanElixirQuest() {
     (3)
       echo_t " Buying elixir agility" ;;
     (4)
-      echo_t " Buying elixir protection" ;;    
+      echo_t " Buying elixir protection" ;;
     esac
     fetch_page "$click"
     sleep 1s
     click=$(grep -o -E "/lab/alchemy/$i/makePotion[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p')
     fetch_page "$click"
     sleep 2s
-    # Finalize the quest
-    checkQuest 7 end
+
+    # Verify success: if the makePotion link is NOT found anymore, it succeeded
+    local verify_link
+    fetch_page "/lab/alchemy/$i/"
+    verify_link=$(grep -o -E "/lab/alchemy/$i/makePotion[?]r=[0-9]+" "$TMP"/SRC | sed -n '1p')
+
+    if [ -z "$verify_link" ]; then
+      echo_t " Elixir success ✅" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "⚗️"
+      # Only finalize quest if elixir was successful
+      checkQuest 7 end
+    else
+      echo_t " Elixir failed (resources available) ❌" "${GRAY_BLACK}" "${COLOR_RESET}" "after" "⚗️"
+    fi
   fi
-  
 }
 
 clanMerchantQuest() {

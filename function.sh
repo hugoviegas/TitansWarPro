@@ -49,8 +49,7 @@ request_update() {
         echo_t "__FUNC__ 13- Coliseum attack interval (seconds). Current value: " "" "${COLISEUM_LA:-5}"
         echo_t "__FUNC__ 14- Coliseum heal threshold (%). Current value: " "" "${COLISEUM_HPER:-38}"
         echo_t "__FUNC__ 15- Coliseum random atk threshold (%). Current value: " "" "${COLISEUM_RPER:-5}"
-        echo_t "__FUNC__ 16- Do missions when available. Current value: " "" "$FUNC_do_missions"
-        echo_t "__FUNC__ 17- Update channel (branch). Current value: " "" "$UPDATE_CHANNEL"
+        echo_t "__FUNC__ 16- Update channel (branch). Current value: " "" "$UPDATE_CHANNEL"
         echo_t "__FUNC__ 99- Reset config to defaults."
         echo_t "Press *'ENTER'* to exit configuration update mode." "" "" "after" "↩️"
 
@@ -177,11 +176,7 @@ request_update() {
                 done
                 continue
                 ;;
-            (16|do-missions)
-                echo_t "Do you want to run missions when available? (y or n):"
-                key="FUNC_do_missions"
-                ;;
-            (17|update-channel)
+            (16|update-channel)
                 echo_t "Select update channel/branch:"
                 echo_t "  1) Master (stable)"
                 echo_t "  2) Beta"
@@ -298,7 +293,6 @@ reset_config_to_defaults() {
     FUNC_clan_missions="y"
     FUNC_clan_statue="n"
     FUNC_cave_boost="n"
-    FUNC_do_missions="n"
     SCRIPT_PAUSED="n"
     LANGUAGE="pt"
     ALLIES="4"
@@ -320,7 +314,6 @@ reset_config_to_defaults() {
     echo "FUNC_clan_missions=$FUNC_clan_missions"
     echo "FUNC_clan_statue=$FUNC_clan_statue"
     echo "FUNC_cave_boost=$FUNC_cave_boost"
-    echo "FUNC_do_missions=$FUNC_do_missions"
     echo "SCRIPT_PAUSED=$SCRIPT_PAUSED"
     echo "LANGUAGE=$LANGUAGE"
     echo "ALLIES=$ALLIES"
@@ -346,7 +339,6 @@ default_config() {
     FUNC_clan_missions="y"
     FUNC_clan_statue="n"
     FUNC_cave_boost="n"
-    FUNC_do_missions="n"
     LANGUAGE="pt"
     ALLIES="4"
     SCRIPT_PAUSED="n"
@@ -368,7 +360,6 @@ default_config() {
     echo "FUNC_clan_missions=$FUNC_clan_missions"
     echo "FUNC_clan_statue=$FUNC_clan_statue"
     echo "FUNC_cave_boost=$FUNC_cave_boost"
-    echo "FUNC_do_missions=$FUNC_do_missions"
     echo "SCRIPT_PAUSED=$SCRIPT_PAUSED"
     echo "LANGUAGE=$LANGUAGE"
     echo "ALLIES=$ALLIES"

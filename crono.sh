@@ -293,13 +293,14 @@ start() {
 
     arena_duel               # Start arena duel function
     career_func              # Call career-related function
-    cave_routine             # Execute cave routine function 
-    func_trade               # Call trading function 
-    campaign_func            # Start campaign function 
-    clanDungeon              # Execute clan dungeon function 
+    cave_routine             # Execute cave routine function
+    func_trade               # Call trading function
+    campaign_func            # Start campaign function
+    clanDungeon              # Execute clan dungeon function
     clan_statue              # Check the clan statue
-    check_missions           # Check for missions 
+    #check_missions           # Check for missions
     check_rewards            # Check for rewards
+    do_missions              # Execute available missions
 
     if [ "${FUNC_auto_events:-y}" = "y" ]; then
         specialEvent
@@ -310,5 +311,5 @@ start() {
     fi
 
     messages_info            # Display messages information
-    func_sleep               # Call sleep function to manage timing 
+    func_sleep               # Call sleep function to manage timing
 }
