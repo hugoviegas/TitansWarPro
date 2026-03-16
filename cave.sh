@@ -137,27 +137,56 @@ _cave_display_probabilities() {
     local log_file="${1:-}"
     local ts
     printf -v ts '%(%H:%M)T' -1
-    local log_line="[$ts] Resources found:"
 
     echo_t "Resources found" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "💎"
 
-    while IFS= read -r line_num; do
-        [ -z "$line_num" ] && continue
+    # Extract all res/N.png + next percentage pairs from HTML
+    # Each match includes the resource image and its percentage nearby
+    grep -oE 'res/[0-9]+\.png[^%]{0,100}?[0-9]+%' "$TMP/SRC" | while read -r match; do
+        [ -z "$match" ] && continue
+
+        # Extract resource ID from res/ID.png
         local id
-        id=$(sed -n "${line_num}p" "$TMP/SRC" | grep -oE 'res/[0-9]+\.png' | grep -oE '[0-9]+' | head -1)
+        id=$(echo "$match" | grep -oE 'res/([0-9]+)' | grep -oE '[0-9]+')
         [ -z "$id" ] && continue
+
+        # Extract percentage
+        local pct
+        pct=$(echo "$match" | grep -oE '[0-9]+%' | head -1 | tr -d '%')
+
         local name
         name=$(_cave_resource_name "$id")
-        local pct
-        pct=$(sed -n "${line_num},$((line_num + 5))p" "$TMP/SRC" | grep -oE '[0-9]+%' | head -1 | tr -d '%')
-        echo_t "  ${name}${pct:+ (${pct}%)}" "${GRAY_BLACK}" "${COLOR_RESET}"
-        log_line="${log_line} ${name}${pct:+(${pct}%)}"
-    done < <(grep -nE 'res/[0-9]+\.png' "$TMP/SRC" | cut -d: -f1)
 
-    [ -n "$log_file" ] && echo "  $log_line" >> "$log_file"
+        # Log this resource found (for final aggregation)
+        echo "$id:$name" >> "$TMP/cave_resources_found.txt"
+
+        echo_t "  ${name}${pct:+ (${pct}%)}" "${GRAY_BLACK}" "${COLOR_RESET}"
+    done
 }
 
-# Check if current SRC is a mining extraction result page (has green/red indicators)
+# Aggregate and display total resources found during session
+_cave_display_aggregated_resources() {
+    local log_file="${1:-}"
+
+    if [ ! -f "$TMP/cave_resources_found.txt" ]; then
+        return
+    fi
+
+    echo_t "Resources found summary" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "📊"
+
+    # Sort and count each resource
+    sort "$TMP/cave_resources_found.txt" | uniq -c | while read -r count id_name; do
+        local name
+        name=$(echo "$id_name" | cut -d: -f2)
+        echo_t "  ${name}: ${count}" "${GRAY_BLACK}" "${COLOR_RESET}"
+
+        if [ -n "$log_file" ]; then
+            local ts
+            printf -v ts '%(%H:%M)T' -1
+            echo "  [$ts] Found: ${name} x${count}" >> "$log_file"
+        fi
+    done
+}
 _cave_is_extraction_page() {
     grep -qE 'res/[0-9]+\.png' "$TMP/SRC" && \
     grep -qiE 'color[^"<>]*green|color[^"<>]*red|class="(green|red)' "$TMP/SRC"
@@ -288,6 +317,9 @@ cave_start() {
   local log_dir="${ACCOUNT_LOGS:-$TMP/logs}"
   mkdir -p "$log_dir"
   local cave_session_log="${log_dir}/cave_session.log"
+
+  # Initialize resource tracking file
+  > "$TMP/cave_resources_found.txt"
 
   # Global timeout (2 hours max)
   local cave_start_time
@@ -424,6 +456,9 @@ cave_start() {
   # Reset to normal game loop (prevents cave mode restart)
   RUN="-boot"
 
+  # Display aggregated resources found during session
+  _cave_display_aggregated_resources "$cave_session_log"
+
   # Calculate final elapsed time
   local end_time
   printf -v end_time '%(%s)T' -1
@@ -448,6 +483,9 @@ cave_start() {
   echo_t "  Gold spent: ${GOLD_SPENT_TOTAL}/${CAVE_GOLD_LIMIT}" "${GRAY_BLACK}" "${COLOR_RESET}" "after" "🪙"
   echo_t "  Silver spent: ${SILVER_SPENT_TOTAL}/${CAVE_SILVER_LIMIT}" "${GRAY_BLACK}" "${COLOR_RESET}" "after" "🥈"
   echo_t "  Log saved: ${cave_session_log}" "${GRAY_BLACK}" "${COLOR_RESET}" "after" "📄"
+
+  # Cleanup temp resource tracking file
+  rm -f "$TMP/cave_resources_found.txt"
 }
 
 cave_routine() {
