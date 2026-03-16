@@ -260,10 +260,14 @@ func_cat() {
 }
 
 func_sleep() {
-    # Update time using bash printf builtin — no date subprocess fork
-    # (HOUR and MIN may already be set by twm_play's case; refresh them here)
-    local _d
+    # Always refresh HOUR/MIN here — they may be stale if a long event (battle, altars, etc.)
+    # ran between the last twm_play call and this func_sleep call
+    local _h _m _d
+    printf -v _h '%(%H)T' -1
+    printf -v _m '%(%M)T' -1
     printf -v _d '%(%d)T' -1
+    HOUR=$((10#$_h))
+    MIN=$((10#$_m))
     # Check if it's the first day of the month
     if [ "$((10#$_d))" -eq 1 ]; then
         # Check if the current hour is between 0 and 8 (inclusive)

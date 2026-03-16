@@ -39,16 +39,22 @@ if [ -f "$lock_file" ]; then
 
   # Check if PID is running
   if kill -0 "$existing_pid" 2>/dev/null; then
-    # Process exists — check if it's really a valid play.sh session or just an orphan
+    # Process exists — it's genuinely running
     is_stale=0
 
-    # If tmux is available, verify the session still exists
+    # If tmux is available, check if the existing process was started inside tmux.
+    # Only flag as stale if: (1) its parent is tmux, AND (2) our expected session is gone.
+    # This avoids incorrectly overriding a direct play.sh invocation (no tmux).
     if command -v tmux >/dev/null 2>&1; then
       session_name="twm_${ACCOUNT_ID}"
-      # If we expect a tmux session but it doesn't exist, the PID is indeed stale
-      if ! tmux has-session -t "$session_name" 2>/dev/null; then
-        # Process exists but session doesn't — clean stale PID and allow restart
-        is_stale=1
+      existing_ppid=$(ps -o ppid= -p "$existing_pid" 2>/dev/null | tr -d ' ')
+      existing_parent=$(ps -o comm= -p "$existing_ppid" 2>/dev/null | tr -d ' ')
+      if [[ "$existing_parent" == *"tmux"* ]]; then
+        # Process was started inside a tmux session — session should still exist
+        if ! tmux has-session -t "$session_name" 2>/dev/null; then
+          # Session gone but process still exists — orphaned, treat as stale
+          is_stale=1
+        fi
       fi
     fi
   fi
