@@ -132,44 +132,73 @@ _cave_resource_name() {
     esac
 }
 
-# Display resources found/extracted with names and mineral/herb percentages
-# Args: label  resources_newline_str  log_file(optional)
-_cave_display_resources() {
-    local label="$1"
-    local resources="$2"
-    local log_file="${3:-}"
+# Display resource probabilities from current SRC (call BEFORE clicking gather)
+_cave_display_probabilities() {
+    local log_file="${1:-}"
+    local ts
+    printf -v ts '%(%H:%M)T' -1
+    local log_line="[$ts] Resources found:"
 
-    local total=0 minerals=0 herbs=0 names_line=""
+    echo_t "Resources found" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "💎"
 
-    while IFS= read -r id; do
+    while IFS= read -r line_num; do
+        [ -z "$line_num" ] && continue
+        local id
+        id=$(sed -n "${line_num}p" "$TMP/SRC" | grep -oE 'res/[0-9]+\.png' | grep -oE '[0-9]+' | head -1)
         [ -z "$id" ] && continue
-        total=$((total + 1))
         local name
         name=$(_cave_resource_name "$id")
-        names_line="${names_line}${name}, "
-        if [[ "$id" =~ ^[1-5]$ ]]; then
-            minerals=$((minerals + 1))
-        else
-            herbs=$((herbs + 1))
+        local pct
+        pct=$(sed -n "${line_num},$((line_num + 5))p" "$TMP/SRC" | grep -oE '[0-9]+%' | head -1 | tr -d '%')
+        echo_t "  ${name}${pct:+ (${pct}%)}" "${GRAY_BLACK}" "${COLOR_RESET}"
+        log_line="${log_line} ${name}${pct:+(${pct}%)}"
+    done < <(grep -nE 'res/[0-9]+\.png' "$TMP/SRC" | cut -d: -f1)
+
+    [ -n "$log_file" ] && echo "  $log_line" >> "$log_file"
+}
+
+# Check if current SRC is a mining extraction result page (has green/red indicators)
+_cave_is_extraction_page() {
+    grep -qE 'res/[0-9]+\.png' "$TMP/SRC" && \
+    grep -qiE 'color[^"<>]*green|color[^"<>]*red|class="(green|red)' "$TMP/SRC"
+}
+
+# Display extraction results from current SRC using color indicators (call AFTER clicking speedUp)
+_cave_display_extraction_results() {
+    local log_file="${1:-}"
+    local ts
+    printf -v ts '%(%H:%M)T' -1
+    local extracted_count=0 not_extracted_count=0
+
+    echo_t "Mining results" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "⛏️"
+
+    while IFS= read -r line_num; do
+        [ -z "$line_num" ] && continue
+        local id
+        id=$(sed -n "${line_num}p" "$TMP/SRC" | grep -oE 'res/[0-9]+\.png' | grep -oE '[0-9]+' | head -1)
+        [ -z "$id" ] && continue
+        local name
+        name=$(_cave_resource_name "$id")
+        # Check next 8 lines for color indicator (green = extracted, else = not extracted)
+        local context
+        context=$(sed -n "${line_num},$((line_num + 8))p" "$TMP/SRC")
+        local extracted=0
+        if echo "$context" | grep -qiE 'color[^"<>]*green|class="green|style="[^"]*green'; then
+            extracted=1
         fi
-    done <<< "$resources"
 
-    [ "$total" -eq 0 ] && return
+        if [ "$extracted" -eq 1 ]; then
+            echo_t "  ${name}: Extracted" "${GREEN_BLACK}" "${COLOR_RESET}" "after" "✅"
+            extracted_count=$((extracted_count + 1))
+            [ -n "$log_file" ] && echo "  [$ts] ${name}: extracted" >> "$log_file"
+        else
+            echo_t "  ${name}: Not extracted" "${RED_BLACK}" "${COLOR_RESET}" "after" "❌"
+            not_extracted_count=$((not_extracted_count + 1))
+            [ -n "$log_file" ] && echo "  [$ts] ${name}: not extracted" >> "$log_file"
+        fi
+    done < <(grep -nE 'res/[0-9]+\.png' "$TMP/SRC" | cut -d: -f1)
 
-    names_line="${names_line%, }"  # strip trailing ", "
-    local min_pct=0 herb_pct=0
-    [ "$total" -gt 0 ] && min_pct=$(( minerals * 100 / total ))
-    [ "$total" -gt 0 ] && herb_pct=$(( herbs * 100 / total ))
-
-    echo_t "$label" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "💎"
-    echo_t "  Minerals: ${minerals} (${min_pct}%) | Herbs: ${herbs} (${herb_pct}%)" "${GRAY_BLACK}" "${COLOR_RESET}"
-    echo_t "  ${names_line}" "${GRAY_BLACK}" "${COLOR_RESET}"
-
-    if [ -n "$log_file" ]; then
-        local ts
-        printf -v ts '%(%H:%M)T' -1
-        echo "  [$ts] $label: $names_line | Minerals: ${minerals}/${total} (${min_pct}%) | Herbs: ${herbs}/${total} (${herb_pct}%)" >> "$log_file"
-    fi
+    [ -n "$log_file" ] && echo "  [$ts] Mined: ${extracted_count} extracted, ${not_extracted_count} not extracted" >> "$log_file"
 }
 
 bottom_info(){
@@ -219,6 +248,8 @@ cave_start() {
     echo_t "Setting cave mode..." "" "" "before" "🔧"
     RUN="-cv"
   fi
+
+  echo_t "Cave session PID: $$" "${GRAY_BLACK}" "${COLOR_RESET}" "after" "🔧"
 
   # Show previous session log if it exists, then ask to clear
   cave_log
@@ -273,12 +304,6 @@ cave_start() {
     echo "  Mining effect: $([ "$MINING_EFFECT_ACTIVE" -eq 1 ] && echo "Active" || echo "Inactive")"
     echo "--- Actions ---"
   } >> "$cave_session_log"
-
-  # Track resources across mining cycles
-  # _cycle_resources: set when gather starts (what's being mined)
-  # _in_cycle: 1 = mining in progress, 0 = on surface
-  local _cycle_resources=""
-  local _in_cycle=0
 
   while [[ "$RUN" =~ [-]cv ]]; do
 
@@ -352,29 +377,27 @@ cave_start() {
           fi
       fi
 
+      # Before gather: show resource probabilities from current SRC
+      if [ "$RESULT" = "gather" ]; then
+          _cave_display_probabilities "$cave_session_log"
+      fi
+
       read_speedup_silver_cost
       fetch_page "$CAVE"
 
       case $RESULT in
           down*)
-              # If we were in a cycle, show and log what was extracted
-              if [ "$_in_cycle" -eq 1 ] && [ -n "$_cycle_resources" ]; then
-                  _cave_display_resources "Resources extracted" "$_cycle_resources" "$cave_session_log"
-              fi
-              _cycle_resources=""
-              _in_cycle=0
               CAN_ATTACK_MONSTER=0
               echo_t "New search" "" "" "after" "🔍"
               ;;
           gather*)
-              # Show what was discovered and start tracking this cycle
               echo_t "Start mining" "" "" "after" "⛏️"
-              _cycle_resources="$RESOURCES"
-              _in_cycle=1
-              _cave_display_resources "Resources discovered" "$_cycle_resources"
               ;;
           speedUp*)
               echo_t "Speeding up mining" "" "" "after" "⚡"
+              if _cave_is_extraction_page; then
+                  _cave_display_extraction_results "$cave_session_log"
+              fi
               ;;
           attack*)
               echo_t "Attacking monster" "" "" "after" "⚔️"
@@ -398,10 +421,8 @@ cave_start() {
       unset ACCESS1 ACCESS2 ACTION DOWN MEGA
   done
 
-  # Log last cycle if mining was in progress when we stopped
-  if [ "$_in_cycle" -eq 1 ] && [ -n "$_cycle_resources" ]; then
-      _cave_display_resources "Resources extracted (partial)" "$_cycle_resources" "$cave_session_log"
-  fi
+  # Reset to normal game loop (prevents cave mode restart)
+  RUN="-boot"
 
   # Calculate final elapsed time
   local end_time
