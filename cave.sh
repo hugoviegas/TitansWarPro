@@ -141,8 +141,8 @@ _cave_display_probabilities() {
     echo_t "Resources found" "${GOLD_BLACK}" "${COLOR_RESET}" "after" "💎"
 
     # Extract all res/N.png + next percentage pairs from HTML
-    # Each match includes the resource image and its percentage nearby
-    grep -oE 'res/[0-9]+\.png[^%]{0,100}?[0-9]+%' "$TMP/SRC" | while read -r match; do
+    # Use [^<]* to match anything except HTML tags (more reliable than [^%])
+    grep -oE 'res/[0-9]+\.png[^<]*[0-9]+%' "$TMP/SRC" | while read -r match; do
         [ -z "$match" ] && continue
 
         # Extract resource ID from res/ID.png
