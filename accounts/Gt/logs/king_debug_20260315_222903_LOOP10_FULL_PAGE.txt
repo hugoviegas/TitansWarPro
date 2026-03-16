@@ -1,0 +1,66 @@
+============================================================
+=  FULL PAGE DUMP AT LOOP 10
+============================================================
+Timestamp: 2026-03-15 22:30:36
+Loop: 10  |  Battle elapsed: 0m28s  |  Phase: PVP
+
+
+--- RENDERED HTML (w3m dump) ---
+hp 11304 | mp 58809:25
+Seu herói foi morto
+Há titãs [0][1]245 aqui
+[wizard]
+– Eu posso ressuscitar seu herói!
+Ressuscitar
+Preço: [gold]15 ouro
+Você acertar [1] Lord Lucha por 4275
+Você usou [3] Fúria de Titã
+Você acertar [1] Lord Lucha por 2780 crítico
+Você usou [3] Turbilhão
+[rip] [1] Claire Bkhw assassinou [king] Rei dos Imortais
+Você acertar [king] Rei dos Imortais por 2447
+Você acertar [king] Rei dos Imortais por 1230 crítico
+Você usou [3] Turbilhão
++35% para danificar
+Você usou [stone] pedra
+Você acertar [king] Rei dos Imortais por 892 crítico
+Você usou [icon] Duplo golpe
+Você acertar [king] Rei dos Imortais por 1043 crítico
+Você usou [3] Turbilhão
+Você acertar [king] Rei dos Imortais por 2742 crítico
+Você usou [3] Turbilhão
+[king] Rei dos Imortais acertar Você por 1464
+Você acertar [king] Rei dos Imortais por 2089 crítico
+[user]Meu Herói
+[user]Meu Clã
+[arrow]Página principal
+Bóreas Gohan TeenConfigurações
+lvl 79 | g 29'835 | s 56,5M
+Oferta especial! Bonus de Ouro! (+)
+Tempo de sobra: 1 dia
+
+Fórum | Conversar | Classificação
+Comentários feed
+Apoio e Informação
+0,01 seg, 22:30:35 | Online: 206
+Overmobile © 2026, 18+
+
+
+--- RAW HTML SOURCE (first 3000 chars) ---
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC '-//WAPFORUM//DTD XHTML Mobile 1.0//EN' 'http://www.wapforum.org/DTD/xhtml-mobile10.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<meta http-equiv='content-type' content='text/html; charset=UTF-8'/>
+<title>Rei dos Imortais</title>
+
+<meta name='author' content='Maxsimus & Tera'/>
+<meta name='keywords' content='furia de titãs, titãs, furia, jogo, online, guerra, móvel, MMORPG' /> 
+<meta name='viewport' content='width=device-width,maximum-scale=1.0,initial-scale=1.0,user-scalable=no'/><meta name='format-detection' content='telephone=no'/>
+<meta name='theme-color' content='#000000'/>
+<link rel='stylesheet' type='text/css' href='/css/main.css?107c'/>
+<link rel='manifest' href='/manifest.webmanifest'>
+<link rel='apple-touch-icon' href='/apple-touch-icon.png'>
+<link rel='icon' href='/favicon.ico?2' type='image/x-icon'/>
+<link rel='shortcut icon' href='/favicon.ico?2' type='image/x-icon'/>
+<link rel='canonical' href='/king/unrip/'/></head><body style='-webkit-text-size-adjust:none;'><div id='topdiv'><div class='main' style='word-wrap:break-word;'><span style='text-shadow:none;'></span><div class='head  cntr' style='position:relative;' onclick="location.href='/';"><span><img src='/images/icon/health.png' alt='hp'/> <span class='white'>11304</span> | <img src='/images/icon/mana.png' alt='mp'/> 588</span><span name='timer' style='position:absolute; right:4px;'>09:25</span><div class='clr'></div></div><div class='exp_bar'><div class='progress' style='width:40%'></div></div><div class='center'><div class='block_zero'><span class='dred'>Seu herói foi morto</span><br/>Há titãs <img src='/images/icon/race/0.png' alt=''/><img src='/images/icon/race/1.png' alt=''/>245 aqui<br/></div><div class='dot-line'></div><div class='block_zero'><img src='/images/town/wizard.png' alt=''/><br/><div class='blue'>– Eu posso ressuscitar seu herói!</div><a class='btn' href='/king/unrip/?r=1773624634'><span class='end'><span class='label'>Ressuscitar</span></span></a><br/><span class='grey'>Preço: <img src='/images/icon/gold.png' alt=''/>15 ouro</span></div></div><div class='mini-line'></div><div class='block_zero'>Você acertar <img src='/images/icon/race/1.png' alt=''/> Lord Lucha por <span class='bold'>4275</span><br/>Você usou <img src='/images/icon/grade/3.png' alt=''/> <span class='quality-3'>Fúria de Titã</span><br/>Você acertar <img src='/images/icon/race/1.png' alt=''/> Lord Lucha por <span class='bold'>2780</span> crítico<br/>Você usou <img src='/images/icon/grade/3.png' alt=''/> <span class='quality-3'>Turbilhão</span><br/><img src='/images/icon/rip.png' alt=''/> <img src='/images/icon/race/1.png' alt=''/> Claire Bkhw assassinou <img src='/images/icon/race/king.png' alt=''/> Rei dos Imortais<br/>Você acertar <img src='/images/icon/race/king.png' alt=''/> Rei dos Imortais por <span class='bold'>2447</span><br/>Você acertar <img src='/images/icon/race/king.png' alt=''/>
