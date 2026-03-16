@@ -98,8 +98,8 @@ kill_child() {
 
 cleanup() {
   should_exit=1
+  rm -f "$lock_file" 2>/dev/null  # remove lock first so restart is possible immediately
   kill_child
-  rm -f "$lock_file" 2>/dev/null
   exit 0
 }
 

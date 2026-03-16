@@ -58,7 +58,7 @@ func_cat() {
     # shellcheck disable=SC2329
     _interrupt_func_cat() {
         printf_t "Stopping macro..." "${RED_BLACK}" "${COLOR_RESET}\n"
-        exit 0
+        exit 99  # 99 = intentional stop; play.sh will NOT restart (exit 0 would restart!)
     }
     # Save current trap before overriding so we can restore it when func_cat exits.
     # Without this, twm_global_cleanup (which kills background w3m jobs) would never
