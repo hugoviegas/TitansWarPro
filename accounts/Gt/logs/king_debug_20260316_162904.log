@@ -1,4 +1,4 @@
-King Debug Log - 2026-03-15 22:29:04
+King Debug Log - 2026-03-16 16:29:04
 Server: furiadetitas.net  Account: Gt
 
 --- CONFIG ---
@@ -10,10 +10,10 @@ Max HP: 26048
 ============================================================
 =  STATE: ENTER GAME
 ============================================================
-Timestamp: 2026-03-15 22:29:07
+Timestamp: 2026-03-16 16:29:07
 
 --- W3M RENDERED DUMP ---
-hp 11527 | mp 889
+[mail] | hp 18723 | mp 474
 [arrow_b]Voltar
 [king] Rei dos Imortais
 [level] 8 nível
@@ -24,7 +24,7 @@ Tempo para a próxima batalha 54 seg
 Atualizar
          Você tem:
 [stone] Pedra  [grass] Erva
-   593 pc.       936 pc.
+   570 pc.       917 pc.
         Compre mais
 [2hit] Bônus Pessoal [2hit]
 +544 com estatísticas
@@ -41,14 +41,16 @@ Mostrar outras melhorias
 [user]Meu Clã
 [arrow]Página principal
 Bóreas Gohan TeenConfigurações
-lvl 79 | g 29'895 | s 56,5M
+lvl 79 | g 29'826 | s 56,7M
+Duelo de clã! (+)
+Tempo de sobra: 6 dias
 Oferta especial! Bonus de Ouro! (+)
-Tempo de sobra: 1 dia
+Tempo de sobra: 7 horas. Anda logo!
 
 Fórum | Conversar | Classificação
 Comentários feed
 Apoio e Informação
-0,012 seg, 22:29:06 | Online: 194
+0,016 seg, 16:29:06 | Online: 181
 Overmobile © 2026, 18+
 
 
@@ -73,10 +75,10 @@ dodge:0  unrip:0  grey:0  rip:0  kingatk:0
 ============================================================
 =  STATE: WAITING (poll #1)
 ============================================================
-Timestamp: 2026-03-15 22:29:09
+Timestamp: 2026-03-16 16:29:09
 
 --- W3M RENDERED DUMP ---
-hp 11529 | mp 890
+[mail] | hp 18726 | mp 476
 [arrow_b]Voltar
 [king] Rei dos Imortais
 [level] 8 nível
@@ -87,7 +89,7 @@ Tempo para a próxima batalha 52 seg
 Atualizar
          Você tem:
 [stone] Pedra  [grass] Erva
-   593 pc.       936 pc.
+   570 pc.       917 pc.
         Compre mais
 [2hit] Bônus Pessoal [2hit]
 +544 com estatísticas
@@ -104,14 +106,16 @@ Mostrar outras melhorias
 [user]Meu Clã
 [arrow]Página principal
 Bóreas Gohan TeenConfigurações
-lvl 79 | g 29'895 | s 56,5M
+lvl 79 | g 29'826 | s 56,7M
+Duelo de clã! (+)
+Tempo de sobra: 6 dias
 Oferta especial! Bonus de Ouro! (+)
-Tempo de sobra: 1 dia
+Tempo de sobra: 7 horas. Anda logo!
 
 Fórum | Conversar | Classificação
 Comentários feed
 Apoio e Informação
-0,014 seg, 22:29:08 | Online: 194
+0,02 seg, 16:29:08 | Online: 181
 Overmobile © 2026, 18+
 
 
@@ -136,10 +140,10 @@ dodge:0  unrip:0  grey:0  rip:0  kingatk:0
 ============================================================
 =  STATE: WAITING (poll #2)
 ============================================================
-Timestamp: 2026-03-15 22:29:13
+Timestamp: 2026-03-16 16:29:13
 
 --- W3M RENDERED DUMP ---
-hp 11534 | mp 893
+[mail] | hp 18730 | mp 478
 [arrow_b]Voltar
 [king] Rei dos Imortais
 [level] 8 nível
@@ -150,7 +154,7 @@ Tempo para a próxima batalha 48 seg
 Atualizar
          Você tem:
 [stone] Pedra  [grass] Erva
-   593 pc.       936 pc.
+   570 pc.       917 pc.
         Compre mais
 [2hit] Bônus Pessoal [2hit]
 +544 com estatísticas
@@ -167,14 +171,16 @@ Mostrar outras melhorias
 [user]Meu Clã
 [arrow]Página principal
 Bóreas Gohan TeenConfigurações
-lvl 79 | g 29'895 | s 56,5M
+lvl 79 | g 29'826 | s 56,7M
+Duelo de clã! (+)
+Tempo de sobra: 6 dias
 Oferta especial! Bonus de Ouro! (+)
-Tempo de sobra: 1 dia
+Tempo de sobra: 7 horas. Anda logo!
 
 Fórum | Conversar | Classificação
 Comentários feed
 Apoio e Informação
-0,013 seg, 22:29:12 | Online: 194
+0,02 seg, 16:29:12 | Online: 181
 Overmobile © 2026, 18+
 
 
@@ -199,10 +205,10 @@ dodge:0  unrip:0  grey:0  rip:0  kingatk:0
 ============================================================
 =  STATE: WAITING (poll #3)
 ============================================================
-Timestamp: 2026-03-15 22:29:17
+Timestamp: 2026-03-16 16:29:17
 
 --- W3M RENDERED DUMP ---
-hp 11538 | mp 895
+[mail] | hp 18735 | mp 480
 [arrow_b]Voltar
 [king] Rei dos Imortais
 [level] 8 nível
@@ -213,7 +219,7 @@ Tempo para a próxima batalha 44 seg
 Atualizar
          Você tem:
 [stone] Pedra  [grass] Erva
-   593 pc.       936 pc.
+   570 pc.       917 pc.
         Compre mais
 [2hit] Bônus Pessoal [2hit]
 +544 com estatísticas
@@ -230,14 +236,16 @@ Mostrar outras melhorias
 [user]Meu Clã
 [arrow]Página principal
 Bóreas Gohan TeenConfigurações
-lvl 79 | g 29'895 | s 56,5M
+lvl 79 | g 29'826 | s 56,7M
+Duelo de clã! (+)
+Tempo de sobra: 6 dias
 Oferta especial! Bonus de Ouro! (+)
-Tempo de sobra: 1 dia
+Tempo de sobra: 7 horas. Anda logo!
 
 Fórum | Conversar | Classificação
 Comentários feed
 Apoio e Informação
-0,014 seg, 22:29:16 | Online: 194
+0,018 seg, 16:29:16 | Online: 181
 Overmobile © 2026, 18+
 
 
@@ -262,21 +270,21 @@ dodge:0  unrip:0  grey:0  rip:0  kingatk:0
 ============================================================
 =  STATE: WAITING (poll #4)
 ============================================================
-Timestamp: 2026-03-15 22:29:21
+Timestamp: 2026-03-16 16:29:22
 
 --- W3M RENDERED DUMP ---
-hp 11543 | mp 897
+[mail] | hp 18740 | mp 483
 [arrow_b]Voltar
 [king] Rei dos Imortais
 [level] 8 nível
 [king]
 Onde a Batalha é cada um por si!!!
-[0][1] Titãs: 9
+[0][1] Titãs: 8
 Tempo para a próxima batalha 40 seg
 Atualizar
          Você tem:
 [stone] Pedra  [grass] Erva
-   593 pc.       936 pc.
+   570 pc.       917 pc.
         Compre mais
 [2hit] Bônus Pessoal [2hit]
 +544 com estatísticas
@@ -293,14 +301,16 @@ Mostrar outras melhorias
 [user]Meu Clã
 [arrow]Página principal
 Bóreas Gohan TeenConfigurações
-lvl 79 | g 29'895 | s 56,5M
+lvl 79 | g 29'826 | s 56,7M
+Duelo de clã! (+)
+Tempo de sobra: 6 dias
 Oferta especial! Bonus de Ouro! (+)
-Tempo de sobra: 1 dia
+Tempo de sobra: 7 horas. Anda logo!
 
 Fórum | Conversar | Classificação
 Comentários feed
 Apoio e Informação
-0,013 seg, 22:29:20 | Online: 194
+0,02 seg, 16:29:20 | Online: 181
 Overmobile © 2026, 18+
 
 
@@ -325,21 +335,21 @@ dodge:0  unrip:0  grey:0  rip:0  kingatk:0
 ============================================================
 =  STATE: WAITING (poll #5)
 ============================================================
-Timestamp: 2026-03-15 22:29:25
+Timestamp: 2026-03-16 16:29:26
 
 --- W3M RENDERED DUMP ---
-hp 11548 | mp 900
+[mail] | hp 18744 | mp 485
 [arrow_b]Voltar
 [king] Rei dos Imortais
 [level] 8 nível
 [king]
 Onde a Batalha é cada um por si!!!
-[0][1] Titãs: 9
+[0][1] Titãs: 8
 Tempo para a próxima batalha 36 seg
 Atualizar
          Você tem:
 [stone] Pedra  [grass] Erva
-   593 pc.       936 pc.
+   570 pc.       917 pc.
         Compre mais
 [2hit] Bônus Pessoal [2hit]
 +544 com estatísticas
@@ -356,14 +366,16 @@ Mostrar outras melhorias
 [user]Meu Clã
 [arrow]Página principal
 Bóreas Gohan TeenConfigurações
-lvl 79 | g 29'895 | s 56,5M
+lvl 79 | g 29'826 | s 56,7M
+Duelo de clã! (+)
+Tempo de sobra: 6 dias
 Oferta especial! Bonus de Ouro! (+)
-Tempo de sobra: 1 dia
+Tempo de sobra: 7 horas. Anda logo!
 
 Fórum | Conversar | Classificação
 Comentários feed
 Apoio e Informação
-0,013 seg, 22:29:24 | Online: 194
+0,018 seg, 16:29:24 | Online: 181
 Overmobile © 2026, 18+
 
 
@@ -388,21 +400,21 @@ dodge:0  unrip:0  grey:0  rip:0  kingatk:0
 ============================================================
 =  STATE: WAITING (poll #6)
 ============================================================
-Timestamp: 2026-03-15 22:29:29
+Timestamp: 2026-03-16 16:29:30
 
 --- W3M RENDERED DUMP ---
-hp 11552 | mp 902
+[mail] | hp 18749 | mp 487
 [arrow_b]Voltar
 [king] Rei dos Imortais
 [level] 8 nível
 [king]
 Onde a Batalha é cada um por si!!!
-[0][1] Titãs: 9
+[0][1] Titãs: 8
 Tempo para a próxima batalha 32 seg
 Atualizar
          Você tem:
 [stone] Pedra  [grass] Erva
-   593 pc.       936 pc.
+   570 pc.       917 pc.
         Compre mais
 [2hit] Bônus Pessoal [2hit]
 +544 com estatísticas
@@ -419,14 +431,16 @@ Mostrar outras melhorias
 [user]Meu Clã
 [arrow]Página principal
 Bóreas Gohan TeenConfigurações
-lvl 79 | g 29'895 | s 56,5M
+lvl 79 | g 29'826 | s 56,7M
+Duelo de clã! (+)
+Tempo de sobra: 6 dias
 Oferta especial! Bonus de Ouro! (+)
-Tempo de sobra: 1 dia
+Tempo de sobra: 7 horas. Anda logo!
 
 Fórum | Conversar | Classificação
 Comentários feed
 Apoio e Informação
-0,012 seg, 22:29:28 | Online: 194
+0,019 seg, 16:29:28 | Online: 181
 Overmobile © 2026, 18+
 
 
@@ -451,21 +465,21 @@ dodge:0  unrip:0  grey:0  rip:0  kingatk:0
 ============================================================
 =  STATE: WAITING (poll #7)
 ============================================================
-Timestamp: 2026-03-15 22:29:33
+Timestamp: 2026-03-16 16:29:34
 
 --- W3M RENDERED DUMP ---
-hp 11558 | mp 905
+[mail] | hp 18755 | mp 490
 [arrow_b]Voltar
 [king] Rei dos Imortais
 [level] 8 nível
 [king]
 Onde a Batalha é cada um por si!!!
-[0][1] Titãs: 9
+[0][1] Titãs: 8
 Tempo para a próxima batalha 27 seg
 Atualizar
          Você tem:
 [stone] Pedra  [grass] Erva
-   593 pc.       936 pc.
+   570 pc.       917 pc.
         Compre mais
 [2hit] Bônus Pessoal [2hit]
 +544 com estatísticas
@@ -482,14 +496,16 @@ Mostrar outras melhorias
 [user]Meu Clã
 [arrow]Página principal
 Bóreas Gohan TeenConfigurações
-lvl 79 | g 29'895 | s 56,5M
+lvl 79 | g 29'826 | s 56,7M
+Duelo de clã! (+)
+Tempo de sobra: 6 dias
 Oferta especial! Bonus de Ouro! (+)
-Tempo de sobra: 1 dia
+Tempo de sobra: 7 horas. Anda logo!
 
 Fórum | Conversar | Classificação
 Comentários feed
 Apoio e Informação
-0,014 seg, 22:29:33 | Online: 194
+0,02 seg, 16:29:33 | Online: 181
 Overmobile © 2026, 18+
 
 
@@ -514,21 +530,21 @@ dodge:0  unrip:0  grey:0  rip:0  kingatk:0
 ============================================================
 =  STATE: WAITING (poll #8)
 ============================================================
-Timestamp: 2026-03-15 22:29:37
+Timestamp: 2026-03-16 16:29:38
 
 --- W3M RENDERED DUMP ---
-hp 11563 | mp 907
+[mail] | hp 18759 | mp 492
 [arrow_b]Voltar
 [king] Rei dos Imortais
 [level] 8 nível
 [king]
 Onde a Batalha é cada um por si!!!
-[0][1] Titãs: 9
+[0][1] Titãs: 8
 Tempo para a próxima batalha 23 seg
 Atualizar
          Você tem:
 [stone] Pedra  [grass] Erva
-   593 pc.       936 pc.
+   570 pc.       917 pc.
         Compre mais
 [2hit] Bônus Pessoal [2hit]
 +544 com estatísticas
@@ -545,14 +561,16 @@ Mostrar outras melhorias
 [user]Meu Clã
 [arrow]Página principal
 Bóreas Gohan TeenConfigurações
-lvl 79 | g 29'895 | s 56,5M
+lvl 79 | g 29'826 | s 56,7M
+Duelo de clã! (+)
+Tempo de sobra: 6 dias
 Oferta especial! Bonus de Ouro! (+)
-Tempo de sobra: 1 dia
+Tempo de sobra: 7 horas. Anda logo!
 
 Fórum | Conversar | Classificação
 Comentários feed
 Apoio e Informação
-0,013 seg, 22:29:37 | Online: 194
+0,019 seg, 16:29:37 | Online: 181
 Overmobile © 2026, 18+
 
 
@@ -577,21 +595,21 @@ dodge:0  unrip:0  grey:0  rip:0  kingatk:0
 ============================================================
 =  STATE: WAITING (poll #9)
 ============================================================
-Timestamp: 2026-03-15 22:29:42
+Timestamp: 2026-03-16 16:29:42
 
 --- W3M RENDERED DUMP ---
-hp 11567 | mp 909
+[mail] | hp 18764 | mp 495
 [arrow_b]Voltar
 [king] Rei dos Imortais
 [level] 8 nível
 [king]
 Onde a Batalha é cada um por si!!!
-[0][1] Titãs: 9
+[0][1] Titãs: 8
 Tempo para a próxima batalha 19 seg
 Atualizar
          Você tem:
 [stone] Pedra  [grass] Erva
-   593 pc.       936 pc.
+   570 pc.       917 pc.
         Compre mais
 [2hit] Bônus Pessoal [2hit]
 +544 com estatísticas
@@ -608,14 +626,16 @@ Mostrar outras melhorias
 [user]Meu Clã
 [arrow]Página principal
 Bóreas Gohan TeenConfigurações
-lvl 79 | g 29'895 | s 56,5M
+lvl 79 | g 29'826 | s 56,7M
+Duelo de clã! (+)
+Tempo de sobra: 6 dias
 Oferta especial! Bonus de Ouro! (+)
-Tempo de sobra: 1 dia
+Tempo de sobra: 7 horas. Anda logo!
 
 Fórum | Conversar | Classificação
 Comentários feed
 Apoio e Informação
-0,014 seg, 22:29:41 | Online: 194
+0,02 seg, 16:29:41 | Online: 181
 Overmobile © 2026, 18+
 
 
@@ -640,21 +660,21 @@ dodge:0  unrip:0  grey:0  rip:0  kingatk:0
 ============================================================
 =  STATE: WAITING (poll #10)
 ============================================================
-Timestamp: 2026-03-15 22:29:46
+Timestamp: 2026-03-16 16:29:46
 
 --- W3M RENDERED DUMP ---
-hp 11572 | mp 912
+[mail] | hp 18769 | mp 497
 [arrow_b]Voltar
 [king] Rei dos Imortais
 [level] 8 nível
 [king]
 Onde a Batalha é cada um por si!!!
-[0][1] Titãs: 9
+[0][1] Titãs: 8
 Tempo para a próxima batalha 15 seg
 Atualizar
          Você tem:
 [stone] Pedra  [grass] Erva
-   593 pc.       936 pc.
+   570 pc.       917 pc.
         Compre mais
 [2hit] Bônus Pessoal [2hit]
 +544 com estatísticas
@@ -671,14 +691,16 @@ Mostrar outras melhorias
 [user]Meu Clã
 [arrow]Página principal
 Bóreas Gohan TeenConfigurações
-lvl 79 | g 29'895 | s 56,5M
+lvl 79 | g 29'826 | s 56,7M
+Duelo de clã! (+)
+Tempo de sobra: 6 dias
 Oferta especial! Bonus de Ouro! (+)
-Tempo de sobra: 1 dia
+Tempo de sobra: 7 horas. Anda logo!
 
 Fórum | Conversar | Classificação
 Comentários feed
 Apoio e Informação
-0,011 seg, 22:29:45 | Online: 194
+0,019 seg, 16:29:45 | Online: 181
 Overmobile © 2026, 18+
 
 
@@ -703,21 +725,21 @@ dodge:0  unrip:0  grey:0  rip:0  kingatk:0
 ============================================================
 =  STATE: WAITING (poll #11)
 ============================================================
-Timestamp: 2026-03-15 22:29:50
+Timestamp: 2026-03-16 16:29:50
 
 --- W3M RENDERED DUMP ---
-hp 11577 | mp 914
+[mail] | hp 18773 | mp 499
 [arrow_b]Voltar
 [king] Rei dos Imortais
 [level] 8 nível
 [king]
 Onde a Batalha é cada um por si!!!
-[0][1] Titãs: 9
+[0][1] Titãs: 8
 Tempo para a próxima batalha 11 seg
 Atualizar
          Você tem:
 [stone] Pedra  [grass] Erva
-   593 pc.       936 pc.
+   570 pc.       917 pc.
         Compre mais
 [2hit] Bônus Pessoal [2hit]
 +544 com estatísticas
@@ -734,14 +756,16 @@ Mostrar outras melhorias
 [user]Meu Clã
 [arrow]Página principal
 Bóreas Gohan TeenConfigurações
-lvl 79 | g 29'895 | s 56,5M
+lvl 79 | g 29'826 | s 56,7M
+Duelo de clã! (+)
+Tempo de sobra: 6 dias
 Oferta especial! Bonus de Ouro! (+)
-Tempo de sobra: 1 dia
+Tempo de sobra: 7 horas. Anda logo!
 
 Fórum | Conversar | Classificação
 Comentários feed
 Apoio e Informação
-0,012 seg, 22:29:49 | Online: 194
+0,02 seg, 16:29:49 | Online: 181
 Overmobile © 2026, 18+
 
 
@@ -766,21 +790,21 @@ dodge:0  unrip:0  grey:0  rip:0  kingatk:0
 ============================================================
 =  STATE: WAITING (poll #12)
 ============================================================
-Timestamp: 2026-03-15 22:29:55
+Timestamp: 2026-03-16 16:29:54
 
 --- W3M RENDERED DUMP ---
-hp 11582 | mp 917
+[mail] | hp 18778 | mp 502
 [arrow_b]Voltar
 [king] Rei dos Imortais
 [level] 8 nível
 [king]
 Onde a Batalha é cada um por si!!!
-[0][1] Titãs: 9
-Tempo para a próxima batalha 6 seg
+[0][1] Titãs: 8
+Tempo para a próxima batalha 7 seg
 Atualizar
          Você tem:
 [stone] Pedra  [grass] Erva
-   593 pc.       936 pc.
+   570 pc.       917 pc.
         Compre mais
 [2hit] Bônus Pessoal [2hit]
 +544 com estatísticas
@@ -797,14 +821,16 @@ Mostrar outras melhorias
 [user]Meu Clã
 [arrow]Página principal
 Bóreas Gohan TeenConfigurações
-lvl 79 | g 29'895 | s 56,5M
+lvl 79 | g 29'826 | s 56,7M
+Duelo de clã! (+)
+Tempo de sobra: 6 dias
 Oferta especial! Bonus de Ouro! (+)
-Tempo de sobra: 1 dia
+Tempo de sobra: 7 horas. Anda logo!
 
 Fórum | Conversar | Classificação
 Comentários feed
 Apoio e Informação
-0,013 seg, 22:29:54 | Online: 194
+0,019 seg, 16:29:53 | Online: 181
 Overmobile © 2026, 18+
 
 
@@ -829,21 +855,21 @@ dodge:0  unrip:0  grey:0  rip:0  kingatk:0
 ============================================================
 =  STATE: WAITING (poll #13)
 ============================================================
-Timestamp: 2026-03-15 22:29:59
+Timestamp: 2026-03-16 16:29:59
 
 --- W3M RENDERED DUMP ---
-hp 11587 | mp 919
+[mail] | hp 18783 | mp 504
 [arrow_b]Voltar
 [king] Rei dos Imortais
 [level] 8 nível
 [king]
 Onde a Batalha é cada um por si!!!
-[0][1] Titãs: 9
-Tempo para a próxima batalha 2 seg
+[0][1] Titãs: 8
+Tempo para a próxima batalha 3 seg
 Atualizar
          Você tem:
 [stone] Pedra  [grass] Erva
-   593 pc.       936 pc.
+   570 pc.       917 pc.
         Compre mais
 [2hit] Bônus Pessoal [2hit]
 +544 com estatísticas
@@ -860,14 +886,16 @@ Mostrar outras melhorias
 [user]Meu Clã
 [arrow]Página principal
 Bóreas Gohan TeenConfigurações
-lvl 79 | g 29'895 | s 56,5M
+lvl 79 | g 29'826 | s 56,7M
+Duelo de clã! (+)
+Tempo de sobra: 6 dias
 Oferta especial! Bonus de Ouro! (+)
-Tempo de sobra: 1 dia
+Tempo de sobra: 7 horas. Anda logo!
 
 Fórum | Conversar | Classificação
 Comentários feed
 Apoio e Informação
-0,023 seg, 22:29:58 | Online: 194
+0,019 seg, 16:29:57 | Online: 181
 Overmobile © 2026, 18+
 
 
@@ -892,19 +920,19 @@ dodge:0  unrip:0  grey:0  rip:0  kingatk:0
 ============================================================
 =  STATE: WAITING (poll #14)
 ============================================================
-Timestamp: 2026-03-15 22:30:05
+Timestamp: 2026-03-16 16:30:03
 
 --- W3M RENDERED DUMP ---
-hp 2604809:57
+hp 2604809:59
 [1] Gohan Teen hp 26048
-[king] Rei hp 99%
+[king] Rei hp 100%
 Atacar o rei
 EsquivarAtacarTroca o alvo[potio]Esmalte heráldico[stone]Pedra
 +35% dano[herb]Erva
 -35% dano
 [0][1] Titãs: 254
 Bóreas Gohan Teen
-lvl 79 | g 29'895 | s 56,5M
+lvl 79 | g 29'826 | s 56,7M
 
 Fuja da batalha
 
@@ -919,7 +947,7 @@ UNRIP:
 
 --- HP VALUES ---
 Player HP: 26048
-King/Enemy HP%: 99
+King/Enemy HP%: 100
 
 --- MARKERS ---
 dodge:1  unrip:0  grey:0  rip:0  kingatk:1
@@ -929,115 +957,44 @@ dodge:1  unrip:0  grey:0  rip:0  kingatk:1
 ============================================================
 =  BATTLE START
 ============================================================
-Timestamp: 2026-03-15 22:30:09
-Team: [1]  MaxHP: 26048  KingHP%: 99
+Timestamp: 2026-03-16 16:30:07
+Team: [1]  MaxHP: 26048  KingHP%: 100
 
 --- ACTION LOG ---
 TIME       #    PHASE    ACTION                               HP_before->after ENH%%_before->after
 ────────────────────────────────────────────────────────────────────────────────
-[22:30:10] #1 [KING] | 👑 KINGATK (HP%:99->)
-       HP: 26048->-  ENH%: 99->-  LA:4.5s  HPER:38%  RPER:5%
-[22:30:13] #2 [KING] | 💀 UNRIP (revived)
-       HP: ->26048  ENH%: ->48  LA:4.5s  HPER:38%  RPER:5%
-[22:30:16] #3 [KING] | 👑 KINGATK (HP%:48->19)
-       HP: 26048->26048  ENH%: 48->19  LA:4.5s  HPER:38%  RPER:5%
-[22:30:19] #4 [KING] | 💪 STONE (King HP%:19<25)
-       HP: 26048->26048  ENH%: 19->5  LA:4.5s  HPER:38%  RPER:5%
-[22:30:22] #5 [KING] | 🔄 REFRESH [KING]
-       HP: 26048->-  ENH%: 5->-  LA:4.5s  HPER:38%  RPER:5%
-[22:30:26] #6 [KING] | 💀 UNRIP (revived)
-       HP: ->26048  ENH%: ->1  LA:4.5s  HPER:38%  RPER:5%
-[22:30:27] #7 [KING] | 👑🗡️ KINGATK KILL SHOT! (HP%:1->)
-       HP: 26048->-  ENH%: 1->-  LA:4.5s  HPER:38%  RPER:5%
-
-[22:30:30] *** KING KILLED (by another player) ***
-[22:30:31] #8 [PVP] | 💀 UNRIP (revived)
-       HP: ->26048  ENH%: ->21860  LA:4s  HPER:38%  RPER:5%
-[22:30:33] #9 [PVP] | ⚔️ ATK -> HIT (ENH%:21860->)
-       HP: 26048->-  ENH%: 21860->-  LA:4s  HPER:38%  RPER:5%
-[22:30:36] #10 [PVP] | 💀 UNRIP (revived)
-       HP: ->-  ENH%: ->-  LA:4s  HPER:38%  RPER:5%
-[22:30:37] #11 [PVP] | 💀 UNRIP (revived)
-       HP: ->26048  ENH%: ->17585  LA:4s  HPER:38%  RPER:5%
-[22:30:39] #12 [PVP] | ⚔️ ATK -> MISS (LA->4.2s)
-       HP: 26048->-  ENH%: 17585->-  LA:4.2s  HPER:38%  RPER:5%
-[22:30:42] #13 [PVP] | 💀 UNRIP (revived)
-       HP: ->-  ENH%: ->-  LA:4.2s  HPER:38%  RPER:5%
-[22:30:43] #14 [PVP] | 💀 UNRIP (revived)
-       HP: ->26048  ENH%: ->12357  LA:4.2s  HPER:38%  RPER:5%
-[22:30:46] #15 [PVP] | ⚔️ ATK -> MISS (LA->4.4s)
-       HP: 26048->-  ENH%: 12357->-  LA:4.4s  HPER:38%  RPER:5%
-[22:30:48] #16 [PVP] | 💀 UNRIP (revived)
-       HP: ->-  ENH%: ->-  LA:4.4s  HPER:38%  RPER:5%
-[22:30:50] #17 [PVP] | 💀 UNRIP (revived)
-       HP: ->26048  ENH%: ->7812  LA:4.4s  HPER:38%  RPER:5%
-[22:30:53] #18 [PVP] | ⚔️ ATK -> MISS (LA->4.6s)
-       HP: 26048->-  ENH%: 7812->-  LA:4.6s  HPER:38%  RPER:5%
-[22:30:55] #19 [PVP] | 💀 UNRIP (revived)
-       HP: ->26048  ENH%: ->6337  LA:4.6s  HPER:38%  RPER:5%
-[22:30:57] #20 [PVP] | ⚔️ ATK -> MISS (LA->4.8s)
-       HP: 26048->-  ENH%: 6337->-  LA:4.8s  HPER:38%  RPER:5%
-[22:31:00] #21 [PVP] | 💀 UNRIP (revived)
-       HP: ->26048  ENH%: ->1793  LA:4.8s  HPER:38%  RPER:5%
-[22:31:02] #22 [PVP] | ⚔️ ATK -> MISS (LA->5.0s)
-       HP: 26048->-  ENH%: 1793->-  LA:5.0s  HPER:38%  RPER:5%
-[22:31:05] #23 [PVP] | 🏁 BATTLE END
-       HP: ->-  ENH%: ->-  LA:5.0s  HPER:38%  RPER:5%
+[16:30:08] #1 [KING] | 👑 KINGATK (HP%:100->)
+       HP: 26048->-  ENH%: 100->-  LA:4.5s  HPER:38%  RPER:5%
+[16:30:11] #2 [KING] | 🏁 BATTLE END
+       HP: ->-  ENH%: ->-  LA:4.5s  HPER:38%  RPER:5%
 
 ============================================================
 =  STATE: POST-BATTLE
 ============================================================
-Timestamp: 2026-03-15 22:31:05
+Timestamp: 2026-03-16 16:30:11
 
 --- W3M RENDERED DUMP ---
-hp 11727 | mp 20108:56
+[mail] | hp 18503 | mp 46109:51
 Seu herói foi morto
-Espere até o fim da batalha
-Há titãs [0][1]139 aqui
-Atualizar
-Você acertar [1] Lord Lucha por 4544 crítico
-Você perdeu
-Você acertar [1] Lord Lucha por 1475 crítico
-Você acertar [1] Lord Lucha por 2979 crítico
-Você acertar [1] Lord Lucha por 1566 crítico
-Você usou [3] Turbilhão
-Você acertar [1] Lord Lucha por 2614 crítico
-Você usou [3] Turbilhão
-Você usou [icon] Duplo golpe
-Você acertar [1] Lord Lucha por 2614 crítico
-Você usou [3] Turbilhão
-Você perdeu
-Você perdeu
-Você acertar [1] Lord Lucha por 4275
-Você usou [3] Fúria de Titã
-Você acertar [1] Lord Lucha por 2780 crítico
-Você usou [3] Turbilhão
-[rip] [1] Claire Bkhw assassinou [king] Rei dos Imortais
-Você acertar [king] Rei dos Imortais por 2447
-Você acertar [king] Rei dos Imortais por 1230 crítico
-Você usou [3] Turbilhão
-+35% para danificar
-Você usou [stone] pedra
-Você acertar [king] Rei dos Imortais por 892 crítico
-Você usou [icon] Duplo golpe
-Você acertar [king] Rei dos Imortais por 1043 crítico
-Você usou [3] Turbilhão
-Você acertar [king] Rei dos Imortais por 2742 crítico
-Você usou [3] Turbilhão
-[king] Rei dos Imortais acertar Você por 1464
-Você acertar [king] Rei dos Imortais por 2089 crítico
+Há titãs [0][1]252 aqui
+[wizard]
+– Eu posso ressuscitar seu herói!
+Ressuscitar
+Preço: [gold]15 ouro
 [user]Meu Herói
 [user]Meu Clã
 [arrow]Página principal
 Bóreas Gohan TeenConfigurações
-lvl 79 | g 29'715 | s 56,5M
+lvl 79 | g 29'826 | s 56,7M
+Duelo de clã! (+)
+Tempo de sobra: 6 dias
 Oferta especial! Bonus de Ouro! (+)
-Tempo de sobra: 1 dia
+Tempo de sobra: 7 horas. Anda logo!
 
 Fórum | Conversar | Classificação
 Comentários feed
 Apoio e Informação
-0,007 seg, 22:31:04 | Online: 206
+0,019 seg, 16:30:09 | Online: 192
 Overmobile © 2026, 18+
 
 
@@ -1048,40 +1005,33 @@ ATKRND:
 DODGE:   
 STONE:   
 HEAL:    
-UNRIP:   
+UNRIP:   /king/unrip/?r=0
 
 --- HP VALUES ---
 Player HP: 
 King/Enemy HP%: 
 
 --- MARKERS ---
-dodge:0  unrip:0  grey:0  rip:0  kingatk:0
+dodge:0  unrip:1  grey:0  rip:0  kingatk:0
 
 --- KEYWORD SEARCH ---
-[rip] [1] Claire Bkhw assassinou [king] Rei dos Imortais
 
 ============================================================
 =  BATTLE SUMMARY
 ============================================================
 Result: unknown
 King Kill: no
-Duration: 0m 57s  |  Loops: 23
-KINGATK:3  ATK:1  RND:0  DODGE:0  HEAL:0  Stone:1
-ATK Fails:5  LA Start:4  LA End:5.0
+Duration: 0m 5s  |  Loops: 2
+KINGATK:1  ATK:0  RND:0  DODGE:0  HEAL:0  Stone:0
+ATK Fails:0  LA Start:4  LA End:4.5
 HPER Final:38  RPER Final:5
 
 --- BATTLE HISTORY (captured during battle) ---
-[Loop 3] 22:30:13 Phase:KING
-[Loop 6] 22:30:24 Phase:KING
-[Loop 9] 22:30:31 Phase:PVP
-[Loop 12] 22:30:37 Phase:PVP
-[Loop 15] 22:30:43 Phase:PVP
-[Loop 18] 22:30:50 Phase:PVP
-[Loop 21] 22:30:58 Phase:PVP
+(no history captured)
 
 --- ATTACK ANALYSIS ---
 perdeu (fails detected): 0
 assassinou (kills): 0
 
 --- DEBUG ARTIFACTS ---
-Full page dump at Loop 10: king_debug_20260315_222904_LOOP10_FULL_PAGE.txt
+Full page dump at Loop 10: king_debug_20260316_162904_LOOP10_FULL_PAGE.txt

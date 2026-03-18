@@ -1,0 +1,54 @@
+============================================================
+=  FULL PAGE DUMP AT LOOP 10
+============================================================
+Timestamp: 2026-03-16 12:30:41
+Loop: 10  |  Battle elapsed: 0m33s  |  Phase: PVP
+
+
+--- RENDERED HTML (w3m dump) ---
+hp 2604809:22
+[1] Gohan Teen hp 26048
+[0] Jonatham Hades hp 0
+●
+[rip]
+EsquivarAtacarTroca o alvo[potio]Esmalte heráldico[stone]Pedra
+00:38[herb]Erva
+-35% dano
+[0][1] Titãs: 235
+[rage] Loucura Sangrenta: 7,6%
+[rip] Você assassinou [0] Jonatham Hades
+Você acertar [0] Jonatham Hades por 4130 crítico
+Você usou [3] Turbilhão
+Você acertar [0] Jonatham Hades por 1159 crítico
+Você usou [3] Turbilhão
+[0] Lula Tinf acertar [0] Jonatham Hades por 1540
+[0] Ghol Dark acertar [0] Jonatham Hades por 1391
+Você acertar [0] Jonatham Hades por 2086
+[rip] [1] Twobirds assassinou [king] Rei dos Imortais
+Você acertar [king] Rei dos Imortais por 3114 crítico
++35% para danificar
+Você usou [stone] pedra
+Você acertar [king] Rei dos Imortais por 2657 crítico
+Bóreas Gohan Teen
+lvl 79 | g 29'749 | s 56,5M
+
+Fuja da batalha
+
+--- RAW HTML SOURCE (first 3000 chars) ---
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC '-//WAPFORUM//DTD XHTML Mobile 1.0//EN' 'http://www.wapforum.org/DTD/xhtml-mobile10.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+<meta http-equiv='content-type' content='text/html; charset=UTF-8'/>
+<title>Rei dos Imortais</title>
+
+<meta name='author' content='Maxsimus & Tera'/>
+<meta name='keywords' content='furia de titãs, titãs, furia, jogo, online, guerra, móvel, MMORPG' /> 
+<meta name='viewport' content='width=device-width,maximum-scale=1.0,initial-scale=1.0,user-scalable=no'/><meta name='format-detection' content='telephone=no'/>
+<meta name='theme-color' content='#000000'/>
+<link rel='stylesheet' type='text/css' href='/css/main.css?107c'/>
+<link rel='manifest' href='/manifest.webmanifest'>
+<link rel='apple-touch-icon' href='/apple-touch-icon.png'>
+<link rel='icon' href='/favicon.ico?2' type='image/x-icon'/>
+<link rel='shortcut icon' href='/favicon.ico?2' type='image/x-icon'/>
+<link rel='canonical' href='/king/attack/'/></head><body style='-webkit-text-size-adjust:none;'><div id='topdiv'><div class='main' style='word-wrap:break-word;'><span style='text-shadow:none;'></span><div class='head  cntr' style='position:relative;'><span><img src='/images/icon/health.png' alt='hp'/> <span class='white'>26048</span></span><span name='timer' style='position:absolute; right:4px;'>09:22</span><div class='clr'></div></div><div class='exp_bar'><div class='progress_life' style='width:100%'></div></div><div class='center'><div class='rght mlr5 mt5'><div class='fl left w50'><img src='/images/icon/race/1.png' alt=''/> Gohan Teen <span class='nwr'><img src='/images/icon/health.png' alt='hp'/> 26048</span></div><img src='/images/icon/race/0.png' alt=''/> Jonatham Hades <span class='nwr'><img src='/images/icon/health.png' alt='hp'/>&nbsp;0</span><div class='clr'></div></div><div class='block_fight'><div class='bf_left'><div class='bf_right'><div class='unit_slot' style='background-image:url("/manekenimage/0/0/m/562/339/508/565/510/511/576/577/1324812338.w?6&png&bg=alpha&flip=left&b=&bc=836");'><div class='fprg'><div class='rate fl' style='width:100%;'></div></div><div class='bf_skills'><img src='/images/skills/3.3.png' width='24' height='24' alt=''/> </div></div><div class='unit_slot s_enemy' style='background-image:url("/manekenimage/0/0/m/506/515/460/517/504/479/520/513/1155071379.w?6&bg=battle&flip=right&b=&bc=700");'><div class='bf_rip'><img src='/images/icon/rip.png' alt=''/></div></div></div></div></div><div class='fight_buttons'><a class='nbtn b_green' href='/king/dodge/?r=1773675037'><span class='lbl'><span class='txt smpl'>Esquivar</span></span></a><a class='nbtn b_red btn-attack-cd' href='/king/attack/?r=1773675037'><span class='lbl'><span class='txt smpl'>Atacar</span></span></a><a class='nbtn b_grey' href='/king/attackrandom/?r=1773675037'><span class='lbl'><span class='txt smpl'>Troca o alvo</span></span></a><a class='nbtn b_green' href='/king/heal/?r=1773675037'
