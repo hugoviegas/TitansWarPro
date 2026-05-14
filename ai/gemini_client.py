@@ -4,9 +4,8 @@ gemini_client.py — Gemini API client via REST (no google-generativeai SDK).
 Exposes GeminiClient + RateLimitError for compatibility with orchestrator.py.
 Works on Termux, Ubuntu, Cygwin — only requires `requests`.
 
-Default model: gemini-1.5-flash-8b
-  - Free tier: 15 RPM, 1M TPM, 1500 RPD
-  - Lowest quota consumption on free plan
+Default model: gemini-3.1-flash-lite-preview
+  - Free tier: 15 RPM, 250K TPM, 500 RPD
   - Override via GEMINI_MODEL env var or model= param
 """
 import logging
@@ -19,7 +18,7 @@ import requests
 logger = logging.getLogger("twm.gemini")
 
 GEMINI_API_BASE     = "https://generativelanguage.googleapis.com/v1beta"
-DEFAULT_MODEL       = os.environ.get("GEMINI_MODEL", "gemini-1.5-flash-8b")
+DEFAULT_MODEL       = os.environ.get("GEMINI_MODEL", "gemini-3.1-flash-lite-preview")
 REQUESTS_PER_MINUTE = 15
 _INTERVAL_SEC       = 60.0 / REQUESTS_PER_MINUTE   # ~4s between calls
 
@@ -48,7 +47,7 @@ class GeminiClient:
         self._call_count   = 0
         self._window_start = time.time()
 
-    # ── Rate limit check ───────────────────────────────────────────────────────
+    # ── Rate limit check ──────────────────────────────────────────────────────
     def can_call(self) -> Tuple[bool, str]:
         if not self.api_key:
             return False, "GEMINI_API_KEY not set"
@@ -68,7 +67,7 @@ class GeminiClient:
 
         return True, ""
 
-    # ── Main call ──────────────────────────────────────────────────────────────
+    # ── Main call ─────────────────────────────────────────────────────────────
     def call(
         self,
         prompt: str,
@@ -129,7 +128,7 @@ class GeminiClient:
 
         raise Exception(f"Gemini: all {retries} attempts failed")
 
-    # ── generate() alias ───────────────────────────────────────────────────────
+    # ── generate() alias ──────────────────────────────────────────────────────
     def generate(
         self,
         prompt: str,
@@ -142,7 +141,7 @@ class GeminiClient:
             logger.error("generate() failed: %s", exc)
             return None
 
-    # ── Connectivity test ──────────────────────────────────────────────────────
+    # ── Connectivity test ─────────────────────────────────────────────────────
     def test_connection(self) -> bool:
         if not self.api_key:
             return False
@@ -154,7 +153,7 @@ class GeminiClient:
             return False
 
 
-# ── Module-level convenience ───────────────────────────────────────────────────
+# ── Module-level convenience ──────────────────────────────────────────────────
 def generate(
     prompt: str,
     api_key: Optional[str] = None,
