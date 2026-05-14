@@ -3,8 +3,12 @@
 gemini_client.py — Gemini API client via REST (no google-generativeai SDK).
 Exposes GeminiClient + RateLimitError for compatibility with orchestrator.py.
 Works on Termux, Ubuntu, Cygwin — only requires `requests`.
+
+Default model: gemini-1.5-flash-8b
+  - Free tier: 15 RPM, 1M TPM, 1500 RPD
+  - Lowest quota consumption on free plan
+  - Override via GEMINI_MODEL env var or model= param
 """
-import json
 import logging
 import os
 import time
@@ -15,8 +19,8 @@ import requests
 logger = logging.getLogger("twm.gemini")
 
 GEMINI_API_BASE     = "https://generativelanguage.googleapis.com/v1beta"
-DEFAULT_MODEL       = "gemini-2.0-flash"
-REQUESTS_PER_MINUTE = 15          # free-tier conservative limit
+DEFAULT_MODEL       = os.environ.get("GEMINI_MODEL", "gemini-1.5-flash-8b")
+REQUESTS_PER_MINUTE = 15
 _INTERVAL_SEC       = 60.0 / REQUESTS_PER_MINUTE   # ~4s between calls
 
 
@@ -27,8 +31,8 @@ class RateLimitError(Exception):
 class GeminiClient:
     """
     REST-only Gemini client.
-    Interface kept compatible with orchestrator.py:
-      - client.can_call()  → (bool, reason_str)
+    Interface compatible with orchestrator.py:
+      - client.can_call()   → (bool, reason_str)
       - client.call(prompt) → str
       - client.test_connection() → bool
     """
@@ -44,14 +48,12 @@ class GeminiClient:
         self._call_count   = 0
         self._window_start = time.time()
 
-    # ── Rate limit check (used by orchestrator before calling) ──────────
+    # ── Rate limit check ───────────────────────────────────────────────────────
     def can_call(self) -> Tuple[bool, str]:
-        """Return (True, '') if safe to call, or (False, reason) if not."""
         if not self.api_key:
             return False, "GEMINI_API_KEY not set"
 
         now = time.time()
-
         if now - self._window_start >= 60.0:
             self._call_count   = 0
             self._window_start = now
@@ -66,7 +68,7 @@ class GeminiClient:
 
         return True, ""
 
-    # ── Main call (used by orchestrator) ────────────────────────────────
+    # ── Main call ──────────────────────────────────────────────────────────────
     def call(
         self,
         prompt: str,
@@ -74,11 +76,6 @@ class GeminiClient:
         max_tokens: int = 1024,
         retries: int = 3,
     ) -> str:
-        """
-        Send prompt to Gemini, return text response.
-        Raises RateLimitError on HTTP 429.
-        Raises Exception on unrecoverable errors.
-        """
         if not self.api_key:
             raise ValueError("GEMINI_API_KEY not set")
 
@@ -97,9 +94,7 @@ class GeminiClient:
 
         for attempt in range(1, retries + 1):
             try:
-                resp = requests.post(
-                    url, headers=headers, json=payload, timeout=30
-                )
+                resp = requests.post(url, headers=headers, json=payload, timeout=30)
 
                 if resp.status_code == 200:
                     self._last_call   = time.time()
@@ -117,10 +112,7 @@ class GeminiClient:
                     raise RateLimitError(f"HTTP 429: {resp.text[:200]}")
 
                 if resp.status_code in (500, 503):
-                    logger.warning(
-                        "Gemini server error %d (attempt %d/%d), retrying...",
-                        resp.status_code, attempt, retries,
-                    )
+                    logger.warning("Gemini server error %d (attempt %d/%d)", resp.status_code, attempt, retries)
                     time.sleep(5 * attempt)
                     continue
 
@@ -137,21 +129,20 @@ class GeminiClient:
 
         raise Exception(f"Gemini: all {retries} attempts failed")
 
-    # ── Alias: generate() — used by standalone tests ────────────────────
+    # ── generate() alias ───────────────────────────────────────────────────────
     def generate(
         self,
         prompt: str,
         temperature: float = 0.3,
         max_tokens: int = 1024,
     ) -> Optional[str]:
-        """Convenience wrapper: returns None instead of raising."""
         try:
             return self.call(prompt, temperature=temperature, max_tokens=max_tokens)
         except Exception as exc:
             logger.error("generate() failed: %s", exc)
             return None
 
-    # ── Connectivity test ────────────────────────────────────────────────
+    # ── Connectivity test ──────────────────────────────────────────────────────
     def test_connection(self) -> bool:
         if not self.api_key:
             return False
@@ -163,7 +154,7 @@ class GeminiClient:
             return False
 
 
-# ── Module-level convenience (kept for any direct imports) ───────────────────
+# ── Module-level convenience ───────────────────────────────────────────────────
 def generate(
     prompt: str,
     api_key: Optional[str] = None,
@@ -183,11 +174,14 @@ def test_connection(api_key: Optional[str] = None) -> bool:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     c = GeminiClient()
+    print(f"[gemini] Model : {c.model}")
     if c.test_connection():
         print("[gemini] Connection OK")
         ok, reason = c.can_call()
         if ok:
             result = c.call("Reply with one word: hello")
             print(f"[gemini] Response: {result}")
+        else:
+            print(f"[gemini] Cannot call yet: {reason}")
     else:
         print("[gemini] Connection FAILED — check GEMINI_API_KEY in .env")
