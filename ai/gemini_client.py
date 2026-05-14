@@ -1,116 +1,193 @@
 #!/usr/bin/env python3
 """
-gemini_client.py - Gemini API client via REST (no google-generativeai SDK).
-Works on Termux, Ubuntu, Cygwin and any env with only `requests` installed.
+gemini_client.py — Gemini API client via REST (no google-generativeai SDK).
+Exposes GeminiClient + RateLimitError for compatibility with orchestrator.py.
+Works on Termux, Ubuntu, Cygwin — only requires `requests`.
 """
 import json
 import logging
 import os
 import time
-from typing import Optional
+from typing import Optional, Tuple
 
 import requests
 
 logger = logging.getLogger("twm.gemini")
 
-GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta"
-DEFAULT_MODEL   = "gemini-2.0-flash"
-
-# Free-tier conservative limits
-REQUESTS_PER_MINUTE = 15
-_last_call_time: float = 0.0
+GEMINI_API_BASE     = "https://generativelanguage.googleapis.com/v1beta"
+DEFAULT_MODEL       = "gemini-2.0-flash"
+REQUESTS_PER_MINUTE = 15          # free-tier conservative limit
+_INTERVAL_SEC       = 60.0 / REQUESTS_PER_MINUTE   # ~4s between calls
 
 
-def _rate_limit():
-    global _last_call_time
-    wait = (60.0 / REQUESTS_PER_MINUTE) - (time.time() - _last_call_time)
-    if wait > 0:
-        time.sleep(wait)
-    _last_call_time = time.time()
+class RateLimitError(Exception):
+    pass
 
 
+class GeminiClient:
+    """
+    REST-only Gemini client.
+    Interface kept compatible with orchestrator.py:
+      - client.can_call()  → (bool, reason_str)
+      - client.call(prompt) → str
+      - client.test_connection() → bool
+    """
+
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        model: str = DEFAULT_MODEL,
+    ):
+        self.api_key       = api_key or os.environ.get("GEMINI_API_KEY", "")
+        self.model         = model
+        self._last_call    = 0.0
+        self._call_count   = 0
+        self._window_start = time.time()
+
+    # ── Rate limit check (used by orchestrator before calling) ──────────
+    def can_call(self) -> Tuple[bool, str]:
+        """Return (True, '') if safe to call, or (False, reason) if not."""
+        if not self.api_key:
+            return False, "GEMINI_API_KEY not set"
+
+        now = time.time()
+
+        if now - self._window_start >= 60.0:
+            self._call_count   = 0
+            self._window_start = now
+
+        if self._call_count >= REQUESTS_PER_MINUTE:
+            wait = 60.0 - (now - self._window_start)
+            return False, f"rate limit: wait {wait:.0f}s"
+
+        elapsed = now - self._last_call
+        if elapsed < _INTERVAL_SEC:
+            return False, f"too soon: wait {_INTERVAL_SEC - elapsed:.1f}s"
+
+        return True, ""
+
+    # ── Main call (used by orchestrator) ────────────────────────────────
+    def call(
+        self,
+        prompt: str,
+        temperature: float = 0.3,
+        max_tokens: int = 1024,
+        retries: int = 3,
+    ) -> str:
+        """
+        Send prompt to Gemini, return text response.
+        Raises RateLimitError on HTTP 429.
+        Raises Exception on unrecoverable errors.
+        """
+        if not self.api_key:
+            raise ValueError("GEMINI_API_KEY not set")
+
+        url = (
+            f"{GEMINI_API_BASE}/models/{self.model}"
+            f":generateContent?key={self.api_key}"
+        )
+        payload = {
+            "contents": [{"parts": [{"text": prompt}]}],
+            "generationConfig": {
+                "temperature": temperature,
+                "maxOutputTokens": max_tokens,
+            },
+        }
+        headers = {"Content-Type": "application/json"}
+
+        for attempt in range(1, retries + 1):
+            try:
+                resp = requests.post(
+                    url, headers=headers, json=payload, timeout=30
+                )
+
+                if resp.status_code == 200:
+                    self._last_call   = time.time()
+                    self._call_count += 1
+                    data = resp.json()
+                    return (
+                        data.get("candidates", [{}])[0]
+                        .get("content", {})
+                        .get("parts", [{}])[0]
+                        .get("text", "")
+                        .strip()
+                    )
+
+                if resp.status_code == 429:
+                    raise RateLimitError(f"HTTP 429: {resp.text[:200]}")
+
+                if resp.status_code in (500, 503):
+                    logger.warning(
+                        "Gemini server error %d (attempt %d/%d), retrying...",
+                        resp.status_code, attempt, retries,
+                    )
+                    time.sleep(5 * attempt)
+                    continue
+
+                raise Exception(f"Gemini HTTP {resp.status_code}: {resp.text[:300]}")
+
+            except RateLimitError:
+                raise
+            except requests.exceptions.Timeout:
+                logger.warning("Timeout attempt %d/%d", attempt, retries)
+                time.sleep(5 * attempt)
+            except requests.exceptions.ConnectionError:
+                logger.warning("Connection error attempt %d/%d", attempt, retries)
+                time.sleep(10)
+
+        raise Exception(f"Gemini: all {retries} attempts failed")
+
+    # ── Alias: generate() — used by standalone tests ────────────────────
+    def generate(
+        self,
+        prompt: str,
+        temperature: float = 0.3,
+        max_tokens: int = 1024,
+    ) -> Optional[str]:
+        """Convenience wrapper: returns None instead of raising."""
+        try:
+            return self.call(prompt, temperature=temperature, max_tokens=max_tokens)
+        except Exception as exc:
+            logger.error("generate() failed: %s", exc)
+            return None
+
+    # ── Connectivity test ────────────────────────────────────────────────
+    def test_connection(self) -> bool:
+        if not self.api_key:
+            return False
+        try:
+            url = f"{GEMINI_API_BASE}/models?key={self.api_key}"
+            resp = requests.get(url, timeout=10)
+            return resp.status_code == 200
+        except Exception:
+            return False
+
+
+# ── Module-level convenience (kept for any direct imports) ───────────────────
 def generate(
     prompt: str,
     api_key: Optional[str] = None,
     model: str = DEFAULT_MODEL,
     temperature: float = 0.3,
     max_tokens: int = 1024,
-    retries: int = 3,
 ) -> Optional[str]:
-    """
-    Send a prompt to Gemini and return the text response.
-    Returns None on failure after retries.
-    """
-    key = api_key or os.environ.get("GEMINI_API_KEY", "")
-    if not key:
-        logger.error("GEMINI_API_KEY not set.")
-        return None
-
-    url = f"{GEMINI_API_BASE}/models/{model}:generateContent?key={key}"
-    payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {
-            "temperature": temperature,
-            "maxOutputTokens": max_tokens,
-        },
-    }
-    headers = {"Content-Type": "application/json"}
-
-    for attempt in range(1, retries + 1):
-        _rate_limit()
-        try:
-            resp = requests.post(url, headers=headers, json=payload, timeout=30)
-            if resp.status_code == 200:
-                data = resp.json()
-                return (
-                    data.get("candidates", [{}])[0]
-                    .get("content", {})
-                    .get("parts", [{}])[0]
-                    .get("text", "")
-                    .strip()
-                )
-            elif resp.status_code == 429:
-                wait = 30 * attempt
-                logger.warning("Rate limited. Waiting %ds...", wait)
-                time.sleep(wait)
-            elif resp.status_code in (500, 503):
-                logger.warning("Server error %d. Retrying...", resp.status_code)
-                time.sleep(5 * attempt)
-            else:
-                logger.error("Gemini error %d: %s", resp.status_code, resp.text[:200])
-                return None
-        except requests.exceptions.Timeout:
-            logger.warning("Request timeout (attempt %d/%d)", attempt, retries)
-            time.sleep(5)
-        except requests.exceptions.ConnectionError:
-            logger.warning("Connection error (attempt %d/%d)", attempt, retries)
-            time.sleep(10)
-        except Exception as exc:
-            logger.error("Unexpected error: %s", exc)
-            return None
-
-    logger.error("All %d attempts failed.", retries)
-    return None
+    return GeminiClient(api_key=api_key, model=model).generate(
+        prompt, temperature=temperature, max_tokens=max_tokens
+    )
 
 
 def test_connection(api_key: Optional[str] = None) -> bool:
-    """Quick connectivity check. Returns True if API key is valid."""
-    key = api_key or os.environ.get("GEMINI_API_KEY", "")
-    if not key:
-        return False
-    try:
-        url = f"{GEMINI_API_BASE}/models?key={key}"
-        resp = requests.get(url, timeout=10)
-        return resp.status_code == 200
-    except Exception:
-        return False
+    return GeminiClient(api_key=api_key).test_connection()
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    if test_connection():
+    c = GeminiClient()
+    if c.test_connection():
         print("[gemini] Connection OK")
-        result = generate("Reply with one word: hello")
-        print(f"[gemini] Response: {result}")
+        ok, reason = c.can_call()
+        if ok:
+            result = c.call("Reply with one word: hello")
+            print(f"[gemini] Response: {result}")
     else:
-        print("[gemini] Connection FAILED - check GEMINI_API_KEY")
+        print("[gemini] Connection FAILED — check GEMINI_API_KEY in .env")
