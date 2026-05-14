@@ -26,22 +26,24 @@ if [ $# -eq 1 ]; then
         4)
             VERSION="Main"
             ;;
+        5)
+            VERSION="Ai-engine"
+            ;;
         *)
-            echo "Invalid selection. Please use 1 for Master, 2 for Beta, 3 for Beta2, or 4 for Other Macro ."
-            exit 1  # Exit if an invalid option is selected
+            echo "Invalid selection. Please use 1-Master 2-Beta 3-Beta2 4-Other 5-AI."
+            exit 1
             ;;
     esac
 else
     # Display version options to the user
-    printf "Versions\n 1- Master\n 2- Beta\n 3- Beta2\n 4- Other Macro (delete all)\n"
+    printf "Versions\n 1- Master\n 2- Beta\n 3- Beta2\n 4- Other Macro (delete all)\n 5- AI Engine (self-improving)\n"
     printf "${CYAN_BLACK}Select the version:${COLOR_RESET} \n"
 
     # User input handling
-    stty raw  # Set terminal to raw mode to read single character input
-    VERSION=$(dd bs=1 count=1 2>/dev/null)  # Read one byte from input
-    stty -raw  # Reset terminal to normal mode
-    #SOURCE_CODE=""
-    # Determine the version based on user input
+    stty raw
+    VERSION=$(dd bs=1 count=1 2>/dev/null)
+    stty -raw
+
     case $VERSION in
         1)
             VERSION="Master"
@@ -54,13 +56,14 @@ else
             ;;
         4)
             VERSION="Main"
-            # Define the server URL based on selected version
-            #SERVER="https://codeberg.org/ueliton/TitansWarMacro/src/branch/master/"
             rm -rf ~/twm
+            ;;
+        5)
+            VERSION="Ai-engine"
             ;;
         *)
             echo "Invalid selection. Exiting."
-            exit 1  # Exit if an invalid option is selected
+            exit 1
             ;;
     esac
 fi
@@ -96,43 +99,35 @@ for script in $SCRIPTS; do
     temp_file="$local_file.tmp.$$"
 
     if [ ! -e "$local_file" ]; then
-        # New file — download unconditionally
         if curl "${SERVER}${script}" -s -L -o "$local_file" 2>/dev/null; then
             printf "  🆕 %s %-32s ${BLACK_YELLOW}new${COLOR_RESET}\n" "$label" "$script"
         else
             printf "  ⚠️  %s %-32s ${BLACK_YELLOW}skipped${COLOR_RESET}\n" "$label" "$script"
         fi
     else
-        # File exists — download to temp and compare hashes
         if curl "${SERVER}${script}" -s -L -o "$temp_file" 2>/dev/null; then
-            # Get hashes for comparison
             local_hash=$(sha256sum "$local_file" 2>/dev/null | awk '{print $1}')
             remote_hash=$(sha256sum "$temp_file" 2>/dev/null | awk '{print $1}')
 
             if [ "$remote_hash" = "$local_hash" ]; then
-                # Content is identical — file is current
                 rm -f "$temp_file"
                 printf "  ✅ %s %-32s ${BLACK_CYAN}unchanged${COLOR_RESET}\n" "$label" "$script"
             else
-                # Content differs — replace with new version
                 mv "$temp_file" "$local_file"
                 printf "  🔽 %s %-32s ${BLACK_GREEN}updated${COLOR_RESET}\n" "$label" "$script"
             fi
         else
-            # Download failed
             rm -f "$temp_file"
             printf "  ⚠️  %s %-32s ${BLACK_YELLOW}skipped${COLOR_RESET}\n" "$label" "$script"
         fi
     fi
 
-    chmod +x "$local_file"  # Make the script executable
-    cp "$local_file" "$HOME/$script" 2>/dev/null  # Copy script to user's home directory (if applicable)
-
-    sleep 0.1s  # Brief pause between downloads for stability
+    chmod +x "$local_file"
+    cp "$local_file" "$HOME/$script" 2>/dev/null
+    sleep 0.1s
 done
 
-# Inform user that repository source has been updated and start easyinstall.sh with selected version
 printf "\n${BLACK_GREEN}✅ Updated repository source${COLOR_RESET}\n\n${BLACK_CYAN}Starting ./easyinstall.sh $version ...${COLOR_RESET}\n"
-sleep 2s  # Pause before starting installation script
+sleep 2s
 
-./easyinstall.sh "$version"  # Execute the installation script with selected version as argument
+./easyinstall.sh "$version"
