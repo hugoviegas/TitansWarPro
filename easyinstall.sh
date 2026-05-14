@@ -18,11 +18,25 @@ script_slogan
 
 cd ~/twm || exit
 
-# ─── Platform setup ───────────────────────────────────────────────────────────
+# ─── Platform detection ────────────────────────────────────────────────────────
 cd ~/ || exit
 
-# Termux (Android)
+IS_TERMUX=0
+IS_CYGWIN=0
+IS_ISH=0
+APPISH=$(uname -a | grep -o "\-ish")
+
 if [ -d /data/data/com.termux/files/usr/share/doc ]; then
+  IS_TERMUX=1
+elif uname | grep -q -i "cygwin"; then
+  IS_CYGWIN=1
+elif [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = "-ish" ]; then
+  IS_ISH=1
+fi
+
+# ─── Platform setup ───────────────────────────────────────────────────────────
+
+if [ "$IS_TERMUX" = "1" ]; then
   termux-wake-lock
   grep -q "nameserver 1.1.1.1" "$PREFIX/etc/resolv.conf" 2>/dev/null || \
     printf "nameserver 1.1.1.1\nnameserver 1.0.0.1\n" >> "$PREFIX/etc/resolv.conf" 2>/dev/null
@@ -35,18 +49,17 @@ if [ -d /data/data/com.termux/files/usr/share/doc ]; then
   chmod +x ~/.termux/boot/play.sh 2>/dev/null
 
   printf "${BLACK_CYAN}  Checking Termux packages...${COLOR_RESET}\n"
-  command -v w3m    >/dev/null 2>&1 || pkg install w3m -y
-  command -v jq     >/dev/null 2>&1 || pkg install jq -y
-  command -v tmux   >/dev/null 2>&1 || pkg install tmux -y
-  command -v python3>/dev/null 2>&1 || pkg install python -y
-  command -v pip3   >/dev/null 2>&1 || pkg install python-pip -y
+  command -v w3m     >/dev/null 2>&1 || pkg install w3m -y
+  command -v jq      >/dev/null 2>&1 || pkg install jq -y
+  command -v tmux    >/dev/null 2>&1 || pkg install tmux -y
+  command -v python3 >/dev/null 2>&1 || pkg install python -y
+  command -v pip3    >/dev/null 2>&1 || pkg install python-pip -y
   [ -d /data/data/com.termux/files/usr/share/doc/coreutils ] || pkg install coreutils ncurses-utils -y
   [ -d /data/data/com.termux/files/usr/share/doc/termux-api ] || pkg install termux-api -y
   [ -d /data/data/com.termux/files/usr/share/doc/procps    ] || pkg install procps ncurses-utils -y
 fi
 
-# Cygwin (Windows)
-if uname | grep -q -i "cygwin"; then
+if [ "$IS_CYGWIN" = "1" ]; then
   LS="/usr/share/doc"
   if [ ! -e /bin/apt-cyg ]; then
     curl -s -L -O "https://raw.githubusercontent.com/hugoviegas/TitansWarPro/beta/apt-cyg"
@@ -61,20 +74,20 @@ if uname | grep -q -i "cygwin"; then
   unset LS
 fi
 
-# iSH (iPhone) / UserLAnd / Generic Linux / WSL
-APPISH=$(uname -a | grep -o "\-ish")
-if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = '-ish' ]; then
-  printf "${BLACK_CYAN}Install the necessary packages for Alpine on app ISh (iPhone):${COLOR_RESET}\n"
-  printf "  apk update\n  apk add curl; apk add w3m; apk add tmux; apk add coreutils; apk add python3; apk add py3-pip; apk add --no-cache tzdata\n\n"
+if [ "$IS_ISH" = "1" ]; then
+  printf "${BLACK_CYAN}Install packages for Alpine/iSH (iPhone):${COLOR_RESET}\n"
+  printf "  apk update && apk add curl w3m tmux coreutils python3 py3-pip tzdata\n\n"
   sleep 5s
-elif [ "$APPISH" != '-ish' ] && uname -m | grep -q -E '(aarch64|armhf|armv7|mips64)' && [ ! -d /data/data/com.termux ]; then
-  printf "${BLACK_CYAN}Install the necessary packages for Alpine on app UserLAnd (Android):${COLOR_RESET}\n"
-  printf "  apk update\n  sudo apk add curl; sudo apk add w3m; sudo apk add tmux; sudo apk add coreutils; sudo apk add python3; sudo apk add py3-pip; sudo apk add --no-cache tzdata\n\n"
-  sleep 5s
-elif [ "$APPISH" != '-ish' ] && uname -m | grep -q -E "(ppc64le|riscv64|s390x|x86|x86_64)" && [ ! -d /data/data/com.termux ]; then
-  printf "${BLACK_CYAN}Install required packages for Linux or Windows WSL:${COLOR_RESET}\n"
-  printf "  sudo apt update\n  sudo apt install curl coreutils ncurses-term procps w3m jq tmux python3 python3-pip -y\n"
-  sleep 5s
+elif [ "$IS_TERMUX" != "1" ] && [ "$IS_CYGWIN" != "1" ] && [ "$IS_ISH" != "1" ]; then
+  if uname -m | grep -q -E '(aarch64|armhf|armv7|mips64)'; then
+    printf "${BLACK_CYAN}Install packages for UserLAnd (Android):${COLOR_RESET}\n"
+    printf "  apk update && sudo apk add curl w3m tmux coreutils python3 py3-pip tzdata\n\n"
+    sleep 5s
+  elif uname -m | grep -q -E '(ppc64le|riscv64|s390x|x86|x86_64)'; then
+    printf "${BLACK_CYAN}Install required packages for Linux/WSL:${COLOR_RESET}\n"
+    printf "  sudo apt update && sudo apt install curl coreutils procps w3m jq tmux python3 python3-pip -y\n"
+    sleep 5s
+  fi
 fi
 unset APPISH
 
@@ -91,7 +104,7 @@ undying.sh update_check.sh multi_runner.sh twm_view.sh twm_monitor.sh \
 twm_control.sh twm_setup.sh"
 
   NUM_SCRIPTS=$(echo "$SCRIPTS" | wc -w)
-  LEN=0 UPDATED=0 NEW=0 OK=0 FAILED=0 UNCHANGED=0
+  LEN=0 UPDATED=0 NEW=0 FAILED=0 UNCHANGED=0
 
   printf "${BLACK_CYAN}  ⬇  Smart sync (comparing hashes)...${COLOR_RESET}\n\n"
 
@@ -113,7 +126,6 @@ twm_control.sh twm_setup.sh"
       if curl "${SERVER}$script" -s -L -o "$temp_file" 2>/dev/null; then
         local_hash=$(sha256sum "$local_file" 2>/dev/null | awk '{print $1}')
         remote_hash=$(sha256sum "$temp_file" 2>/dev/null | awk '{print $1}')
-
         if [ "$remote_hash" = "$local_hash" ]; then
           rm -f "$temp_file"
           printf "  ✅ %s %-32s ${GRAY_BLACK}unchanged${COLOR_RESET}\n" "$label" "$script"
@@ -131,13 +143,11 @@ twm_control.sh twm_setup.sh"
     fi
   done
 
-  # DOS to Unix + permissions
   find ~/twm -type f -name '*.sh' -print0 | xargs -0 sed -i 's/\r$//' 2>/dev/null
   chmod +x ~/twm/*.sh
 
-  # ─── AI Engine files ────────────────────────────────────────────────────────
+  # ─── AI Engine files ────────────────────────────────────────────────────
   printf "\n${BLACK_CYAN}  🤖  Downloading AI Engine files...${COLOR_RESET}\n\n"
-
   mkdir -p ~/twm/core ~/twm/ai ~/twm/data/configs ~/twm/data/logs ~/twm/data/backups
 
   AI_FILES="core/helpers.sh \
@@ -152,8 +162,7 @@ AI_ENGINE.md"
   for ai_file in $AI_FILES; do
     local_file="$HOME/twm/$ai_file"
     temp_file="$local_file.tmp.$$"
-    dir=$(dirname "$local_file")
-    mkdir -p "$dir"
+    mkdir -p "$(dirname "$local_file")"
 
     if [ ! -e "$local_file" ]; then
       if curl "${SERVER}$ai_file" -s -L -o "$local_file" 2>/dev/null; then
@@ -186,15 +195,50 @@ AI_ENGINE.md"
 
   chmod +x ~/twm/core/helpers.sh 2>/dev/null || true
 
-  # ─── Python dependencies ────────────────────────────────────────────────────
+  # ─── Python dependencies (robust, package-by-package) ─────────────────────
   if [ -f ~/twm/ai/requirements.txt ]; then
     printf "\n${BLACK_CYAN}  🐍  Installing Python dependencies...${COLOR_RESET}\n"
+    PIP_LOG="$HOME/twm/data/pip_install.log"
+    PIP_OK=0 PIP_FAIL=0
+
     if command -v pip3 >/dev/null 2>&1; then
-      pip3 install -r ~/twm/ai/requirements.txt --quiet && \
-        printf "  ✅ Python packages installed\n" || \
-        printf "  ⚠️  pip3 install failed — run manually: pip3 install -r ~/twm/ai/requirements.txt\n"
+      # Termux/Python 3.12: use pre-compiled wheels only, no Rust build
+      if [ "$IS_TERMUX" = "1" ]; then
+        PY_VER=$(python3 -c 'import sys; print("%d%d" % (sys.version_info.major, sys.version_info.minor))' 2>/dev/null)
+        if [ "$PY_VER" = "312" ] || [ "$PY_VER" -ge "312" ] 2>/dev/null; then
+          printf "  ${BLACK_YELLOW}⚠️  Python %s detected on Termux — forcing pre-compiled wheels (no Rust build)${COLOR_RESET}\n" "$PY_VER"
+          PIP_FLAGS="--only-binary=:all: --prefer-binary"
+        else
+          PIP_FLAGS="--prefer-binary"
+        fi
+      else
+        PIP_FLAGS="--prefer-binary"
+      fi
+
+      # Install package by package for clear error reporting
+      grep -v '^#' ~/twm/ai/requirements.txt | grep -v '^$' | while IFS= read -r pkg; do
+        printf "  📦 Installing %-35s" "$pkg ..."
+        if pip3 install "$pkg" $PIP_FLAGS --quiet >> "$PIP_LOG" 2>&1; then
+          printf " ${GREENb_BLACK}✅ ok${COLOR_RESET}\n"
+          PIP_OK=$((PIP_OK + 1))
+        else
+          printf " ${BLACK_YELLOW}❌ failed${COLOR_RESET}\n"
+          printf "    └─ ver log: %s\n" "$PIP_LOG"
+          PIP_FAIL=$((PIP_FAIL + 1))
+        fi
+      done
+
+      # Fallback: if grpcio failed, try Termux package
+      if [ "$IS_TERMUX" = "1" ] && grep -q 'grpcio' "$PIP_LOG" 2>/dev/null && grep -q 'error' "$PIP_LOG" 2>/dev/null; then
+        printf "  🔄 grpcio fallback: trying pkg install...\n"
+        pkg install python-grpcio -y 2>/dev/null && printf "  ✅ grpcio installed via pkg\n" || \
+          printf "  ${BLACK_YELLOW}⚠️  grpcio via pkg also failed — see $PIP_LOG${COLOR_RESET}\n"
+      fi
+
+      printf "\n  Python packages: log in ${GOLD_BLACK}%s${COLOR_RESET}\n" "$PIP_LOG"
     else
-      printf "  ⚠️  pip3 not found — install Python 3 and run: pip3 install -r ~/twm/ai/requirements.txt\n"
+      printf "  ⚠️  pip3 not found — instala Python 3 e corre manualmente:\n"
+      printf "    pip3 install -r ~/twm/ai/requirements.txt --prefer-binary\n"
     fi
   fi
 
@@ -204,11 +248,10 @@ AI_ENGINE.md"
     printf "\n  ${BLACK_YELLOW}⚠️  Edit ~/twm/.env and set your GEMINI_API_KEY${COLOR_RESET}\n"
   fi
 
-  # Account scaffold + docs
   mkdir -p ~/twm/accounts
   [ -f ~/twm/accounts/index.json ] || curl "${SERVER}accounts/index.json" -s -L -o ~/twm/accounts/index.json 2>/dev/null || true
   curl "${SERVER}HOW_TO_MONITOR.md" -s -L -o ~/twm/HOW_TO_MONITOR.md 2>/dev/null || true
-  curl "${SERVER}QUICK_START.md" -s -L -o ~/twm/QUICK_START.md 2>/dev/null || true
+  curl "${SERVER}QUICK_START.md"    -s -L -o ~/twm/QUICK_START.md    2>/dev/null || true
 
   printf "\n${BLACK_CYAN}  Summary: 🔽 %d updated  🆕 %d new  ✅ %d unchanged  ⚠️  %d skipped${COLOR_RESET}\n" \
     "$UPDATED" "$NEW" "$UNCHANGED" "$FAILED"
@@ -248,7 +291,7 @@ twm_monitor.sh twm_control.sh"
   mkdir -p ~/twm/accounts
   [ -f ~/twm/accounts/index.json ] || curl "${SERVER}accounts/index.json" -s -L -o ~/twm/accounts/index.json 2>/dev/null || true
   curl "${SERVER}HOW_TO_MONITOR.md" -s -L -o ~/twm/HOW_TO_MONITOR.md 2>/dev/null || true
-  curl "${SERVER}QUICK_START.md" -s -L -o ~/twm/QUICK_START.md 2>/dev/null || true
+  curl "${SERVER}QUICK_START.md"    -s -L -o ~/twm/QUICK_START.md    2>/dev/null || true
 }
 
 #/merge
@@ -302,7 +345,7 @@ shortcut_set
 
 # iSH: rewrite shebang for compatibility
 APPISH=$(uname -a | grep -o "\-ish")
-if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = '-ish' ]; then
+if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = "-ish" ]; then
   sed -i 's,#!/bin/bash,#!/bin/sh,g' "$HOME"/twm/*.sh
 fi
 unset APPISH
