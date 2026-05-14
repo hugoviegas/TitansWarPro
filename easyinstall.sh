@@ -3,7 +3,7 @@
 # ─── Bootstrap ────────────────────────────────────────────────────────────────
 mkdir -p ~/twm ~/twm/accounts
 
-VERSION="${1:-master}"
+VERSION="${1:-ai-engine}"
 SERVER="https://raw.githubusercontent.com/hugoviegas/TitansWarPro/$VERSION/"
 
 if [ ! -e "$HOME/twm/info.sh" ]; then
@@ -35,9 +35,11 @@ if [ -d /data/data/com.termux/files/usr/share/doc ]; then
   chmod +x ~/.termux/boot/play.sh 2>/dev/null
 
   printf "${BLACK_CYAN}  Checking Termux packages...${COLOR_RESET}\n"
-  command -v w3m  >/dev/null 2>&1 || pkg install w3m -y
-  command -v jq   >/dev/null 2>&1 || pkg install jq -y
-  command -v tmux >/dev/null 2>&1 || pkg install tmux -y
+  command -v w3m    >/dev/null 2>&1 || pkg install w3m -y
+  command -v jq     >/dev/null 2>&1 || pkg install jq -y
+  command -v tmux   >/dev/null 2>&1 || pkg install tmux -y
+  command -v python3>/dev/null 2>&1 || pkg install python -y
+  command -v pip3   >/dev/null 2>&1 || pkg install python-pip -y
   [ -d /data/data/com.termux/files/usr/share/doc/coreutils ] || pkg install coreutils ncurses-utils -y
   [ -d /data/data/com.termux/files/usr/share/doc/termux-api ] || pkg install termux-api -y
   [ -d /data/data/com.termux/files/usr/share/doc/procps    ] || pkg install procps ncurses-utils -y
@@ -63,15 +65,15 @@ fi
 APPISH=$(uname -a | grep -o "\-ish")
 if [ "$SHELL" = "/bin/ash" ] && [ "$APPISH" = '-ish' ]; then
   printf "${BLACK_CYAN}Install the necessary packages for Alpine on app ISh (iPhone):${COLOR_RESET}\n"
-  printf "  apk update\n  apk add curl; apk add w3m; apk add tmux; apk add coreutils; apk add --no-cache tzdata\n\n"
+  printf "  apk update\n  apk add curl; apk add w3m; apk add tmux; apk add coreutils; apk add python3; apk add py3-pip; apk add --no-cache tzdata\n\n"
   sleep 5s
 elif [ "$APPISH" != '-ish' ] && uname -m | grep -q -E '(aarch64|armhf|armv7|mips64)' && [ ! -d /data/data/com.termux ]; then
   printf "${BLACK_CYAN}Install the necessary packages for Alpine on app UserLAnd (Android):${COLOR_RESET}\n"
-  printf "  apk update\n  sudo apk add curl; sudo apk add w3m; sudo apk add tmux; sudo apk add coreutils; sudo apk add --no-cache tzdata\n\n"
+  printf "  apk update\n  sudo apk add curl; sudo apk add w3m; sudo apk add tmux; sudo apk add coreutils; sudo apk add python3; sudo apk add py3-pip; sudo apk add --no-cache tzdata\n\n"
   sleep 5s
 elif [ "$APPISH" != '-ish' ] && uname -m | grep -q -E "(ppc64le|riscv64|s390x|x86|x86_64)" && [ ! -d /data/data/com.termux ]; then
   printf "${BLACK_CYAN}Install required packages for Linux or Windows WSL:${COLOR_RESET}\n"
-  printf "  sudo apt update\n  sudo apt install curl coreutils ncurses-term procps w3m jq tmux -y\n"
+  printf "  sudo apt update\n  sudo apt install curl coreutils ncurses-term procps w3m jq tmux python3 python3-pip -y\n"
   sleep 5s
 fi
 unset APPISH
@@ -84,7 +86,7 @@ sync_func() {
   SCRIPTS="allies.sh altars.sh arena.sh campaign.sh career.sh cave.sh check.sh \
 clancoliseum.sh clandmg.sh clanfight.sh clanid.sh coliseum.sh crono.sh \
 flagfight.sh function.sh king.sh language.sh league.sh loginlogoff.sh \
-missions.sh play.sh requeriments.sh run.sh svproxy.sh specialevent.sh trade.sh twm.sh \
+missions.sh play.sh requeriments.sh run.sh run_ai.sh svproxy.sh specialevent.sh trade.sh twm.sh \
 undying.sh update_check.sh multi_runner.sh twm_view.sh twm_monitor.sh \
 twm_control.sh twm_setup.sh"
 
@@ -100,7 +102,6 @@ twm_control.sh twm_setup.sh"
     temp_file="$local_file.tmp.$$"
 
     if [ ! -e "$local_file" ]; then
-      # New file — download unconditionally
       if curl "${SERVER}$script" -s -L -o "$local_file" 2>/dev/null; then
         printf "  🆕 %s %-32s ${BLACK_YELLOW}new${COLOR_RESET}\n" "$label" "$script"
         NEW=$((NEW + 1))
@@ -109,25 +110,20 @@ twm_control.sh twm_setup.sh"
         FAILED=$((FAILED + 1))
       fi
     else
-      # File exists — download to temp and compare hashes
       if curl "${SERVER}$script" -s -L -o "$temp_file" 2>/dev/null; then
-        # Get hashes for comparison
         local_hash=$(sha256sum "$local_file" 2>/dev/null | awk '{print $1}')
         remote_hash=$(sha256sum "$temp_file" 2>/dev/null | awk '{print $1}')
 
         if [ "$remote_hash" = "$local_hash" ]; then
-          # Content is identical — file is current
           rm -f "$temp_file"
           printf "  ✅ %s %-32s ${GRAY_BLACK}unchanged${COLOR_RESET}\n" "$label" "$script"
           UNCHANGED=$((UNCHANGED + 1))
         else
-          # Content differs — replace with new version
           mv "$temp_file" "$local_file"
           printf "  🔽 %s %-32s ${GREENb_BLACK}updated${COLOR_RESET}\n" "$label" "$script"
           UPDATED=$((UPDATED + 1))
         fi
       else
-        # Download failed
         rm -f "$temp_file"
         printf "  ⚠️  %s %-32s ${BLACK_YELLOW}skipped${COLOR_RESET}\n" "$label" "$script"
         FAILED=$((FAILED + 1))
@@ -138,6 +134,75 @@ twm_control.sh twm_setup.sh"
   # DOS to Unix + permissions
   find ~/twm -type f -name '*.sh' -print0 | xargs -0 sed -i 's/\r$//' 2>/dev/null
   chmod +x ~/twm/*.sh
+
+  # ─── AI Engine files ────────────────────────────────────────────────────────
+  printf "\n${BLACK_CYAN}  🤖  Downloading AI Engine files...${COLOR_RESET}\n\n"
+
+  mkdir -p ~/twm/core ~/twm/ai ~/twm/data/configs ~/twm/data/logs ~/twm/data/backups
+
+  AI_FILES="core/helpers.sh \
+ai/gemini_client.py \
+ai/analyzer.py \
+ai/patcher.py \
+ai/orchestrator.py \
+ai/requirements.txt \
+data/configs/strategy_config.json \
+AI_ENGINE.md"
+
+  for ai_file in $AI_FILES; do
+    local_file="$HOME/twm/$ai_file"
+    temp_file="$local_file.tmp.$$"
+    dir=$(dirname "$local_file")
+    mkdir -p "$dir"
+
+    if [ ! -e "$local_file" ]; then
+      if curl "${SERVER}$ai_file" -s -L -o "$local_file" 2>/dev/null; then
+        printf "  🆕 %-40s ${BLACK_YELLOW}new${COLOR_RESET}\n" "$ai_file"
+        NEW=$((NEW + 1))
+      else
+        printf "  ⚠️  %-40s ${BLACK_YELLOW}skipped${COLOR_RESET}\n" "$ai_file"
+        FAILED=$((FAILED + 1))
+      fi
+    else
+      if curl "${SERVER}$ai_file" -s -L -o "$temp_file" 2>/dev/null; then
+        local_hash=$(sha256sum "$local_file" 2>/dev/null | awk '{print $1}')
+        remote_hash=$(sha256sum "$temp_file" 2>/dev/null | awk '{print $1}')
+        if [ "$remote_hash" = "$local_hash" ]; then
+          rm -f "$temp_file"
+          printf "  ✅ %-40s ${GRAY_BLACK}unchanged${COLOR_RESET}\n" "$ai_file"
+          UNCHANGED=$((UNCHANGED + 1))
+        else
+          mv "$temp_file" "$local_file"
+          printf "  🔽 %-40s ${GREENb_BLACK}updated${COLOR_RESET}\n" "$ai_file"
+          UPDATED=$((UPDATED + 1))
+        fi
+      else
+        rm -f "$temp_file"
+        printf "  ⚠️  %-40s ${BLACK_YELLOW}skipped${COLOR_RESET}\n" "$ai_file"
+        FAILED=$((FAILED + 1))
+      fi
+    fi
+  done
+
+  chmod +x ~/twm/core/helpers.sh 2>/dev/null || true
+
+  # ─── Python dependencies ────────────────────────────────────────────────────
+  if [ -f ~/twm/ai/requirements.txt ]; then
+    printf "\n${BLACK_CYAN}  🐍  Installing Python dependencies...${COLOR_RESET}\n"
+    if command -v pip3 >/dev/null 2>&1; then
+      pip3 install -r ~/twm/ai/requirements.txt --quiet && \
+        printf "  ✅ Python packages installed\n" || \
+        printf "  ⚠️  pip3 install failed — run manually: pip3 install -r ~/twm/ai/requirements.txt\n"
+    else
+      printf "  ⚠️  pip3 not found — install Python 3 and run: pip3 install -r ~/twm/ai/requirements.txt\n"
+    fi
+  fi
+
+  # ─── .env scaffold ──────────────────────────────────────────────────────────
+  if [ ! -f ~/twm/.env ]; then
+    printf 'GEMINI_API_KEY=your_key_here\n' > ~/twm/.env
+    printf "\n  ${BLACK_YELLOW}⚠️  Edit ~/twm/.env and set your GEMINI_API_KEY${COLOR_RESET}\n"
+  fi
 
   # Account scaffold + docs
   mkdir -p ~/twm/accounts
@@ -199,13 +264,13 @@ check_if_exists() {
 }
 
 shortcut_set() {
-  # All shortcuts route through twm_control.sh
   defs='
 play-twm()  { $HOME/twm/twm_control.sh "$@"; }
 twmsetup()  { $HOME/twm/twm_control.sh "$@"; }
 twmstart()  { $HOME/twm/twm_control.sh start; }
 twmstop()   { $HOME/twm/twm_control.sh stop; }
 twmview()   { $HOME/twm/twm_control.sh view; }
+twmai()     { $HOME/twm/run_ai.sh "$@"; }
 '
 
   case "$(uname)" in
@@ -222,7 +287,7 @@ twmview()   { $HOME/twm/twm_control.sh view; }
         printf "\n  ✅ Shortcuts already set in %s\n" "$config_file"
       else
         printf '%s\n' "$defs" >> "$config_file"
-        printf 'export -f play-twm twmsetup twmstart twmstop twmview 2>/dev/null || true\n' >> "$config_file"
+        printf 'export -f play-twm twmsetup twmstart twmstop twmview twmai 2>/dev/null || true\n' >> "$config_file"
         printf "\n  ✅ Shortcuts added to %s\n" "$config_file"
         # shellcheck disable=SC1090
         . "$config_file" 2>/dev/null || true
@@ -246,13 +311,17 @@ unset APPISH
 printf "\n${BLACK_CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${COLOR_RESET}\n"
 printf "${GREENb_BLACK}  ✅  Instalação completa / Installation complete!${COLOR_RESET}\n"
 printf "${BLACK_CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${COLOR_RESET}\n\n"
+printf "  ${GREENb_BLACK}AI Engine (novo / new):${COLOR_RESET}\n"
+printf "    1. Editar / Edit: ${GOLD_BLACK}~/twm/.env${COLOR_RESET} → GEMINI_API_KEY=your_key\n"
+printf "    2. Iniciar / Start: ${GOLD_BLACK}twmai${COLOR_RESET}   ou   ${GOLD_BLACK}bash ~/twm/run_ai.sh${COLOR_RESET}\n\n"
 printf "  ${GREENb_BLACK}Painel de controle / Control panel:${COLOR_RESET}\n"
 printf "    ${GOLD_BLACK}twmsetup${COLOR_RESET}   ou   ${GOLD_BLACK}./twm/twm_control.sh${COLOR_RESET}\n\n"
 printf "  ${GREENb_BLACK}Atalhos disponíveis / Available shortcuts:${COLOR_RESET}\n"
 printf "    ${GOLD_BLACK}twmstart${COLOR_RESET}   — Iniciar todas as contas + monitor\n"
 printf "    ${GOLD_BLACK}twmstop${COLOR_RESET}    — Parar todas as contas\n"
 printf "    ${GOLD_BLACK}twmview${COLOR_RESET}    — Abrir monitor de logs\n"
-printf "    ${GOLD_BLACK}twmsetup${COLOR_RESET}   — Abrir painel de controle\n\n"
+printf "    ${GOLD_BLACK}twmsetup${COLOR_RESET}   — Abrir painel de controle\n"
+printf "    ${GOLD_BLACK}twmai${COLOR_RESET}      — Iniciar AI Engine\n\n"
 printf "  ${GREENb_BLACK}Conta individual / Single account:${COLOR_RESET}\n"
 printf "    ${GOLD_BLACK}play.sh A1${COLOR_RESET}     — Iniciar conta A1\n"
 printf "    ${GOLD_BLACK}play.sh A1 -cv${COLOR_RESET} — Modo caverna\n\n"
