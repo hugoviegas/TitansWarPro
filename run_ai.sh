@@ -5,11 +5,13 @@
 # BOTH in full background. Safe to close the terminal after running.
 #
 # Usage:
-#   bash run_ai.sh [ACCOUNT] [FLAGS...]   # e.g. bash run_ai.sh A1 -cv
+#   bash run_ai.sh [ACCOUNT] [FLAGS...]   # launch everything in background
+#   bash run_ai.sh --fg  [ACCOUNT] [FLAGS...]  # macro in foreground (watch live)
+#   bash run_ai.sh --watch                # tail macro+orchestrator logs live
 #   bash run_ai.sh --all                  # all accounts via multi_runner.sh
 #   bash run_ai.sh --stop                 # stop everything
 #   bash run_ai.sh --status               # show running processes
-#   bash run_ai.sh --logs                 # tail live logs
+#   bash run_ai.sh --logs                 # tail all logs
 # =============================================================================
 set -uo pipefail
 
@@ -52,6 +54,13 @@ stop_pid() {
   fi
 }
 
+pick_macro() {
+  if   [[ -f "$TWM_DIR/play.sh" ]]; then echo "$TWM_DIR/play.sh"
+  elif [[ -f "$TWM_DIR/run.sh"  ]]; then echo "$TWM_DIR/run.sh"
+  else err "No macro script found (play.sh or run.sh)"; return 1
+  fi
+}
+
 # ── --stop ──────────────────────────────────────────────────────────────────
 do_stop() {
   stop_pid "$WATCH_PID" "Watchdog"
@@ -73,38 +82,59 @@ do_status() {
   done
 }
 
-# ── --logs ──────────────────────────────────────────────────────────────────
+# ── --logs / --watch ───────────────────────────────────────────────────────
 do_logs() {
   echo "=== Live logs (Ctrl+C to exit) ==="
-  tail -f "$ORCH_LOG" "$MACRO_LOG" "$WATCH_LOG" 2>/dev/null
+  echo "    macro.log | orchestrator.log | watchdog.log"
+  echo ""
+  tail -f "$MACRO_LOG" "$ORCH_LOG" "$WATCH_LOG" 2>/dev/null
+}
+
+do_watch() {
+  echo "=== Watching macro output live (Ctrl+C to exit) ==="
+  echo "    Orchestrator + Watchdog continue in background."
+  echo ""
+  tail -f "$MACRO_LOG" 2>/dev/null
 }
 
 # ── Start macro in background ────────────────────────────────────────────
 start_macro() {
   local account="${1:-}" flags="${2:-}"
+  local macro_script; macro_script=$(pick_macro) || return 1
 
-  # Pick macro script: play.sh preferred, fallback run.sh
-  local macro_script
-  if [[ -f "$TWM_DIR/play.sh" ]]; then
-    macro_script="$TWM_DIR/play.sh"
-  elif [[ -f "$TWM_DIR/run.sh" ]]; then
-    macro_script="$TWM_DIR/run.sh"
-  else
-    err "No macro script found (play.sh or run.sh)"
-    return 1
-  fi
-
-  # Build command
   local cmd="bash \"$macro_script\""
   [[ -n "$account" ]] && cmd+=' '"\"$account\""
   [[ -n "$flags"   ]] && cmd+=' '"$flags"
 
-  # Launch detached
   nohup bash -c "$cmd" >> "$MACRO_LOG" 2>&1 &
   local pid=$!
   echo "$pid" > "$MACRO_PID"
   disown "$pid" 2>/dev/null || true
   log "Macro started (PID $pid) → $MACRO_LOG"
+}
+
+# ── Start macro in FOREGROUND (visible output) ───────────────────────
+start_macro_fg() {
+  local account="${1:-}" flags="${2:-}"
+  local macro_script; macro_script=$(pick_macro) || return 1
+
+  log "Macro running in foreground. Press Ctrl+C to stop."
+  log "Orchestrator + Watchdog running in background."
+  echo ""
+
+  # Run macro in foreground — output goes straight to terminal
+  # Also tee to log file so orchestrator can read it
+  local cmd="bash \"$macro_script\""
+  [[ -n "$account" ]] && cmd+=' '"\"$account\""
+  [[ -n "$flags"   ]] && cmd+=' '"$flags"
+
+  # Save PID via subshell trick
+  bash -c "$cmd" 2>&1 | tee -a "$MACRO_LOG"
+
+  # When macro ends (Ctrl+C or finishes), update PID file
+  rm -f "$MACRO_PID"
+  log "Macro ended. Orchestrator + Watchdog still running in background."
+  log "To stop everything: bash run_ai.sh --stop"
 }
 
 # ── Start orchestrator in background ───────────────────────────────────
@@ -113,7 +143,6 @@ start_orchestrator() {
     err "Python not found. Install python3 first."
     return 1
   fi
-
   nohup "$PY" "$AI_DIR/orchestrator.py" >> "$ORCH_LOG" 2>&1 &
   local pid=$!
   echo "$pid" > "$ORCH_PID"
@@ -121,11 +150,9 @@ start_orchestrator() {
   log "Orchestrator started (PID $pid) → $ORCH_LOG"
 }
 
-# ── Watchdog — restarts macro if it dies, keeps orchestrator alive ─────────
+# ── Watchdog ─────────────────────────────────────────────────────────────────
 start_watchdog() {
   local account="${1:-}" flags="${2:-}"
-
-  # Write watchdog script to tmp
   local wscript; wscript=$(mktemp /tmp/twm_watchdog.XXXXXX.sh)
   cat > "$wscript" << WATCHDOG
 #!/usr/bin/env bash
@@ -143,10 +170,8 @@ ACCOUNT="$account"
 FLAGS="$flags"
 
 log_w() { echo "\$(date '+%Y-%m-%d %H:%M:%S') [watchdog] \$*" >> "\$WATCH_LOG"; }
-
 is_alive() { [[ -f "\$1" ]] && kill -0 "\$(cat "\$1")" 2>/dev/null; }
 
-# pick macro script
 macro_script="\$TWM_DIR/play.sh"
 [[ ! -f "\$macro_script" ]] && macro_script="\$TWM_DIR/run.sh"
 
@@ -155,7 +180,6 @@ log_w "Watchdog started (PID \$\$)"
 while true; do
   sleep 15
 
-  # ─ Restart macro if dead ───────────────────────────────────────────
   if ! is_alive "\$MACRO_PID"; then
     log_w "Macro died, restarting..."
     cmd="bash \"\$macro_script\""
@@ -167,7 +191,6 @@ while true; do
     log_w "Macro restarted (PID \$(cat \$MACRO_PID))"
   fi
 
-  # ─ Restart orchestrator if dead ─────────────────────────────────
   if [[ -n "\$PY" ]] && ! is_alive "\$ORCH_PID"; then
     log_w "Orchestrator died, restarting..."
     nohup "\$PY" "\$AI_DIR/orchestrator.py" >> "\$ORCH_LOG" 2>&1 &
@@ -178,7 +201,6 @@ while true; do
 done
 WATCHDOG
   chmod +x "$wscript"
-
   nohup bash "$wscript" >> "$WATCH_LOG" 2>&1 &
   local pid=$!
   echo "$pid" > "$WATCH_PID"
@@ -193,6 +215,25 @@ case "$ARG1" in
   --stop)   do_stop;   exit 0 ;;
   --status) do_status; exit 0 ;;
   --logs)   do_logs;   exit 0 ;;
+  --watch)  do_watch;  exit 0 ;;
+
+  --fg)
+    # Foreground mode: macro visible in terminal, AI in background
+    shift || true
+    ACCOUNT="${1:-}"; FLAGS="${*:2}"
+    if is_running "$WATCH_PID" || is_running "$ORCH_PID" || is_running "$MACRO_PID"; then
+      log "Stopping previous session..."; do_stop; sleep 1
+    fi
+    echo ""
+    echo "  =============================="
+    echo "   TitansWarPro  AI Engine  [FG]"
+    echo "  =============================="
+    echo ""
+    start_orchestrator
+    start_watchdog "$ACCOUNT" "$FLAGS"
+    start_macro_fg "$ACCOUNT" "$FLAGS"   # blocks until macro ends/Ctrl+C
+    ;;
+
   --all)
     log "Starting all accounts via multi_runner.sh..."
     nohup bash "$TWM_DIR/multi_runner.sh" >> "$MACRO_LOG" 2>&1 &
@@ -203,35 +244,31 @@ case "$ARG1" in
     start_orchestrator
     start_watchdog "" ""
     ;;
+
   *)
+    # Default: full background
     ACCOUNT="$ARG1"
     FLAGS="${*:2}"
-
-    # Stop any existing processes first
     if is_running "$WATCH_PID" || is_running "$ORCH_PID" || is_running "$MACRO_PID"; then
-      log "Stopping previous session..."
-      do_stop
-      sleep 1
+      log "Stopping previous session..."; do_stop; sleep 1
     fi
-
     echo ""
     echo "  =============================="
     echo "   TitansWarPro  AI Engine"
     echo "  =============================="
     echo ""
-
     start_macro       "$ACCOUNT" "$FLAGS"
     start_orchestrator
     start_watchdog    "$ACCOUNT" "$FLAGS"
-
     echo ""
     log "All processes launched in background."
     log "Terminal can be safely closed."
     echo ""
     log "Commands:"
-    log "  Status : bash run_ai.sh --status"
-    log "  Logs   : bash run_ai.sh --logs"
-    log "  Stop   : bash run_ai.sh --stop"
+    log "  Watch macro : bash run_ai.sh --watch"
+    log "  All logs    : bash run_ai.sh --logs"
+    log "  Status      : bash run_ai.sh --status"
+    log "  Stop        : bash run_ai.sh --stop"
     echo ""
     ;;
 esac
