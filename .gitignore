@@ -1,1 +1,37 @@
-.vscode/settings.json
+# TitansWarPro - .gitignore
+
+# Sensitive account data
+accounts/*/cookies
+accounts/*/session
+accounts/*.cfg
+accounts/*.json
+
+# AI engine runtime data (logs, backups, metrics - not committed)
+data/logs/*.jsonl
+data/logs/*.log
+data/backups/*.json
+data/metrics/*.json
+data/metrics/*.jsonl
+
+# Keep folder structure
+!data/logs/.gitkeep
+!data/backups/.gitkeep
+!data/metrics/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+.venv/
+
+# Temp/runtime
+/tmp/
+*.tmp
+*.log
+*.bak
+
+# OS
+.DS_Store
+Thumbs.db
