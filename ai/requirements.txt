@@ -1,13 +1,5 @@
-# TitansWarPro AI Engine — Python dependencies
-# Pinned to avoid grpcio/maturin build issues on Termux (Python 3.12)
+# TitansWarPro AI Engine - Python dependencies
+# REST-only: no grpcio, no maturin, no Rust build required
+# Compatible with Termux, Ubuntu, Cygwin, iSH
 
-# Gemini SDK — REST-only transport (avoids grpcio build from source)
-google-generativeai==0.7.2
-
-# Force pre-compiled grpcio wheel (no Rust/maturin needed)
-grpcio==1.62.2
-grpcio-status==1.62.2
-
-# Core dependencies (all have pure-Python or pre-compiled wheels)
-google-auth>=2.23.0
-requests>=2.31.0
+requests>=2.28.0

@@ -1,95 +1,116 @@
 #!/usr/bin/env python3
 """
-gemini_client.py — Gemini API wrapper with rate limiter.
-Protects Gemini free tier: max 1 call per 15 min, max 90 calls/day.
+gemini_client.py - Gemini API client via REST (no google-generativeai SDK).
+Works on Termux, Ubuntu, Cygwin and any env with only `requests` installed.
 """
-
-import os
 import json
-import time
 import logging
-from datetime import date
-from pathlib import Path
+import os
+import time
+from typing import Optional
+
+import requests
 
 logger = logging.getLogger("twm.gemini")
 
-STATE_FILE = Path(__file__).parent.parent / "data" / "metrics" / "gemini_state.json"
-STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta"
+DEFAULT_MODEL   = "gemini-2.0-flash"
 
-MIN_INTERVAL_SEC = 900   # 15 min between calls
-MAX_CALLS_DAY    = 90    # safety margin under free tier daily limit
-MODEL            = "gemini-2.0-flash"  # lightweight, free tier friendly
-
-
-class RateLimitError(Exception):
-    pass
+# Free-tier conservative limits
+REQUESTS_PER_MINUTE = 15
+_last_call_time: float = 0.0
 
 
-class GeminiClient:
-    def __init__(self, api_key: str | None = None):
-        self.api_key = api_key or os.environ.get("GEMINI_API_KEY", "")
-        if not self.api_key:
-            raise ValueError("GEMINI_API_KEY not set")
-        self._state = self._load_state()
+def _rate_limit():
+    global _last_call_time
+    wait = (60.0 / REQUESTS_PER_MINUTE) - (time.time() - _last_call_time)
+    if wait > 0:
+        time.sleep(wait)
+    _last_call_time = time.time()
 
-    # ── State persistence ──────────────────────────────────────────────────
-    def _load_state(self) -> dict:
-        if STATE_FILE.exists():
-            try:
-                return json.loads(STATE_FILE.read_text())
-            except Exception:
-                pass
-        return {"last_call_ts": 0, "calls_today": 0, "last_date": ""}
 
-    def _save_state(self):
-        STATE_FILE.write_text(json.dumps(self._state, indent=2))
+def generate(
+    prompt: str,
+    api_key: Optional[str] = None,
+    model: str = DEFAULT_MODEL,
+    temperature: float = 0.3,
+    max_tokens: int = 1024,
+    retries: int = 3,
+) -> Optional[str]:
+    """
+    Send a prompt to Gemini and return the text response.
+    Returns None on failure after retries.
+    """
+    key = api_key or os.environ.get("GEMINI_API_KEY", "")
+    if not key:
+        logger.error("GEMINI_API_KEY not set.")
+        return None
 
-    def _reset_daily_if_needed(self):
-        today = str(date.today())
-        if self._state.get("last_date") != today:
-            self._state["calls_today"] = 0
-            self._state["last_date"] = today
+    url = f"{GEMINI_API_BASE}/models/{model}:generateContent?key={key}"
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {
+            "temperature": temperature,
+            "maxOutputTokens": max_tokens,
+        },
+    }
+    headers = {"Content-Type": "application/json"}
 
-    # ── Rate limit check ───────────────────────────────────────────────────
-    def can_call(self) -> tuple[bool, str]:
-        self._reset_daily_if_needed()
-        elapsed = time.time() - self._state["last_call_ts"]
-        if elapsed < MIN_INTERVAL_SEC:
-            wait = int(MIN_INTERVAL_SEC - elapsed)
-            return False, f"Rate limit: wait {wait}s more"
-        if self._state["calls_today"] >= MAX_CALLS_DAY:
-            return False, f"Daily limit reached ({MAX_CALLS_DAY} calls)"
-        return True, "ok"
-
-    # ── Main call ──────────────────────────────────────────────────────────
-    def call(self, prompt: str) -> str:
-        ok, reason = self.can_call()
-        if not ok:
-            raise RateLimitError(reason)
-
+    for attempt in range(1, retries + 1):
+        _rate_limit()
         try:
-            import google.generativeai as genai
-            genai.configure(api_key=self.api_key)
-            model = genai.GenerativeModel(MODEL)
-            response = model.generate_content(prompt)
-            text = response.text.strip()
-        except Exception as e:
-            logger.error("Gemini call failed: %s", e)
-            raise
+            resp = requests.post(url, headers=headers, json=payload, timeout=30)
+            if resp.status_code == 200:
+                data = resp.json()
+                return (
+                    data.get("candidates", [{}])[0]
+                    .get("content", {})
+                    .get("parts", [{}])[0]
+                    .get("text", "")
+                    .strip()
+                )
+            elif resp.status_code == 429:
+                wait = 30 * attempt
+                logger.warning("Rate limited. Waiting %ds...", wait)
+                time.sleep(wait)
+            elif resp.status_code in (500, 503):
+                logger.warning("Server error %d. Retrying...", resp.status_code)
+                time.sleep(5 * attempt)
+            else:
+                logger.error("Gemini error %d: %s", resp.status_code, resp.text[:200])
+                return None
+        except requests.exceptions.Timeout:
+            logger.warning("Request timeout (attempt %d/%d)", attempt, retries)
+            time.sleep(5)
+        except requests.exceptions.ConnectionError:
+            logger.warning("Connection error (attempt %d/%d)", attempt, retries)
+            time.sleep(10)
+        except Exception as exc:
+            logger.error("Unexpected error: %s", exc)
+            return None
 
-        self._state["last_call_ts"] = time.time()
-        self._state["calls_today"] = self._state.get("calls_today", 0) + 1
-        self._save_state()
-        logger.info("Gemini call #%d today OK", self._state["calls_today"])
-        return text
+    logger.error("All %d attempts failed.", retries)
+    return None
 
-    def status(self) -> dict:
-        self._reset_daily_if_needed()
-        elapsed = time.time() - self._state["last_call_ts"]
-        return {
-            "calls_today": self._state.get("calls_today", 0),
-            "max_calls_day": MAX_CALLS_DAY,
-            "seconds_since_last_call": int(elapsed),
-            "min_interval_sec": MIN_INTERVAL_SEC,
-            "ready": elapsed >= MIN_INTERVAL_SEC and self._state.get("calls_today", 0) < MAX_CALLS_DAY,
-        }
+
+def test_connection(api_key: Optional[str] = None) -> bool:
+    """Quick connectivity check. Returns True if API key is valid."""
+    key = api_key or os.environ.get("GEMINI_API_KEY", "")
+    if not key:
+        return False
+    try:
+        url = f"{GEMINI_API_BASE}/models?key={key}"
+        resp = requests.get(url, timeout=10)
+        return resp.status_code == 200
+    except Exception:
+        return False
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    if test_connection():
+        print("[gemini] Connection OK")
+        result = generate("Reply with one word: hello")
+        print(f"[gemini] Response: {result}")
+    else:
+        print("[gemini] Connection FAILED - check GEMINI_API_KEY")
